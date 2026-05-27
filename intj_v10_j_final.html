@@ -228,6 +228,13 @@ input[type=range]{accent-color:#534AB7;flex:1;}
 .cta-reassure{font-size:12px;color:#555;text-align:center;margin-top:.625rem;line-height:1.55;}
 .diag-basis{font-size:11px;color:#444;text-align:center;padding:.75rem 0;letter-spacing:.02em;line-height:1.6;border-top:.5px solid #1a1a24;margin-top:1.5rem;}
 .paid-fomo{font-size:13px;color:#c8a84b;line-height:1.65;margin-bottom:.875rem;padding:.625rem .875rem;background:rgba(255,180,30,.04);border-radius:8px;border-left:2px solid rgba(255,200,50,.3);}
+/* iOS Safari タップ改善 */
+*{-webkit-tap-highlight-color:transparent;}
+.style-card,.risk-card,.cta-opt,.select-btn,.submit-btn,.paid-main-btn,.gold-branch-btn,.gold-btn,.back-btn,.share-main-btn,.share-modal-btn,.nav-btn{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;}
+.style-card:active,.risk-card:active,.cta-opt:active{transform:scale(0.97);transition:transform 80ms ease;}
+.submit-btn:active,.paid-main-btn:active,.gold-branch-btn:active,.gold-btn:active{transform:scale(0.98);transition:transform 80ms ease;}
+.style-card{min-height:88px;}
+.risk-card{min-height:76px;}
 </style>
 </head>
 <body>
@@ -432,12 +439,15 @@ input[type=range]{accent-color:#534AB7;flex:1;}
 
   <!-- 9. 下部CTA（無料DM導線）役割明示 -->
   <div class="cta-card">
-    <div class="cta-title">まだ動けないなら、一度構造を整理しましょう。</div>
+    <div class="cta-title">まだ決めきれないなら、<br>一度構造を整理しましょう。</div>
     <div class="cta-body" id="r-cta-body"></div>
     <div class="cta-alert" id="r-cta-alert"></div>
     <div class="cta-list" id="cta-list"></div>
-    <button class="submit-btn" id="submit-btn">副業構造を整理する（無料）→</button>
-    <div class="cta-reassure">X または Instagram から「INTJ診断から」と送ってください。<br>@akira_life_（X） / @akira._life_（Instagram）</div>
+    <div style="display:grid;gap:.625rem;margin-bottom:.75rem;">
+      <button class="submit-btn" id="submit-btn-x" style="background:rgba(255,255,255,.08);color:#e8e6f0;border:1px solid rgba(255,255,255,.15);">Xで相談する →</button>
+      <button class="submit-btn" id="submit-btn-ig" style="background:rgba(131,58,180,.15);color:#c084fc;border:1px solid rgba(131,58,180,.3);">Instagramで相談する →</button>
+    </div>
+    <div class="cta-reassure">「INTJ診断から」と送ってください。売り込みはありません。</div>
   </div>
 </div>
 
@@ -549,22 +559,26 @@ function init(){
   STYLES.forEach(([i,t,d])=>{
     const b=mk('button','opt-card',`<span class="oc-icon">${i}</span><span class="oc-title">${t}</span><span class="oc-desc">${d}</span>`);
     if(S.styles.includes(t))b.classList.add('on');
-    b.addEventListener('click',()=>{
+    const toggleStyle=()=>{
       b.classList.toggle('on');
       if(b.classList.contains('on'))S.styles.push(t);
       else S.styles=S.styles.filter(x=>x!==t);
       saveState();
-    });
+    };
+    b.addEventListener('pointerup',e=>{e.preventDefault();toggleStyle();});
+    b.addEventListener('click',e=>{e.preventDefault();});
     stg.appendChild(b);
   });
   const rg=document.getElementById('risk-grid');
   RISKS.forEach(([i,t,d])=>{
     const b=mk('button','opt-card',`<span class="oc-icon">${i}</span><span class="oc-title">${t}</span><span class="oc-desc">${d}</span>`);
     if(S.risk===t)b.classList.add('on');
-    b.addEventListener('click',()=>{
+    const toggleRisk=()=>{
       document.querySelectorAll('#risk-grid .opt-card').forEach(x=>x.classList.remove('on'));
       b.classList.add('on');S.risk=t;saveState();
-    });
+    };
+    b.addEventListener('pointerup',e=>{e.preventDefault();toggleRisk();});
+    b.addEventListener('click',e=>{e.preventDefault();});
     rg.appendChild(b);
   });
   document.getElementById('style-next').addEventListener('click',()=>{buildQ();go('s-questions');});
@@ -597,7 +611,11 @@ function init(){
     });
     cl.appendChild(b);
   });
-  document.getElementById('submit-btn').addEventListener('click',submitCta);
+  // X / Instagram 2ボタン
+  const btnX=document.getElementById('submit-btn-x');
+  const btnIg=document.getElementById('submit-btn-ig');
+  if(btnX)btnX.addEventListener('click',()=>{window.open('https://twitter.com/messages/compose?recipient_id=akira_life_','_blank');});
+  if(btnIg)btnIg.addEventListener('click',()=>{window.open('https://www.instagram.com/akira._life_/','_blank');});
 
   // Gold振り分けボタン → GOLD_FORM_URLへ遷移
   document.getElementById('gold-branch-btn').addEventListener('click',()=>{
@@ -1040,10 +1058,7 @@ function buildResult(){
   }
 }
 
-function submitCta(){
-  // 下部CTAは無料DM導線（Xへ遷移）
-  window.open('https://twitter.com/messages/compose?recipient_id=akira_life_','_blank');
-}
+function submitCta(){}
 
 init();
 </script>
