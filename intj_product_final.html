@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INTJ副業 初動設計図｜考えすぎて出せない人のための14日構造</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0a0f;
+  --bg2:#0f0f16;
+  --bg3:#111118;
+  --border:#1e1e2a;
+  --border2:#2a2a3a;
+  --purple:#534AB7;
+  --purple-light:#7C6FE0;
+  --purple-pale:#B8B0FF;
+  --gold:#c8940a;
+  --gold-light:#e8b020;
+  --text:#e8e6f0;
+  --text2:#aaa;
+  --text3:#666;
+  --text4:#444;
+  --red:rgba(180,60,60,.8);
+  --green:#2EAA7E;
+}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;line-height:1.6;min-height:100vh;}
+.wrap{max-width:680px;margin:0 auto;padding:0 1rem 6rem;}
+
+/* ===== COVER ===== */
+.cover{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:3rem 1rem 4rem;position:relative;overflow:hidden;}
+.cover::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 30%,rgba(83,74,183,.18) 0%,transparent 70%);pointer-events:none;}
+.cover::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:80px;background:linear-gradient(to bottom,transparent,var(--bg));pointer-events:none;}
+.cover-label{font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--purple-light);text-transform:uppercase;margin-bottom:2rem;opacity:.8;}
+.cover-type{display:inline-flex;gap:8px;flex-wrap:wrap;margin-bottom:2rem;}
+.cover-tag{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;}
+.cover-tag.purple{background:rgba(83,74,183,.18);color:var(--purple-pale);border:1px solid rgba(83,74,183,.3);}
+.cover-tag.dim{background:rgba(255,255,255,.05);color:var(--text3);border:1px solid rgba(255,255,255,.08);}
+.cover-title{font-size:clamp(26px,5vw,38px);font-weight:700;color:var(--text);line-height:1.25;margin-bottom:1.25rem;letter-spacing:-.01em;}
+.cover-title em{color:var(--purple-pale);font-style:normal;display:block;margin-top:.25rem;}
+.cover-sub{font-size:14px;color:var(--text3);line-height:1.75;margin-bottom:2.5rem;max-width:480px;}
+.cover-meta{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.cover-meta-item{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:5px;}
+.cover-meta-item::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--purple);flex-shrink:0;}
+.cover-line{width:40px;height:2px;background:linear-gradient(90deg,var(--purple),transparent);margin-bottom:2rem;}
+
+/* ===== SECTION ===== */
+.section{padding:3rem 0;border-top:.5px solid var(--border);}
+.section-label{font-size:10px;font-weight:700;letter-spacing:.18em;color:var(--text4);text-transform:uppercase;margin-bottom:1.25rem;display:flex;align-items:center;gap:10px;}
+.section-label::after{content:'';flex:1;height:.5px;background:var(--border);}
+.section-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:.75rem;line-height:1.4;}
+.section-desc{font-size:14px;color:var(--text3);line-height:1.75;margin-bottom:1.5rem;}
+
+/* ===== STEP CARDS ===== */
+.step-list{display:grid;gap:.75rem;}
+.step-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:1.25rem;display:flex;gap:1rem;align-items:flex-start;transition:border-color .2s;}
+.step-card:hover{border-color:rgba(83,74,183,.3);}
+.step-num{width:36px;height:36px;border-radius:10px;background:rgba(83,74,183,.12);color:var(--purple-light);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-body{}
+.step-label{font-size:10px;font-weight:700;color:var(--purple);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem;}
+.step-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:.375rem;}
+.step-desc{font-size:13px;color:var(--text3);line-height:1.6;}
+.step-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(83,74,183,.1);color:var(--purple-light);border:1px solid rgba(83,74,183,.18);margin-top:.5rem;}
+
+/* ===== 書き込み欄 ===== */
+.write-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:.75rem;}
+.write-card-header{padding:.875rem 1.25rem;background:rgba(83,74,183,.06);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.write-card-title{font-size:13px;font-weight:600;color:var(--text);}
+.write-card-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.write-card-badge.req{background:rgba(83,74,183,.15);color:var(--purple-pale);border:1px solid rgba(83,74,183,.25);}
+.write-card-badge.opt{background:rgba(255,255,255,.05);color:var(--text4);border:1px solid var(--border2);}
+.write-card-body{padding:1.125rem;}
+.write-hint{font-size:12px;color:var(--text4);line-height:1.55;margin-bottom:.875rem;}
+.write-field{width:100%;background:rgba(83,74,183,.04);border:1px solid rgba(83,74,183,.15);border-radius:10px;padding:.75rem 1rem;color:var(--text2);font-size:13px;font-family:inherit;resize:vertical;min-height:52px;outline:none;transition:border-color .15s;}
+.write-field:focus{border-color:rgba(83,74,183,.4);background:rgba(83,74,183,.07);}
+.write-field::placeholder{color:var(--text4);}
+.write-field-line{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border2);padding:.5rem 0;color:var(--text2);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s;}
+.write-field-line:focus{border-bottom-color:var(--purple);}
+.write-field-line::placeholder{color:var(--text4);}
+.write-rows{display:grid;gap:.5rem;}
+.write-row{display:flex;gap:8px;align-items:center;}
+.write-row-num{font-size:11px;font-weight:700;color:var(--purple);width:18px;flex-shrink:0;}
+
+/* ===== チェックボックス ===== */
+.check-list{display:grid;gap:.5rem;}
+.check-item{display:flex;gap:10px;align-items:flex-start;padding:.75rem .875rem;background:var(--bg3);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;}
+.check-item:hover{border-color:rgba(83,74,183,.25);}
+.check-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--purple);flex-shrink:0;margin-top:2px;cursor:pointer;}
+.check-item-text{font-size:13px;color:var(--text2);line-height:1.5;}
+.check-item-sub{font-size:11px;color:var(--text4);margin-top:.2rem;}
+
+/* ===== 選択ボタン ===== */
+.select-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+.select-btn{padding:.75rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:12px;font-family:inherit;cursor:pointer;text-align:left;transition:all .15s;line-height:1.4;}
+.select-btn:hover{border-color:rgba(83,74,183,.3);background:rgba(83,74,183,.05);}
+.select-btn.on{border-color:var(--purple);background:rgba(83,74,183,.12);color:var(--purple-pale);}
+.select-btn .s-main{font-weight:600;display:block;margin-bottom:.2rem;}
+.select-btn .s-sub{font-size:11px;color:var(--text4);}
+.select-btn.on .s-sub{color:rgba(184,176,255,.6);}
+
+/* ===== 14日タイムライン ===== */
+.timeline{display:grid;gap:.5rem;}
+.tl-item{display:flex;gap:12px;align-items:flex-start;padding:.875rem 1rem;background:var(--bg3);border:1px solid var(--border);border-radius:12px;}
+.tl-phase{font-size:10px;font-weight:700;color:var(--purple);flex-shrink:0;width:68px;padding-top:2px;letter-spacing:.03em;}
+.tl-body{}
+.tl-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:.25rem;}
+.tl-desc{font-size:12px;color:var(--text3);line-height:1.5;}
+.tl-field{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border2);padding:.375rem 0;color:var(--text2);font-size:12px;font-family:inherit;outline:none;margin-top:.375rem;}
+.tl-field:focus{border-bottom-color:var(--purple);}
+.tl-field::placeholder{color:var(--text4);}
+.tl-ban{font-size:11px;color:rgba(180,60,60,.6);margin-top:.25rem;padding-left:.5rem;border-left:1px solid rgba(180,60,60,.2);}
+
+/* ===== 禁止リスト ===== */
+.ban-list{display:grid;gap:.4rem;}
+.ban-item{display:flex;gap:10px;align-items:flex-start;padding:.625rem .875rem;background:rgba(83,74,183,.04);border:1px solid rgba(83,74,183,.12);border-radius:10px;cursor:pointer;transition:all .15s;}
+.ban-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--purple);flex-shrink:0;margin-top:1px;cursor:pointer;}
+.ban-item-text{font-size:13px;color:var(--text2);line-height:1.45;}
+.ban-write{display:grid;gap:.4rem;margin-top:.625rem;}
+.ban-write-item{display:flex;gap:8px;align-items:center;}
+.ban-write-bullet{color:var(--purple-light);font-size:12px;flex-shrink:0;}
+
+/* ===== 型別一覧 ===== */
+.type-table{background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.type-table-head{display:grid;grid-template-columns:1fr 1.2fr 1.5fr;gap:0;background:rgba(83,74,183,.08);border-bottom:1px solid var(--border);}
+.type-table-th{font-size:10px;font-weight:700;color:var(--text4);letter-spacing:.08em;padding:.625rem .875rem;text-transform:uppercase;}
+.type-row{display:grid;grid-template-columns:1fr 1.2fr 1.5fr;border-bottom:.5px solid var(--border);}
+.type-row:last-child{border-bottom:none;}
+.type-cell{padding:.75rem .875rem;font-size:12px;color:var(--text3);line-height:1.5;border-right:.5px solid var(--border);}
+.type-cell:last-child{border-right:none;}
+.type-cell .name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:.2rem;}
+.type-cell .action{font-size:11px;font-weight:600;color:var(--purple-light);margin-top:.3rem;padding:.25rem .5rem;background:rgba(83,74,183,.1);border-radius:6px;display:inline-block;}
+
+/* ===== 反応判定 ===== */
+.reaction-grid{display:grid;gap:.625rem;}
+.reaction-card{border-radius:12px;overflow:hidden;}
+.reaction-card.good{border:1px solid rgba(46,170,126,.2);}
+.reaction-card.mid{border:1px solid rgba(83,74,183,.2);}
+.reaction-card.none{border:1px solid var(--border);}
+.reaction-head{padding:.625rem .875rem;font-size:11px;font-weight:700;letter-spacing:.06em;}
+.reaction-card.good .reaction-head{background:rgba(46,170,126,.08);color:var(--green);}
+.reaction-card.mid .reaction-head{background:rgba(83,74,183,.08);color:var(--purple-pale);}
+.reaction-card.none .reaction-head{background:rgba(255,255,255,.03);color:var(--text4);}
+.reaction-body{padding:.875rem;background:var(--bg3);}
+.reaction-check{font-size:12px;color:var(--text3);padding-left:.75rem;border-left:1px solid var(--border2);margin-bottom:.375rem;line-height:1.5;}
+.reaction-next{font-size:12px;color:var(--text4);margin-top:.5rem;}
+
+/* ===== 処方 ===== */
+.rx-box{background:linear-gradient(135deg,rgba(83,74,183,.1),rgba(83,74,183,.03));border:1px solid rgba(83,74,183,.2);border-radius:12px;padding:1rem 1.125rem;margin-top:.625rem;}
+.rx-text{font-size:14px;color:var(--purple-pale);line-height:1.7;font-weight:500;}
+
+/* ===== Gold CTA ===== */
+.gold-cta{border:1.5px solid rgba(255,200,50,.22);border-radius:18px;overflow:hidden;margin-top:3rem;}
+.gold-cta-head{background:linear-gradient(135deg,rgba(255,180,30,.09),rgba(255,140,0,.02));padding:1.25rem;border-bottom:1px solid rgba(255,200,50,.1);}
+.gold-cta-label{font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:.5rem;}
+.gold-cta-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:.375rem;}
+.gold-cta-sub{font-size:13px;color:var(--text3);line-height:1.6;}
+.gold-cta-body{padding:1.25rem;background:var(--bg);}
+.gold-checks{display:grid;gap:.4rem;margin-bottom:1rem;}
+.gold-check{font-size:13px;color:var(--text3);padding-left:.75rem;border-left:1px solid rgba(255,200,50,.2);line-height:1.5;}
+.gold-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#0a0a0f;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;letter-spacing:.03em;transition:opacity .15s;text-decoration:none;font-family:inherit;}
+.gold-btn:hover{opacity:.88;}
+.gold-note{font-size:11px;color:var(--text4);text-align:center;margin-top:.5rem;}
+
+/* ===== APPENDIX ===== */
+.appendix{padding:2.5rem 0;border-top:.5px solid var(--border);}
+.app-checks{display:grid;gap:.4rem;margin-bottom:1.25rem;}
+.app-check{display:flex;gap:8px;align-items:flex-start;}
+.app-check input[type=checkbox]{width:16px;height:16px;accent-color:var(--purple);flex-shrink:0;margin-top:2px;}
+.app-check-text{font-size:13px;color:var(--text3);line-height:1.5;}
+.app-verdict{font-size:13px;color:var(--text3);line-height:1.8;padding:1rem 1.125rem;background:var(--bg3);border:1px solid var(--border);border-radius:12px;margin-bottom:1rem;}
+.app-verdict em{color:var(--text);font-style:normal;font-weight:500;}
+.app-verdict strong{color:var(--purple-pale);}
+
+/* ===== PDF DL ===== */
+.dl-bar{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.875rem 1.125rem;display:flex;align-items:center;justify-content:space-between;margin-top:2rem;}
+.dl-info{font-size:13px;color:var(--text3);}
+.dl-info strong{color:var(--text);display:block;margin-bottom:.2rem;}
+.dl-btn{padding:.625rem 1.125rem;background:rgba(83,74,183,.15);color:var(--purple-pale);border:1px solid rgba(83,74,183,.3);border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.dl-btn:hover{background:rgba(83,74,183,.25);}
+
+/* ===== 進捗インジケーター ===== */
+.progress-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--purple-light));z-index:100;transition:width .1s;}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress-bar"></div>
+
+<div class="wrap">
+
+<!-- ===== COVER ===== -->
+<div class="cover">
+  <div class="cover-label">INTJ専用 副業実行設計図</div>
+  <div class="cover-type">
+    <span class="cover-tag purple">INTJ向け</span>
+    <span class="cover-tag dim">副業初動設計</span>
+  </div>
+  <div class="cover-line"></div>
+  <div class="cover-title">
+    INTJ副業 初動設計図
+    <em>考えすぎて出せない人のための14日構造</em>
+  </div>
+  <div class="cover-sub">
+    これは読む設計書ではない。埋める設計図だ。<br>
+    INTJが副業で止まるのは、<br>
+    能力じゃなく<br>
+    順番の問題だ。
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">14ページ</div>
+    <div class="cover-meta-item">無駄な理論なし</div>
+    <div class="cover-meta-item">書き込み85%</div>
+  </div>
+</div>
+
+<!-- ===== 型別前倒し（Cover直後） ===== -->
+<div class="section" style="padding:1.5rem 0 2rem;">
+  <div class="section-label">この設計図で止まりやすい型</div>
+  <div style="display:grid;gap:.4rem;margin-bottom:1rem;">
+    <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--text2);"><span style="color:var(--purple-light);font-weight:700;">✓</span> 設計中毒型 — 完成前に次の改善へ進んで止まる</div>
+    <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--text2);"><span style="color:var(--purple-light);font-weight:700;">✓</span> 完璧停止型 — 品質基準が高くて市場に出せない</div>
+    <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--text2);"><span style="color:var(--purple-light);font-weight:700;">✓</span> 比較迷走型 — 最適解を探しすぎて動き出せない</div>
+  </div>
+  <div style="font-size:12px;color:var(--text4);padding-left:.75rem;border-left:1px solid var(--border2);">自分の型の詳細はSTEP6で確認できます。</div>
+</div>
+
+<!-- ===== STEP 0 ===== -->
+<div class="section">
+  <div class="section-label">STEP 0</div>
+  <div class="section-title">この設計図の使い方</div>
+
+  <div class="step-list">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-label">ルール</div>
+        <div class="step-title">順番通りに進む。飛ばさない。</div>
+        <div class="step-desc">STEPを飛ばすと必ず後で詰まる。順番に意味がある。</div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-label">ルール</div>
+        <div class="step-title">埋まった欄は変えない。改善しない。</div>
+        <div class="step-desc">設計中毒型INTJは埋めた内容を改善したくなる。それは禁止。</div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-label">ルール</div>
+        <div class="step-title">STEP5が終わるまで2本目は考えない。</div>
+        <div class="step-desc">アイデアが浮かんだらメモするだけ。今回は動かさない。</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:1rem;padding:.875rem 1rem;background:rgba(83,74,183,.05);border:1px solid rgba(83,74,183,.15);border-radius:10px;font-size:13px;color:var(--purple-pale);line-height:1.6;">
+    STEP5まで終われば、最初の1商品を出して反応を見る準備が整う。
+  </div>
+</div>
+
+<!-- ===== STEP 1 ===== -->
+<div class="section">
+  <div class="section-label">STEP 1</div>
+  <div class="section-title">1行定義シート</div>
+
+  <!-- 知見ブロック -->
+  <div style="padding:.875rem 1rem;background:rgba(83,74,183,.06);border:1px solid rgba(83,74,183,.15);border-radius:12px;margin-bottom:1.25rem;">
+    <div style="font-size:11px;font-weight:700;color:var(--purple-light);letter-spacing:.08em;margin-bottom:.5rem;">WHY THIS STEP</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;">INTJが副業で止まる最初の原因は「テーマ迷走」だ。選択肢を増やすほど動けなくなる。このSTEPは深掘りではなく<strong style="color:var(--text);">最小定義</strong>が目的。30分以内に終わらせる。</div>
+    <div style="margin-top:.75rem;display:grid;gap:.3rem;">
+      <div style="font-size:12px;color:var(--text4);">⚠ 強みを深掘りしすぎない（それはGoldで行う）</div>
+      <div style="font-size:12px;color:var(--text4);">⚠ 「最適解」を探さない。今の自分に最も近いものを選ぶ</div>
+    </div>
+  </div>
+
+  <div class="section-desc" style="margin-bottom:1rem;">テーマ迷走を止める。最小定義まで。</div>
+
+  <div class="write-card" style="margin-bottom:.75rem;">
+    <div class="write-card-header">
+      <div class="write-card-title">1-1　候補を出す</div>
+      <span class="write-card-badge req">必須</span>
+    </div>
+    <div class="write-card-body">
+      <div class="write-hint">「自分ができること・経験・解決してきた問題」をまず3つ書く。絞れたら6つまで増やす。良し悪しは判断しない。</div>
+      <div class="write-rows">
+        <div class="write-row"><div class="write-row-num">1</div><input type="text" class="write-field-line" placeholder="例：業務フローの整理"/></div>
+        <div class="write-row"><div class="write-row-num">2</div><input type="text" class="write-field-line" placeholder=""/></div>
+        <div class="write-row"><div class="write-row-num">3</div><input type="text" class="write-field-line" placeholder=""/></div>
+        <div class="write-row"><div class="write-row-num" style="color:var(--text4);">4</div><input type="text" class="write-field-line" placeholder="（絞れたら）"/></div>
+        <div class="write-row"><div class="write-row-num" style="color:var(--text4);">5</div><input type="text" class="write-field-line" placeholder="（絞れたら）"/></div>
+        <div class="write-row"><div class="write-row-num" style="color:var(--text4);">6</div><input type="text" class="write-field-line" placeholder="（絞れたら）"/></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="write-card" style="margin-bottom:.75rem;">
+    <div class="write-card-header">
+      <div class="write-card-title">1-2　市場性チェック</div>
+      <span class="write-card-badge req">必須</span>
+    </div>
+    <div class="write-card-body">
+      <div class="write-hint">上の6つの中から「他人がお金を払いそうなもの」に✓をつける。</div>
+      <div class="check-list">
+        <label class="check-item"><input type="checkbox"><div class="check-item-text">同じ悩みを持つ人がいそうか</div></label>
+        <label class="check-item"><input type="checkbox"><div class="check-item-text">検索や質問サイトに似た悩みが出るか</div></label>
+        <label class="check-item"><input type="checkbox"><div class="check-item-text">同テーマで売れているコンテンツが存在するか</div></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="write-card">
+    <div class="write-card-header">
+      <div class="write-card-title">1-3　1行定義を完成させる</div>
+      <span class="write-card-badge req">必須</span>
+    </div>
+    <div class="write-card-body">
+      <div class="write-hint">候補から1つに絞る。最適解を探さない。今の自分に最も近いものを選ぶ。</div>
+      <div style="font-size:12px;color:var(--text4);margin-bottom:.75rem;padding:.5rem .75rem;background:rgba(83,74,183,.04);border-radius:8px;">
+        例：IT系会社員に、業務フロー設計書を提供する。
+      </div>
+      <input type="text" class="write-field-line" placeholder="（　　　　　　）に、（　　　　　　）を提供する。" style="font-size:15px;"/>
+      <div style="margin-top:1rem;">
+        <div class="check-list">
+          <label class="check-item"><input type="checkbox"><div class="check-item-text">対象が書けた</div></label>
+          <label class="check-item"><input type="checkbox"><div class="check-item-text">内容が書けた</div></label>
+        </div>
+      </div>
+      <div style="margin-top:.875rem;font-size:12px;color:var(--text4);padding-left:.75rem;border-left:1px solid var(--border2);">
+        30分で書けなければ、候補を1つに絞って仮置きで進む。それでも止まるならAPPENDIXへ。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STEP 2 ===== -->
+<div class="section">
+  <div class="section-label">STEP 2</div>
+  <div class="section-title">最初の1商品テンプレ</div>
+
+  <!-- 知見ブロック -->
+  <div style="padding:.875rem 1rem;background:rgba(83,74,183,.06);border:1px solid rgba(83,74,183,.15);border-radius:12px;margin-bottom:1.25rem;">
+    <div style="font-size:11px;font-weight:700;color:var(--purple-light);letter-spacing:.08em;margin-bottom:.5rem;">WHY THIS STEP</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;">INTJは「最初の商品を完璧に作りたい」と思う。だが最初の商品の役割は<strong style="color:var(--text);">売れるか検証すること</strong>だ。完成度ではなく「出せる形」を優先する。完璧にするのはデータが出てから。</div>
+    <div style="margin-top:.75rem;display:grid;gap:.3rem;">
+      <div style="font-size:12px;color:var(--text4);">⚠ フォーマットは1つだけ選ぶ。複数同時に作らない</div>
+      <div style="font-size:12px;color:var(--text4);">⚠ 目次は完璧にしない。5項目で出すのが正解</div>
+    </div>
+  </div>
+
+  <div class="section-desc" style="margin-bottom:1rem;">1行定義を、売れる形に固定する。</div>
+
+  <div class="write-card" style="margin-bottom:.75rem;">
+    <div class="write-card-header">
+      <div class="write-card-title">2-1　フォーマットを選ぶ</div>
+      <span class="write-card-badge req">1つだけ選ぶ</span>
+    </div>
+    <div class="write-card-body">
+      <div class="write-hint">制作コストが最も低いものを選ぶ。</div>
+      <div class="select-grid">
+        <button class="select-btn" onclick="toggleSelect(this)"><span class="s-main">有料note</span><span class="s-sub">文章・ノウハウ系</span></button>
+        <button class="select-btn" onclick="toggleSelect(this)"><span class="s-main">PDF設計書</span><span class="s-sub">業務・手順系</span></button>
+        <button class="select-btn" onclick="toggleSelect(this)"><span class="s-main">書き込みワークシート</span><span class="s-sub">整理・自己分析系</span></button>
+        <button class="select-btn" onclick="toggleSelect(this)"><span class="s-main">Notionテンプレ</span><span class="s-sub">仕組み・管理系</span></button>
+        <button class="select-btn" onclick="toggleSelect(this)"><span class="s-main">単発相談</span><span class="s-sub">対話型</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="write-card" style="margin-bottom:.75rem;">
+    <div class="write-card-header">
+      <div class="write-card-title">2-2　価格を仮決め</div>
+      <span class="write-card-badge req">必須</span>
+    </div>
+    <div class="write-card-body">
+      <div style="display:inline-block;padding:.5rem .875rem;background:rgba(200,148,10,.1);border:1px solid rgba(200,148,10,.2);border-radius:8px;font-size:12px;color:var(--gold);font-weight:600;margin-bottom:.875rem;">
+        初手推奨価格：1,980〜4,980円<br>
+        <span style="font-weight:400;opacity:.8;">検証しやすく、心理負荷が低い</span>
+      </div>
+      <input type="text" class="write-field-line" placeholder="価格：___円"/>
+      <div style="margin-top:.625rem;display:grid;gap:.3rem;">
+        <div style="font-size:12px;color:var(--text4);">1,980〜4,980円：初動検証向け（推奨）</div>
+        <div style="font-size:12px;color:var(--text4);">5,000〜9,800円：実績・深度がある場合</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="write-card">
+    <div class="write-card-header">
+      <div class="write-card-title">2-3　目次を書く</div>
+      <span class="write-card-badge req">5〜8項目</span>
+    </div>
+    <div class="write-card-body">
+      <div class="write-hint">「自分が伝えたいこと」ではなく「買い手が知りたいこと」で書く。</div>
+      <div class="write-rows">
+        <div class="write-row"><div class="write-row-num">1</div><input type="text" class="write-field-line" placeholder=""/></div>
+        <div class="write-row"><div class="write-row-num">2</div><input type="text" class="write-field-line" placeholder=""/></div>
+        <div class="write-row"><div class="write-row-num">3</div><input type="text" class="write-field-line" placeholder=""/></div>
+        <div class="write-row"><div class="write-row-num">4</div><input type="text" class="write-field-line" placeholder=""/></div>
+        <div class="write-row"><div class="write-row-num">5</div><input type="text" class="write-field-line" placeholder=""/></div>
+        <div class="write-row"><div class="write-row-num">6</div><input type="text" class="write-field-line" placeholder="（任意）"/></div>
+        <div class="write-row"><div class="write-row-num">7</div><input type="text" class="write-field-line" placeholder="（任意）"/></div>
+        <div class="write-row"><div class="write-row-num">8</div><input type="text" class="write-field-line" placeholder="（任意）"/></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STEP 3 ===== -->
+<div class="section">
+  <div class="section-label">STEP 3</div>
+  <div class="section-title">改善禁止リスト</div>
+
+  <!-- 知見ブロック -->
+  <div style="padding:.875rem 1rem;background:rgba(83,74,183,.06);border:1px solid rgba(83,74,183,.15);border-radius:12px;margin-bottom:1.25rem;">
+    <div style="font-size:11px;font-weight:700;color:var(--purple-light);letter-spacing:.08em;margin-bottom:.5rem;">WHY THIS STEP</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;">設計中毒型INTJの最大の敵は改善案が浮かぶこと自体ではない。<strong style="color:var(--text);">浮かんだ改善案をすぐ追加してしまう</strong>ことだ。このSTEPは「今回やらないこと」を先に固定して、完走への邪魔を切る。</div>
+  </div>
+
+  <div class="section-desc" style="margin-bottom:1rem;">INTJの改善ループを止める。「今回やらないこと」を先に固定する。</div>
+
+  <div class="write-card" style="margin-bottom:.75rem;">
+    <div class="write-card-header">
+      <div class="write-card-title">3-1　禁止ルール宣言</div>
+      <span class="write-card-badge req">全部チェック</span>
+    </div>
+    <div class="write-card-body">
+      <div class="ban-list">
+        <label class="ban-item"><input type="checkbox"><div class="ban-item-text">2本目の商品を同時に設計しない</div></label>
+        <label class="ban-item"><input type="checkbox"><div class="ban-item-text">SaaS化・自動化の検討をしない</div></label>
+        <label class="ban-item"><input type="checkbox"><div class="ban-item-text">販売ページを作り込みすぎない</div></label>
+        <label class="ban-item"><input type="checkbox"><div class="ban-item-text">フォロワーを増やしてから公開しようとしない</div></label>
+        <label class="ban-item"><input type="checkbox"><div class="ban-item-text">比較記事を再度読み直さない</div></label>
+        <label class="ban-item"><input type="checkbox"><div class="ban-item-text">完璧にしてから公開しようとしない</div></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="write-card">
+    <div class="write-card-header">
+      <div class="write-card-title">3-2　今回やらないこと（自由記入）</div>
+      <span class="write-card-badge opt">任意</span>
+    </div>
+    <div class="write-card-body">
+      <div class="write-hint">浮かんだアイデア・改善案をここに書く。今回は触らない。</div>
+      <div class="ban-write">
+        <div class="ban-write-item"><div class="ban-write-bullet">→</div><input type="text" class="write-field-line" placeholder=""/></div>
+        <div class="ban-write-item"><div class="ban-write-bullet">→</div><input type="text" class="write-field-line" placeholder=""/></div>
+        <div class="ban-write-item"><div class="ban-write-bullet">→</div><input type="text" class="write-field-line" placeholder=""/></div>
+        <div class="ban-write-item"><div class="ban-write-bullet">→</div><input type="text" class="write-field-line" placeholder=""/></div>
+        <div class="ban-write-item"><div class="ban-write-bullet">→</div><input type="text" class="write-field-line" placeholder=""/></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STEP 4 ===== -->
+<div class="section">
+  <div class="section-label">STEP 4</div>
+  <div class="section-title">14日公開設計図</div>
+
+  <!-- 知見ブロック -->
+  <div style="padding:.875rem 1rem;background:rgba(83,74,183,.06);border:1px solid rgba(83,74,183,.15);border-radius:12px;margin-bottom:1.25rem;">
+    <div style="font-size:11px;font-weight:700;color:var(--purple-light);letter-spacing:.08em;margin-bottom:.5rem;">WHY THIS STEP</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;">設計中毒型INTJは締切がないと完走しない。<strong style="color:var(--text);">公開日を先に決めてから作り始める</strong>のが唯一の対策だ。30日ではなく14日なのは、INTJが14日あると再設計を始めるからだ。</div>
+  </div>
+
+  <div class="section-desc" style="margin-bottom:1rem;">再設計前に公開させる。締切を先に作ってから進める。</div>
+
+  <div class="write-card" style="margin-bottom:.75rem;">
+    <div class="write-card-header">
+      <div class="write-card-title">4-1　日付を固定する</div>
+      <span class="write-card-badge req">必須</span>
+    </div>
+    <div class="write-card-body">
+      <div style="display:grid;gap:.5rem;margin-bottom:.875rem;">
+        <div class="write-row"><div style="font-size:12px;color:var(--text4);width:80px;flex-shrink:0;">設計開始日</div><input type="text" class="write-field-line" placeholder="___年___月___日"/></div>
+        <div class="write-row"><div style="font-size:12px;color:var(--gold);width:80px;flex-shrink:0;font-weight:600;">公開予定日</div><input type="text" class="write-field-line" placeholder="___年___月___日（今日から14日後）"/></div>
+      </div>
+      <label class="check-item"><input type="checkbox"><div class="check-item-text">カレンダーに「公開日」を入れた</div></label>
+    </div>
+  </div>
+
+  <div class="write-card">
+    <div class="write-card-header">
+      <div class="write-card-title">4-2　14日タイムライン</div>
+      <span class="write-card-badge req">順番を守る</span>
+    </div>
+    <div class="write-card-body">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-phase">Day 1〜3</div>
+          <div class="tl-body">
+            <div class="tl-title">定義する</div>
+            <div class="tl-desc">「誰に・何を・なぜ」を1行で書く。競合10件だけ調べる。</div>
+            <input type="text" class="tl-field" placeholder="今日やること："/>
+            <div class="tl-ban">禁止：10件以上の比較</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-phase">Day 4〜10</div>
+          <div class="tl-body">
+            <div class="tl-title">作る</div>
+            <div class="tl-desc">完成度60%でいい。改善案は禁止リストに書くだけ。追加しない。</div>
+            <input type="text" class="tl-field" placeholder="今日やること："/>
+            <div class="tl-ban">禁止：改善案の追加・2本目の設計</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-phase">Day 11〜12</div>
+          <div class="tl-body">
+            <div class="tl-title">公開準備</div>
+            <div class="tl-desc">販売ページを作る。タイトル・概要・価格・購入ボタンのみ。</div>
+            <input type="text" class="tl-field" placeholder="今日やること："/>
+            <div class="tl-ban">禁止：「もう少し直してから」</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-phase">Day 13〜14</div>
+          <div class="tl-body">
+            <div class="tl-title">売る</div>
+            <div class="tl-desc">知人1〜3人に直販のDMを送る。売れた・売れなかった理由を記録する。</div>
+            <input type="text" class="tl-field" placeholder="今日やること："/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STEP 5 ===== -->
+<div class="section">
+  <div class="section-label">STEP 5</div>
+  <div class="section-title">最初の3人に売る設計</div>
+
+  <!-- 知見ブロック -->
+  <div style="padding:.875rem 1rem;background:rgba(83,74,183,.06);border:1px solid rgba(83,74,183,.15);border-radius:12px;margin-bottom:1.25rem;">
+    <div style="font-size:11px;font-weight:700;color:var(--purple-light);letter-spacing:.08em;margin-bottom:.5rem;">WHY THIS STEP</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;">最初の3人に売ることの目的は、収益ではなく<strong style="color:var(--text);">最初の市場反応を取ること</strong>だ。SNS告知より直販が先。反応は改善のデータになる。売れなくても失敗ではない。判定できれば次に進める。</div>
+  </div>
+
+  <div class="section-desc" style="margin-bottom:1rem;">告知ではなく直販から始める。</div>
+
+  <div class="write-card" style="margin-bottom:.75rem;">
+    <div class="write-card-header">
+      <div class="write-card-title">5-1　直販する相手を書く</div>
+      <span class="write-card-badge req">まず3人</span>
+    </div>
+    <div class="write-card-body">
+      <div class="write-hint" style="padding:.625rem .875rem;background:rgba(83,74,183,.05);border-radius:8px;border-left:2px solid rgba(83,74,183,.2);margin-bottom:.875rem;">
+        最初は知らない人ではなく、<strong style="color:var(--text2);">少しでも信頼関係がある相手</strong>を書く。元同僚・友人・SNSでやり取りしたことがある人。反応の質が全く変わる。
+      </div>
+      <div class="write-rows">
+        <div class="write-row"><div class="write-row-num">1</div><input type="text" class="write-field-line" placeholder="名前・属性など"/></div>
+        <div class="write-row"><div class="write-row-num">2</div><input type="text" class="write-field-line" placeholder="名前・属性など"/></div>
+        <div class="write-row"><div class="write-row-num">3</div><input type="text" class="write-field-line" placeholder="名前・属性など"/></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="write-card" style="margin-bottom:.75rem;">
+    <div class="write-card-header">
+      <div class="write-card-title">5-2　DM文の下書き</div>
+      <span class="write-card-badge opt">任意</span>
+    </div>
+    <div class="write-card-body">
+      <div class="write-hint">送る日：<input type="text" class="write-field-line" placeholder="___年___月___日" style="display:inline;width:auto;font-size:13px;"/></div>
+      <textarea class="write-field" rows="4" placeholder="「（商品名）を作りました。（対象）向けの内容です。使ってもらえますか？（価格）でご案内できます。」"></textarea>
+    </div>
+  </div>
+
+  <div class="write-card">
+    <div class="write-card-header">
+      <div class="write-card-title">5-3　反応を判定する</div>
+      <span class="write-card-badge req">公開後に記入</span>
+    </div>
+    <div class="write-card-body">
+      <div class="reaction-grid">
+        <div class="reaction-card good">
+          <div class="reaction-head">売れた</div>
+          <div class="reaction-body">
+            <div class="reaction-check">価格・タイトル・テーマのどれが刺さったか</div>
+            <input type="text" class="tl-field" placeholder="次のアクション："/>
+          </div>
+        </div>
+        <div class="reaction-card mid">
+          <div class="reaction-head">返信は来たが売れなかった</div>
+          <div class="reaction-body">
+            <div class="reaction-check">価格が高かった / 訴求がずれた / 導線の問題</div>
+            <input type="text" class="tl-field" placeholder="次のアクション："/>
+          </div>
+        </div>
+        <div class="reaction-card none">
+          <div class="reaction-head">無反応</div>
+          <div class="reaction-body">
+            <div class="reaction-check">相手の選択ミス / 訴求ミス / タイミングの問題</div>
+            <input type="text" class="tl-field" placeholder="次のアクション："/>
+          </div>
+        </div>
+      </div>
+      <div class="rx-box" style="margin-top:.875rem;">
+        <div class="rx-text">反応があれば失敗ではない。次の設計材料になる。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STEP 6 ===== -->
+<div class="section">
+  <div class="section-label">STEP 6</div>
+  <div class="section-title">型別補足</div>
+  <div class="section-desc">自分の型の行だけ読む。次の1アクションを今日やる。</div>
+
+  <div class="type-table">
+    <div class="type-table-head">
+      <div class="type-table-th">型名</div>
+      <div class="type-table-th">詰みポイント</div>
+      <div class="type-table-th">制約 / 次の1アクション</div>
+    </div>
+    <div class="type-row">
+      <div class="type-cell"><div class="name">設計中毒型</div></div>
+      <div class="type-cell">完成前に次へ進む</div>
+      <div class="type-cell">改善案はSTEP3に書く<div class="action">公開日を今日入れる</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-cell"><div class="name">完璧停止型</div></div>
+      <div class="type-cell">品質基準が高すぎて出せない</div>
+      <div class="type-cell">完了チェックが入ったら次へ<div class="action">β版で出すと今日決める</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-cell"><div class="name">比較迷走型</div></div>
+      <div class="type-cell">最適解を探して動かない</div>
+      <div class="type-cell">選択後は他を見ない<div class="action">今日中に1つ選んでSTEP1を埋める</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-cell"><div class="name">孤立完結型</div></div>
+      <div class="type-cell">外部検証なしに完成させる</div>
+      <div class="type-cell">Day7までに1人に見せる<div class="action">今日1人に聞く</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-cell"><div class="name">売れない職人型</div></div>
+      <div class="type-cell">売り方を設計しない</div>
+      <div class="type-cell">STEP5をSTEP2の前に書く<div class="action">先にDM文を書く</div></div>
+    </div>
+    <div class="type-row">
+      <div class="type-cell"><div class="name">完成後虚無型</div></div>
+      <div class="type-cell">完成後に熱量が落ちる</div>
+      <div class="type-cell">Day13をカレンダーに入れる<div class="action">告知日を今日入れる</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APPENDIX ===== -->
+<div class="appendix">
+  <div class="section-label">APPENDIX</div>
+  <div class="section-title" style="margin-bottom:1rem;">ここで止まったら</div>
+
+  <div class="app-checks">
+    <div class="app-check"><input type="checkbox"><div class="app-check-text">STEP1で1行定義が書けない</div></div>
+    <div class="app-check"><input type="checkbox"><div class="app-check-text">テーマが1つに絞れない</div></div>
+    <div class="app-check"><input type="checkbox"><div class="app-check-text">また設計し直している</div></div>
+    <div class="app-check"><input type="checkbox"><div class="app-check-text">同じ場所で何度も止まっている</div></div>
+  </div>
+
+  <div class="app-verdict">
+    ここまで埋めても同じ場所で止まるなら、<br>
+    思考の問題ではなく<em>構造の問題</em>だ。<br><br>
+    同じ思考癖で設計し直しても、同じ場所に戻る。<br>
+    必要なのは知識追加ではない。<br>
+    <strong>最初の1商品構造を外から固定すること</strong>だ。
+  </div>
+
+  <!-- ===== 次の1アクション固定 ===== -->
+  <div style="border:1.5px solid rgba(255,200,50,.22);border-radius:18px;overflow:hidden;margin-bottom:2rem;">
+    <div style="background:linear-gradient(135deg,rgba(255,180,30,.09),rgba(255,140,0,.02));padding:1rem 1.25rem;border-bottom:1px solid rgba(255,200,50,.09);">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.14em;color:#c8940a;text-transform:uppercase;margin-bottom:.3rem;">⚡ このページを閉じる前に</div>
+      <div style="font-size:14px;font-weight:600;color:#f0eeff;">次の1アクションを固定する</div>
+    </div>
+    <div style="padding:1.125rem;background:#0f0f13;display:grid;gap:.5rem;">
+      <label style="display:flex;gap:10px;align-items:flex-start;padding:.625rem .875rem;background:#111118;border:1px solid #1e1e2a;border-radius:10px;cursor:pointer;">
+        <input type="checkbox" style="width:16px;height:16px;accent-color:#534AB7;flex-shrink:0;margin-top:2px;">
+        <span style="font-size:13px;color:#ccc;">公開日をカレンダーに入れた</span>
+      </label>
+      <label style="display:flex;gap:10px;align-items:flex-start;padding:.625rem .875rem;background:#111118;border:1px solid #1e1e2a;border-radius:10px;cursor:pointer;">
+        <input type="checkbox" style="width:16px;height:16px;accent-color:#534AB7;flex-shrink:0;margin-top:2px;">
+        <span style="font-size:13px;color:#ccc;">最初の1商品名を書いた</span>
+      </label>
+      <label style="display:flex;gap:10px;align-items:flex-start;padding:.625rem .875rem;background:#111118;border:1px solid #1e1e2a;border-radius:10px;cursor:pointer;">
+        <input type="checkbox" style="width:16px;height:16px;accent-color:#534AB7;flex-shrink:0;margin-top:2px;">
+        <span style="font-size:13px;color:#ccc;">直販する相手を1人決めた</span>
+      </label>
+      <div style="margin-top:.25rem;">
+        <div style="font-size:12px;color:#555;margin-bottom:.375rem;">今日やること（1行）</div>
+        <input type="text" style="width:100%;background:transparent;border:none;border-bottom:1px solid #2a2a3a;padding:.5rem 0;color:#e8e6f0;font-size:14px;font-family:inherit;outline:none;" placeholder="例：競合10件調べて目次を5項目書く"/>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:13px;color:var(--text3);text-align:center;padding:.875rem 0;line-height:1.7;">自力で進める人はここで終了。<br>まだ決めきれない人だけ次へ。</div>
+
+  <div class="gold-cta">
+    <div class="gold-cta-head">
+      <div class="gold-cta-label">自力で決めきれない人向け</div>
+      <div class="gold-cta-title">最初の1商品構造を、外から固定する。</div>
+      <div class="gold-cta-sub">自分で埋められる人はこの設計図だけで動ける。<br>テーマが決まらない・何度も止まる・外から決めたい人だけここへ。</div>
+    </div>
+    <div class="gold-cta-body">
+      <div class="gold-checks">
+        <div class="gold-check">本業・経験・強みから売れるテーマを特定する</div>
+        <div class="gold-check">最初の商品構造を1つ固定する</div>
+        <div class="gold-check">14日以内に公開できる設計まで落とす</div>
+        <div class="gold-check">初回ヒアリングで、固定すべき構造だけ整理する</div>
+      </div>
+      <a class="gold-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeNcedRorzunIoIPYKxIH_TwvIVm8KbhfKq44trDV0WNapOsg/viewform" target="_blank" rel="noopener">
+        最初の1商品構造を外から固定する →
+      </a>
+      <div class="gold-note">先着3枠。会話ではなく、固定すべき構造だけを整理する。</div>
+    </div>
+  </div>
+
+  <div class="dl-bar">
+    <div class="dl-info">
+      <strong>この設計図は2本目以降も使える。</strong>
+      最初の1商品が出たら、次の商品でも同じSTEPを回す。保存しておく。
+    </div>
+    <button class="dl-btn" onclick="window.print()">PDFで保存 →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// 進捗バー
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  const pct=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100;
+  document.getElementById('progress-bar').style.width=pct+'%';
+});
+
+// 選択ボタン（1つだけ選択）
+function toggleSelect(btn){
+  const grid=btn.closest('.select-grid');
+  grid.querySelectorAll('.select-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// 印刷時のスタイル
+const printStyle=document.createElement('style');
+printStyle.textContent=`
+  @media print{
+    body{background:white;color:#111;}
+    .progress-bar{display:none;}
+    .gold-cta{break-inside:avoid;}
+    .step-card,.write-card,.tl-item,.type-row{break-inside:avoid;}
+    .cover{min-height:auto;page-break-after:always;}
+    a{color:#534AB7;}
+    .write-field,.write-field-line,.tl-field{border-color:#999;color:#333;}
+    .write-field-line{border-bottom:1px solid #999;}
+  }
+`;
+document.head.appendChild(printStyle);
+</script>
+</body>
+</html>

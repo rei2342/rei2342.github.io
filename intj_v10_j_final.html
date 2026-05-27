@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INTJ専用 副業戦略設計ツール</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0f0f13;color:#e8e6f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;}
+.app{max-width:640px;margin:0 auto;padding:2rem 1rem;}
+.screen{display:none;}.screen.active{display:block;}
+.lsm{font-size:11px;color:#555;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;}
+.ttl{font-size:22px;font-weight:500;color:#f0eeff;margin-bottom:.5rem;}
+.sub{font-size:15px;color:#888;line-height:1.6;margin-bottom:2rem;}
+.prog{height:2px;background:#1a1a24;border-radius:2px;margin-bottom:1.5rem;}
+.prog-fill{height:100%;background:linear-gradient(90deg,#534AB7,#8B7FE8);border-radius:2px;transition:width .4s ease;}
+.nav-row{min-height:28px;margin-bottom:1.5rem;}
+.back-btn{background:none;border:none;color:#555;font-size:13px;cursor:pointer;padding:0;}
+.back-btn:hover{color:#e8e6f0;}
+/* 冒頭 */
+.intro-screen{text-align:center;padding:2.5rem 0 1.5rem;}
+.intro-label{font-size:10px;font-weight:600;letter-spacing:.18em;color:#534AB7;text-transform:uppercase;margin-bottom:1.5rem;}
+.intro-title{font-size:28px;font-weight:600;color:#f0eeff;margin-bottom:1.75rem;line-height:1.25;}
+.intro-lines{margin-bottom:2rem;}
+.intro-line{font-size:16px;color:#777;line-height:2.1;}
+.intro-divider{width:1px;height:2rem;background:linear-gradient(to bottom,transparent,#534AB7,transparent);margin:0 auto 2rem;}
+.intro-conclusion{font-size:15px;color:#B8B0FF;line-height:1.75;}
+/* 共通 */
+.sel-list{display:grid;gap:8px;margin-bottom:2rem;}
+.sel-card{padding:14px 16px;border:1px solid #1a1a24;border-radius:14px;background:#111118;cursor:pointer;transition:all .15s;text-align:left;display:flex;align-items:flex-start;gap:12px;width:100%;}
+.sel-card:hover{border-color:#534AB7;background:rgba(83,74,183,.05);}
+.sel-card.on{border-color:#534AB7;background:rgba(83,74,183,.1);box-shadow:0 0 0 1px rgba(83,74,183,.25);}
+.sel-card.on .sc-title{color:#B8B0FF;}
+.sc-icon{font-size:18px;width:26px;text-align:center;flex-shrink:0;margin-top:1px;}
+.sc-title{font-weight:500;font-size:14px;color:#e8e6f0;display:block;margin-bottom:2px;}
+.sc-desc{font-size:12px;color:#555;line-height:1.4;}
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.5rem;}
+.opt-card{padding:12px 13px;border:1px solid #1a1a24;border-radius:14px;background:#111118;cursor:pointer;transition:all .15s;text-align:left;position:relative;}
+.opt-card:hover{border-color:#534AB7;background:rgba(83,74,183,.05);}
+.opt-card.on{border-color:#534AB7;background:rgba(83,74,183,.1);box-shadow:0 0 0 1px rgba(83,74,183,.25);}
+.opt-card.on .oc-title{color:#B8B0FF;}
+.opt-card.on::after{content:'✓';position:absolute;top:9px;right:11px;font-size:11px;font-weight:700;color:#7C6FE0;}
+.oc-icon{font-size:17px;display:block;margin-bottom:6px;}
+.oc-title{font-size:13px;font-weight:500;color:#e8e6f0;display:block;margin-bottom:2px;}
+.oc-desc{font-size:11px;color:#555;line-height:1.4;}
+.block-title{font-size:10px;letter-spacing:.12em;color:#444;text-transform:uppercase;padding:.5rem 0;border-top:.5px solid #1a1a24;margin-bottom:1.25rem;margin-top:.25rem;}
+.q-block{margin-bottom:1.75rem;}
+.intj-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(83,74,183,.12);color:#7C6FE0;border:1px solid rgba(83,74,183,.2);margin-bottom:.6rem;}
+.q-label{font-size:14px;font-weight:500;color:#e8e6f0;margin-bottom:.9rem;line-height:1.5;}
+.scale-row{display:flex;align-items:center;gap:10px;}
+input[type=range]{accent-color:#534AB7;flex:1;}
+.scale-labels{display:flex;justify-content:space-between;margin-top:5px;}
+.scale-label{font-size:11px;color:#444;}
+.scale-val{min-width:22px;text-align:center;font-size:14px;font-weight:600;color:#8B7FE8;}
+.sel-q-grid{display:grid;gap:7px;margin-bottom:1.25rem;}
+.sel-q-grid.two{grid-template-columns:1fr 1fr;}
+.sel-q-btn{padding:10px 13px;border:1px solid #1a1a24;border-radius:10px;background:#181820;color:#e8e6f0;font-size:13px;cursor:pointer;transition:all .15s;text-align:left;width:100%;display:flex;align-items:center;gap:8px;}
+.sel-q-btn:hover{border-color:#534AB7;background:rgba(83,74,183,.05);}
+.sel-q-btn.on{border-color:#534AB7;background:rgba(83,74,183,.12);color:#B8B0FF;font-weight:500;}
+.sel-q-btn.on::before{content:'✓';font-size:11px;color:#7C6FE0;font-weight:700;flex-shrink:0;}
+.goal-section{border:1px solid #1a1a24;border-radius:14px;padding:1.25rem;background:#111118;margin-bottom:1rem;}
+.goal-row{margin-bottom:1.25rem;}
+.goal-row:last-child{margin-bottom:0;}
+.goal-qlabel{font-size:12px;font-weight:500;color:#666;margin-bottom:.6rem;}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.choice-btn{padding:9px 10px;border:1px solid #1a1a24;border-radius:9px;background:#181820;color:#e8e6f0;font-size:12px;cursor:pointer;transition:all .15s;text-align:left;width:100%;}
+.choice-btn:hover{border-color:#534AB7;}
+.choice-btn.on{border-color:#534AB7;background:rgba(83,74,183,.12);color:#B8B0FF;font-weight:500;}
+/* ===== 結果 ===== */
+.result-section{margin-bottom:2.5rem;}
+.section-label{font-size:10px;font-weight:600;letter-spacing:.14em;color:#444;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:.5px;background:#1a1a24;}
+/* タイプ */
+.type-hero{border-radius:20px;padding:1.75rem;margin-bottom:.75rem;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(83,74,183,.15) 0%,rgba(83,74,183,.04) 100%);border:1px solid rgba(83,74,183,.25);}
+.type-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(83,74,183,.18) 0%,transparent 70%);pointer-events:none;}
+.type-label{font-size:10px;font-weight:600;letter-spacing:.14em;color:#7C6FE0;text-transform:uppercase;margin-bottom:.5rem;}
+.type-name{font-size:26px;font-weight:600;color:#f0eeff;margin-bottom:.75rem;line-height:1.2;}
+.type-copy{font-size:14px;color:#aaa;line-height:1.75;border-left:2px solid #534AB7;padding-left:1rem;}
+/* シェアセクション */
+.share-section{background:#111118;border:1px solid #1a1a24;border-radius:16px;padding:1.25rem;margin-top:.75rem;}
+.share-section-ttl{font-size:14px;font-weight:600;color:#e8e6f0;margin-bottom:.3rem;}
+.share-section-sub{font-size:12px;color:#666;margin-bottom:1rem;line-height:1.5;}
+.share-main-btn{display:block;width:100%;padding:11px;background:rgba(83,74,183,.15);color:#B8B0FF;border:1px solid rgba(83,74,183,.3);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;margin-bottom:.75rem;font-family:inherit;}
+.share-main-btn:hover{background:rgba(83,74,183,.25);}
+/* シェアモーダル */
+.share-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:none;align-items:flex-end;justify-content:center;}
+.share-modal-overlay.show{display:flex;}
+.share-modal{background:#181820;border:1px solid #2a2a3a;border-radius:20px 20px 0 0;padding:1.5rem;width:100%;max-width:640px;}
+.share-modal-title{font-size:14px;font-weight:600;color:#e8e6f0;margin-bottom:1rem;text-align:center;}
+.share-modal-btns{display:grid;gap:8px;margin-bottom:1rem;}
+.share-modal-btn{padding:13px;border:1px solid #2a2a3a;border-radius:12px;background:#1e1e2a;color:#e8e6f0;font-size:14px;cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;}
+.share-modal-btn:hover{border-color:#534AB7;background:rgba(83,74,183,.1);}
+.share-modal-close{display:block;width:100%;padding:11px;background:transparent;color:#666;border:none;font-size:13px;cursor:pointer;text-align:center;font-family:inherit;}
+.share-copied-msg{font-size:12px;color:#7C6FE0;text-align:center;display:none;margin-top:.5rem;}
+/* シェアカード canvas */
+.share-card-wrap{display:flex;justify-content:center;margin-bottom:.875rem;}
+/* バロメーター */
+.baro-wrap{background:#111118;border:1px solid #1a1a24;border-radius:18px;padding:1.5rem;margin-bottom:.75rem;}
+.baro-radar-row{display:flex;justify-content:center;margin-bottom:1.5rem;}
+.baro-items{display:grid;gap:.875rem;}
+.baro-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem;}
+.baro-label{font-size:13px;font-weight:500;color:#ccc;}
+.baro-score{font-size:13px;font-weight:700;color:#8B7FE8;}
+.baro-track{height:6px;background:#1a1a24;border-radius:3px;overflow:hidden;}
+.baro-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+.baro-desc{font-size:12px;color:#555;margin-top:.35rem;line-height:1.45;}
+/* スコア理由 */
+.score-reason{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.75rem;}
+.score-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(83,74,183,.15);color:#8B7FE8;border:1px solid rgba(83,74,183,.2);}
+.score-conclusion{font-size:13px;color:#B8B0FF;line-height:1.6;padding:.625rem .875rem;background:rgba(83,74,183,.07);border-radius:8px;border-left:2px solid #534AB7;margin-bottom:.75rem;}
+/* 強み */
+.strength-grid{display:grid;gap:.75rem;}
+.strength-card{background:#111118;border:1px solid #1a1a24;border-radius:14px;padding:1rem 1.125rem;display:flex;gap:12px;align-items:flex-start;}
+.strength-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:rgba(83,74,183,.12);}
+.strength-title{font-size:14px;font-weight:500;color:#B8B0FF;margin-bottom:.3rem;}
+.strength-desc{font-size:13px;color:#777;line-height:1.5;}
+/* パターン */
+.pattern-list{display:grid;gap:.75rem;}
+.pattern-card{background:#111118;border:1px solid #1a1a24;border-radius:14px;padding:1rem 1.125rem;}
+.pattern-card.top{border-color:rgba(180,60,60,.2);background:rgba(180,60,60,.03);}
+.pattern-rank-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:.5rem;}
+.pattern-rank-badge.top{background:rgba(180,60,60,.12);color:rgba(210,90,90,.9);}
+.pattern-rank-badge.sub{background:rgba(83,74,183,.1);color:#7C6FE0;}
+.pattern-title{font-size:14px;font-weight:500;color:#e8e6f0;margin-bottom:.4rem;}
+.pattern-desc{font-size:13px;color:#777;line-height:1.55;}
+/* モデル */
+.model-hero{background:#111118;border:1px solid rgba(83,74,183,.3);border-radius:18px;padding:1.25rem;margin-bottom:.75rem;}
+.model-hero-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(83,74,183,.18);color:#8B7FE8;border:1px solid rgba(83,74,183,.25);margin-bottom:.75rem;display:inline-block;}
+.model-hero-name{font-size:18px;font-weight:600;color:#B8B0FF;margin-bottom:.5rem;}
+.model-hero-desc{font-size:13px;color:#888;line-height:1.6;margin-bottom:.875rem;}
+.model-hero-items{display:grid;gap:5px;}
+.model-hero-item{font-size:12px;color:#777;padding-left:.75rem;border-left:1px solid rgba(83,74,183,.25);line-height:1.5;}
+/* 避ける */
+.avoid-list{display:grid;gap:.75rem;}
+.avoid-card{background:#111118;border:1px solid #1a1a24;border-radius:14px;padding:1rem 1.125rem;}
+.avoid-header{display:flex;align-items:center;gap:8px;margin-bottom:.4rem;}
+.avoid-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(180,60,60,.1);color:rgba(210,90,90,.85);}
+.avoid-title{font-size:14px;font-weight:500;color:#e8e6f0;}
+.avoid-reason{font-size:13px;color:#777;line-height:1.55;}
+.avoid-exc{font-size:12px;color:#7C6FE0;background:rgba(83,74,183,.07);border-radius:8px;padding:7px 10px;border-left:2px solid rgba(83,74,183,.35);margin-top:.6rem;}
+/* ミニロードマップ（⑤圧縮） */
+.mini-rm-list{display:grid;gap:.625rem;}
+.mini-rm-card{background:#111118;border:1px solid #1a1a24;border-radius:12px;padding:.875rem 1rem;display:flex;gap:12px;align-items:flex-start;}
+.mini-rm-num{width:24px;height:24px;border-radius:50%;background:rgba(83,74,183,.15);color:#7C6FE0;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.mini-rm-period{font-size:10px;font-weight:500;color:#534AB7;margin-bottom:.2rem;}
+.mini-rm-title{font-size:13px;font-weight:500;color:#e8e6f0;margin-bottom:.3rem;}
+.mini-rm-action{font-size:12px;color:#888;line-height:1.5;padding-left:.625rem;border-left:1px solid rgba(83,74,183,.2);}
+/* 有料ゲート */
+.paid-gate{border:1.5px solid rgba(255,200,50,.2);border-radius:20px;overflow:hidden;margin-bottom:.75rem;}
+.paid-banner{background:linear-gradient(135deg,rgba(255,180,30,.1),rgba(255,140,0,.04));padding:1.25rem;border-bottom:1px solid rgba(255,200,50,.12);}
+.paid-banner-label{font-size:10px;font-weight:700;letter-spacing:.14em;color:#c8940a;text-transform:uppercase;margin-bottom:.625rem;}
+.paid-banner-lead{font-size:15px;font-weight:600;color:#f0eeff;line-height:1.5;margin-bottom:.875rem;}
+.paid-banner-body{font-size:13px;color:#aaa;line-height:1.7;margin-bottom:1rem;}
+.paid-banner-items{display:grid;gap:5px;}
+.paid-banner-item{font-size:13px;color:#c8a84b;padding-left:.75rem;border-left:1px solid rgba(255,200,50,.25);line-height:1.5;}
+.paid-content{padding:1.25rem;background:#0f0f13;}
+.paid-preview{margin-bottom:1rem;}
+.paid-preview-item{font-size:13px;color:#aaa;line-height:1.65;padding:.5rem .875rem;border-left:2px solid rgba(255,200,50,.2);margin-bottom:.5rem;background:rgba(255,180,30,.02);border-radius:0 8px 8px 0;}
+.paid-blur-wrap{position:relative;margin-bottom:.5rem;}
+.paid-blur{font-size:13px;color:#aaa;line-height:1.65;padding:.5rem .875rem;border-left:2px solid rgba(255,200,50,.08);background:rgba(255,180,30,.01);border-radius:0 8px 8px 0;filter:blur(5px);user-select:none;pointer-events:none;}
+/* 目次チラ見せ */
+.paid-toc{background:#111118;border:1px solid rgba(83,74,183,.2);border-radius:12px;padding:1rem 1.125rem;margin-bottom:1rem;}
+.paid-toc-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:#7C6FE0;text-transform:uppercase;margin-bottom:.75rem;}
+.paid-toc-blocks{display:grid;gap:.5rem;margin-bottom:.625rem;}
+.paid-toc-block{display:flex;align-items:flex-start;gap:8px;padding:.5rem .75rem;background:rgba(83,74,183,.06);border-radius:8px;}
+.paid-toc-icon{font-size:14px;flex-shrink:0;}
+.paid-toc-text{font-size:13px;color:#ccc;line-height:1.45;}
+.paid-toc-meta{font-size:12px;color:#555;padding-top:.5rem;border-top:.5px solid #1e1e2a;}
+/* 主CTA（1,980円） */
+.paid-main-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#c8940a,#e8b020);color:#0f0f13;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;letter-spacing:.03em;transition:opacity .15s;text-decoration:none;}
+.paid-main-btn:hover{opacity:.88;}
+.paid-main-sub{font-size:12px;color:#666;text-align:center;margin-top:.5rem;margin-bottom:1rem;line-height:1.5;}
+/* Gold振り分けCTA */
+.gold-branch{background:#111118;border:1px solid rgba(83,74,183,.2);border-radius:14px;padding:1rem 1.125rem;margin-top:.75rem;}
+.gold-branch-label{font-size:11px;font-weight:600;color:#7C6FE0;margin-bottom:.625rem;}
+.gold-branch-checks{display:grid;gap:.375rem;margin-bottom:.875rem;}
+.gold-branch-check{font-size:13px;color:#888;padding-left:.75rem;border-left:1px solid rgba(83,74,183,.2);line-height:1.5;}
+.gold-branch-btn{display:block;width:100%;padding:11px;background:rgba(83,74,183,.15);color:#B8B0FF;border:1px solid rgba(83,74,183,.3);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;text-decoration:none;font-family:inherit;}
+.gold-branch-btn:hover{background:rgba(83,74,183,.25);}
+.gold-branch-note{font-size:11px;color:#444;text-align:center;margin-top:.5rem;}
+.paid-blur-2{font-size:13px;color:#999;line-height:1.65;padding:.5rem .875rem;margin-bottom:.6rem;filter:blur(6px);user-select:none;pointer-events:none;opacity:.45;}
+.paid-blur-3{font-size:13px;color:#888;line-height:1.65;padding:.5rem .875rem;margin-bottom:.6rem;filter:blur(7px);user-select:none;pointer-events:none;opacity:.3;}
+/* 決済ボタン（Stripe仮置き） */
+.paid-unlock-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#c8940a,#e8b020);color:#0f0f13;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;letter-spacing:.03em;transition:opacity .15s;margin-top:.5rem;}
+.paid-unlock-btn:hover{opacity:.88;}
+.paid-unlock-sub{font-size:12px;color:#666;text-align:center;margin-top:.625rem;line-height:1.5;}
+/* アンロック済み */
+.unlocked-content{display:none;}
+.unlocked-content.show{display:block;}
+.unlocked-banner{background:linear-gradient(135deg,rgba(255,180,30,.08),rgba(255,140,0,.02));border:1px solid rgba(255,200,50,.15);border-radius:14px;padding:1rem 1.25rem;margin-bottom:1rem;text-align:center;}
+.unlocked-label{font-size:12px;font-weight:600;color:#c8940a;margin-bottom:.3rem;}
+.unlocked-title{font-size:15px;font-weight:600;color:#f0eeff;}
+.unlocked-item{background:#111118;border:1px solid #1a1a24;border-radius:12px;padding:1rem 1.125rem;margin-bottom:.625rem;}
+.unlocked-item-title{font-size:13px;font-weight:600;color:#B8B0FF;margin-bottom:.4rem;}
+.unlocked-item-body{font-size:13px;color:#888;line-height:1.6;}
+/* CTA */
+.cta-card{border:1px solid rgba(83,74,183,.25);border-radius:20px;padding:1.5rem;background:linear-gradient(135deg,rgba(83,74,183,.07) 0%,rgba(83,74,183,.02) 100%);}
+.cta-title{font-size:17px;font-weight:600;color:#f0eeff;margin-bottom:.5rem;}
+.cta-body{font-size:13px;color:#888;line-height:1.7;margin-bottom:1rem;}
+.cta-alert{font-size:13px;color:rgba(180,80,80,.85);line-height:1.6;margin-bottom:1.25rem;padding:.75rem 1rem;background:rgba(180,60,60,.04);border-radius:10px;border-left:2px solid rgba(180,60,60,.3);}
+.cta-list{display:grid;gap:7px;margin-bottom:1.25rem;}
+.cta-opt{padding:11px 14px;border:1px solid #2a2a3a;border-radius:11px;background:#181820;color:#e8e6f0;font-size:13px;cursor:pointer;text-align:left;transition:all .15s;width:100%;display:flex;align-items:center;gap:8px;}
+.cta-opt:hover{border-color:#534AB7;background:rgba(83,74,183,.07);}
+.cta-opt.on{border-color:#534AB7;background:rgba(83,74,183,.12);color:#B8B0FF;font-weight:500;}
+.cta-opt.on::before{content:'✓';font-size:11px;color:#7C6FE0;font-weight:700;flex-shrink:0;}
+.contact-row{margin-bottom:1rem;}
+.contact-label{font-size:12px;color:#555;margin-bottom:.4rem;}
+.contact-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:.75rem;}
+.contact-tab{padding:8px 6px;border:1px solid #2a2a3a;border-radius:9px;background:#181820;color:#666;font-size:12px;cursor:pointer;text-align:center;transition:all .15s;}
+.contact-tab:hover{border-color:#534AB7;color:#e8e6f0;}
+.contact-tab.on{border-color:#534AB7;background:rgba(83,74,183,.12);color:#B8B0FF;font-weight:500;}
+.contact-fields{display:grid;gap:8px;}
+.contact-field{display:none;}.contact-field.show{display:block;}
+.contact-inp{width:100%;padding:9px 12px;border:1px solid #2a2a3a;border-radius:10px;background:#181820;color:#e8e6f0;font-size:13px;font-family:inherit;}
+.contact-inp:focus{outline:none;border-color:#534AB7;}
+.submit-btn{display:block;width:100%;padding:13px;background:linear-gradient(135deg,#534AB7,#7C6FE0);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;text-align:center;transition:opacity .15s;}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+.submit-btn:hover:not(:disabled){opacity:.88;}
+/* サンクス */
+.thanks-screen{text-align:center;padding:3rem 1rem;}
+.thanks-icon{font-size:48px;margin-bottom:1.5rem;}
+.thanks-title{font-size:22px;font-weight:600;color:#f0eeff;margin-bottom:.75rem;}
+.thanks-desc{font-size:14px;color:#777;line-height:1.7;}
+.btn-p{width:100%;padding:13px;background:linear-gradient(135deg,#534AB7,#7C6FE0);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:.75rem;transition:opacity .15s;}
+.btn-p:hover{opacity:.88;}.btn-p:disabled{opacity:.4;cursor:not-allowed;}
+.baro-score-wrap{display:flex;align-items:center;gap:8px;}
+.baro-level{font-size:11px;color:#555;letter-spacing:.02em;}
+.cta-reassure{font-size:12px;color:#555;text-align:center;margin-top:.625rem;line-height:1.55;}
+.diag-basis{font-size:11px;color:#444;text-align:center;padding:.75rem 0;letter-spacing:.02em;line-height:1.6;border-top:.5px solid #1a1a24;margin-top:1.5rem;}
+.paid-fomo{font-size:13px;color:#c8a84b;line-height:1.65;margin-bottom:.875rem;padding:.625rem .875rem;background:rgba(255,180,30,.04);border-radius:8px;border-left:2px solid rgba(255,200,50,.3);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- 冒頭 -->
+<div id="s-intro" class="screen active">
+  <div class="prog"><div class="prog-fill" style="width:3%"></div></div>
+  <div class="nav-row"></div>
+  <div class="intro-screen">
+    <div class="intro-label">INTJ専用 副業戦略設計ツール</div>
+    <div class="intro-title">ようこそ、INTJへ。</div>
+    <div class="intro-lines">
+      <div class="intro-line">考えすぎて動けない。</div>
+      <div class="intro-line">作ったのに続かない。</div>
+      <div class="intro-line">売る前に飽きる。</div>
+    </div>
+    <div class="intro-divider"></div>
+    <div class="intro-conclusion">それは能力ではなく、<br>構造の問題かもしれません。<br><br>あなた専用の副業戦略を設計します。</div>
+  </div>
+  <button class="btn-p" id="intro-next">診断を始める →</button>
+</div>
+
+<!-- step1: ステージ -->
+<div id="s-stage" class="screen">
+  <div class="lsm">step 1 / 4</div><div class="prog"><div class="prog-fill" style="width:25%"></div></div>
+  <div class="nav-row"><button class="back-btn" data-to="s-intro">← 戻る</button></div>
+  <div class="ttl">今の自分に近いのはどれ？</div><div class="sub">正直に選んでください。ここから戦略が変わります。</div>
+  <div class="sel-list" id="stage-list"></div>
+  <button class="btn-p" id="stage-next" disabled>次へ</button>
+</div>
+
+<!-- step2: スタイル -->
+<div id="s-style" class="screen">
+  <div class="lsm">step 2 / 4</div><div class="prog"><div class="prog-fill" style="width:50%"></div></div>
+  <div class="nav-row"><button class="back-btn" data-to="s-stage">← 戻る</button></div>
+  <div class="ttl">副業への興味を教えてください</div><div class="sub">直感で選んでください（複数可）。</div>
+  <div class="opt-grid" id="style-grid"></div>
+  <div class="block-title">初期投資への考え方</div>
+  <div class="opt-grid" id="risk-grid"></div>
+  <button class="btn-p" id="style-next">次へ</button>
+</div>
+
+<!-- step3: 質問 -->
+<div id="s-questions" class="screen">
+  <div class="lsm">step 3 / 4</div><div class="prog"><div class="prog-fill" style="width:75%"></div></div>
+  <div class="nav-row"><button class="back-btn" data-to="s-style">← 戻る</button></div>
+  <div class="ttl">INTJとしての特性を教えてください</div>
+  <div class="sub">直感で答えてください。考えすぎないほうが精度が上がります。</div>
+  <div id="q-container"></div>
+  <div class="block-title">もう少し教えてください</div>
+  <div id="sel-q-container"></div>
+  <button class="btn-p" id="q-next">次へ</button>
+</div>
+
+<!-- step4: プラン -->
+<div id="s-plan" class="screen">
+  <div class="lsm">step 4 / 4</div><div class="prog"><div class="prog-fill" style="width:90%"></div></div>
+  <div class="nav-row"><button class="back-btn" data-to="s-questions">← 戻る</button></div>
+  <div class="ttl">戦略の設計軸を選んでください</div><div class="sub">ロードマップの組み立て方を選んでください。</div>
+  <div class="sel-list" id="plan-list"></div>
+  <div id="plan-detail"></div>
+  <button class="btn-p" id="plan-next" disabled>戦略を設計する</button>
+</div>
+
+<!-- 結果 -->
+<div id="s-result" class="screen">
+  <div class="lsm">診断結果</div><div class="prog"><div class="prog-fill" style="width:100%"></div></div>
+  <div class="nav-row"><button class="back-btn" data-to="s-plan">← 戻って修正する</button></div>
+
+  <!-- 1. タイプ（シェアは下に移動） -->
+  <div class="result-section">
+    <div class="type-hero" id="r-hero">
+      <div class="type-label" id="r-label"></div>
+      <div class="type-name" id="r-type-name"></div>
+      <div class="type-copy" id="r-type-copy"></div>
+    </div>
+  </div>
+
+  <!-- 2. バロメーター -->
+  <div class="result-section">
+    <div class="section-label">あなたの特性バロメーター</div>
+    <div class="baro-wrap">
+      <div class="baro-radar-row"><canvas id="radar" width="260" height="220" role="img" aria-label="特性レーダーチャート"></canvas></div>
+      <div class="baro-items" id="baro-items"></div>
+    </div>
+  </div>
+
+  <!-- 3. 強み -->
+  <div class="result-section">
+    <div class="section-label">あなたの優れたところ</div>
+    <div id="r-score-reason-strength"></div>
+    <div class="strength-grid" id="r-strengths"></div>
+  </div>
+
+  <!-- 4. 陥りやすいパターン -->
+  <div class="result-section">
+    <div class="section-label">一方で陥りやすいパターン</div>
+    <div class="pattern-list" id="r-patterns"></div>
+  </div>
+
+  <!-- 5. 向いている副業 -->
+  <div class="result-section">
+    <div class="section-label">強みを活かすならこの副業</div>
+    <div id="r-score-reason-model"></div>
+    <div id="r-models"></div>
+  </div>
+
+  <!-- 6. 避けるべき副業 -->
+  <div class="result-section">
+    <div class="section-label">一方でこの仕事は苦手かも</div>
+    <div style="font-size:13px;color:#666;margin-bottom:.875rem;line-height:1.55;">ものによっては例外パターンもあります。</div>
+    <div class="avoid-list" id="r-avoid"></div>
+  </div>
+
+  <!-- 7. ミニロードマップ -->
+  <div class="result-section">
+    <div class="section-label">まず動くための3ステップ</div>
+    <div style="font-size:13px;color:#666;margin-bottom:.875rem;line-height:1.55;">あなたの判定タイプをもとに設計しています。</div>
+    <div class="rm-premise" id="r-rm-premise" style="font-size:13px;color:#8B7FE8;background:rgba(83,74,183,.07);border-radius:10px;padding:10px 14px;margin-bottom:1rem;line-height:1.6;border:1px solid rgba(83,74,183,.15);"></div>
+    <div class="mini-rm-list" id="r-mini-roadmap"></div>
+  </div>
+
+  <!-- ①シェア（結果に納得した後・有料の前） -->
+  <div class="result-section">
+    <div class="share-section">
+      <div class="share-section-ttl">これ、INTJなら刺さるかも。</div>
+      <div class="share-section-sub">同じINTJに見せたくなったら共有してください。</div>
+      <div class="share-card-wrap"><canvas id="share-card" width="400" height="220" style="border-radius:12px;max-width:100%;"></canvas></div>
+      <button class="share-main-btn" id="share-main-btn">結果をシェアする →</button>
+    </div>
+  </div>
+
+  <!-- 8. 有料ゲート -->
+  <div class="result-section">
+    <div class="section-label">ここから先はあなた専用の副業設計図</div>
+    <div class="paid-gate" id="paid-gate">
+      <div class="paid-banner">
+        <div class="paid-banner-label">🔒 有料コンテンツ</div>
+        <div class="paid-banner-lead">INTJが副業で止まるのは、<br>才能不足じゃない。「作る順番」を間違えてるだけ。</div>
+        <div class="paid-banner-body">あなたは、商品設計より先に「売れる条件」を固定するべきタイプです。ここから先は、あなた専用の詰み回避設計・売り方の順番・最初の商品案・30日行動計画を解放します。</div>
+        <div class="paid-banner-items">
+          <div class="paid-banner-item">・あなた専用の詰み回避設計</div>
+          <div class="paid-banner-item">・売り方の順番（モデル別）</div>
+          <div class="paid-banner-item">・最初に作るべき商品案3選</div>
+          <div class="paid-banner-item">・30日行動計画（Day単位）</div>
+          <div class="paid-banner-item">・収益シミュレーション</div>
+        </div>
+      </div>
+      <div class="paid-content">
+        <div class="paid-preview" id="r-paid-preview"></div>
+        <div class="paid-blur-wrap"><div class="paid-blur" id="r-paid-blur1"></div></div>
+        <div class="paid-blur-wrap"><div class="paid-blur" id="r-paid-blur2"></div></div>
+
+        <!-- 目次チラ見せ -->
+        <div class="paid-toc">
+          <div class="paid-toc-label">INTJ副業 初動設計図｜14日で最初の1商品を出す</div>
+          <div class="paid-toc-blocks">
+            <div class="paid-toc-block">
+              <div class="paid-toc-icon">📐</div>
+              <div class="paid-toc-text">テーマを1行に固定する<br>最初の1商品を形にする</div>
+            </div>
+            <div class="paid-toc-block">
+              <div class="paid-toc-icon">🚫</div>
+              <div class="paid-toc-text">改善ループを止める<br>14日で公開まで進める</div>
+            </div>
+            <div class="paid-toc-block">
+              <div class="paid-toc-icon">📊</div>
+              <div class="paid-toc-text">最初の反応を判定する<br>自分の型ごとの詰まり方を外す</div>
+            </div>
+          </div>
+          <div class="paid-toc-meta">14P / 無駄な理論を削った実行設計</div>
+        </div>
+
+        <!-- ②主CTA（1,980円）：役割明示 -->
+        <a class="paid-main-btn" id="paid-main-btn" href="#" target="_blank" rel="noopener">14日で最初の1商品を出す（¥1,980）→</a>
+        <div class="paid-main-sub">まず自力で進めたい人はこちら。実行設計図を購入後すぐに使えます。</div>
+
+        <!-- Gold事前振り分け：役割明示 -->
+        <div class="gold-branch">
+          <div class="gold-branch-label">以下に当てはまる場合、まずGoldが向いています</div>
+          <div class="gold-branch-checks">
+            <div class="gold-branch-check">✗ 自分の強みが言葉にならない</div>
+            <div class="gold-branch-check">✗ 副業のテーマが1つに絞れない</div>
+            <div class="gold-branch-check">✗ 何から始めるか、まだ決まっていない</div>
+          </div>
+          <button class="gold-branch-btn" id="gold-branch-btn">自力で決めきれない人はこちら →</button>
+          <div class="gold-branch-note">テーマ設計から一緒に整理します。外から構造を固定する。</div>
+        </div>
+
+      </div>
+    </div>
+    <!-- アンロック後コンテンツ -->
+    <div class="unlocked-content" id="unlocked-content">
+      <div class="unlocked-banner">
+        <div class="unlocked-label">🔓 解放済み</div>
+        <div class="unlocked-title">あなた専用の副業設計図</div>
+      </div>
+      <div id="unlocked-items"></div>
+    </div>
+  </div>
+
+  <!-- 9. 下部CTA（無料DM導線）役割明示 -->
+  <div class="cta-card">
+    <div class="cta-title">まだ動けないなら、一度構造を整理しましょう。</div>
+    <div class="cta-body" id="r-cta-body"></div>
+    <div class="cta-alert" id="r-cta-alert"></div>
+    <div class="cta-list" id="cta-list"></div>
+    <button class="submit-btn" id="submit-btn">副業構造を整理する（無料）→</button>
+    <div class="cta-reassure">X または Instagram から「INTJ診断から」と送ってください。<br>@akira_life_（X） / @akira._life_（Instagram）</div>
+  </div>
+</div>
+
+<!-- サンクス（連絡先入力済） -->
+<div id="s-thanks" class="screen">
+  <div class="thanks-screen">
+    <div class="thanks-icon">🏛️</div>
+    <div class="thanks-title">お申し込みありがとうございます。</div>
+    <div class="thanks-desc">順次対応させていただきますので、しばらくお待ちください。<br><br>INTJらしく、設計した通りに動いてきました。<br>次のステップは一緒に詰めていきましょう。</div>
+  </div>
+</div>
+
+<!-- サンクス（連絡先未入力 → DM案内） -->
+<div id="s-thanks-dm" class="screen">
+  <div class="thanks-screen">
+    <div class="thanks-icon">🏛️</div>
+    <div class="thanks-title">ありがとうございます。</div>
+    <div class="thanks-desc">
+      X または Instagram から「INTJ診断からの申し込み」とDMください。<br><br>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:.5rem 0;">
+        <div style="display:inline-block;padding:.625rem 1rem;background:rgba(83,74,183,.12);border:1px solid rgba(83,74,183,.25);border-radius:12px;font-size:14px;font-weight:600;color:#B8B0FF;">@akira_life_（X）</div>
+        <div style="display:inline-block;padding:.625rem 1rem;background:rgba(83,74,183,.12);border:1px solid rgba(83,74,183,.25);border-radius:12px;font-size:14px;font-weight:600;color:#B8B0FF;">@akira._life_（Instagram）</div>
+      </div><br>
+      <span style="font-size:12px;color:#555;">24時間以内に返信します。売り込みはありません。</span>
+    </div>
+  </div>
+</div>
+
+<!-- シェアモーダル -->
+<div class="share-modal-overlay" id="share-modal-overlay">
+  <div class="share-modal">
+    <div class="share-modal-title">シェアする</div>
+    <div class="share-modal-btns">
+      <button class="share-modal-btn" id="modal-share-x">𝕏（Twitter）でシェア</button>
+      <button class="share-modal-btn" id="modal-share-threads">Threadsでシェア</button>
+      <button class="share-modal-btn" id="modal-share-copy">URLをコピー</button>
+    </div>
+    <div class="share-copied-msg" id="share-copied-msg">URLをコピーしました</div>
+    <button class="share-modal-close" id="share-modal-close">閉じる</button>
+  </div>
+</div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+emailjs.init({publicKey:'PQpRWfJ06hCpA1qYw'});
+
+// ===== ▼▼▼ URL差し替えエリア（本番化時はここだけ変更） ▼▼▼ =====
+const URL_1980      = 'https://buy.stripe.com/8x29AUcV8b8t66kgQtawo01';   // 1,980円 Stripe Payment Link
+const GOLD_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeNcedRorzunIoIPYKxIH_TwvIVm8KbhfKq44trDV0WNapOsg/viewform';                      // Gold申し込みGoogleフォーム
+const URL_SHARE     = 'https://akiralife.jp/intj';               // 公開後の診断ツールURL
+// ===== ▲▲▲ URL差し替えエリア ▲▲▲ ===================================
+
+const STAGES=[['🌱','副業はまだこれから。まず動き出したい','何から始めればいいか模索中の段階'],['🔥','副業は始めているが、まだ手応えがない','動いてはいるが結果が見えていない段階'],['🍣','副業で、たまに美味しいものを食べに行けるくらい稼いでいる','少しずつ形になってきた段階'],['✈️','副業で、年2〜3回は旅行に行けるくらい稼いでいる','手応えが出てきた段階'],['🚗','副業で、車一台分くらいは稼げている。次のステージへ','スケールを目指す段階']];
+const STYLES=[['💡','設計・仕組み・知識を売る','ツール、テンプレ、コンテンツ販売など'],['📦','モノを仕入れて売る','EC、転売、自社ブランドなど'],['🤝','直接人に提供する','コンサル、設計代行、コーチングなど'],['🔭','自分に合う型から決めたい','診断から最適な副業モデルを見たい']];
+const RISKS=[['🪙','元手ゼロで始めたい','初期投資なしでスタートしたい'],['💳','少額ならかけられる','3万円程度まで'],['📈','成果が見込めるなら投資できる','30万円程度まで'],['🏦','事業として本気でやるなら元手を惜しまない','しっかり投資して取り組みたい']];
+const PLANS=[['🎯','収益ラインから逆算して設計したい','いつまでに・いくら・どんな状態かを決めて逆算する'],['📅','本業の変化に合わせて設計したい','予定している環境変化を軸に副業を設計する'],['⚡','まず一つ作って動き始めたい','考えより先に動く。最小アクションから始める']];
+const G_TL=['3ヶ月以内','半年以内','1年以内','2〜3年以内'];
+const G_AM=['月3万円のキャッシュフロー','月10万円の安定収益','月30万円の事業収益','本業を超える収益'];
+const G_VI=['副業を自動化して手離れさせたい','本業依存を段階的に下げたい','特定分野での実績・権威を作りたい','完全独立の足場を作りたい'];
+const CTA=['🏛️ 最初の商品を一緒に決めたい','🔧 自分の強みが何か整理したい','⚙️ 手放せる副業構造を設計したい','📐 本業の強みを副業に転用したい','🌱 方向性は見えたが次の一手が決まらない'];
+const QS=[['A1','本業以外に、自由に使える時間がある','全くない','十分ある'],['A2','今の収入・働き方に、このままでよいという感覚がある','全くない','十分ある'],['B1','何かを一から設計・構築することに、強い充実感を感じる','全くそう思わない','非常にそう思う'],['B4','自分が作った仕組みが、自分なしで動いている状態に強い魅力を感じる','全くそう思わない','非常にそう思う'],['B5','アイデアが浮かんだとき、すぐ動くより先に全体の設計を考えてしまう','全くそう思わない','非常にそう思う'],['C2','何かを作り終えた瞬間に、急激にやる気が落ちた経験がある','全くない','よくある'],['E1','副業のアイデアが固まっても、完璧でないと思うと出せないことがある','全くない','よくある'],['E2','作ることより、売ることの方に苦手意識がある','全くそう思わない','非常にそう思う'],['F3','自分の裁量で仕事を進めたいという欲求が強い','全くそう思わない','非常にそう思う'],['F4','自分の仕事を他人に任せることに、強い抵抗を感じる','全くそう思わない','非常にそう思う'],['G2','副業を通じて、自分の名前や実績を世の中に残したいという気持ちがある','全くそう思わない','非常にそう思う'],['G5','副業で作ったものが、自分がいなくても収益を生む状態を目指したい','全くそう思わない','非常にそう思う'],['NUM','数字・利益率・回収計算を考えることに抵抗が少ない','全くそう思わない','非常にそう思う']];
+const SEL_QS=[{id:'SQ1',label:'副業で止まったのはどのフェーズ？',multi:false,opts:['アイデア段階','制作段階','リリース直前','リリース後の運用','止まった経験がない']},{id:'SQ2',label:'得意または苦にならない形式は？（複数可）',multi:true,opts:['自分の考え・知識を表に出す（文章・動画・発信）','テンプレート・ツール作成','直接話す・相談に乗る','動画・音声制作','特になし']},{id:'SQ3',label:'副業に使える時間は週に何時間？',multi:false,opts:['3時間未満','3〜7時間','7〜15時間','15時間以上']},{id:'SQ4',label:'今の自分に近いのは？',multi:false,opts:['人に教えられる経験や専門性がある','仕事経験はあるが商品化レベルではない','これから作っていきたい']}];
+
+// ===== 状態管理（sessionStorageで保持） =====
+const SS_KEY = 'intj_diag_v9';
+const S = loadState();
+
+function defaultState(){
+  return {stage:null,styles:[],risk:null,sc:{},plan:null,goal:{tl:'',am:'',vi:''},selQ:{SQ1:null,SQ2:[],SQ3:null,SQ4:null},cta:null,unlocked:false};
+}
+function loadState(){
+  try{const d=sessionStorage.getItem(SS_KEY);if(d)return JSON.parse(d);}catch(e){}
+  return defaultState();
+}
+function saveState(){try{sessionStorage.setItem(SS_KEY,JSON.stringify(S));}catch(e){}}
+
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-to]');
+  if(b&&b.classList.contains('back-btn'))go(b.dataset.to);
+});
+function mk(tag,cls,html){const el=document.createElement(tag);if(cls)el.className=cls;if(html!==undefined)el.innerHTML=html;return el;}
+
+function init(){
+  document.getElementById('intro-next').addEventListener('click',()=>go('s-stage'));
+
+  // ステージ
+  const sl=document.getElementById('stage-list');
+  STAGES.forEach(([i,t,d],idx)=>{
+    const b=mk('button','sel-card',`<span class="sc-icon">${i}</span><div><span class="sc-title">${t}</span><br><span class="sc-desc">${d}</span></div>`);
+    if(S.stage===idx)b.classList.add('on');
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('#stage-list .sel-card').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');S.stage=idx;saveState();
+      document.getElementById('stage-next').disabled=false;
+    });
+    sl.appendChild(b);
+  });
+  if(S.stage!==null)document.getElementById('stage-next').disabled=false;
+  document.getElementById('stage-next').addEventListener('click',()=>go('s-style'));
+
+  // スタイル
+  const stg=document.getElementById('style-grid');
+  STYLES.forEach(([i,t,d])=>{
+    const b=mk('button','opt-card',`<span class="oc-icon">${i}</span><span class="oc-title">${t}</span><span class="oc-desc">${d}</span>`);
+    if(S.styles.includes(t))b.classList.add('on');
+    b.addEventListener('click',()=>{
+      b.classList.toggle('on');
+      if(b.classList.contains('on'))S.styles.push(t);
+      else S.styles=S.styles.filter(x=>x!==t);
+      saveState();
+    });
+    stg.appendChild(b);
+  });
+  const rg=document.getElementById('risk-grid');
+  RISKS.forEach(([i,t,d])=>{
+    const b=mk('button','opt-card',`<span class="oc-icon">${i}</span><span class="oc-title">${t}</span><span class="oc-desc">${d}</span>`);
+    if(S.risk===t)b.classList.add('on');
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('#risk-grid .opt-card').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');S.risk=t;saveState();
+    });
+    rg.appendChild(b);
+  });
+  document.getElementById('style-next').addEventListener('click',()=>{buildQ();go('s-questions');});
+
+  document.getElementById('q-next').addEventListener('click',()=>go('s-plan'));
+
+  // プラン
+  const pl=document.getElementById('plan-list');
+  PLANS.forEach(([i,t,d],idx)=>{
+    const b=mk('button','sel-card',`<span class="sc-icon">${i}</span><div><span class="sc-title">${t}</span><br><span class="sc-desc">${d}</span></div>`);
+    if(S.plan===idx)b.classList.add('on');
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('#plan-list .sel-card').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');S.plan=idx;saveState();renderPlan(idx);
+      document.getElementById('plan-next').disabled=false;
+    });
+    pl.appendChild(b);
+  });
+  if(S.plan!==null){renderPlan(S.plan);document.getElementById('plan-next').disabled=false;}
+  document.getElementById('plan-next').addEventListener('click',()=>{buildResult();go('s-result');});
+
+  // CTA
+  const cl=document.getElementById('cta-list');
+  CTA.forEach(opt=>{
+    const b=mk('button','cta-opt',opt);
+    if(S.cta===opt)b.classList.add('on');
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.cta-opt').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');S.cta=opt;saveState();
+    });
+    cl.appendChild(b);
+  });
+  document.getElementById('submit-btn').addEventListener('click',submitCta);
+
+  // Gold振り分けボタン → GOLD_FORM_URLへ遷移
+  document.getElementById('gold-branch-btn').addEventListener('click',()=>{
+    window.open(GOLD_FORM_URL,'_blank');
+  });
+
+  // 1,980円 初動設計図ボタン
+  document.getElementById('paid-main-btn').href = URL_1980;
+
+  // シェアモーダル
+  document.getElementById('share-main-btn').addEventListener('click',()=>{
+    document.getElementById('share-modal-overlay').classList.add('show');
+  });
+  document.getElementById('share-modal-close').addEventListener('click',()=>{
+    document.getElementById('share-modal-overlay').classList.remove('show');
+  });
+  document.getElementById('share-modal-overlay').addEventListener('click',e=>{
+    if(e.target===document.getElementById('share-modal-overlay'))
+      document.getElementById('share-modal-overlay').classList.remove('show');
+  });
+  document.getElementById('modal-share-x').addEventListener('click',()=>doShare('x'));
+  document.getElementById('modal-share-threads').addEventListener('click',()=>doShare('threads'));
+  document.getElementById('modal-share-copy').addEventListener('click',()=>doShare('copy'));
+
+  // URLパラメータでアンロック確認
+  const params=new URLSearchParams(location.search);
+  if(params.get('unlocked')==='1'||S.unlocked){
+    S.unlocked=true;saveState();
+    if(document.getElementById('s-result').classList.contains('active')){
+      showUnlocked();
+    }
+  }
+}
+
+function buildQ(){
+  const qc=document.getElementById('q-container');qc.innerHTML='';
+  QS.forEach(([id,l,lo,hi])=>{
+    const saved=S.sc[id]!==undefined?S.sc[id]:3;
+    S.sc[id]=saved;
+    const div=mk('div','q-block',`<div class="intj-tag">INTJ専用</div><div class="q-label">${l}</div><div class="scale-row"><input type="range" style="flex:1" min="1" max="5" value="${saved}" step="1"/><span class="scale-val" id="sv-${id}">${saved}</span></div><div class="scale-labels"><span class="scale-label">${lo}</span><span class="scale-label">${hi}</span></div>`);
+    div.querySelector('input').addEventListener('input',function(){
+      S.sc[id]=parseInt(this.value);
+      document.getElementById('sv-'+id).textContent=this.value;
+      saveState();
+    });
+    qc.appendChild(div);
+  });
+  const sqc=document.getElementById('sel-q-container');sqc.innerHTML='';
+  SEL_QS.forEach(q=>{
+    if(S.selQ[q.id]===undefined)S.selQ[q.id]=q.multi?[]:null;
+    const wrap=mk('div','q-block','');
+    wrap.appendChild(mk('div','intj-tag','INTJ専用'));
+    wrap.appendChild(mk('div','q-label',q.label));
+    const grid=mk('div',`sel-q-grid${q.opts.length<=4?' two':''}`,'');
+    q.opts.forEach(opt=>{
+      const b=mk('button','sel-q-btn',opt);
+      const isOn=q.multi?(S.selQ[q.id]||[]).includes(opt):S.selQ[q.id]===opt;
+      if(isOn)b.classList.add('on');
+      b.addEventListener('click',()=>{
+        if(q.multi){
+          b.classList.toggle('on');
+          if(!S.selQ[q.id])S.selQ[q.id]=[];
+          if(b.classList.contains('on'))S.selQ[q.id].push(opt);
+          else S.selQ[q.id]=S.selQ[q.id].filter(x=>x!==opt);
+        }else{
+          grid.querySelectorAll('.sel-q-btn').forEach(x=>x.classList.remove('on'));
+          b.classList.add('on');S.selQ[q.id]=opt;
+        }
+        saveState();
+      });
+      grid.appendChild(b);
+    });
+    wrap.appendChild(grid);sqc.appendChild(wrap);
+  });
+}
+
+function renderPlan(i){
+  const pd=document.getElementById('plan-detail');
+  if(i===0){
+    pd.innerHTML=`<div class="goal-section"><div class="block-title" style="border-top:none;margin-top:0;">達成したいゴールを教えてください</div><div class="goal-row"><div class="goal-qlabel">いつまでに？</div><div class="choice-grid" id="cg-tl"></div></div><div class="goal-row"><div class="goal-qlabel">収益ラインは？</div><div class="choice-grid" id="cg-am"></div></div><div class="goal-row"><div class="goal-qlabel">どんな状態を作りたいですか？</div><div class="choice-grid" id="cg-vi"></div></div></div>`;
+    const mkG=(gid,opts,field)=>{
+      const g=document.getElementById(gid);
+      opts.forEach(o=>{
+        const b=mk('button','choice-btn',o);
+        if(S.goal[field]===o)b.classList.add('on');
+        b.addEventListener('click',()=>{
+          g.querySelectorAll('.choice-btn').forEach(x=>x.classList.remove('on'));
+          b.classList.add('on');S.goal[field]=o;saveState();
+        });
+        g.appendChild(b);
+      });
+    };
+    mkG('cg-tl',G_TL,'tl');mkG('cg-am',G_AM,'am');mkG('cg-vi',G_VI,'vi');
+  }else if(i===1){
+    pd.innerHTML=`<div style="font-size:13px;color:#666;padding:10px 0 1rem;line-height:1.6;">本業の変化予定を軸に副業設計を組み立てます。</div>`;
+  }else{
+    pd.innerHTML=`<div style="font-size:13px;color:#666;padding:10px 0 1rem;line-height:1.6;">「まず一つ作って出す」設計で進めます。完璧を待たず、動けば完成の思想で組み立てます。</div>`;
+  }
+}
+
+function calc(){
+  const c=S.sc;
+  const design=c.B1||3;
+  const handoff=Math.round(((6-(c.F4||3))+(c.B4||3))/2);
+  const system=Math.round(((c.B5||3)+(c.G5||3))/2);
+  const indep=Math.round(((c.F3||3)+(c.G2||3))/2);
+  const urgency=Math.round(((6-(c.A2||3))+(6-(c.A1||3)))/2);
+  const perf=c.C2||3;
+  const anal=Math.round(((c.E1||3)+(c.B5||3))/2);
+  const selfrel=c.F4||3;
+  const sellFear=c.E2||3;
+  const clarity=Math.round(((c.G5||3)+(c.B4||3))/2);
+  const num=c.NUM||3;
+  const canPublish=(S.selQ.SQ2||[]).includes('自分の考え・知識を表に出す（文章・動画・発信）');
+  const canTool=(S.selQ.SQ2||[]).includes('テンプレート・ツール作成');
+  const canTalk=(S.selQ.SQ2||[]).includes('直接話す・相談に乗る');
+  const hasCred=S.selQ.SQ4==='人に教えられる経験や専門性がある';
+  const diagStyle=S.styles.includes('自分に合う型から決めたい');
+  const longGoal=S.goal.tl==='1年以内'||S.goal.tl==='2〜3年以内'||S.goal.am==='本業を超える収益'||S.goal.vi==='副業を自動化して手離れさせたい'||S.goal.vi==='完全独立の足場を作りたい';
+  const highInvest=S.risk&&(S.risk.includes('成果が見込め')||S.risk.includes('本気'));
+  const devAI=Math.round(design*0.35+(canTool?5:2)*0.3+(diagStyle?5:2)*0.15+system*0.2);
+  const longTerm=longGoal?4:Math.round((indep+system)/2);
+  const diagInt=Math.round((diagStyle?5:2)*0.4+perf*0.3+anal*0.3);
+  const otherBiz=Math.round((canTalk?5:2)*0.4+design*0.35+(S.styles.includes('直接')?5:2)*0.25);
+  return{design,handoff,system,indep,urgency,perf,anal,selfrel,sellFear,clarity,num,canPublish,canTool,canTalk,hasCred,diagStyle,longTerm,devAI,diagInt,otherBiz,highInvest,longGoal};
+}
+
+function isHon(b){return b.urgency<=2 && b.indep<=2 && b.system<=2;}
+
+function get7Type(b){
+  if(b.hasCred&&b.canTalk&&b.indep>=4)return'consult';
+  if(b.devAI>=4&&b.longTerm>=4&&b.system>=4)return'saas';
+  if(b.diagInt>=5&&b.canPublish&&b.design>=4)return'diag';
+  if(b.canPublish&&b.design>=3&&!b.canTalk)return'content';
+  if(b.otherBiz>=4&&b.handoff>=3&&b.indep<=3)return'produce';
+  if(b.design>=4&&b.selfrel<=3)return'design';
+  if(b.highInvest&&b.num>=4&&b.handoff>=3&&S.styles.some(s=>s.includes('モノ')))return'ec';
+  return'content';
+}
+
+const TYPE7={
+  content:{name:'コンテンツ資産型INTJ',desc:'自分の知識・経験・考え方を教材・テンプレ・診断・PDFにして売る。顔出し不要。作って終わり、運用不要。INTJの完成後虚無を逆手に取れる形式。',items:['note有料記事・有料マガジン','Notionテンプレート販売','業務設計書・マニュアル販売','AI活用マニュアル・設計書'],reason:b=>`設計力${b.design}・発信形式が得意・対人接触を最小化できる構造`},
+  design:{name:'設計代行型INTJ',desc:'相手の課題を整理し、導線・業務フロー・商品設計・資料構成などを作って納品する。「自分の商品」より「相手の仕組みを作る」寄り。',items:['業務フロー設計・納品','副業・事業構造の設計代行','資料・導線・LP構成代行','商品設計コンサルティング'],reason:b=>`設計力${b.design}・手放し力${b.handoff}・実務整理が得意な構造`},
+  consult:{name:'高単価コンサル型INTJ',desc:'相談・壁打ち・戦略設計・顧問で高単価化する。実績と専門性が前提。10〜30万円が適正価格帯。',items:['副業・事業戦略の壁打ち・顧問','業務効率化コンサルティング','キャリア・独立戦略設計','専門知識を活かした高単価支援'],reason:b=>`設計力${b.design}・対人耐性あり・実績/専門性あり・独立志向${b.indep}`},
+  diag:{name:'診断販売型INTJ',desc:'診断・チェックリスト・タイプ分類・ロードマップ生成などを商品化する。「人は自分のことを知りたい」に課金させるモデル。',items:['MBTI×副業診断ツール（このツール自体が例）','自己分析ワークシート販売','業種別チェックリスト販売','診断コンテンツ＋個別相談セット'],reason:b=>`設計力${b.design}・診断/分析への興味が高い・発信形式が得意な構造`},
+  produce:{name:'裏方プロデュース型INTJ',desc:'表に出る人・専門家の裏側で、商品設計・導線設計・企画・運用構造を作る。表出欲が低い×設計力が高いINTJに向いている。',items:['インフルエンサーの商品・導線設計','専門家の副業立ち上げ支援','事業者のバックエンド設計','AI・自動化を使った運用構造構築'],reason:b=>`設計力${b.design}・他者事業設計への関心・手放し力${b.handoff}・表出欲低い構造`},
+  saas:{name:'SaaS・ツール型INTJ',desc:'アプリ・診断ツール・自動化ツールを作る。長期資産型。開発力またはAI活用力が前提。',items:['診断・チェックリスト自動生成ツール','業務自動化SaaS','AI活用の業務効率化ツール','特定業種向けシステム販売'],reason:b=>`設計力${b.design}・仕組み化志向${b.system}・開発/AI適性高・長期視点あり`},
+  ec:{name:'EC・物販構造型INTJ',desc:'仕入れ・販売・外注・利益率を構造化して回す。数字管理と初期投資耐性が前提。',items:['OEM・自社ブランド商品開発','仕入れ×外注システム構築EC','物販ノウハウのコンテンツ化','Amazonセラー×仕組み化'],reason:b=>`仕組み化志向${b.system}・数字管理適性${b.num}・初期投資許容・手放し力${b.handoff}`}
+};
+
+function getSubScores(b){return{sekkei:Math.round((b.design+(6-b.handoff)+b.system)/3),kansei:Math.round((b.perf+(6-b.handoff))/2),jizen:Math.round((b.selfrel+(6-b.handoff))/2),kanpeki:Math.round((b.anal+b.sellFear)/2)};}
+function getSubtype(b){
+  if(isHon(b))return{main:'hongyou',sub:null};
+  // 孤立完結型：独立志向高×手放し抵抗強×対人耐性低
+  if(b.indep>=5&&b.selfrel<=1&&b.handoff<=3)return{main:'kodoku',sub:null};
+  const ss=getSubScores(b);
+  const sorted=[['sekkei',ss.sekkei],['kansei',ss.kansei],['jizen',ss.jizen],['kanpeki',ss.kanpeki]].sort((a,z)=>z[1]-a[1]);
+  if(sorted[0][1]>=4&&sorted[1][1]>=4)return{main:sorted[0][0],sub:sorted[1][0]};
+  return{main:sorted[0][0],sub:null};
+}
+const SD={
+  sekkei:{name:'設計中毒型',copy:'構造を設計し、仕組みを作り上げる力がある。ただし完成前に次の改善へ進みやすい。必要なのは根性ではなく、手放せる仕組みです。'},
+  kansei:{name:'完成後虚無型',copy:'一から作り上げる力がある。ただし完成した瞬間に熱量が急速に落ちる。完成した数だけ資産になる副業形態がある。'},
+  jizen:{name:'自前主義型',copy:'高い基準と強いコントロール欲求がある。ただし全部自分でやろうとすると収益化前に疲弊する。あなたの時間は設計だけに使うべきです。'},
+  kanpeki:{name:'完璧停止型',copy:'完璧になるまで出せない。だから、永遠に市場に存在しない。最初の1件だけが、分析の代わりになる。'},
+  kodoku:{name:'孤立完結型',copy:'一人で深く設計・構築する力がある。顔出し不要・非対面・ストック型の副業と相性が良い。ただし外部フィードバックが少なく、市場とのズレが蓄積しやすい。最初の1商品を出すことが、唯一の検証手段です。'},
+  hongyou:{name:'本業集中型',copy:'切迫度・目的明確度のスコアから判定しました。今すぐ副業を始めるより本業に集中した方が、収入・キャリアともに伸びやすい状態です。'}
+};
+const CD={
+  'sekkei-kansei':{name:'設計中毒×完成後虚無型',copy:'設計力と構築力は本物です。ただし作り込んで完成した瞬間に熱量が死ぬ。次の設計が浮かんで今のものを放置するループを断ち切る構造設計が最優先課題です。'},
+  'sekkei-jizen':{name:'設計中毒×自前主義型',copy:'設計力と高い基準を持っている。ただし誰にも渡せない。手放す設計を最初に組み込まないと、完璧な仕組みを一人で抱えたまま燃え尽きます。'},
+  'kansei-kanpeki':{name:'完成後虚無×完璧停止型',copy:'深く考え丁寧に作る力がある。ただし完成しても「もっと良くできる」が止まらない。最初の一手を強制的に決める仕組みが必要です。'},
+  'kanpeki-jizen':{name:'完璧停止×自前主義型',copy:'高品質なものを自分の手で作り上げる力がある。ただし完璧基準が高すぎて市場に出ない。動く順番を先に決めてください。'}
+};
+function getTypeData(st){if(st.sub){const k1=`${st.main}-${st.sub}`,k2=`${st.sub}-${st.main}`;return CD[k1]||CD[k2]||SD[st.main];}return SD[st.main];}
+
+function scoreLevel(s){return s>=5?'極めて高い':s===4?'高い':s===3?'安定':s===2?'低め':'要注意';}
+
+function getAxes(b){
+  return[
+    {label:'設計力',score:b.design,color:'#7C6FE0',desc:b.design>=4?'仕組み販売・設計販売に転換できます。':b.design<=2?'設計より実行・運用に強みがある特性です。':'仕組みを組み立てる力を持っています。'},
+    {label:'手放し力',score:b.handoff,color:'#5B9BD5',desc:b.handoff>=4?'作ったものを委ねられる。副業の自動化・外注化を最初から設計に組み込める。':b.handoff<=2?'手放しへの抵抗が強い。最初から外注設計を組み込むこと。':'作ったものを一部手放せる力を持っています。'},
+    {label:'仕組み化志向',score:b.system,color:'#7C6FE0',desc:b.system>=4?'単発収益ではなく積み上がる収益設計に向いています。':b.system<=2?'今動くことへの意欲が強い。まず動いてから仕組み化する流れが合います。':'仕組みで収益を作ろうとする意識を持っています。'},
+    {label:'独立志向',score:b.indep,color:'#9B7FE0',desc:b.indep>=4?'本業依存を下げる収益構造を設計できる。この意欲が副業の継続エンジンになります。':'副業はあくまで収入の補完として使う意識が強い。'},
+    {label:'切迫度',score:b.urgency,color:'#C07B5B',desc:b.urgency>=4?'今すぐ動かなければいけない理由がある。この切迫感をエネルギーに変換できます。':'余裕のある状態。焦らず正しい順番で設計できます。'}
+  ];
+}
+
+function drawRadar(axes){
+  const cv=document.getElementById('radar');const dpr=window.devicePixelRatio||1;
+  const W=260,H=220;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  const cx=W/2,cy=H/2+5,r=72,n=5,vals=axes.map(a=>a.score);
+  const gc='rgba(255,255,255,.06)',lc='rgba(255,255,255,.5)';
+  for(let lv=1;lv<=5;lv++){ctx.beginPath();for(let i=0;i<n;i++){const a=-Math.PI/2+(2*Math.PI/n)*i,lr=(r*lv)/5;i===0?ctx.moveTo(cx+lr*Math.cos(a),cy+lr*Math.sin(a)):ctx.lineTo(cx+lr*Math.cos(a),cy+lr*Math.sin(a));}ctx.closePath();ctx.strokeStyle=gc;ctx.lineWidth=1;ctx.stroke();}
+  for(let i=0;i<n;i++){const a=-Math.PI/2+(2*Math.PI/n)*i;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));ctx.strokeStyle=gc;ctx.lineWidth=1;ctx.stroke();}
+  ctx.beginPath();for(let i=0;i<n;i++){const a=-Math.PI/2+(2*Math.PI/n)*i,rv=(r*vals[i])/5;i===0?ctx.moveTo(cx+rv*Math.cos(a),cy+rv*Math.sin(a)):ctx.lineTo(cx+rv*Math.cos(a),cy+rv*Math.sin(a));}
+  ctx.closePath();const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,'rgba(124,111,224,.3)');g.addColorStop(1,'rgba(83,74,183,.08)');
+  ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#7C6FE0';ctx.lineWidth=2;ctx.stroke();
+  for(let i=0;i<n;i++){const a=-Math.PI/2+(2*Math.PI/n)*i,rv=(r*vals[i])/5;ctx.beginPath();ctx.arc(cx+rv*Math.cos(a),cy+rv*Math.sin(a),4,0,Math.PI*2);ctx.fillStyle='#B8B0FF';ctx.fill();ctx.strokeStyle='#0f0f13';ctx.lineWidth=1.5;ctx.stroke();}
+  axes.forEach((ax,i)=>{const a=-Math.PI/2+(2*Math.PI/n)*i,lx=cx+(r+24)*Math.cos(a),ly=cy+(r+24)*Math.sin(a),ey=Math.sin(a)>.6?10:(Math.sin(a)<-.6?-8:0);ctx.font='500 11px sans-serif';ctx.fillStyle=lc;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(ax.label,lx,ly+ey);});
+}
+
+function drawShareCard(typeName){
+  const cv=document.getElementById('share-card');const dpr=window.devicePixelRatio||1;
+  const W=400,H=220;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=Math.min(W,320)+'px';cv.style.height=Math.min(H,176)+'px';
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#111118');bg.addColorStop(1,'#0f0f17');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const glow=ctx.createRadialGradient(W*.75,H*.25,0,W*.75,H*.25,150);glow.addColorStop(0,'rgba(83,74,183,.22)');glow.addColorStop(1,'transparent');
+  ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(83,74,183,.3)';ctx.lineWidth=1;ctx.strokeRect(1,1,W-2,H-2);
+  // 上部ラベル
+  ctx.font='600 10px sans-serif';ctx.fillStyle='#534AB7';ctx.textAlign='left';
+  ctx.fillText('INTJ専用 副業戦略診断',24,30);
+  // タイプ名（大）
+  ctx.font='700 24px sans-serif';ctx.fillStyle='#f0eeff';
+  ctx.fillText('INTJ / '+typeName,24,70);
+  // 区切り
+  ctx.strokeStyle='rgba(83,74,183,.25)';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(24,84);ctx.lineTo(W-24,84);ctx.stroke();
+  // キャッチ（2行以内）
+  const catchMap={
+    '設計中毒型':'作る力はある。\n完成前に次を作る。',
+    '完成後虚無型':'完成した瞬間に\n熱量が死ぬ。',
+    '自前主義型':'全部自分でやろうとして\n収益化前に疲弊する。',
+    '分析麻痺型':'正解を探しすぎて\n市場に出ない。',
+    '設計中毒×完成後虚無型':'作って、完成して、\n熱量が消える。',
+    '設計中毒×自前主義型':'設計は得意。\nでも誰にも渡せない。',
+    '完成後虚無×分析麻痺型':'完成しても動けず、\n分析しても動けない。',
+    '分析麻痺×自前主義型':'考え続けて、\n全部自分でやろうとする。',
+    '本業集中型':'今は副業より\n本業に集中するタイミング。'
+  };
+  const lines=(catchMap[typeName]||'副業で詰む場所が\n言い当てられた。').split('\n');
+  ctx.font='500 14px sans-serif';ctx.fillStyle='#aaa';
+  lines.forEach((l,i)=>ctx.fillText(l,24,108+i*22));
+  // 下部
+  ctx.font='600 12px sans-serif';ctx.fillStyle='#7C6FE0';ctx.textAlign='left';
+  ctx.fillText('あなたは何型？',24,H-20);
+  ctx.font='500 11px sans-serif';ctx.fillStyle='#444';ctx.textAlign='right';
+  ctx.fillText('INTJ副業戦略診断',W-24,H-20);
+}
+
+function getStrengths(b){
+  const c=[];
+  if(b.design>=4)c.push({score:b.design,icon:'🏗️',title:'ゼロから仕組みを設計する力',desc:'仕組み販売・設計代行・ツール販売に転換できます。「誰かのために仕組みを作る」こと自体が収益になる。'});
+  if(b.handoff>=4)c.push({score:b.handoff,icon:'🤲',title:'作ったものを手放せる',desc:'副業の自動化・外注化を最初から設計に組み込める。INTJの中でも希少な強みです。'});
+  if(b.system>=4)c.push({score:b.system,icon:'⚙️',title:'積み上がる収益設計に向いている',desc:'単発収益ではなく、コンテンツ資産・ツール販売など時間が経つほど強くなる構造を作れます。'});
+  if(b.indep>=4)c.push({score:b.indep,icon:'🎯',title:'本業依存を下げる収益構造を設計できる',desc:'独立・脱サラへの強い意志がある。この意欲が副業を長期継続させるエンジンになります。'});
+  if(b.urgency>=4)c.push({score:b.urgency,icon:'⚡',title:'今すぐ動ける切迫感がある',desc:'焦りではなく行動のエンジンとして使える。最速で最小商品を出す動機になります。'});
+  if(b.design>=3&&b.system>=3)c.push({score:(b.design+b.system)/2,icon:'🧠',title:'複雑な問題をシンプルな構造に整理できる',desc:'設計書・フレームワーク・診断ツールなど、構造そのものを商品にできます。'});
+  if(b.indep>=3&&b.selfrel<=2)c.push({score:b.indep,icon:'🌐',title:'外注・自動化を自然に設計できる',desc:'人に任せることへの抵抗が低い。副業の仕組み化において最大のアドバンテージです。'});
+  c.sort((a,z)=>z.score-a.score);
+  const seen=new Set();
+  return c.filter(x=>{if(seen.has(x.title))return false;seen.add(x.title);return true;}).slice(0,3);
+}
+
+function getPatterns(b){
+  const items=[];
+  if(b.perf>=4)items.push({score:b.perf,t:'完成した瞬間に熱量が死ぬ',d:'作ることに充実感があるため、完成＝終わりになりやすい。「作って終わり」になる売り切り型を選ぶことで、これを逆手に取れます。'});
+  if(b.system>=4&&b.handoff<=2)items.push({score:b.system,t:'次の設計が浮かんで今のものを放置する',d:'一本目が動き始める前に二本目・三本目が頭を占領する。一本目が売れるまで次の設計は禁止にするルールが必要です。'});
+  if(b.selfrel>=4)items.push({score:b.selfrel,t:'運用を誰かに渡す設計をしていない',d:'「自分がいなくても動く状態」を最初から設計しないと、飽きた後に放置商品が増えるだけになる。外注・自動化を最初の設計フェーズに組み込むこと。'});
+  if(b.anal>=4)items.push({score:b.anal,t:'完璧でないと出せない。止まる前に完成したことがない',d:'「60点で出す」をルールにしないと、副業が永遠に準備中になります。最初の1件が唯一の突破口です。'});
+  if(b.sellFear>=4)items.push({score:b.sellFear,t:'作れるが、売ることに強い苦手意識がある',d:'自分が売らなくても回る導線設計を最初から組み込んでください。'});
+  items.sort((a,z)=>z.score-a.score);
+  return items.slice(0,3);
+}
+
+function getAvoid(b){
+  const hasConsult=b.canTalk;
+  const longTime=S.selQ.SQ3==='7〜15時間'||S.selQ.SQ3==='15時間以上';
+  const canWrite=b.canPublish;
+  return[
+    {title:'SNS運用代行',reason:'構造化しにくく裁量が低い案件は消耗しやすい。他人のスケジュール・トンマナに縛られる形は、INTJの設計力を活かしにくい。',exc:null},
+    {title:'単発受託制作',reason:'自分が動き続けないと収益が止まる。仕組み化されないまま時間を売る構造になりやすい。',exc:longTime?'最初の3ヶ月だけ実績を積む目的で使うなら有効。期限を決めて卒業する前提で。':null},
+    {title:'毎日DM・営業前提の副業',reason:'感情労働と短期反応への依存が強い。仕組みではなく根性で回す構造は長続きしにくい。',exc:null},
+    {title:'アフィリエイト（初期から単体で）',reason:'成果が出るまでの期間が長く、途中で別の設計に興味が移りやすい特性と相性が悪い。',exc:canWrite?'コンテンツ資産と組み合わせて後から仕込む形なら有効。':null},
+    {title:'コーチング・メンタリング（単発）',reason:'相手の感情管理にエネルギーを取られる構造は消耗しやすい。',exc:hasConsult?'「型を作って渡す」設計コンサル形式なら向く。感情より構造を扱う形に変えることがポイント。':null}
+  ];
+}
+
+// ⑤ ミニロードマップ（3STEP）
+function getMiniRoadmap(b){
+  const type7=get7Type(b);
+  const urg=b.urgency>=4;
+  const t7name=TYPE7[type7]?.name||'コンテンツ資産型';
+  const premise=`「${t7name}」を前提に設計した最初の3ステップです。`;
+  const maps={
+    content:[{p:urg?'今週中':'1〜7日目',t:'まず何を作るか1つに絞る',a:'自分の知見10個→「他人が悩んでいてお金を払うテーマ」を1つ絞る。競合を10件調べる。'},{p:'8〜14日目',t:'60%で出して反応を取る',a:'完成度60%でいい。目次→本文→タイトル決定。3,000〜9,800円で価格設定して公開。'},{p:'15〜21日目',t:'売れる形に変えて回す',a:'SNSで告知1投稿。知人に1件DM。データを見て告知→販売ページ→購入の導線を自動化する。'}],
+    design:[{p:urg?'今週中':'1〜7日目',t:'提供する型を1行で決める',a:'「何を設計して渡すか」を明文化。例：業務フロー設計書（A4・5枚）を5万円で提供。'},{p:'8〜14日目',t:'モニターで1件動かす',a:'SNSかDMで直接声をかける。2〜3万円のモニターで受けて型を確立する。'},{p:'15〜30日目',t:'成果物をテンプレ化して売れる形にする',a:'1件目の成果物をテンプレ化。設計代行×テンプレ販売の二重収益を設計する。'}],
+    consult:[{p:urg?'今週中':'1〜7日目',t:'提供するコンサルの型を1ページで決める',a:'「何を設計して渡すか」を1ページで定義。例：副業の仕組み設計書（A4・3枚）を10万円で提供。'},{p:'8〜14日目',t:'モニター価格で1件動かす',a:'SNSかDMで直接声をかける。3〜5万円のモニターで提供し、型を検証する。'},{p:'15〜30日目',t:'標準化して単価を上げる',a:'1件目で作ったプロセスをテンプレ化。正規価格（10〜30万円）で販売開始。'}],
+    diag:[{p:urg?'今週中':'1〜4日目',t:'診断テーマを1つに絞る',a:'「何を診断するか」を決める。MBTI×副業、業種別チェックリストなど。'},{p:'5〜14日目',t:'最小診断を60%で出す',a:'Google FormかNoCodeで診断を作る。結果は3〜5パターンで十分。'},{p:'15〜21日目',t:'無料→有料の導線に変えて回す',a:'基本診断無料・詳細有料の構造を作る。診断結果→有料コンテンツへの自動誘導を設計。'}],
+    produce:[{p:urg?'今週中':'1〜7日目',t:'支援する対象を1行で決める',a:'「誰の裏側で何を設計するか」を1行で定義。例：インフルエンサーの商品設計代行。'},{p:'8〜14日目',t:'モニターで1件動かす',a:'SNSかDMで声をかける。3〜5万円のモニターで受けて設計パターンを確立する。'},{p:'15〜30日目',t:'型にして売れる形に変える',a:'1件目で作ったものをテンプレ・パッケージ化。月額顧問（10〜30万円/月）への移行を設計する。'}],
+    saas:[{p:urg?'今週中':'1〜7日目',t:'作るツールのスコープを最小に絞る',a:'「何を自動化するか」を1行で定義。フル開発ではなくNoCodeかAIで最小構成から始める。'},{p:'8〜14日目',t:'60%で出して反応を取る',a:'完成度60%でいい。使ってもらってフィードバックを得ることが目的。'},{p:'15〜30日目',t:'売れる形に変えて回す',a:'月額or単品販売を決める。1,980〜9,800円から始める。'}],
+    ec:[{p:urg?'今週中':'1〜7日目',t:'仕組みを設計してから商材を絞る',a:'仕入れ→販売→外注→利益回収の構造を先に設計する。商材はその後。'},{p:'8〜14日目',t:'小ロットで仕組みを動かす',a:'3〜5万円の小ロットで仕入れ・出品。写真・説明文の型を作る。'},{p:'15〜30日目',t:'外注化して手放せる形に変える',a:'売れ筋が見えてきたら写真撮影・梱包・発送の一部を外注する。'}]
+  };
+  // 孤立完結型はコンテンツ型ロードマップを使用（顔出し不要・非対面形式を強調）
+  const isKodoku=getSubtype(b).main==='kodoku';
+  const roadmapKey=isKodoku?'content':type7;
+  return{premise:isKodoku?'「孤立完結型」を前提に設計した最初の3ステップです。顔出し不要・非対面型で完結する設計になっています。':premise,steps:maps[roadmapKey]||maps.content};
+}
+
+// アンロックコンテンツ（型別）
+function getUnlockedContent(b,type7,td){
+  const t7=TYPE7[type7];
+  const perf=b.handoff<=2||b.anal>=4;
+  return[
+    {title:'あなた専用の詰み回避設計',body:`${td.name}としての最大のリスクは「${td.name==='設計中毒型'?'完成前に改善案を増やしすぎること':td.name==='完成後虚無型'?'完成した瞬間に熱量が死ぬこと':td.name==='自前主義型'?'全部自分でやろうとして収益化前に疲弊すること':td.name==='孤立完結型'?'外部フィードバックがないまま設計が内側に閉じること':'正解を探しすぎて市場に出す前に時間を使い切ること'}」です。回避策：${td.name==='孤立完結型'?'最初の1商品を出すことが唯一の検証手段。完成度60%でいい。1人に見せることがフィードバック設計の最小単位。':perf?'「70点で出す」を強制ルールにする。公開日を先に決めてから作り始める。':'作ったものを手放す設計を最初に組み込む。外注・自動化の仕組みを最初の設計フェーズで決める。'}`},
+    {title:'最初に作るべき商品案3選',body:`${t7.name}として最初に作るべき商品は以下の3つです。\n\n①${t7.items[0]}（価格帯：3,000〜9,800円）\n②${t7.items[1]}（価格帯：5,000〜19,800円）\n③${t7.items[2]}（価格帯：10,000〜30,000円）\n\n最初は①から始める。③は②が売れてから展開する。`},
+    {title:'売り方の順番（あなたの場合）',body:`${t7.name}の売り方の正しい順番：\n\n1. 最小商品を一つ作って出す（完成度60%でいい）\n2. 一本売れる導線を一つだけ作る\n3. 運用を仕組みに乗せて手放す\n4. 二本目を作る\n\n${perf?'注意：この順番を読んだ瞬間に「3の仕組み化から始めよう」と考えた人は要注意。1から始めてください。':'この順番を守ることが最優先。複数を同時に進めると全部中途半端になります。'}`},
+    {title:'30日行動計画（Day単位）',body:`Day1〜3：売れるテーマを1つ決定。競合10件リサーチ完了。\nDay4〜7：最小商品の目次と価格を決定。\nDay8〜14：最小商品を作り切る（完成度60%）。\nDay15〜17：販売ページを作って公開。\nDay18〜21：SNS告知1投稿＋知人1件DM。データを取る。\nDay22〜28：告知→販売ページ→購入の導線を自動化。\nDay29〜30：振り返り。次の商品か改善かを決める。`},
+    {title:'収益シミュレーション',body:`あなたの判定タイプ「${t7.name}」での収益シミュ：\n\n月3万円ライン\n→ ${t7.items[0]}（5,000円）× 月6本 で到達可能\n→ または ${t7.items[1]}（9,800円）× 月3本\n\n月10万円ライン\n→ コンテンツ自動収益（月5〜6万円）+ 個別相談（3〜5万円/件）× 月1件\n\n月30万円以上\n→ 複数コンテンツの自動収益 + 高単価サービスの組み合わせが必要`}
+  ];
+}
+
+// 決済処理（Stripe簡易版）
+function handleUnlock(){
+  if(URL_1980.includes('YOUR_')){
+    S.unlocked=true;saveState();showUnlocked();
+    return;
+  }
+  window.open(URL_1980,'_blank');
+}
+
+function showUnlocked(){
+  const b=calc(),st=getSubtype(b),td=getTypeData(st),type7=get7Type(b);
+  document.getElementById('paid-gate').style.display='none';
+  const uc=document.getElementById('unlocked-content');
+  uc.classList.add('show');
+  const items=getUnlockedContent(b,type7,td);
+  document.getElementById('unlocked-items').innerHTML=items.map(item=>`
+    <div class="unlocked-item">
+      <div class="unlocked-item-title">${item.title}</div>
+      <div class="unlocked-item-body">${item.body.replace(/\n/g,'<br>')}</div>
+    </div>`).join('');
+}
+
+function doShare(platform){
+  const b=calc(),st=getSubtype(b),td=getTypeData(st);
+  const text=`INTJ、副業で詰む場所まで言い当てられた。\n私は「${td.name}」でした。\n#INTJ #副業診断`;
+  const url=URL_SHARE;
+  if(platform==='x'){
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,'_blank');
+  }else if(platform==='threads'){
+    window.open(`https://www.threads.net/intent/post?text=${encodeURIComponent(text+' '+url)}`,'_blank');
+  }else{
+    navigator.clipboard.writeText(url).then(()=>{
+      const el=document.getElementById('share-copied-msg');
+      el.style.display='block';
+      setTimeout(()=>el.style.display='none',2000);
+    });
+  }
+}
+
+function buildResult(){
+  const b=calc(),stage=S.stage||0,st=getSubtype(b),td=getTypeData(st),hon=isHon(b),type7=hon?'content':get7Type(b),t7=TYPE7[type7];
+
+  // タイプ
+  document.getElementById('r-label').textContent='INTJ / '+td.name;
+  document.getElementById('r-type-name').textContent=td.name;
+  document.getElementById('r-type-copy').textContent=td.copy;
+
+  // シェアカード生成
+  setTimeout(()=>drawShareCard(td.name),80);
+
+  // バロメーター
+  const axes=getAxes(b);
+  setTimeout(()=>drawRadar(axes),80);
+  const bi=document.getElementById('baro-items');bi.innerHTML='';
+  axes.forEach(ax=>{
+    const pct=Math.round((ax.score/5)*100);
+    const lv=scoreLevel(ax.score);
+    const div=document.createElement('div');div.className='baro-item';
+    div.innerHTML=`<div class="baro-header"><span class="baro-label">${ax.label}</span><div class="baro-score-wrap"><span class="baro-score">${ax.score}/5</span><span class="baro-level">${lv}</span></div></div><div class="baro-track"><div class="baro-fill" style="width:0%;background:${ax.color};"></div></div><div class="baro-desc">${ax.desc}</div>`;
+    bi.appendChild(div);
+    setTimeout(()=>{div.querySelector('.baro-fill').style.width=pct+'%';},120);
+  });
+
+  // 強み（スコア理由）
+  const topAxes=axes.slice().sort((a,z)=>z.score-a.score).slice(0,3);
+  document.getElementById('r-score-reason-strength').innerHTML=`<div class="score-reason">${topAxes.map(a=>`<span class="score-tag">${a.label} ${a.score}</span>`).join('')}</div><div class="score-conclusion">設計力${b.design}・手放し力${b.handoff}・独立志向${b.indep}のスコアから、以下の強みが突出しています。</div>`;
+  const strengths=getStrengths(b);
+  document.getElementById('r-strengths').innerHTML=strengths.length===0?'<div style="font-size:13px;color:#666;padding:.875rem;background:#111118;border-radius:12px;">全体的にバランスの取れた特性です。</div>':strengths.map(s=>`<div class="strength-card"><div class="strength-icon">${s.icon}</div><div><div class="strength-title">${s.title}</div><div class="strength-desc">${s.desc}</div></div></div>`).join('');
+
+  // 陥りやすいパターン
+  const patterns=getPatterns(b);
+  document.getElementById('r-patterns').innerHTML=patterns.length===0?'<div style="font-size:13px;color:#666;padding:.875rem;background:#111118;border-radius:12px;">スコアのバランスが取れています。ただしINTJとして副業を始めるなら、完成後の運用フェーズに注意してください。</div>':patterns.map((p,i)=>`<div class="pattern-card${i===0?' top':''}"><span class="pattern-rank-badge ${i===0?'top':'sub'}">${i===0?'⚠️ 最も注意すべきパターン':'パターン '+(i+1)}</span><div class="pattern-title">${p.t}</div><div class="pattern-desc">${p.d}</div></div>`).join('');
+
+  // モデル（スコア理由）
+  const modelReason=hon?'本業集中型':t7?.reason?t7.reason(b):'';
+  document.getElementById('r-score-reason-model').innerHTML=`<div class="score-conclusion" style="margin-bottom:.875rem;">${modelReason}のため、以下の収益モデルが最適です。</div>`;
+  document.getElementById('r-models').innerHTML=hon?`<div class="model-hero"><div class="model-hero-badge">本業集中型</div><div class="model-hero-name">まず本業に集中する</div><div class="model-hero-desc">切迫度・目的明確度のスコアから、今は副業より本業に集中した方が収入・キャリアともに伸びやすい状態です。</div></div>`:`<div class="model-hero"><div class="model-hero-badge">第1推奨</div><div class="model-hero-name">${t7.name}</div><div class="model-hero-desc">${t7.desc}</div><div class="model-hero-items">${t7.items.map(i=>`<div class="model-hero-item">・${i}</div>`).join('')}</div></div>`;
+
+  // 避けるべき副業
+  document.getElementById('r-avoid').innerHTML=getAvoid(b).map(a=>`<div class="avoid-card"><div class="avoid-header"><span class="avoid-badge">相性注意</span><span class="avoid-title">${a.title}</span></div><div class="avoid-reason">${a.reason}</div>${a.exc?`<div class="avoid-exc">💡 例外あり：${a.exc}</div>`:''}</div>`).join('');
+
+  // ミニロードマップ（3STEP）
+  const mr=getMiniRoadmap(b);
+  document.getElementById('r-rm-premise').textContent=mr.premise;
+  document.getElementById('r-mini-roadmap').innerHTML=mr.steps.map((s,i)=>`<div class="mini-rm-card"><div class="mini-rm-num">${i+1}</div><div><div class="mini-rm-period">${s.p}</div><div class="mini-rm-title">${s.t}</div><div class="mini-rm-action">${s.a}</div></div></div>`).join('');
+
+  // 有料ゲート
+  if(S.unlocked){
+    showUnlocked();
+  }else{
+    // プレビュー
+    const paidPrev={
+      content:['デジタルコンテンツを公開するだけでは売れません。INTJが最も陥りやすいのは「作って出したのに売れない」パターンです。','あなたの場合、まず「無料コンテンツで信頼を作ってから有料に誘導する」導線が有効です。'],
+      design:['設計代行は「設計できます」と言うだけでは売れません。「何を設計して渡すか」を1枚で定義できることが前提です。','あなたの場合、まず「無料の業務整理シートを配布し、そこから有料設計代行に繋げる」パターンが最も効率的です。'],
+      consult:['高単価コンサルは「発信して問い合わせを待つ」だけでは売れません。INTJが最も陥りやすいのは「実力はあるのに売り方がわからない」パターンです。','あなたの場合、まず「無料の設計書を1枚作って配布し、そこから有料相談に繋げる」パターンが最も効率的です。'],
+      diag:['診断コンテンツは「作って公開するだけ」では認知されません。INTJが最も陥りやすいのは「精度の高い診断を作ったのに誰にも届かない」パターンです。','あなたの場合、まず「SNSで診断の一部を無料で見せ、詳細版に誘導する」構造が最も効果的です。'],
+      produce:['裏方プロデュースは「何でもできます」では売れません。「誰の・何を・どう設計するか」を1枚で定義できることが前提です。','あなたの場合、まず「支援できるクライアント像を1つ絞り、そこに特化した無料診断か提案資料を作る」ところから始めます。'],
+      saas:['SaaS・ツールは「作って公開するだけ」では売れません。INTJが最も陥りやすいのは「作り込みすぎてリリースできない」パターンです。','あなたの場合、まず「60%の完成度でリリースして、ユーザーの反応をデータとして取る」順番が最も効率的です。'],
+      ec:['物販は「出品するだけでは売れない」という現実があります。INTJが最も陥りやすいのは「仕入れたのに売れない在庫が積み上がる」パターンです。','あなたの場合、まず「売れる商材の選定ロジック」を設計することが先です。']
+    };
+    const pp=paidPrev[type7]||paidPrev.content;
+    document.getElementById('r-paid-preview').innerHTML=pp.map(p=>`<div class="paid-preview-item">${p}</div>`).join('');
+    document.getElementById('r-paid-blur1').textContent='高単価コンサルへの繋ぎ方、具体的な導線の設計パターン3選…';
+    document.getElementById('r-paid-blur2').textContent='INTJが消耗せずに売り続けられる自動化の仕組みの全体設計…';
+    // ⑦FOMO：paid-bannerの直後にFOMO文を挿入
+    const bannerBody=document.querySelector('.paid-banner-body');
+    if(bannerBody&&!document.querySelector('.paid-fomo')){
+      const fomo=document.createElement('div');
+      fomo.className='paid-fomo';
+      fomo.textContent='設計だけ増えて未完成の商品が積み上がる前に、順番を固定してください。';
+      bannerBody.after(fomo);
+    }
+  }
+
+  // CTA
+  document.getElementById('r-cta-body').innerHTML=`上の有料コンテンツの伴走もそうですが、他にもニーズに合わせた個別相談を無料で受け付けています。<br><br>・自分の経験のどこが売れるのか<br>・最初の商品は何にすべきか<br>・どう設計すれば手放せる構造になるか<br><br>この3点は、あなたの本業・経験・使える時間を聞かないと設計できません。`;
+  document.getElementById('r-cta-alert').textContent='設計中毒型INTJは、ここを一人で考え始めると「商品案の設計」に入り、また完成しない商品が増えます。最初の商品を一緒に決めたい方は個別相談へどうぞ。';
+
+  // ⑩診断根拠
+  const ctaCard=document.querySelector('.cta-card');
+  if(ctaCard&&!document.querySelector('.diag-basis')){
+    const basis=document.createElement('div');
+    basis.className='diag-basis';
+    basis.textContent='この診断は回答傾向・構造志向・収益設計志向・完了特性から判定しています。';
+    ctaCard.after(basis);
+  }
+}
+
+function submitCta(){
+  // 下部CTAは無料DM導線（Xへ遷移）
+  window.open('https://twitter.com/messages/compose?recipient_id=akira_life_','_blank');
+}
+
+init();
+</script>
+</body>
+</html>
