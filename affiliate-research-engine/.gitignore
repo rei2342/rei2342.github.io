@@ -1,0 +1,4 @@
+affiliate-research-engine/__pycache__/
+affiliate-research-engine/**/__pycache__/
+.env
+outputs/
