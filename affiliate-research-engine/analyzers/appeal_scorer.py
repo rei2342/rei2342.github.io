@@ -79,7 +79,7 @@ def score_and_rank(
         aid = appeal["appeal_id"]
         s = scores_map.get(aid, {})
         merged = dict(appeal)
-        merged["appeal_score"] = s.get("score", 0)
+        merged["appeal_score"] = int(s.get("score") or 0)
         merged["appeal_score_reason"] = s.get("reason", "")
         merged["content_repeatability"] = s.get("content_repeatability", "medium")
         merged["repeatability_reason"] = s.get("repeatability_reason", "")
