@@ -26,6 +26,27 @@ def _empty_validation() -> dict:
     }
 
 
+def _compute_creator_priority_score(case_score_obj: dict, startup_fit: dict, cef: dict) -> int | None:
+    case_score = int(case_score_obj.get("total") or 0)
+    automation_fit = int(case_score_obj.get("automation_fit") or 0)
+    sf_score = startup_fit.get("score") if startup_fit else None
+    zcv = (startup_fit.get("zero_cost_validation_score") or {}) if startup_fit else {}
+    zero_cost_total = zcv.get("total")
+    cef_score = cef.get("score") if cef else None
+
+    if sf_score is None or zero_cost_total is None or cef_score is None:
+        return None
+
+    zero_cost_norm = round(zero_cost_total / 1.2)
+    return round(
+        case_score * 0.2
+        + automation_fit * 0.2
+        + sf_score * 0.2
+        + zero_cost_norm * 0.2
+        + cef_score * 0.2
+    )
+
+
 def _compute_scores(
     case: CaseInput,
     lp_analysis: dict,
@@ -67,6 +88,7 @@ def build(
     top_appeals: list,
     winning_data: dict,
     startup_fit: dict,
+    cef: dict,
     llm: LLMClient,
 ) -> dict:
     scores = _compute_scores(
@@ -136,6 +158,10 @@ def build(
         },
         "case_score": winning_data.get("case_score", {}),
         "startup_fit": startup_fit,
+        "cef": cef,
+        "creator_priority_score": _compute_creator_priority_score(
+            winning_data.get("case_score", {}), startup_fit, cef
+        ),
         "winning_summary": winning_data.get("winning_summary", {}),
         "risk_score": risk_result.get("risk_score", 0),
         "risk_factors": risk_result.get("risk_factors", []),

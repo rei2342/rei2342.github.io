@@ -195,14 +195,16 @@ def _run_single_analysis(input_path: str, llm: LLMClient, verbose: bool = True) 
     )
     ok()
 
-    step("startup_fit分析")
-    sf = startup_fit_analyzer.analyze(case, lp, market, risk, triggers, llm)
+    step("startup_fit / CEF分析")
+    sf_result = startup_fit_analyzer.analyze(case, lp, market, risk, triggers, llm)
+    sf = sf_result.get("startup_fit", {})
+    cef = sf_result.get("cef", {})
     ok()
 
     step("レポート統合・スコアリング")
     report = report_generator.build(
         case, iq, lp, market, triggers, sns_fit, risk,
-        scored_appeals, top_appeals, winning_data, sf, llm
+        scored_appeals, top_appeals, winning_data, sf, cef, llm
     )
     ok()
 
@@ -445,12 +447,17 @@ def batch_analyze(cases_dir: str | None, force: bool, max_cases: int | None):
             cs_obj = report.get("case_score", {})
             sf_obj = report.get("startup_fit", {}) or {}
             zcv = (sf_obj.get("zero_cost_validation_score") or {}).get("total", "-")
+            cef_obj = report.get("cef", {}) or {}
+            cef_score = cef_obj.get("score", "-")
+            creator_ps = report.get("creator_priority_score")
             click.echo(
                 f"  ✓  "
                 f"case_score:{cs_obj.get('total','-')}  "
                 f"automation:{cs_obj.get('automation_fit','-')}  "
                 f"startup_fit:{sf_obj.get('score','-')}  "
-                f"zero_cost:{zcv}/120"
+                f"zero_cost:{zcv}/120  "
+                f"cef:{cef_score}  "
+                f"creator_ps:{creator_ps if creator_ps is not None else '-'}"
             )
             results.append({"name": case_name, "path": str(out_path), "report": report})
         except Exception as e:
@@ -503,7 +510,7 @@ def compare_top(cases_dir: str | None, top_n: int):
     sep = "=" * (W * min(len(top), 5) + 20)
 
     click.echo(f"\n{sep}")
-    click.echo(f"  compare-top  TOP{top_n}案件比較（priority_score順）")
+    click.echo(f"  compare-top  TOP{top_n}案件比較（priority_score順）  ※creator_psはCEF込み総合スコア")
     click.echo(sep)
 
     ROWS = [
@@ -515,6 +522,8 @@ def compare_top(cases_dir: str | None, top_n: int):
         ("start_priority",  lambda e: e["start_priority"] or "-"),
         ("EPC",             lambda e: str(e["epc"]) if e["epc"] is not None else "-"),
         ("approval_rate",   lambda e: f"{e['approval_rate']}%" if e["approval_rate"] is not None else "-"),
+        ("CEF/100",          lambda e: f"{e['cef_score']}/100" if e.get("cef_score") is not None else "未分析"),
+        ("creator_ps",       lambda e: str(e["creator_priority_score"]) if e.get("creator_priority_score") is not None else "未分析"),
         ("category",        lambda e: (e["category"] or "-")[:18]),
     ]
 
@@ -560,6 +569,31 @@ def compare_top(cases_dir: str | None, top_n: int):
                 click.echo(row)
             click.echo()
 
+    # cef breakdown table
+    has_cef = [e for e in top if e.get("cef_breakdown")]
+    if has_cef:
+        click.echo(f"{'─' * 60}")
+        click.echo("  【CEF 内訳】\n")
+        CEF_ROWS = [
+            ("量産性 /20",      "content_producibility"),
+            ("市場規模 /20",    "market_size"),
+            ("継続性 /20",      "continuity"),
+            ("横展開性 /20",    "cross_expansion"),
+            ("動画適性 /20",    "short_video_fit"),
+            ("資産化 /20",      "account_asset_potential"),
+        ]
+        for col_start in range(0, len(has_cef), chunk):
+            cols = has_cef[col_start:col_start + chunk]
+            header = f"  {'軸':<18}" + "".join(f"  {c['product_name'][:W-2]:<{W-2}}" for c in cols)
+            click.echo(header)
+            click.echo("  " + "─" * (18 + W * len(cols)))
+            for label, key in CEF_ROWS:
+                row = f"  {label:<18}" + "".join(
+                    f"  {c['cef_breakdown'].get(key, '-'):<{W-2}}" for c in cols
+                )
+                click.echo(row)
+            click.echo()
+
     click.echo(sep + "\n")
 
 
@@ -578,6 +612,22 @@ def _extract_ranking_entry(data: dict, path: str) -> dict:
     zcv = (sf.get("zero_cost_validation_score") or {}) if sf else {}
     zero_cost_total = int(zcv.get("total") or 0) if zcv else None
     zero_cost_breakdown = zcv.get("breakdown", {}) if zcv else {}
+
+    cef = data.get("cef", {}) or {}
+    cef_score = int(cef.get("score") or 0) if cef else None
+    cef_total = int(cef.get("total") or 0) if cef else None
+    cef_breakdown = cef.get("breakdown", {}) if cef else {}
+
+    creator_ps = data.get("creator_priority_score")
+    if creator_ps is None and startup_fit_score is not None and zero_cost_total is not None and cef_score is not None:
+        zero_cost_norm = round(zero_cost_total / 1.2)
+        creator_ps = round(
+            case_score * 0.2
+            + automation_fit * 0.2
+            + startup_fit_score * 0.2
+            + zero_cost_norm * 0.2
+            + cef_score * 0.2
+        )
 
     if startup_fit_score is not None:
         priority_score = round(
@@ -599,6 +649,10 @@ def _extract_ranking_entry(data: dict, path: str) -> dict:
         "startup_fit_level": startup_fit_level,
         "zero_cost_total": zero_cost_total,
         "zero_cost_breakdown": zero_cost_breakdown,
+        "cef_score": cef_score,
+        "cef_total": cef_total,
+        "cef_breakdown": cef_breakdown,
+        "creator_priority_score": creator_ps,
         "start_priority": winning.get("start_priority"),
         "winning_angle": winning.get("winning_angle", ""),
         "epc": basic.get("epc"),
@@ -650,7 +704,9 @@ def rank_cases(cases_dir: str | None, output_dir: str | None):
 
     # ターミナル表示
     click.echo(f"\n{'=' * 65}")
-    click.echo(f"  案件ランキング  ({len(entries)}件)  priority_score = case_score×0.3 + automation_fit×0.3 + startup_fit×0.4")
+    click.echo(f"  案件ランキング  ({len(entries)}件)")
+    click.echo(f"  priority_score     = case_score×0.3 + automation_fit×0.3 + startup_fit×0.4")
+    click.echo(f"  creator_priority   = (case_score + automation_fit + startup_fit + zero_cost_norm + CEF) × 0.2 each")
     click.echo(f"{'=' * 65}")
 
     for rank, e in enumerate(entries, start=1):
@@ -689,6 +745,31 @@ def rank_cases(cases_dir: str | None, output_dir: str | None):
         else:
             click.echo()
         click.echo(f"       case_score     : {e['case_score']}  automation_fit: {e['automation_fit']}")
+        cef_s = e.get("cef_score")
+        cef_bd = e.get("cef_breakdown") or {}
+        if cef_s is not None:
+            cef_total = e.get("cef_total", 0)
+            bar_filled = round(cef_s / 100 * 20)
+            bar = "█" * bar_filled + "░" * (20 - bar_filled)
+            click.echo(f"       CEF            : {cef_s:>3}/100  [{bar}]  ← コンテンツエンジン適性")
+            if cef_bd:
+                parts = []
+                for k, label in [
+                    ("content_producibility", "量産"),
+                    ("market_size", "市場"),
+                    ("continuity", "継続"),
+                    ("cross_expansion", "横展開"),
+                    ("short_video_fit", "動画"),
+                    ("account_asset_potential", "資産化"),
+                ]:
+                    parts.append(f"{label}:{cef_bd.get(k, '-')}")
+                click.echo(f"                     {' / '.join(parts)}")
+        else:
+            click.echo(f"       CEF            : 未分析")
+
+        creator_ps = e.get("creator_priority_score")
+        if creator_ps is not None:
+            click.echo(f"       creator_ps     : {creator_ps}  ← CEF込み総合スコア")
         if e["start_priority"]:
             click.echo(f"       start_priority : {_priority_label(e['start_priority'])}")
         if e["epc"] is not None:

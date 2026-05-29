@@ -37,4 +37,8 @@ def analyze(
     )
 
     result = llm.call_json(prompt, SYSTEM)
-    return result.get("startup_fit", result)
+    startup_fit = result.get("startup_fit", {})
+    if not startup_fit and "score" in result:
+        startup_fit = result
+    cef = result.get("cef", {})
+    return {"startup_fit": startup_fit, "cef": cef}

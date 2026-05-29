@@ -92,8 +92,47 @@ total = 6軸の合計（最大120点）
 - **Medium（45〜69）**: 一定の準備や条件があれば検証できる
 - **Low（44以下）**: 実績・実機・顔出しなど障壁が高く新規参入には不向き
 
-## 出力形式
-以下のJSONのみを返してください。
+startup_fit.scoreはbreakdownの6軸の平均値（整数）にしてください。
+startup_fit.levelはscoreに基づいて自動判定してください（70以上=High, 45-69=Medium, 44以下=Low）。
+zero_cost_validation_score.totalは6軸の合計値（最大120）にしてください。
+
+---
+
+## 評価C：Content Engine Fit（CEF）（各0〜20で採点）
+
+このジャンル・商品カテゴリを使って「SNSアカウントを長期育成・資産化できるか」を評価します。
+
+### 1. ネタ量産性（content_producibility）
+- 同一ブランド・ジャンルでコンテンツを繰り返し量産できるか
+- 0点: 1〜2本のみ / 10点: 10〜20本程度 / 20点: 50本以上継続量産可能
+
+### 2. 市場規模（market_size）
+- ターゲットとなる潜在視聴者・検索ユーザーの市場規模
+- 0点: ニッチ（数万人） / 10点: 中規模（数十万人） / 20点: 大規模（数百万人以上）
+
+### 3. 継続性（continuity）
+- 1〜2年後も継続してコンテンツを投稿できるか（季節・トレンド依存度）
+- 0点: トレンド依存で短命 / 10点: 1年程度継続可能 / 20点: 長期的に安定した需要がある
+
+### 4. 横展開性（cross_expansion）
+- 関連テーマ・商品ジャンルへの横展開でコンテンツ幅を広げられるか
+- 0点: 単品のみ / 10点: 数商品への展開可能 / 20点: カテゴリ全体・関連ジャンルへ無限展開可能
+
+### 5. SNSショート動画適性（short_video_fit）
+- TikTok/Instagram Reels/YouTubeショートでのバズりやすさ
+- 0点: 動画不向き / 10点: ある程度動画映えする / 20点: ギミック・before-after・比較動画に最適
+
+### 6. アカウント資産化しやすさ（account_asset_potential）
+- このジャンルで継続するとフォロワー獲得・権威形成・長期資産化がしやすいか
+- 0点: アカウント価値が形成されにくい / 10点: ある程度の資産化可能 / 20点: ジャンル特化で長期的権威形成・高収益化しやすい
+
+cef.total = 6軸の合計（最大120点）
+cef.score = round(total / 1.2)（0〜100に換算）
+
+---
+
+## 出力形式（更新版）
+以下のJSONのみを返してください。startup_fitとcefを両方含むこと。
 
 {
   "startup_fit": {
@@ -121,9 +160,18 @@ total = 6軸の合計（最大120点）
     "bottleneck": "実機購入が前提の体験談コンテンツが必要なため、実機なしでの参入が困難",
     "verdict": "実機を持っていれば Medium→High に昇格。持っていない場合は他案件を優先推奨",
     "recommended_first_action": "実機なしなら: 公式デモ動画を引用しつつ「こんな悩みに刺さりそう」という考察系投稿から始める"
+  },
+  "cef": {
+    "score": 65,
+    "total": 78,
+    "breakdown": {
+      "content_producibility": 15,
+      "market_size": 15,
+      "continuity": 15,
+      "cross_expansion": 10,
+      "short_video_fit": 15,
+      "account_asset_potential": 8
+    },
+    "verdict": "インテリアジャンルは季節需要があり継続性は中程度。横展開余地は広い"
   }
 }
-
-startup_fit.scoreはbreakdownの6軸の平均値（整数）にしてください。
-startup_fit.levelはscoreに基づいて自動判定してください（70以上=High, 45-69=Medium, 44以下=Low）。
-zero_cost_validation_score.totalは6軸の合計値（最大120）にしてください。
