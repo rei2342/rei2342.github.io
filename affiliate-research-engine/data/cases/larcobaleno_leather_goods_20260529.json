@@ -1,0 +1,21 @@
+{
+  "case_name": "larcobaleno_leather_goods",
+  "affiliate_url": "https://larcobaleno.jp/",
+  "lp_text": "ラルコバレーノ（L'arcobaleno）は、イタリア製・オールレザー・オールハンドメイドの革小物ブランド。ゴートレザー使用のバイカラーデザインが特徴。ギフト需要が高く日経マガジン掲載実績あり。楽天などECモールでも展開中。",
+  "asp_name": "A8.net",
+  "reward": null,
+  "reward_type": "purchase_percentage",
+  "reward_rate": 10.0,
+  "reward_note": null,
+  "epc": 84.94,
+  "approval_rate": 100.0,
+  "cookie_period": 90,
+  "category": "ファッション小物",
+  "conversion_condition": "WEB注文後、30日以内の入金確認",
+  "restrictions": "本人申込NG。入力不備・未入金・返品・受け取り拒否・キャンセルは否認。他ブランド（colon/SYNEtokyo/DinoMattia）への注文は否認。リスティング違反の場合は否認。ポイントサイト・セルフバック経由の代引き決済は否認。人物画像使用NG。リスティング一部OK（NGワード: 社名・サービス名・表記ゆれ）。PR表示必須。",
+  "sns_allowed": null,
+  "listing_allowed": true,
+  "pr_required": true,
+  "sns_examples": [],
+  "competitor_examples": []
+}
