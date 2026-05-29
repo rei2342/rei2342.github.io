@@ -21,6 +21,7 @@ import analyzers.risk_analyzer as risk_analyzer
 import analyzers.appeal_scorer as appeal_scorer
 import analyzers.startup_fit_analyzer as startup_fit_analyzer
 import analyzers.account_fit_analyzer as account_fit_analyzer
+import analyzers.creator_fit_analyzer as creator_fit_analyzer
 import generators.appeal_generator as appeal_generator
 import generators.winning_summary_generator as winning_summary_generator
 import generators.report_generator as report_generator
@@ -481,8 +482,9 @@ def account_fit_score(cases_dir: str | None, force: bool):
                 cs_obj = data.get("case_score", {})
                 sf = data.get("startup_fit", {}) or {}
                 cef = data.get("cef", {}) or {}
+                cf_existing = data.get("creator_fit", {}) or {}
                 from generators.report_generator import _compute_creator_priority_score
-                data["creator_priority_score"] = _compute_creator_priority_score(cs_obj, sf, cef, af)
+                data["creator_priority_score"] = _compute_creator_priority_score(cs_obj, sf, cef, af, cf_existing)
                 f.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
                 click.echo(f"  ✓  account_fit:{af.get('score','-')}  creator_ps:{data['creator_priority_score']}")
                 total += 1
@@ -501,6 +503,116 @@ def account_fit_score(cases_dir: str | None, force: bool):
     click.echo(sep + "\n")
     if total > 0:
         click.echo("  → rank-cases または compare-top でaccount_fit込みランキングを確認できます\n")
+
+
+@cli.command("set-creator-profile")
+@click.option("--name", default="", help="発信者名")
+@click.option("--expertise", required=True, help="専門分野・スキル（カンマ区切り）")
+@click.option("--domains", required=True, help="一次情報保有領域（カンマ区切り）")
+@click.option("--style", "content_style", default="実験ログ・データ公開・一次情報共有", help="コンテンツスタイル")
+@click.option("--projects", default="", help="現在進行中のプロジェクト（カンマ区切り）")
+@click.option("--topics", default="", help="継続発信可能なテーマ（カンマ区切り）")
+@click.option("--weak", default="", help="一次情報が薄い領域（カンマ区切り）")
+def set_creator_profile(
+    name: str, expertise: str, domains: str, content_style: str,
+    projects: str, topics: str, weak: str
+):
+    """発信者プロフィールを設定します（creator_fit算出に使用）"""
+    base = Path(__file__).parent
+    profile = {
+        "name": name,
+        "expertise": [e.strip() for e in expertise.split(",") if e.strip()],
+        "first_hand_domains": [d.strip() for d in domains.split(",") if d.strip()],
+        "proven_content_style": content_style,
+        "current_projects": [p.strip() for p in projects.split(",") if p.strip()],
+        "sustainable_topics": [t.strip() for t in topics.split(",") if t.strip()],
+        "weak_domains": [w.strip() for w in weak.split(",") if w.strip()],
+    }
+    out = base / "data" / "creator_profile.json"
+    out.write_text(json.dumps(profile, ensure_ascii=False, indent=2), encoding="utf-8")
+    click.echo(f"\n✓ 発信者プロフィール保存: {out}")
+    click.echo(f"  name       : {name or '（未設定）'}")
+    click.echo(f"  expertise  : {', '.join(profile['expertise'])}")
+    click.echo(f"  domains    : {', '.join(profile['first_hand_domains'])}")
+    click.echo(f"  style      : {content_style}")
+    click.echo(f"\n  次: python main.py creator-fit-score  でスコアを算出してください\n")
+
+
+@cli.command("creator-fit-score")
+@click.option("--cases-dir", default=None, type=click.Path(), help="分析済みJSONディレクトリ（デフォルト: outputs/cases/）")
+@click.option("--force", is_flag=True, default=False, help="既存スコアを上書き")
+def creator_fit_score_cmd(cases_dir: str | None, force: bool):
+    """分析済み案件にcreator_fitスコアを追加します"""
+    base = Path(__file__).parent
+    cases_path = Path(cases_dir) if cases_dir else base / "outputs" / "cases"
+    profile_path = base / "data" / "creator_profile.json"
+
+    if not profile_path.exists():
+        click.echo("[エラー] data/creator_profile.json が見つかりません", err=True)
+        click.echo("  先に: python main.py set-creator-profile --expertise ... --domains ...", err=True)
+        sys.exit(1)
+
+    profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    name = profile.get("name") or "発信者"
+    click.echo(f"\ncreator-fit-score  発信者: {name} / {', '.join(profile.get('expertise', [])[:3])}")
+
+    json_files = sorted(cases_path.glob("*.json"))
+    if not json_files:
+        click.echo(f"[エラー] {cases_path} にJSONファイルが見つかりません", err=True)
+        sys.exit(1)
+
+    # 同一case_nameは最新のみ
+    seen: dict[str, Path] = {}
+    for f in json_files:
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            cname = data.get("meta", {}).get("case_name") or data.get("basic_info", {}).get("case_name", f.stem)
+            seen[cname] = f
+        except Exception:
+            pass
+
+    llm = LLMClient()
+    sep = "=" * 65
+    click.echo(sep)
+    total, skipped, errors = 0, 0, []
+
+    for cname, f in seen.items():
+        data = json.loads(f.read_text(encoding="utf-8"))
+        existing = data.get("creator_fit", {})
+        if existing and not force:
+            click.echo(f"  {cname:<40} → スキップ（スコア済み: {existing.get('score','-')}）")
+            skipped += 1
+            continue
+
+        click.echo(f"  {cname:<40} → 採点中...", nl=False)
+        try:
+            cf = creator_fit_analyzer.analyze(data, llm)
+            if cf:
+                data["creator_fit"] = cf
+                cs_obj = data.get("case_score", {})
+                sf = data.get("startup_fit", {}) or {}
+                cef = data.get("cef", {}) or {}
+                af = data.get("account_fit", {}) or {}
+                from generators.report_generator import _compute_creator_priority_score
+                data["creator_priority_score"] = _compute_creator_priority_score(cs_obj, sf, cef, af, cf)
+                f.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+                click.echo(f"  ✓  creator_fit:{cf.get('score','-')}  creator_ps:{data['creator_priority_score']}")
+                total += 1
+            else:
+                click.echo(f"  ✗  空レスポンス")
+                errors.append(cname)
+        except Exception as e:
+            click.echo(f"  ✗  エラー: {e}")
+            errors.append(cname)
+
+    click.echo(sep)
+    click.echo(f"  完了: {total}件  スキップ: {skipped}件  エラー: {len(errors)}件")
+    if errors:
+        for e in errors:
+            click.echo(f"    エラー: {e}")
+    click.echo(sep + "\n")
+    if total > 0:
+        click.echo("  → rank-cases または compare-top でcreator_fit込みランキングを確認できます\n")
 
 
 @cli.command("batch-analyze")
@@ -616,7 +728,7 @@ def compare_top(cases_dir: str | None, top_n: int):
     sep = "=" * (W * min(len(top), 5) + 20)
 
     click.echo(f"\n{sep}")
-    click.echo(f"  compare-top  TOP{top_n}案件比較（priority_score順）  ※creator_psはCEF込み総合スコア")
+    click.echo(f"  compare-top  TOP{top_n}案件比較（priority_score順）  ※creator_psは7軸総合スコア")
     click.echo(sep)
 
     ROWS = [
@@ -630,6 +742,7 @@ def compare_top(cases_dir: str | None, top_n: int):
         ("approval_rate",   lambda e: f"{e['approval_rate']}%" if e["approval_rate"] is not None else "-"),
         ("CEF/100",          lambda e: f"{e['cef_score']}/100" if e.get("cef_score") is not None else "未分析"),
         ("account_fit",      lambda e: f"{e['account_fit']}/100" if e.get("account_fit") is not None else "未設定"),
+        ("creator_fit",      lambda e: f"{e['creator_fit']}/100" if e.get("creator_fit") is not None else "未設定"),
         ("creator_ps",       lambda e: str(e["creator_priority_score"]) if e.get("creator_priority_score") is not None else "未分析"),
         ("category",        lambda e: (e["category"] or "-")[:18]),
     ]
@@ -726,6 +839,31 @@ def compare_top(cases_dir: str | None, top_n: int):
                 click.echo(row)
             click.echo()
 
+    # creator_fit breakdown table
+    has_cf = [e for e in top if e.get("creator_fit_breakdown")]
+    if has_cf:
+        click.echo(f"{'─' * 60}")
+        click.echo("  【creator_fit 内訳】\n")
+        CF_ROWS = [
+            ("一次情報 /100",    "first_hand_info"),
+            ("専門性 /100",      "expertise_alignment"),
+            ("継続ネタ量 /100",   "content_sustainability"),
+            ("差別化力 /100",    "differentiation_potential"),
+            ("体験語り /100",    "authentic_voice"),
+            ("継続性 /100",      "longevity"),
+        ]
+        for col_start in range(0, len(has_cf), chunk):
+            cols = has_cf[col_start:col_start + chunk]
+            header = f"  {'軸':<20}" + "".join(f"  {c['product_name'][:W-2]:<{W-2}}" for c in cols)
+            click.echo(header)
+            click.echo("  " + "─" * (20 + W * len(cols)))
+            for label, key in CF_ROWS:
+                row = f"  {label:<20}" + "".join(
+                    f"  {c['creator_fit_breakdown'].get(key, '-'):<{W-2}}" for c in cols
+                )
+                click.echo(row)
+            click.echo()
+
     click.echo(sep + "\n")
 
 
@@ -755,6 +893,13 @@ def _extract_ranking_entry(data: dict, path: str) -> dict:
     account_fit_breakdown = af.get("breakdown", {}) if af else {}
     account_fit_verdict = af.get("verdict", "") if af else ""
     account_fit_angle = af.get("recommended_angle", "") if af else ""
+
+    cf = data.get("creator_fit", {}) or {}
+    creator_fit_score = int(cf.get("score") or 0) if cf else None
+    creator_fit_breakdown = cf.get("breakdown", {}) if cf else {}
+    creator_fit_verdict = cf.get("verdict", "") if cf else ""
+    creator_fit_angle = cf.get("content_angle", "") if cf else ""
+    creator_fit_risk = cf.get("risk_note", "") if cf else ""
 
     creator_ps = data.get("creator_priority_score")
     if creator_ps is None and startup_fit_score is not None and zero_cost_total is not None and cef_score is not None:
@@ -794,6 +939,11 @@ def _extract_ranking_entry(data: dict, path: str) -> dict:
         "account_fit_breakdown": account_fit_breakdown,
         "account_fit_verdict": account_fit_verdict,
         "account_fit_angle": account_fit_angle,
+        "creator_fit": creator_fit_score,
+        "creator_fit_breakdown": creator_fit_breakdown,
+        "creator_fit_verdict": creator_fit_verdict,
+        "creator_fit_angle": creator_fit_angle,
+        "creator_fit_risk": creator_fit_risk,
         "creator_priority_score": creator_ps,
         "start_priority": winning.get("start_priority"),
         "winning_angle": winning.get("winning_angle", ""),
@@ -848,7 +998,7 @@ def rank_cases(cases_dir: str | None, output_dir: str | None):
     click.echo(f"\n{'=' * 65}")
     click.echo(f"  案件ランキング  ({len(entries)}件)")
     click.echo(f"  priority_score     = case_score×0.3 + automation_fit×0.3 + startup_fit×0.4")
-    click.echo(f"  creator_priority   = (case_score + automation_fit + startup_fit + zero_cost_norm + CEF) × 0.2 each")
+    click.echo(f"  creator_priority   = (case_score + automation_fit + startup_fit + zero_cost_norm + CEF + account_fit + creator_fit) / 7")
     click.echo(f"{'=' * 65}")
 
     for rank, e in enumerate(entries, start=1):
@@ -921,9 +1071,23 @@ def rank_cases(cases_dir: str | None, output_dir: str | None):
         else:
             click.echo(f"       account_fit    : 未設定（set-account → account-fit-score で算出）")
 
+        cf_s = e.get("creator_fit")
+        if cf_s is not None:
+            bar_filled = round(cf_s / 100 * 20)
+            bar = "█" * bar_filled + "░" * (20 - bar_filled)
+            click.echo(f"       creator_fit    : {cf_s:>3}/100  [{bar}]  ← 発信者適合スコア")
+            cf_verdict = e.get("creator_fit_verdict", "")
+            if cf_verdict:
+                click.echo(f"                     {cf_verdict[:60]}")
+            cf_risk = e.get("creator_fit_risk", "")
+            if cf_risk:
+                click.echo(f"                     ⚠ {cf_risk[:55]}")
+        else:
+            click.echo(f"       creator_fit    : 未設定（set-creator-profile → creator-fit-score で算出）")
+
         creator_ps = e.get("creator_priority_score")
         if creator_ps is not None:
-            click.echo(f"       creator_ps     : {creator_ps}  ← CEF込み総合スコア")
+            click.echo(f"       creator_ps     : {creator_ps}  ← 7軸総合スコア")
         if e["start_priority"]:
             click.echo(f"       start_priority : {_priority_label(e['start_priority'])}")
         if e["epc"] is not None:

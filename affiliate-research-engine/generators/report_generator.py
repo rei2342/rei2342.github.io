@@ -27,7 +27,11 @@ def _empty_validation() -> dict:
 
 
 def _compute_creator_priority_score(
-    case_score_obj: dict, startup_fit: dict, cef: dict, account_fit: dict | None = None
+    case_score_obj: dict,
+    startup_fit: dict,
+    cef: dict,
+    account_fit: dict | None = None,
+    creator_fit: dict | None = None,
 ) -> int | None:
     case_score = int(case_score_obj.get("total") or 0)
     automation_fit = int(case_score_obj.get("automation_fit") or 0)
@@ -40,11 +44,24 @@ def _compute_creator_priority_score(
         return None
 
     zero_cost_norm = round(zero_cost_total / 1.2)
+    has_af = account_fit and account_fit.get("score") is not None
+    has_cf = creator_fit and creator_fit.get("score") is not None
 
-    if account_fit and account_fit.get("score") is not None:
+    if has_af and has_cf:
+        af_score = int(account_fit.get("score") or 0)
+        cf_score = int(creator_fit.get("score") or 0)
+        return round(
+            (case_score + automation_fit + sf_score + zero_cost_norm + cef_score + af_score + cf_score) / 7
+        )
+    elif has_af:
         af_score = int(account_fit.get("score") or 0)
         return round(
             (case_score + automation_fit + sf_score + zero_cost_norm + cef_score + af_score) / 6
+        )
+    elif has_cf:
+        cf_score = int(creator_fit.get("score") or 0)
+        return round(
+            (case_score + automation_fit + sf_score + zero_cost_norm + cef_score + cf_score) / 6
         )
     else:
         return round(
@@ -100,6 +117,7 @@ def build(
     cef: dict,
     llm: LLMClient,
     account_fit: dict | None = None,
+    creator_fit: dict | None = None,
 ) -> dict:
     scores = _compute_scores(
         case, lp_analysis, market_analysis,
@@ -170,8 +188,9 @@ def build(
         "startup_fit": startup_fit,
         "cef": cef,
         "account_fit": account_fit or {},
+        "creator_fit": creator_fit or {},
         "creator_priority_score": _compute_creator_priority_score(
-            winning_data.get("case_score", {}), startup_fit, cef, account_fit
+            winning_data.get("case_score", {}), startup_fit, cef, account_fit, creator_fit
         ),
         "winning_summary": winning_data.get("winning_summary", {}),
         "risk_score": risk_result.get("risk_score", 0),
