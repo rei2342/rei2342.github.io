@@ -155,6 +155,64 @@ def cli():
     """Affiliate Research Engine v1"""
 
 
+def _run_single_analysis(input_path: str, llm: LLMClient, verbose: bool = True) -> tuple[dict, str]:
+    """
+    Run full analysis pipeline on one case JSON.
+    Returns (report, output_path). Raises on error.
+    verbose=False suppresses per-step output (batch mode).
+    """
+    def step(label: str):
+        if verbose:
+            _step(label)
+
+    def ok():
+        if verbose:
+            _ok()
+
+    case = load_case(input_path)
+    iq = generate_information_quality(case)
+
+    step("LP分析"); lp = lp_analyzer.analyze(case, llm); ok()
+    step("市場分析"); market = market_analyzer.analyze(case, lp, llm); ok()
+    step("購買トリガー分析"); triggers = buying_trigger_analyzer.analyze(case, lp, market, llm); ok()
+    step("SNS適性・アルゴリズム分析"); sns_fit = sns_fit_analyzer.analyze(case, lp, market, triggers, llm); ok()
+    step("リスク分析"); risk = risk_analyzer.analyze(case, lp, market, llm); ok()
+
+    step("訴求フック生成（100件）")
+    emotion = sns_fit.get("emotion_analysis", {"primary": [], "secondary": []})
+    raw_appeals = appeal_generator.generate(case, triggers, emotion, sns_fit, risk, llm)
+    ok()
+
+    step("訴求スコアリング・TOP10抽出")
+    scored_appeals, top_appeals = appeal_scorer.score_and_rank(
+        raw_appeals, triggers, emotion, sns_fit, risk, llm
+    )
+    ok()
+
+    step("勝ち筋サマリー・case_score生成")
+    winning_data = winning_summary_generator.generate(
+        case, lp, market, triggers, sns_fit, risk, top_appeals, llm
+    )
+    ok()
+
+    step("startup_fit分析")
+    sf = startup_fit_analyzer.analyze(case, lp, market, risk, triggers, llm)
+    ok()
+
+    step("レポート統合・スコアリング")
+    report = report_generator.build(
+        case, iq, lp, market, triggers, sns_fit, risk,
+        scored_appeals, top_appeals, winning_data, sf, llm
+    )
+    ok()
+
+    step("JSON保存")
+    output_path = save_case_output(report, case.case_name)
+    ok()
+
+    return report, output_path
+
+
 @cli.command("analyze-case")
 @click.option("--input", "input_path", required=True, type=click.Path(exists=True), help="入力JSONファイルのパス")
 def analyze_case(input_path: str):
@@ -163,68 +221,11 @@ def analyze_case(input_path: str):
     click.echo(f"入力ファイル: {input_path}")
 
     llm = LLMClient()
-
     try:
-        _step("入力データ読み込み")
-        case = load_case(input_path)
-        iq = generate_information_quality(case)
-        _ok()
-
-        _step("LP分析")
-        lp = lp_analyzer.analyze(case, llm)
-        _ok()
-
-        _step("市場分析")
-        market = market_analyzer.analyze(case, lp, llm)
-        _ok()
-
-        _step("購買トリガー分析")
-        triggers = buying_trigger_analyzer.analyze(case, lp, market, llm)
-        _ok()
-
-        _step("SNS適性・アルゴリズム分析")
-        sns_fit = sns_fit_analyzer.analyze(case, lp, market, triggers, llm)
-        _ok()
-
-        _step("リスク分析")
-        risk = risk_analyzer.analyze(case, lp, market, llm)
-        _ok()
-
-        _step("訴求フック生成（100件）")
-        emotion = sns_fit.get("emotion_analysis", {"primary": [], "secondary": []})
-        raw_appeals = appeal_generator.generate(case, triggers, emotion, sns_fit, risk, llm)
-        _ok()
-
-        _step("訴求スコアリング・TOP10抽出")
-        scored_appeals, top_appeals = appeal_scorer.score_and_rank(
-            raw_appeals, triggers, emotion, sns_fit, risk, llm
-        )
-        _ok()
-
-        _step("勝ち筋サマリー・case_score生成")
-        winning_data = winning_summary_generator.generate(
-            case, lp, market, triggers, sns_fit, risk, top_appeals, llm
-        )
-        _ok()
-
-        _step("startup_fit分析")
-        sf = startup_fit_analyzer.analyze(case, lp, market, risk, triggers, llm)
-        _ok()
-
-        _step("レポート統合・スコアリング")
-        report = report_generator.build(
-            case, iq, lp, market, triggers, sns_fit, risk,
-            scored_appeals, top_appeals, winning_data, sf, llm
-        )
-        _ok()
-
-        _step("JSON保存")
-        output_path = save_case_output(report, case.case_name)
-        _ok()
-
+        _step("入力データ読み込み"); _ok()
+        report, output_path = _run_single_analysis(input_path, llm, verbose=True)
         _print_summary(report)
         click.echo(f"\n出力ファイル: {output_path}\n")
-
     except ValueError as e:
         click.echo(f"\n[エラー] {e}", err=True)
         sys.exit(1)
@@ -286,6 +287,280 @@ def generate_posts(input_path: str, appeal_ids: str, platform: str):
     except Exception as e:
         click.echo(f"\n[予期せぬエラー] {e}", err=True)
         raise
+
+
+_SCREENSHOT_TO_CASE_SYSTEM = (
+    "あなたはASPアフィリエイトプログラムのデータ抽出専門家です。"
+    "スクリーンショットから読み取れる情報のみを抽出し、JSONのみを返してください。推測禁止。"
+)
+
+
+@cli.command("screenshot-to-case")
+@click.argument("images", nargs=-1, required=True, type=click.Path(exists=True))
+@click.option("--output-dir", default=None, type=click.Path(), help="保存先ディレクトリ（デフォルト: data/cases/）")
+@click.option("--name", default=None, help="case_name を上書き指定")
+def screenshot_to_case(images: tuple, output_dir: str | None, name: str | None):
+    """スクリーンショットから CaseInput JSON を生成します"""
+    base = Path(__file__).parent
+    out_dir = Path(output_dir) if output_dir else base / "data" / "cases"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    click.echo(f"\nscreenshot-to-case — 画像読み込み: {len(images)}枚")
+    llm = LLMClient()
+
+    from core.storage import load_prompt
+    prompt = load_prompt("screenshot_to_case_prompt.md")
+
+    try:
+        result = llm.call_vision_json(prompt, list(images), _SCREENSHOT_TO_CASE_SYSTEM)
+    except Exception as e:
+        click.echo(f"[エラー] LLM呼び出し失敗: {e}", err=True)
+        sys.exit(1)
+
+    if name:
+        result["case_name"] = name
+
+    today = datetime.now(timezone.utc).strftime("%Y%m%d")
+    case_name = result.get("case_name", "unknown_case")
+    out_file = out_dir / f"{case_name}_{today}.json"
+    out_file.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    # バリデーション
+    try:
+        from core.input_loader import CaseInput
+        CaseInput(**result)
+        click.echo("  バリデーション: OK")
+    except Exception as e:
+        click.echo(f"  バリデーション: 警告 — {e}")
+
+    # 不足・null レポート
+    null_fields = [k for k, v in result.items() if v is None]
+    empty_fields = [k for k, v in result.items() if v == [] or v == ""]
+    click.echo(f"\n✓ 保存: {out_file}")
+    click.echo(f"\n▶ 不足・null項目:")
+    if null_fields:
+        for f in null_fields:
+            click.echo(f"  ⚠ {f}: null")
+    else:
+        click.echo("  なし")
+    if empty_fields:
+        click.echo(f"\n▶ 空配列・空文字項目:")
+        for f in empty_fields:
+            click.echo(f"  △ {f}: 空")
+    click.echo()
+
+
+@cli.command("case-check")
+@click.argument("paths", nargs=-1, required=True, type=click.Path(exists=True))
+def case_check(paths: tuple):
+    """分析前に案件JSONの不足項目を確認します"""
+    from core.input_loader import generate_information_quality
+
+    for path in paths:
+        try:
+            data = json.loads(Path(path).read_text(encoding="utf-8"))
+        except Exception as e:
+            click.echo(f"[エラー] {path}: {e}", err=True)
+            continue
+
+        from core.input_loader import CaseInput
+        try:
+            case = CaseInput(**data)
+        except Exception as e:
+            click.echo(f"[バリデーションエラー] {path}: {e}")
+            continue
+
+        iq = generate_information_quality(case)
+        missing = iq.get("missing", [])
+        confirmed = iq.get("confirmed", [])
+
+        # 分析可否判定
+        blockers = [m for m in missing if m in ("LP本文またはアフィリエイトURL",)]
+        ready = "✓ 分析可能" if not blockers else "✗ 分析不可（LP情報が必要）"
+
+        sep = "─" * 50
+        click.echo(f"\n{sep}")
+        click.echo(f"  {Path(path).name}")
+        click.echo(f"  case_name : {case.case_name}")
+        click.echo(f"  判定      : {ready}")
+        click.echo(sep)
+        click.echo(f"  確認済み ({len(confirmed)}件):")
+        for c in confirmed:
+            click.echo(f"    ✓ {c}")
+        if missing:
+            click.echo(f"  不足 ({len(missing)}件):")
+            for m in missing:
+                marker = "✗" if m in ("LP本文またはアフィリエイトURL",) else "⚠"
+                click.echo(f"    {marker} {m}")
+        click.echo()
+
+
+@cli.command("batch-analyze")
+@click.option("--cases-dir", default=None, type=click.Path(), help="入力JSONディレクトリ（デフォルト: data/cases/）")
+@click.option("--force", is_flag=True, default=False, help="分析済みでも再分析する")
+@click.option("--limit", "max_cases", default=None, type=int, help="最大分析件数")
+def batch_analyze(cases_dir: str | None, force: bool, max_cases: int | None):
+    """data/cases/*.json を一括分析します（分析済みはスキップ）"""
+    base = Path(__file__).parent
+    cases_path = Path(cases_dir) if cases_dir else base / "data" / "cases"
+    outputs_path = base / "outputs" / "cases"
+
+    input_files = sorted(cases_path.glob("*.json"))
+    if not input_files:
+        click.echo(f"[エラー] {cases_path} にJSONファイルが見つかりません", err=True)
+        sys.exit(1)
+
+    if max_cases:
+        input_files = input_files[:max_cases]
+
+    # 分析済みケースを判定（outputs/cases/{case_name}_*.json が存在するか）
+    def _is_analyzed(case_name: str) -> bool:
+        return bool(list(outputs_path.glob(f"{case_name}_*.json")))
+
+    llm = LLMClient()
+    results = []
+    skipped = []
+    errors = []
+
+    sep = "=" * 65
+    click.echo(f"\n{sep}")
+    click.echo(f"  batch-analyze  対象: {len(input_files)}件  force={force}")
+    click.echo(sep)
+
+    for i, f in enumerate(input_files, start=1):
+        try:
+            raw = json.loads(f.read_text(encoding="utf-8"))
+            case_name = raw.get("case_name", f.stem)
+        except Exception:
+            case_name = f.stem
+
+        if not force and _is_analyzed(case_name):
+            click.echo(f"  [{i:02d}/{len(input_files)}] {case_name}  → スキップ（分析済み）")
+            skipped.append(case_name)
+            continue
+
+        click.echo(f"  [{i:02d}/{len(input_files)}] {case_name}  → 分析中...", nl=False)
+        try:
+            report, out_path = _run_single_analysis(str(f), llm, verbose=False)
+            cs_obj = report.get("case_score", {})
+            sf_obj = report.get("startup_fit", {}) or {}
+            zcv = (sf_obj.get("zero_cost_validation_score") or {}).get("total", "-")
+            click.echo(
+                f"  ✓  "
+                f"case_score:{cs_obj.get('total','-')}  "
+                f"automation:{cs_obj.get('automation_fit','-')}  "
+                f"startup_fit:{sf_obj.get('score','-')}  "
+                f"zero_cost:{zcv}/120"
+            )
+            results.append({"name": case_name, "path": str(out_path), "report": report})
+        except Exception as e:
+            click.echo(f"  ✗  エラー: {e}")
+            errors.append((case_name, str(e)))
+
+    click.echo(f"\n{sep}")
+    click.echo(f"  完了: {len(results)}件  スキップ: {len(skipped)}件  エラー: {len(errors)}件")
+    if errors:
+        click.echo("  エラー詳細:")
+        for name, msg in errors:
+            click.echo(f"    {name}: {msg}")
+    click.echo(sep + "\n")
+
+    if results:
+        click.echo("  → rank-cases で横並び比較できます: python main.py rank-cases")
+
+
+@cli.command("compare-top")
+@click.option("--cases-dir", default=None, type=click.Path(), help="分析済みJSONディレクトリ（デフォルト: outputs/cases/）")
+@click.option("--top", "top_n", default=10, show_default=True, help="表示件数")
+def compare_top(cases_dir: str | None, top_n: int):
+    """TOP N 案件をスコア比較表で表示します"""
+    base = Path(__file__).parent
+    cases_path = Path(cases_dir) if cases_dir else base / "outputs" / "cases"
+
+    json_files = sorted(cases_path.glob("*.json"))
+    if not json_files:
+        click.echo(f"[エラー] {cases_path} にJSONファイルが見つかりません", err=True)
+        sys.exit(1)
+
+    entries = []
+    seen_names: set[str] = set()
+    for f in json_files:
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            e = _extract_ranking_entry(data, str(f))
+            # 同一case_nameは最新ファイルのみ（ファイル名ソートで後優先）
+            if e["product_name"] in seen_names:
+                entries = [x for x in entries if x["product_name"] != e["product_name"]]
+            seen_names.add(e["product_name"])
+            entries.append(e)
+        except Exception:
+            pass
+
+    entries.sort(key=lambda x: x["priority_score"], reverse=True)
+    top = entries[:top_n]
+
+    W = 22  # column width
+    sep = "=" * (W * min(len(top), 5) + 20)
+
+    click.echo(f"\n{sep}")
+    click.echo(f"  compare-top  TOP{top_n}案件比較（priority_score順）")
+    click.echo(sep)
+
+    ROWS = [
+        ("priority_score",  lambda e: str(e["priority_score"]) + ("※" if e["priority_score_note"] else "")),
+        ("zero_cost/120",   lambda e: f"{e['zero_cost_total']}/120" if e["zero_cost_total"] is not None else "-"),
+        ("startup_fit",     lambda e: f"{e['startup_fit']} [{e['startup_fit_level'] or '?'}]" if e["startup_fit"] is not None else "未分析"),
+        ("case_score",      lambda e: str(e["case_score"])),
+        ("automation_fit",  lambda e: str(e["automation_fit"])),
+        ("start_priority",  lambda e: e["start_priority"] or "-"),
+        ("EPC",             lambda e: str(e["epc"]) if e["epc"] is not None else "-"),
+        ("approval_rate",   lambda e: f"{e['approval_rate']}%" if e["approval_rate"] is not None else "-"),
+        ("category",        lambda e: (e["category"] or "-")[:18]),
+    ]
+
+    # Print in groups of 5 columns
+    chunk = 5
+    for col_start in range(0, len(top), chunk):
+        cols = top[col_start:col_start + chunk]
+
+        # Header
+        header = f"  {'指標':<18}" + "".join(f"  {c['product_name'][:W-2]:<{W-2}}" for c in cols)
+        click.echo(f"\n{header}")
+        click.echo("  " + "─" * (18 + (W) * len(cols)))
+
+        # Rows
+        for label, fn in ROWS:
+            row = f"  {label:<18}" + "".join(f"  {fn(c):<{W-2}}" for c in cols)
+            click.echo(row)
+
+        click.echo()
+
+    # zcv breakdown table
+    has_zcv = [e for e in top if e.get("zero_cost_breakdown")]
+    if has_zcv:
+        click.echo(f"{'─' * 60}")
+        click.echo("  【zero_cost 内訳】\n")
+        ZCV_ROWS = [
+            ("free_signup /20",   "free_signup"),
+            ("free_trial /20",    "free_trial"),
+            ("self_apply /20",    "self_application_ok"),
+            ("no_purchase /20",   "no_purchase_needed"),
+            ("no_face /20",       "no_face_needed"),
+            ("no_record /20",     "no_track_record_needed"),
+        ]
+        for col_start in range(0, len(has_zcv), chunk):
+            cols = has_zcv[col_start:col_start + chunk]
+            header = f"  {'軸':<18}" + "".join(f"  {c['product_name'][:W-2]:<{W-2}}" for c in cols)
+            click.echo(header)
+            click.echo("  " + "─" * (18 + W * len(cols)))
+            for label, key in ZCV_ROWS:
+                row = f"  {label:<18}" + "".join(
+                    f"  {c['zero_cost_breakdown'].get(key, '-'):<{W-2}}" for c in cols
+                )
+                click.echo(row)
+            click.echo()
+
+    click.echo(sep + "\n")
 
 
 def _extract_ranking_entry(data: dict, path: str) -> dict:
