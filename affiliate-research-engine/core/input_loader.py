@@ -10,6 +10,12 @@ class CaseInput(BaseModel):
     lp_text: Optional[str] = None
     asp_name: Optional[str] = None
     reward: Optional[int] = None
+    reward_type: Optional[str] = None
+    reward_rate: Optional[float] = None
+    reward_note: Optional[str] = None
+    epc: Optional[float] = None
+    approval_rate: Optional[float] = None
+    cookie_period: Optional[int] = None
     category: str
     conversion_condition: Optional[str] = None
     restrictions: Optional[str] = None

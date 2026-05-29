@@ -1,4 +1,6 @@
 import sys
+import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import click
@@ -9,6 +11,7 @@ load_dotenv()
 from core.llm_client import LLMClient
 from core.input_loader import load_case, generate_information_quality
 from core.storage import save_case_output, load_case_output, update_case_output
+import config
 
 import analyzers.lp_analyzer as lp_analyzer
 import analyzers.market_analyzer as market_analyzer
@@ -272,6 +275,137 @@ def generate_posts(input_path: str, appeal_ids: str, platform: str):
     except Exception as e:
         click.echo(f"\n[予期せぬエラー] {e}", err=True)
         raise
+
+
+def _extract_ranking_entry(data: dict, path: str) -> dict:
+    meta = data.get("meta", {})
+    basic = data.get("basic_info", {})
+    case_score_obj = data.get("case_score", {})
+    winning = data.get("winning_summary", {})
+    sf = data.get("startup_fit", {})
+
+    case_score = int(case_score_obj.get("total") or 0)
+    automation_fit = int(case_score_obj.get("automation_fit") or 0)
+    startup_fit_score = int(sf.get("score") or 0) if sf else None
+    startup_fit_level = sf.get("level") if sf else None
+
+    if startup_fit_score is not None:
+        priority_score = round(
+            case_score * 0.3 + automation_fit * 0.3 + startup_fit_score * 0.4
+        )
+    else:
+        # startup_fit未分析の場合は case_score + automation_fit の平均で代替
+        priority_score = round((case_score + automation_fit) / 2)
+
+    return {
+        "file": Path(path).name,
+        "case_id": meta.get("case_id"),
+        "analyzed_at": meta.get("analyzed_at", "")[:19],
+        "product_name": basic.get("case_name", meta.get("case_name", "unknown")),
+        "category": basic.get("category", ""),
+        "case_score": case_score,
+        "automation_fit": automation_fit,
+        "startup_fit": startup_fit_score,
+        "startup_fit_level": startup_fit_level,
+        "start_priority": winning.get("start_priority"),
+        "winning_angle": winning.get("winning_angle", ""),
+        "epc": basic.get("epc"),
+        "approval_rate": basic.get("approval_rate"),
+        "priority_score": priority_score,
+        "priority_score_note": None if startup_fit_score is not None else "startup_fit未分析のため概算",
+    }
+
+
+def _level_label(level: str | None) -> str:
+    return {"High": "High ★★★", "Medium": "Medium ★★", "Low": "Low ★"}.get(level or "", level or "-")
+
+
+@cli.command("rank-cases")
+@click.option(
+    "--cases-dir",
+    default=None,
+    type=click.Path(),
+    help="分析済みJSONが入ったディレクトリ（デフォルト: outputs/cases/）",
+)
+@click.option(
+    "--output-dir",
+    default=None,
+    type=click.Path(),
+    help="ランキングJSONの保存先（デフォルト: outputs/rankings/）",
+)
+def rank_cases(cases_dir: str | None, output_dir: str | None):
+    """分析済みJSON一覧からpriority_score順にランキングを表示・保存します"""
+    base = Path(__file__).parent
+    cases_path = Path(cases_dir) if cases_dir else base / "outputs" / "cases"
+    rankings_path = Path(output_dir) if output_dir else base / "outputs" / "rankings"
+    rankings_path.mkdir(parents=True, exist_ok=True)
+
+    json_files = sorted(cases_path.glob("*.json"))
+    if not json_files:
+        click.echo(f"[エラー] {cases_path} にJSONファイルが見つかりません", err=True)
+        sys.exit(1)
+
+    entries = []
+    errors = []
+    for f in json_files:
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            entries.append(_extract_ranking_entry(data, str(f)))
+        except Exception as e:
+            errors.append((f.name, str(e)))
+
+    entries.sort(key=lambda x: x["priority_score"], reverse=True)
+
+    # ターミナル表示
+    click.echo(f"\n{'=' * 65}")
+    click.echo(f"  案件ランキング  ({len(entries)}件)  priority_score = case_score×0.3 + automation_fit×0.3 + startup_fit×0.4")
+    click.echo(f"{'=' * 65}")
+
+    for rank, e in enumerate(entries, start=1):
+        sf_disp = str(e["startup_fit"]) if e["startup_fit"] is not None else "未分析"
+        note = f"  ※{e['priority_score_note']}" if e["priority_score_note"] else ""
+        click.echo(f"\n  #{rank:02d} {e['product_name']}")
+        click.echo(f"       priority_score : {e['priority_score']}{note}")
+        click.echo(f"       case_score     : {e['case_score']}")
+        click.echo(f"       automation_fit : {e['automation_fit']}")
+        click.echo(f"       startup_fit    : {sf_disp}", nl=False)
+        if e["startup_fit_level"]:
+            click.echo(f"  [{_level_label(e['startup_fit_level'])}]")
+        else:
+            click.echo()
+        if e["start_priority"]:
+            click.echo(f"       start_priority : {_priority_label(e['start_priority'])}")
+        if e["epc"] is not None:
+            click.echo(f"       EPC            : {e['epc']}")
+        if e["approval_rate"] is not None:
+            click.echo(f"       approval_rate  : {e['approval_rate']}%")
+        if e["winning_angle"]:
+            wa = e["winning_angle"][:60] + ("…" if len(e["winning_angle"]) > 60 else "")
+            click.echo(f"       winning_angle  : {wa}")
+        if e["category"]:
+            click.echo(f"       category       : {e['category']}")
+
+    if errors:
+        click.echo(f"\n⚠ 読み込みエラー ({len(errors)}件):")
+        for fname, msg in errors:
+            click.echo(f"  {fname}: {msg}")
+
+    click.echo(f"\n{'=' * 65}")
+
+    # JSON保存
+    today = datetime.now(timezone.utc).strftime("%Y%m%d")
+    out_file = rankings_path / f"ranking_{today}.json"
+    ranking_doc = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "schema_version": config.SCHEMA_VERSION,
+        "total": len(entries),
+        "formula": "priority_score = case_score × 0.3 + automation_fit × 0.3 + startup_fit × 0.4",
+        "rankings": [{"rank": i + 1, **e} for i, e in enumerate(entries)],
+    }
+    out_file.write_text(
+        json.dumps(ranking_doc, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    click.echo(f"  ランキングJSON: {out_file}\n")
 
 
 if __name__ == "__main__":
