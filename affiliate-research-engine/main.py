@@ -20,6 +20,7 @@ import analyzers.sns_fit_analyzer as sns_fit_analyzer
 import analyzers.risk_analyzer as risk_analyzer
 import analyzers.appeal_scorer as appeal_scorer
 import analyzers.startup_fit_analyzer as startup_fit_analyzer
+import analyzers.account_fit_analyzer as account_fit_analyzer
 import generators.appeal_generator as appeal_generator
 import generators.winning_summary_generator as winning_summary_generator
 import generators.report_generator as report_generator
@@ -397,6 +398,111 @@ def case_check(paths: tuple):
         click.echo()
 
 
+@cli.command("set-account")
+@click.option("--type", "account_type", required=True, help="アカウント種別（例: 20代女性）")
+@click.option("--interests", required=True, help="興味関心（カンマ区切り）")
+@click.option("--platform", "platform_focus", required=True, help="主要媒体（カンマ区切り）")
+@click.option("--style", "content_style", default="体験談・比較・ライフハック系", help="コンテンツスタイル")
+@click.option("--persona", default="", help="ペルソナ説明（任意）")
+def set_account(account_type: str, interests: str, platform_focus: str, content_style: str, persona: str):
+    """アカウントプロフィールを設定します（account_fit算出に使用）"""
+    base = Path(__file__).parent
+    profile = {
+        "account_type": account_type,
+        "interests": [i.strip() for i in interests.split(",")],
+        "platform_focus": [p.strip() for p in platform_focus.split(",")],
+        "content_style": content_style,
+        "follower_stage": "ゼロフォロワー新規",
+        "persona": persona,
+    }
+    out = base / "data" / "account_profile.json"
+    out.write_text(json.dumps(profile, ensure_ascii=False, indent=2), encoding="utf-8")
+    click.echo(f"\n✓ アカウントプロフィール保存: {out}")
+    click.echo(f"  account_type : {account_type}")
+    click.echo(f"  interests    : {', '.join(profile['interests'])}")
+    click.echo(f"  platforms    : {', '.join(profile['platform_focus'])}")
+    click.echo(f"  style        : {content_style}")
+    if persona:
+        click.echo(f"  persona      : {persona}")
+    click.echo(f"\n  次: python main.py account-fit-score  でスコアを算出してください\n")
+
+
+@cli.command("account-fit-score")
+@click.option("--cases-dir", default=None, type=click.Path(), help="分析済みJSONディレクトリ（デフォルト: outputs/cases/）")
+@click.option("--force", is_flag=True, default=False, help="既存スコアを上書き")
+def account_fit_score(cases_dir: str | None, force: bool):
+    """分析済み案件にaccount_fitスコアを追加します"""
+    base = Path(__file__).parent
+    cases_path = Path(cases_dir) if cases_dir else base / "outputs" / "cases"
+    profile_path = base / "data" / "account_profile.json"
+
+    if not profile_path.exists():
+        click.echo("[エラー] data/account_profile.json が見つかりません", err=True)
+        click.echo("  先に: python main.py set-account --type ... --interests ... --platform ...", err=True)
+        sys.exit(1)
+
+    profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    click.echo(f"\naccount-fit-score  アカウント: {profile.get('account_type','不明')} / {', '.join(profile.get('interests',[]))}")
+
+    json_files = sorted(cases_path.glob("*.json"))
+    if not json_files:
+        click.echo(f"[エラー] {cases_path} にJSONファイルが見つかりません", err=True)
+        sys.exit(1)
+
+    # 同一case_nameは最新のみ（compare-topと同じ重複排除）
+    seen: dict[str, Path] = {}
+    for f in json_files:
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            name = data.get("meta", {}).get("case_name") or data.get("basic_info", {}).get("case_name", f.stem)
+            seen[name] = f
+        except Exception:
+            pass
+
+    llm = LLMClient()
+    sep = "=" * 65
+    click.echo(sep)
+    total, skipped, errors = 0, 0, []
+
+    for name, f in seen.items():
+        data = json.loads(f.read_text(encoding="utf-8"))
+        existing = data.get("account_fit", {})
+        if existing and not force:
+            click.echo(f"  {name:<40} → スキップ（スコア済み: {existing.get('score','-')}）")
+            skipped += 1
+            continue
+
+        click.echo(f"  {name:<40} → 採点中...", nl=False)
+        try:
+            af = account_fit_analyzer.analyze(data, llm)
+            if af:
+                data["account_fit"] = af
+                # creator_priority_scoreを再計算
+                cs_obj = data.get("case_score", {})
+                sf = data.get("startup_fit", {}) or {}
+                cef = data.get("cef", {}) or {}
+                from generators.report_generator import _compute_creator_priority_score
+                data["creator_priority_score"] = _compute_creator_priority_score(cs_obj, sf, cef, af)
+                f.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+                click.echo(f"  ✓  account_fit:{af.get('score','-')}  creator_ps:{data['creator_priority_score']}")
+                total += 1
+            else:
+                click.echo(f"  ✗  空レスポンス")
+                errors.append(name)
+        except Exception as e:
+            click.echo(f"  ✗  エラー: {e}")
+            errors.append(name)
+
+    click.echo(sep)
+    click.echo(f"  完了: {total}件  スキップ: {skipped}件  エラー: {len(errors)}件")
+    if errors:
+        for e in errors:
+            click.echo(f"    エラー: {e}")
+    click.echo(sep + "\n")
+    if total > 0:
+        click.echo("  → rank-cases または compare-top でaccount_fit込みランキングを確認できます\n")
+
+
 @cli.command("batch-analyze")
 @click.option("--cases-dir", default=None, type=click.Path(), help="入力JSONディレクトリ（デフォルト: data/cases/）")
 @click.option("--force", is_flag=True, default=False, help="分析済みでも再分析する")
@@ -523,6 +629,7 @@ def compare_top(cases_dir: str | None, top_n: int):
         ("EPC",             lambda e: str(e["epc"]) if e["epc"] is not None else "-"),
         ("approval_rate",   lambda e: f"{e['approval_rate']}%" if e["approval_rate"] is not None else "-"),
         ("CEF/100",          lambda e: f"{e['cef_score']}/100" if e.get("cef_score") is not None else "未分析"),
+        ("account_fit",      lambda e: f"{e['account_fit']}/100" if e.get("account_fit") is not None else "未設定"),
         ("creator_ps",       lambda e: str(e["creator_priority_score"]) if e.get("creator_priority_score") is not None else "未分析"),
         ("category",        lambda e: (e["category"] or "-")[:18]),
     ]
@@ -594,6 +701,31 @@ def compare_top(cases_dir: str | None, top_n: int):
                 click.echo(row)
             click.echo()
 
+    # account_fit breakdown table
+    has_af = [e for e in top if e.get("account_fit_breakdown")]
+    if has_af:
+        click.echo(f"{'─' * 60}")
+        click.echo("  【account_fit 内訳】\n")
+        AF_ROWS = [
+            ("視聴者一致 /100",    "audience_match"),
+            ("テーマ親和 /100",    "interest_alignment"),
+            ("スタイル適合 /100",  "content_style_fit"),
+            ("信頼性適合 /100",    "credibility_fit"),
+            ("フォロワー相乗 /100", "follower_growth_synergy"),
+            ("購買心理一致 /100",  "purchase_psychology_match"),
+        ]
+        for col_start in range(0, len(has_af), chunk):
+            cols = has_af[col_start:col_start + chunk]
+            header = f"  {'軸':<20}" + "".join(f"  {c['product_name'][:W-2]:<{W-2}}" for c in cols)
+            click.echo(header)
+            click.echo("  " + "─" * (20 + W * len(cols)))
+            for label, key in AF_ROWS:
+                row = f"  {label:<20}" + "".join(
+                    f"  {c['account_fit_breakdown'].get(key, '-'):<{W-2}}" for c in cols
+                )
+                click.echo(row)
+            click.echo()
+
     click.echo(sep + "\n")
 
 
@@ -617,6 +749,12 @@ def _extract_ranking_entry(data: dict, path: str) -> dict:
     cef_score = int(cef.get("score") or 0) if cef else None
     cef_total = int(cef.get("total") or 0) if cef else None
     cef_breakdown = cef.get("breakdown", {}) if cef else {}
+
+    af = data.get("account_fit", {}) or {}
+    account_fit_score = int(af.get("score") or 0) if af else None
+    account_fit_breakdown = af.get("breakdown", {}) if af else {}
+    account_fit_verdict = af.get("verdict", "") if af else ""
+    account_fit_angle = af.get("recommended_angle", "") if af else ""
 
     creator_ps = data.get("creator_priority_score")
     if creator_ps is None and startup_fit_score is not None and zero_cost_total is not None and cef_score is not None:
@@ -652,6 +790,10 @@ def _extract_ranking_entry(data: dict, path: str) -> dict:
         "cef_score": cef_score,
         "cef_total": cef_total,
         "cef_breakdown": cef_breakdown,
+        "account_fit": account_fit_score,
+        "account_fit_breakdown": account_fit_breakdown,
+        "account_fit_verdict": account_fit_verdict,
+        "account_fit_angle": account_fit_angle,
         "creator_priority_score": creator_ps,
         "start_priority": winning.get("start_priority"),
         "winning_angle": winning.get("winning_angle", ""),
@@ -766,6 +908,18 @@ def rank_cases(cases_dir: str | None, output_dir: str | None):
                 click.echo(f"                     {' / '.join(parts)}")
         else:
             click.echo(f"       CEF            : 未分析")
+
+        af_s = e.get("account_fit")
+        af_bd = e.get("account_fit_breakdown") or {}
+        if af_s is not None:
+            bar_filled = round(af_s / 100 * 20)
+            bar = "█" * bar_filled + "░" * (20 - bar_filled)
+            click.echo(f"       account_fit    : {af_s:>3}/100  [{bar}]  ← アカウント適合スコア")
+            af_verdict = e.get("account_fit_verdict", "")
+            if af_verdict:
+                click.echo(f"                     {af_verdict[:60]}")
+        else:
+            click.echo(f"       account_fit    : 未設定（set-account → account-fit-score で算出）")
 
         creator_ps = e.get("creator_priority_score")
         if creator_ps is not None:

@@ -26,7 +26,9 @@ def _empty_validation() -> dict:
     }
 
 
-def _compute_creator_priority_score(case_score_obj: dict, startup_fit: dict, cef: dict) -> int | None:
+def _compute_creator_priority_score(
+    case_score_obj: dict, startup_fit: dict, cef: dict, account_fit: dict | None = None
+) -> int | None:
     case_score = int(case_score_obj.get("total") or 0)
     automation_fit = int(case_score_obj.get("automation_fit") or 0)
     sf_score = startup_fit.get("score") if startup_fit else None
@@ -38,13 +40,20 @@ def _compute_creator_priority_score(case_score_obj: dict, startup_fit: dict, cef
         return None
 
     zero_cost_norm = round(zero_cost_total / 1.2)
-    return round(
-        case_score * 0.2
-        + automation_fit * 0.2
-        + sf_score * 0.2
-        + zero_cost_norm * 0.2
-        + cef_score * 0.2
-    )
+
+    if account_fit and account_fit.get("score") is not None:
+        af_score = int(account_fit.get("score") or 0)
+        return round(
+            (case_score + automation_fit + sf_score + zero_cost_norm + cef_score + af_score) / 6
+        )
+    else:
+        return round(
+            case_score * 0.2
+            + automation_fit * 0.2
+            + sf_score * 0.2
+            + zero_cost_norm * 0.2
+            + cef_score * 0.2
+        )
 
 
 def _compute_scores(
@@ -90,6 +99,7 @@ def build(
     startup_fit: dict,
     cef: dict,
     llm: LLMClient,
+    account_fit: dict | None = None,
 ) -> dict:
     scores = _compute_scores(
         case, lp_analysis, market_analysis,
@@ -159,8 +169,9 @@ def build(
         "case_score": winning_data.get("case_score", {}),
         "startup_fit": startup_fit,
         "cef": cef,
+        "account_fit": account_fit or {},
         "creator_priority_score": _compute_creator_priority_score(
-            winning_data.get("case_score", {}), startup_fit, cef
+            winning_data.get("case_score", {}), startup_fit, cef, account_fit
         ),
         "winning_summary": winning_data.get("winning_summary", {}),
         "risk_score": risk_result.get("risk_score", 0),
