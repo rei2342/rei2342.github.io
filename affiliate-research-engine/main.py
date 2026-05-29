@@ -15,7 +15,9 @@ import analyzers.market_analyzer as market_analyzer
 import analyzers.buying_trigger_analyzer as buying_trigger_analyzer
 import analyzers.sns_fit_analyzer as sns_fit_analyzer
 import analyzers.risk_analyzer as risk_analyzer
+import analyzers.appeal_scorer as appeal_scorer
 import generators.appeal_generator as appeal_generator
+import generators.winning_summary_generator as winning_summary_generator
 import generators.report_generator as report_generator
 import generators.post_generator as post_generator
 
@@ -28,50 +30,88 @@ def _ok() -> None:
     click.echo(" ✓")
 
 
+def _priority_label(priority: str) -> str:
+    return {"High": "HIGH ★★★", "Medium": "MEDIUM ★★", "Low": "LOW ★"}.get(priority, priority)
+
+
 def _print_summary(report: dict) -> None:
     meta = report["meta"]
     scores = report["scores"]
+    case_score = report.get("case_score", {})
+    winning = report.get("winning_summary", {})
     risk = report.get("risk_score", 0)
     ai_risk = report.get("ai_content_risk", {})
     triggers = report.get("buying_triggers", [])
+    top_appeals = report.get("top_appeals", [])
     iq = report.get("information_quality", {})
 
-    click.echo("\n" + "=" * 60)
+    click.echo("\n" + "=" * 65)
     click.echo(f"  案件名   : {meta['case_name']}")
     click.echo(f"  分析日時 : {meta['analyzed_at'][:19]}")
-    click.echo("=" * 60)
+    click.echo("=" * 65)
 
-    click.echo("\n▶ スコア")
-    click.echo(f"  affiliate_score : {scores.get('affiliate_score', '-')}")
-    click.echo(f"  risk_score      : {risk}")
-    click.echo(f"  ai_content_risk : {ai_risk.get('score', '-')} ({ai_risk.get('risk_level', '-')})")
+    # 開始優先度（最重要項目を先頭に）
+    priority = winning.get("start_priority", "-")
+    priority_reason = winning.get("start_priority_reason", "")
+    click.echo(f"\n▶ 開始優先度     : {_priority_label(priority)}")
+    if priority_reason:
+        click.echo(f"  理由             : {priority_reason}")
 
-    pf = scores.get("platform_fit_scores", {})
-    if pf:
-        click.echo("\n▶ 媒体別スコア")
-        for platform, score in pf.items():
-            click.echo(f"  {platform:<12}: {score}")
+    # case_score
+    ct = case_score.get("total", "-")
+    af = case_score.get("automation_fit", "-")
+    click.echo(f"\n▶ case_score     : {ct}")
+    click.echo(f"  automation_fit   : {af}  ← Claude Codeでの量産適性")
+    click.echo(f"  profitability    : {case_score.get('profitability', '-')}")
+    click.echo(f"  sns_scalability  : {case_score.get('sns_scalability', '-')}")
+    click.echo(f"  content_repeat   : {case_score.get('content_repeatability', '-')}")
+    click.echo(f"  conv_closeness   : {case_score.get('conversion_closeness', '-')}")
+    click.echo(f"  risk_safety      : {case_score.get('risk_safety', '-')}")
 
+    # 勝ち筋
+    wa = winning.get("winning_angle", "")
+    best_p = ", ".join(winning.get("best_platforms", []))
+    best_a = ", ".join(winning.get("best_appeal_types", []))
+    diff = winning.get("difficulty", "-")
+    if wa:
+        click.echo(f"\n▶ 勝ち筋         : {wa}")
+    if best_p:
+        click.echo(f"  最強媒体         : {best_p}")
+    if best_a:
+        click.echo(f"  最強訴求タイプ   : {best_a}")
+    click.echo(f"  難易度           : {diff}")
+
+    # TOP10訴求
+    if top_appeals:
+        click.echo(f"\n▶ TOP10訴求（スコア順）")
+        for a in top_appeals[:10]:
+            rep = a.get("content_repeatability", "?").upper()
+            click.echo(
+                f"  #{a['rank']:02d} [{a['appeal_score']:3d}] "
+                f"[量産:{rep}] "
+                f"[{a['appeal_type']}] {a['hook']}"
+            )
+
+    # 購買トリガー
     if triggers:
-        click.echo("\n▶ 購買トリガー TOP3")
+        click.echo(f"\n▶ 購買トリガー TOP3")
         for t in triggers[:3]:
             click.echo(f"  [{t.get('strength','?').upper()}] {t.get('trigger','')} — {t.get('reason','')}")
 
-    appeals = report.get("appeals", [])
-    click.echo(f"\n▶ 生成された訴求フック : {len(appeals)}件")
+    # リスク
+    click.echo(f"\n▶ リスク")
+    click.echo(f"  risk_score      : {risk}")
+    click.echo(f"  ai_content_risk : {ai_risk.get('score', '-')} ({ai_risk.get('risk_level', '-')})")
 
-    high_appeals = [a for a in appeals if a.get("expected_strength") == "high"]
-    if high_appeals:
-        click.echo(f"\n▶ 期待値 HIGH の訴求 (上位5件)")
-        for a in high_appeals[:5]:
-            click.echo(f"  [{a.get('appeal_type','')}] {a.get('hook','')}")
-
+    # 情報不足
     if iq.get("missing"):
         click.echo(f"\n▶ 情報不足 (missing)")
         for m in iq["missing"]:
             click.echo(f"  ⚠ {m}")
 
-    click.echo("=" * 60)
+    total_appeals = len(report.get("appeals", []))
+    click.echo(f"\n  全訴求フック: {total_appeals}件（スコア順でJSONに保存済み）")
+    click.echo("=" * 65)
 
 
 @click.group()
@@ -116,12 +156,25 @@ def analyze_case(input_path: str):
 
         _step("訴求フック生成（100件）")
         emotion = sns_fit.get("emotion_analysis", {"primary": [], "secondary": []})
-        appeals = appeal_generator.generate(case, triggers, emotion, sns_fit, risk, llm)
+        raw_appeals = appeal_generator.generate(case, triggers, emotion, sns_fit, risk, llm)
         _ok()
 
-        _step("スコアリング・レポート統合")
+        _step("訴求スコアリング・TOP10抽出")
+        scored_appeals, top_appeals = appeal_scorer.score_and_rank(
+            raw_appeals, triggers, emotion, sns_fit, risk, llm
+        )
+        _ok()
+
+        _step("勝ち筋サマリー・case_score生成")
+        winning_data = winning_summary_generator.generate(
+            case, lp, market, triggers, sns_fit, risk, top_appeals, llm
+        )
+        _ok()
+
+        _step("レポート統合・スコアリング")
         report = report_generator.build(
-            case, iq, lp, market, triggers, sns_fit, risk, appeals, llm
+            case, iq, lp, market, triggers, sns_fit, risk,
+            scored_appeals, top_appeals, winning_data, llm
         )
         _ok()
 
@@ -142,7 +195,7 @@ def analyze_case(input_path: str):
 
 @cli.command("generate-posts")
 @click.option("--input", "input_path", required=True, type=click.Path(exists=True), help="分析済みJSONファイルのパス")
-@click.option("--appeal-ids", required=True, help="カンマ区切りのappal_id一覧")
+@click.option("--appeal-ids", required=True, help="カンマ区切りのappal_id一覧（top_appealsのappeal_idを使用）")
 @click.option(
     "--platform",
     required=True,

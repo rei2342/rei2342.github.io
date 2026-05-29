@@ -48,7 +48,9 @@ def build(
     buying_triggers_result: dict,
     sns_fit_result: dict,
     risk_result: dict,
-    appeals: list,
+    scored_appeals: list,
+    top_appeals: list,
+    winning_data: dict,
     llm: LLMClient,
 ) -> dict:
     scores = _compute_scores(
@@ -113,10 +115,13 @@ def build(
             "score_breakdown": scores.get("score_breakdown", {}),
             "score_reasoning": scores.get("score_reasoning", ""),
         },
+        "case_score": winning_data.get("case_score", {}),
+        "winning_summary": winning_data.get("winning_summary", {}),
         "risk_score": risk_result.get("risk_score", 0),
         "risk_factors": risk_result.get("risk_factors", []),
         "ai_content_risk": risk_result.get("ai_content_risk", {}),
-        "appeals": appeals,
+        "top_appeals": top_appeals,
+        "appeals": scored_appeals,
         "generated_posts": [],
         "human_feedback": {
             "selected_appeals": [],
