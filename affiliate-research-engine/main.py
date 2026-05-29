@@ -110,6 +110,9 @@ def _print_summary(report: dict) -> None:
         sf_bottleneck = sf.get("bottleneck", "")
         sf_action = sf.get("recommended_first_action", "")
         sf_breakdown = sf.get("breakdown", {})
+        zcv = sf.get("zero_cost_validation_score", {}) or {}
+        zcv_total = zcv.get("total", "-")
+        zcv_bd = zcv.get("breakdown", {})
         click.echo(f"\n▶ startup_fit    : {sf_score} [{sf_level}]")
         if sf_breakdown:
             click.echo(f"  zero_follower    : {sf_breakdown.get('zero_follower_viable', '-')}")
@@ -118,8 +121,16 @@ def _print_summary(report: dict) -> None:
             click.echo(f"  no_physical      : {sf_breakdown.get('no_physical_product_needed', '-')}")
             click.echo(f"  free_trial       : {sf_breakdown.get('free_trial_available', '-')}")
             click.echo(f"  trust_free_conv  : {sf_breakdown.get('trust_free_conversion', '-')}")
+        if zcv_bd:
+            click.echo(f"\n▶ zero_cost_validation : {zcv_total}/120  ← 費用ゼロ検証スコア（新規参入最重要指標）")
+            click.echo(f"  free_signup      : {zcv_bd.get('free_signup', '-')}/20")
+            click.echo(f"  free_trial       : {zcv_bd.get('free_trial', '-')}/20")
+            click.echo(f"  self_apply_ok    : {zcv_bd.get('self_application_ok', '-')}/20")
+            click.echo(f"  no_purchase      : {zcv_bd.get('no_purchase_needed', '-')}/20")
+            click.echo(f"  no_face          : {zcv_bd.get('no_face_needed', '-')}/20")
+            click.echo(f"  no_track_record  : {zcv_bd.get('no_track_record_needed', '-')}/20")
         if sf_bottleneck:
-            click.echo(f"  ボトルネック     : {sf_bottleneck}")
+            click.echo(f"\n  ボトルネック     : {sf_bottleneck}")
         if sf_action:
             click.echo(f"  最初のアクション : {sf_action}")
 
@@ -289,6 +300,10 @@ def _extract_ranking_entry(data: dict, path: str) -> dict:
     startup_fit_score = int(sf.get("score") or 0) if sf else None
     startup_fit_level = sf.get("level") if sf else None
 
+    zcv = (sf.get("zero_cost_validation_score") or {}) if sf else {}
+    zero_cost_total = int(zcv.get("total") or 0) if zcv else None
+    zero_cost_breakdown = zcv.get("breakdown", {}) if zcv else {}
+
     if startup_fit_score is not None:
         priority_score = round(
             case_score * 0.3 + automation_fit * 0.3 + startup_fit_score * 0.4
@@ -307,6 +322,8 @@ def _extract_ranking_entry(data: dict, path: str) -> dict:
         "automation_fit": automation_fit,
         "startup_fit": startup_fit_score,
         "startup_fit_level": startup_fit_level,
+        "zero_cost_total": zero_cost_total,
+        "zero_cost_breakdown": zero_cost_breakdown,
         "start_priority": winning.get("start_priority"),
         "winning_angle": winning.get("winning_angle", ""),
         "epc": basic.get("epc"),
@@ -364,21 +381,47 @@ def rank_cases(cases_dir: str | None, output_dir: str | None):
     for rank, e in enumerate(entries, start=1):
         sf_disp = str(e["startup_fit"]) if e["startup_fit"] is not None else "未分析"
         note = f"  ※{e['priority_score_note']}" if e["priority_score_note"] else ""
+        zcv = e.get("zero_cost_total")
+        zcv_bd = e.get("zero_cost_breakdown") or {}
+
         click.echo(f"\n  #{rank:02d} {e['product_name']}")
         click.echo(f"       priority_score : {e['priority_score']}{note}")
-        click.echo(f"       case_score     : {e['case_score']}")
-        click.echo(f"       automation_fit : {e['automation_fit']}")
+
+        # zero_cost_validation_score を最重要指標として最上部に表示
+        if zcv is not None:
+            bar_filled = round(zcv / 120 * 20)
+            bar = "█" * bar_filled + "░" * (20 - bar_filled)
+            click.echo(f"       zero_cost      : {zcv:>3}/120  [{bar}]  ← 費用ゼロ検証スコア")
+            if zcv_bd:
+                parts = []
+                for k, label in [
+                    ("free_signup", "登録"),
+                    ("free_trial", "体験"),
+                    ("self_application_ok", "本人申込"),
+                    ("no_purchase_needed", "購入不要"),
+                    ("no_face_needed", "顔出し不要"),
+                    ("no_track_record_needed", "実績不要"),
+                ]:
+                    v = zcv_bd.get(k, "-")
+                    parts.append(f"{label}:{v}")
+                click.echo(f"                     {' / '.join(parts)}")
+        else:
+            click.echo(f"       zero_cost      : 未分析")
+
         click.echo(f"       startup_fit    : {sf_disp}", nl=False)
         if e["startup_fit_level"]:
             click.echo(f"  [{_level_label(e['startup_fit_level'])}]")
         else:
             click.echo()
+        click.echo(f"       case_score     : {e['case_score']}  automation_fit: {e['automation_fit']}")
         if e["start_priority"]:
             click.echo(f"       start_priority : {_priority_label(e['start_priority'])}")
         if e["epc"] is not None:
-            click.echo(f"       EPC            : {e['epc']}")
+            click.echo(f"       EPC            : {e['epc']}", nl=False)
         if e["approval_rate"] is not None:
-            click.echo(f"       approval_rate  : {e['approval_rate']}%")
+            click.echo(f"  approval_rate: {e['approval_rate']}%")
+        elif e["epc"] is not None:
+            click.echo()
         if e["winning_angle"]:
             wa = e["winning_angle"][:60] + ("…" if len(e["winning_angle"]) > 60 else "")
             click.echo(f"       winning_angle  : {wa}")
@@ -575,8 +618,11 @@ def validate_ranking(cases_dir: str | None, output_dir: str | None):
         tested_mark = " ✓" if e["validation"].get("tested") else ""
         v = e["validation"]
         ctr = _safe_rate(v["link_clicks"], v["impressions"])
+        zcv = e.get("zero_cost_total")
+        zcv_disp = f"{zcv}/120" if zcv is not None else "未分析"
         click.echo(f"  #{rank:02d} {e['product_name']}{tested_mark}")
         click.echo(f"       priority_score : {e['priority_score']}{note}  "
+                   f"zero_cost: {zcv_disp}  "
                    f"startup_fit: {e['startup_fit'] if e['startup_fit'] is not None else '未分析'}  "
                    f"automation_fit: {e['automation_fit']}")
         click.echo(f"       status: {v['status']}  posts: {v['posts_created']}  "
