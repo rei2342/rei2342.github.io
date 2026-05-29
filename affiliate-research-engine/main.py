@@ -412,7 +412,10 @@ _EMPTY_VALIDATION = {
     "tested": False,
     "status": "pending",
     "posts_created": 0,
-    "clicks": 0,
+    "impressions": 0,
+    "engagements": 0,
+    "profile_visits": 0,
+    "link_clicks": 0,
     "conversions": 0,
     "revenue": 0,
     "memo": "",
@@ -421,12 +424,33 @@ _EMPTY_VALIDATION = {
 _VALID_STATUSES = ("pending", "testing", "done", "paused")
 
 
+def _fill_validation(v: dict) -> dict:
+    """既存JSONの旧フォーマット互換 + 欠損フィールド補完。"""
+    filled = dict(_EMPTY_VALIDATION)
+    filled.update(v)
+    # 旧フィールド clicks → link_clicks に移行
+    if "clicks" in filled and "link_clicks" not in v:
+        filled["link_clicks"] = filled.pop("clicks")
+    filled.pop("clicks", None)
+    return filled
+
+
+def _safe_rate(numerator: int, denominator: int, pct: bool = True) -> str:
+    if not denominator:
+        return "-%"
+    val = numerator / denominator
+    return f"{val * 100:.2f}%" if pct else f"{val:.4f}"
+
+
 @cli.command("set-validation")
 @click.option("--file", "file_path", required=True, type=click.Path(exists=True), help="更新対象の案件JSONファイル")
 @click.option("--tested/--not-tested", default=None, help="検証済みフラグ")
 @click.option("--status", type=click.Choice(_VALID_STATUSES), default=None, help="ステータス")
 @click.option("--posts", "posts_created", type=int, default=None, help="投稿作成数")
-@click.option("--clicks", type=int, default=None, help="クリック数")
+@click.option("--impressions", type=int, default=None, help="インプレッション数")
+@click.option("--engagements", type=int, default=None, help="エンゲージメント数（いいね+RT+返信等）")
+@click.option("--profile-visits", type=int, default=None, help="プロフィール遷移数")
+@click.option("--link-clicks", type=int, default=None, help="リンククリック数")
 @click.option("--conversions", type=int, default=None, help="CV数")
 @click.option("--revenue", type=int, default=None, help="売上（円）")
 @click.option("--memo", default=None, help="メモ")
@@ -435,14 +459,17 @@ def set_validation(
     tested: bool | None,
     status: str | None,
     posts_created: int | None,
-    clicks: int | None,
+    impressions: int | None,
+    engagements: int | None,
+    profile_visits: int | None,
+    link_clicks: int | None,
     conversions: int | None,
     revenue: int | None,
     memo: str | None,
 ):
     """案件JSONのvalidationフィールドを更新します"""
     data = json.loads(Path(file_path).read_text(encoding="utf-8"))
-    v = data.setdefault("validation", dict(_EMPTY_VALIDATION))
+    v = _fill_validation(data.get("validation") or {})
 
     if tested is not None:
         v["tested"] = tested
@@ -450,8 +477,14 @@ def set_validation(
         v["status"] = status
     if posts_created is not None:
         v["posts_created"] = posts_created
-    if clicks is not None:
-        v["clicks"] = clicks
+    if impressions is not None:
+        v["impressions"] = impressions
+    if engagements is not None:
+        v["engagements"] = engagements
+    if profile_visits is not None:
+        v["profile_visits"] = profile_visits
+    if link_clicks is not None:
+        v["link_clicks"] = link_clicks
     if conversions is not None:
         v["conversions"] = conversions
     if revenue is not None:
@@ -459,18 +492,26 @@ def set_validation(
     if memo is not None:
         v["memo"] = memo
 
+    data["validation"] = v
     Path(file_path).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
     name = data.get("meta", {}).get("case_name", Path(file_path).stem)
+    ctr = _safe_rate(v["link_clicks"], v["impressions"])
+    eng_rate = _safe_rate(v["engagements"], v["impressions"])
+    prof_rate = _safe_rate(v["profile_visits"], v["impressions"])
+    cvr = _safe_rate(v["conversions"], v["link_clicks"])
+
     click.echo(f"\n✓ {name} — validation 更新済み")
-    click.echo(f"  tested       : {v['tested']}")
-    click.echo(f"  status       : {v['status']}")
-    click.echo(f"  posts_created: {v['posts_created']}")
-    click.echo(f"  clicks       : {v['clicks']}")
-    click.echo(f"  conversions  : {v['conversions']}")
-    click.echo(f"  revenue      : ¥{v['revenue']:,}")
+    click.echo(f"  tested         : {v['tested']}  status: {v['status']}")
+    click.echo(f"  posts_created  : {v['posts_created']}")
+    click.echo(f"  impressions    : {v['impressions']:,}")
+    click.echo(f"  engagements    : {v['engagements']:,}  ({eng_rate})")
+    click.echo(f"  profile_visits : {v['profile_visits']:,}  ({prof_rate})")
+    click.echo(f"  link_clicks    : {v['link_clicks']:,}  CTR: {ctr}")
+    click.echo(f"  conversions    : {v['conversions']}  CVR: {cvr}")
+    click.echo(f"  revenue        : ¥{v['revenue']:,}")
     if v["memo"]:
-        click.echo(f"  memo         : {v['memo']}")
+        click.echo(f"  memo           : {v['memo']}")
     click.echo()
 
 
@@ -482,12 +523,26 @@ def _load_cases_for_validation(cases_path: Path) -> tuple[list, list]:
         try:
             data = json.loads(f.read_text(encoding="utf-8"))
             entry = _extract_ranking_entry(data, str(f))
-            v = data.get("validation") or dict(_EMPTY_VALIDATION)
-            entry["validation"] = v
+            entry["validation"] = _fill_validation(data.get("validation") or {})
             entries.append(entry)
         except Exception as e:
             errors.append((f.name, str(e)))
     return entries, errors
+
+
+def _print_sub_ranking(title: str, entries: list, key_fn, label_fn, min_count: int = 1) -> None:
+    ranked = [e for e in entries if e["validation"].get("tested") and key_fn(e["validation"]) > 0]
+    ranked.sort(key=lambda x: key_fn(x["validation"]), reverse=True)
+    click.echo(f"\n{'─' * 65}")
+    click.echo(f"\n{title}\n")
+    if len(ranked) < min_count:
+        click.echo(f"  データなし（tested=true かつ値 > 0 の案件が {min_count} 件以上必要）")
+        return
+    for rank, e in enumerate(ranked, start=1):
+        click.echo(f"  #{rank:02d} {e['product_name']}")
+        click.echo(f"       {label_fn(e['validation'])}")
+        if e["validation"]["memo"]:
+            click.echo(f"       memo: {e['validation']['memo']}")
 
 
 @cli.command("validate-ranking")
@@ -505,83 +560,111 @@ def validate_ranking(cases_dir: str | None, output_dir: str | None):
         click.echo(f"[エラー] {cases_path} にJSONファイルが見つかりません", err=True)
         sys.exit(1)
 
-    # validationフィールドが未初期化の既存JSONを自動補完（上書き保存はしない、表示のみ）
     tested_entries = [e for e in entries if e["validation"].get("tested")]
-
-    # 予測ランキング（priority_score順、全件）
     predicted = sorted(entries, key=lambda x: x["priority_score"], reverse=True)
-
-    # 実績ランキング（revenue順、tested=Trueのみ）
-    actual = sorted(tested_entries, key=lambda x: x["validation"]["revenue"], reverse=True)
 
     sep = "=" * 65
     click.echo(f"\n{sep}")
-    click.echo(f"  検証レポート  予測 {len(predicted)}件 ／ 実績あり {len(actual)}件")
+    click.echo(f"  検証レポート  全件: {len(entries)}  検証済み: {len(tested_entries)}")
     click.echo(sep)
 
     # ── 予測ランキング ──
     click.echo("\n【予測ランキング】  priority_score = case_score×0.3 + automation_fit×0.3 + startup_fit×0.4\n")
     for rank, e in enumerate(predicted, start=1):
         note = " ※概算" if e["priority_score_note"] else ""
-        tested_mark = " ✓検証済" if e["validation"].get("tested") else ""
-        click.echo(f"  #{rank:02d} {e['product_name']}{tested_mark}")
-        click.echo(f"       priority_score : {e['priority_score']}{note}")
-        click.echo(f"       startup_fit    : {e['startup_fit'] if e['startup_fit'] is not None else '未分析'}  "
-                   f"case_score: {e['case_score']}  automation_fit: {e['automation_fit']}")
+        tested_mark = " ✓" if e["validation"].get("tested") else ""
         v = e["validation"]
-        click.echo(f"       status         : {v['status']}  "
-                   f"posts: {v['posts_created']}  clicks: {v['clicks']}  cv: {v['conversions']}  revenue: ¥{v['revenue']:,}")
+        ctr = _safe_rate(v["link_clicks"], v["impressions"])
+        click.echo(f"  #{rank:02d} {e['product_name']}{tested_mark}")
+        click.echo(f"       priority_score : {e['priority_score']}{note}  "
+                   f"startup_fit: {e['startup_fit'] if e['startup_fit'] is not None else '未分析'}  "
+                   f"automation_fit: {e['automation_fit']}")
+        click.echo(f"       status: {v['status']}  posts: {v['posts_created']}  "
+                   f"imp: {v['impressions']:,}  clicks: {v['link_clicks']:,}  CTR: {ctr}  "
+                   f"cv: {v['conversions']}  rev: ¥{v['revenue']:,}")
         if v["memo"]:
-            click.echo(f"       memo           : {v['memo']}")
+            click.echo(f"       memo: {v['memo']}")
 
-    # ── 実績ランキング ──
-    click.echo(f"\n{'─' * 65}")
-    click.echo("\n【実績ランキング】  revenue順（tested=true のみ）\n")
-    if not actual:
-        click.echo("  まだ検証済み案件がありません。")
-        click.echo("  `python main.py set-validation --file <path> --tested --revenue <円>` で実績を記録してください。")
-    else:
-        for rank, e in enumerate(actual, start=1):
-            v = e["validation"]
-            cv_rate = f"{v['conversions']/v['clicks']*100:.1f}%" if v["clicks"] else "-%"
-            click.echo(f"  #{rank:02d} {e['product_name']}")
-            click.echo(f"       revenue        : ¥{v['revenue']:,}")
-            click.echo(f"       clicks         : {v['clicks']}  conversions: {v['conversions']}  CVR: {cv_rate}")
-            click.echo(f"       posts_created  : {v['posts_created']}")
-            if v["memo"]:
-                click.echo(f"       memo           : {v['memo']}")
+    # ── ①売上ランキング ──
+    _print_sub_ranking(
+        "【①売上ランキング】  revenue順",
+        entries,
+        key_fn=lambda v: v["revenue"],
+        label_fn=lambda v: (
+            f"revenue: ¥{v['revenue']:,}  "
+            f"conversions: {v['conversions']}  "
+            f"CVR: {_safe_rate(v['conversions'], v['link_clicks'])}"
+        ),
+    )
 
-    # ── 予測誤差 ──
+    # ── ②CVランキング ──
+    _print_sub_ranking(
+        "【②CVランキング】  conversions順",
+        entries,
+        key_fn=lambda v: v["conversions"],
+        label_fn=lambda v: (
+            f"conversions: {v['conversions']}  "
+            f"link_clicks: {v['link_clicks']:,}  "
+            f"CVR: {_safe_rate(v['conversions'], v['link_clicks'])}"
+        ),
+    )
+
+    # ── ③クリックランキング ──
+    _print_sub_ranking(
+        "【③クリックランキング】  link_clicks順  ← 売れてないが反応強い案件を発見",
+        entries,
+        key_fn=lambda v: v["link_clicks"],
+        label_fn=lambda v: (
+            f"link_clicks: {v['link_clicks']:,}  "
+            f"impressions: {v['impressions']:,}  "
+            f"CTR: {_safe_rate(v['link_clicks'], v['impressions'])}  "
+            f"revenue: ¥{v['revenue']:,}"
+        ),
+    )
+
+    # ── ④CTRランキング ──
+    def _ctr_val(v: dict) -> float:
+        return v["link_clicks"] / v["impressions"] if v["impressions"] else 0.0
+
+    _print_sub_ranking(
+        "【④CTRランキング】  link_clicks/impressions順  ← 訴求の鋭さ",
+        entries,
+        key_fn=_ctr_val,
+        label_fn=lambda v: (
+            f"CTR: {_safe_rate(v['link_clicks'], v['impressions'])}  "
+            f"link_clicks: {v['link_clicks']:,}  "
+            f"impressions: {v['impressions']:,}  "
+            f"eng_rate: {_safe_rate(v['engagements'], v['impressions'])}  "
+            f"prof_rate: {_safe_rate(v['profile_visits'], v['impressions'])}"
+        ),
+    )
+
+    # ── 予測誤差（revenue順と比較） ──
     click.echo(f"\n{'─' * 65}")
-    click.echo("\n【予測誤差】  予測順位 vs 実績順位\n")
-    if len(actual) < 2:
-        click.echo("  比較には検証済み案件が2件以上必要です。")
+    click.echo("\n【予測誤差】  予測順位(priority_score) vs 実績順位(revenue)\n")
+    revenue_ranked = sorted(tested_entries, key=lambda x: x["validation"]["revenue"], reverse=True)
+    if len(revenue_ranked) < 2:
+        click.echo("  比較には検証済み案件（revenue > 0）が2件以上必要です。")
     else:
-        pred_rank_map = {e["product_name"]: rank for rank, e in enumerate(predicted, start=1)}
-        actual_rank_map = {e["product_name"]: rank for rank, e in enumerate(actual, start=1)}
+        pred_rank_map = {e["product_name"]: r for r, e in enumerate(predicted, start=1)}
+        rev_rank_map = {e["product_name"]: r for r, e in enumerate(revenue_ranked, start=1)}
 
         deltas = []
-        for name in actual_rank_map:
-            pred_r = pred_rank_map.get(name, "-")
-            act_r = actual_rank_map[name]
-            if isinstance(pred_r, int):
-                delta = pred_r - act_r  # 正 = 予測より実績が上
-                deltas.append((name, pred_r, act_r, delta))
-            else:
-                deltas.append((name, pred_r, act_r, None))
-
+        for name, act_r in rev_rank_map.items():
+            pred_r = pred_rank_map.get(name)
+            delta = (pred_r - act_r) if pred_r is not None else None
+            deltas.append((name, pred_r, act_r, delta))
         deltas.sort(key=lambda x: (x[3] is None, abs(x[3]) if x[3] is not None else 0), reverse=True)
 
         for name, pred_r, act_r, delta in deltas:
             if delta is None:
-                click.echo(f"  {name:30s}  予測: -   実績: #{act_r:02d}  差: 不明")
+                click.echo(f"  {name:30s}  予測: -    実績: #{act_r:02d}  差: 不明")
             else:
                 sign = f"+{delta}" if delta > 0 else str(delta)
                 direction = "予測より上" if delta > 0 else ("予測より下" if delta < 0 else "一致")
                 click.echo(f"  {name:30s}  予測: #{pred_r:02d}  実績: #{act_r:02d}  差: {sign:>4s}  ({direction})")
 
-        # 平均絶対誤差
-        numeric = [abs(d) for _, _, _, d in deltas if d is not None]
+        numeric = [abs(d) for *_, d in deltas if d is not None]
         if numeric:
             mae = sum(numeric) / len(numeric)
             click.echo(f"\n  平均絶対誤差 (MAE): {mae:.2f}  ← 0に近いほど予測精度が高い")
@@ -595,7 +678,7 @@ def validate_ranking(cases_dir: str | None, output_dir: str | None):
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "schema_version": config.SCHEMA_VERSION,
         "total_cases": len(entries),
-        "tested_cases": len(actual),
+        "tested_cases": len(tested_entries),
         "predicted_ranking": [
             {"rank": i + 1, "product_name": e["product_name"],
              "priority_score": e["priority_score"],
@@ -605,19 +688,16 @@ def validate_ranking(cases_dir: str | None, output_dir: str | None):
              "validation": e["validation"]}
             for i, e in enumerate(predicted)
         ],
-        "actual_ranking": [
+        "revenue_ranking": [
             {"rank": i + 1, "product_name": e["product_name"],
-             "revenue": e["validation"]["revenue"],
-             "conversions": e["validation"]["conversions"],
-             "clicks": e["validation"]["clicks"],
-             "posts_created": e["validation"]["posts_created"]}
-            for i, e in enumerate(actual)
+             **{k: e["validation"][k] for k in
+                ("revenue", "conversions", "link_clicks", "impressions", "posts_created")}}
+            for i, e in enumerate(revenue_ranked)
         ],
     }
-    if len(actual) >= 2:
+    if len(revenue_ranked) >= 2:
         doc["rank_deltas"] = [
-            {"product_name": name, "predicted_rank": pred_r,
-             "actual_rank": act_r, "delta": delta}
+            {"product_name": name, "predicted_rank": pred_r, "actual_rank": act_r, "delta": delta}
             for name, pred_r, act_r, delta in deltas
         ]
     out_file.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
