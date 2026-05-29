@@ -6,6 +6,50 @@ from core.storage import load_prompt
 
 SYSTEM = "あなたはSNSアフィリエイトの訴求評価専門家です。JSONのみで回答してください。"
 
+BATCH_SIZE = 50
+
+
+def _score_batch(
+    appeals_batch: list,
+    buying_triggers: dict,
+    emotion_analysis: dict,
+    sns_fit: dict,
+    risk_analysis: dict,
+    llm: LLMClient,
+) -> dict:
+    appeals_list = [
+        {
+            "appeal_id": a["appeal_id"],
+            "appeal_type": a["appeal_type"],
+            "hook": a["hook"],
+            "platform": a["platform"],
+            "risk": a["risk"],
+        }
+        for a in appeals_batch
+    ]
+
+    template = load_prompt("appeal_scoring_prompt.md")
+    prompt = (
+        template
+        .replace("{buying_triggers}", json.dumps(buying_triggers, ensure_ascii=False))
+        .replace("{emotion_analysis}", json.dumps(emotion_analysis, ensure_ascii=False))
+        .replace("{sns_fit}", json.dumps(sns_fit, ensure_ascii=False))
+        .replace("{risk_analysis}", json.dumps(risk_analysis, ensure_ascii=False))
+        .replace("{appeals_list}", json.dumps(appeals_list, ensure_ascii=False, indent=2))
+        # Clarify batch size in prompt
+        .replace(
+            "100件の中での**相対評価**で採点すること",
+            f"このバッチ{len(appeals_batch)}件の中での**相対評価**で採点すること",
+        )
+        .replace(
+            "上位10件はスコア80以上になることが望ましい",
+            f"上位{max(1, len(appeals_batch)//10)}件はスコア80以上になることが望ましい",
+        )
+    )
+
+    result = llm.call_json(prompt, SYSTEM)
+    return {s["appeal_id"]: s for s in result.get("scores", [])}
+
 
 def score_and_rank(
     appeals: list,
@@ -17,44 +61,28 @@ def score_and_rank(
 ) -> tuple[list, list]:
     """
     Returns:
-        scored_appeals: all 100 appeals with score/reason/repeatability merged in
+        scored_appeals: all appeals with score/reason/repeatability merged in
         top_appeals: top 10 by score, with enriched fields
     """
-    # Minimal payload per appeal to save tokens
-    appeals_list = [
-        {
-            "appeal_id": a["appeal_id"],
-            "appeal_type": a["appeal_type"],
-            "hook": a["hook"],
-            "platform": a["platform"],
-            "risk": a["risk"],
-        }
-        for a in appeals
-    ]
-
-    template = load_prompt("appeal_scoring_prompt.md")
-    prompt = (
-        template
-        .replace("{buying_triggers}", json.dumps(buying_triggers, ensure_ascii=False))
-        .replace("{emotion_analysis}", json.dumps(emotion_analysis, ensure_ascii=False))
-        .replace("{sns_fit}", json.dumps(sns_fit, ensure_ascii=False))
-        .replace("{risk_analysis}", json.dumps(risk_analysis, ensure_ascii=False))
-        .replace("{appeals_list}", json.dumps(appeals_list, ensure_ascii=False, indent=2))
-    )
-
-    result = llm.call_json(prompt, SYSTEM)
-    scores_map = {s["appeal_id"]: s for s in result.get("scores", [])}
+    # Split into batches to stay within token limits
+    scores_map = {}
+    for i in range(0, len(appeals), BATCH_SIZE):
+        batch = appeals[i: i + BATCH_SIZE]
+        batch_scores = _score_batch(
+            batch, buying_triggers, emotion_analysis, sns_fit, risk_analysis, llm
+        )
+        scores_map.update(batch_scores)
 
     # Merge scores back into full appeals
     scored_appeals = []
     for appeal in appeals:
         aid = appeal["appeal_id"]
-        score_data = scores_map.get(aid, {})
+        s = scores_map.get(aid, {})
         merged = dict(appeal)
-        merged["appeal_score"] = score_data.get("score", 0)
-        merged["appeal_score_reason"] = score_data.get("reason", "")
-        merged["content_repeatability"] = score_data.get("content_repeatability", "medium")
-        merged["repeatability_reason"] = score_data.get("repeatability_reason", "")
+        merged["appeal_score"] = s.get("score", 0)
+        merged["appeal_score_reason"] = s.get("reason", "")
+        merged["content_repeatability"] = s.get("content_repeatability", "medium")
+        merged["repeatability_reason"] = s.get("repeatability_reason", "")
         scored_appeals.append(merged)
 
     # Sort by score descending
