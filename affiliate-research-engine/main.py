@@ -16,6 +16,7 @@ import analyzers.buying_trigger_analyzer as buying_trigger_analyzer
 import analyzers.sns_fit_analyzer as sns_fit_analyzer
 import analyzers.risk_analyzer as risk_analyzer
 import analyzers.appeal_scorer as appeal_scorer
+import analyzers.startup_fit_analyzer as startup_fit_analyzer
 import generators.appeal_generator as appeal_generator
 import generators.winning_summary_generator as winning_summary_generator
 import generators.report_generator as report_generator
@@ -98,6 +99,27 @@ def _print_summary(report: dict) -> None:
         for t in triggers[:3]:
             click.echo(f"  [{t.get('strength','?').upper()}] {t.get('trigger','')} — {t.get('reason','')}")
 
+    # startup_fit
+    sf = report.get("startup_fit", {})
+    if sf:
+        sf_score = sf.get("score", "-")
+        sf_level = sf.get("level", "-")
+        sf_bottleneck = sf.get("bottleneck", "")
+        sf_action = sf.get("recommended_first_action", "")
+        sf_breakdown = sf.get("breakdown", {})
+        click.echo(f"\n▶ startup_fit    : {sf_score} [{sf_level}]")
+        if sf_breakdown:
+            click.echo(f"  zero_follower    : {sf_breakdown.get('zero_follower_viable', '-')}")
+            click.echo(f"  no_track_record  : {sf_breakdown.get('no_track_record_needed', '-')}")
+            click.echo(f"  no_face          : {sf_breakdown.get('no_face_required', '-')}")
+            click.echo(f"  no_physical      : {sf_breakdown.get('no_physical_product_needed', '-')}")
+            click.echo(f"  free_trial       : {sf_breakdown.get('free_trial_available', '-')}")
+            click.echo(f"  trust_free_conv  : {sf_breakdown.get('trust_free_conversion', '-')}")
+        if sf_bottleneck:
+            click.echo(f"  ボトルネック     : {sf_bottleneck}")
+        if sf_action:
+            click.echo(f"  最初のアクション : {sf_action}")
+
     # リスク
     click.echo(f"\n▶ リスク")
     click.echo(f"  risk_score      : {risk}")
@@ -171,10 +193,14 @@ def analyze_case(input_path: str):
         )
         _ok()
 
+        _step("startup_fit分析")
+        sf = startup_fit_analyzer.analyze(case, lp, market, risk, triggers, llm)
+        _ok()
+
         _step("レポート統合・スコアリング")
         report = report_generator.build(
             case, iq, lp, market, triggers, sns_fit, risk,
-            scored_appeals, top_appeals, winning_data, llm
+            scored_appeals, top_appeals, winning_data, sf, llm
         )
         _ok()
 

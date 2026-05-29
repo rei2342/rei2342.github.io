@@ -51,6 +51,7 @@ def build(
     scored_appeals: list,
     top_appeals: list,
     winning_data: dict,
+    startup_fit: dict,
     llm: LLMClient,
 ) -> dict:
     scores = _compute_scores(
@@ -116,6 +117,7 @@ def build(
             "score_reasoning": scores.get("score_reasoning", ""),
         },
         "case_score": winning_data.get("case_score", {}),
+        "startup_fit": startup_fit,
         "winning_summary": winning_data.get("winning_summary", {}),
         "risk_score": risk_result.get("risk_score", 0),
         "risk_factors": risk_result.get("risk_factors", []),
