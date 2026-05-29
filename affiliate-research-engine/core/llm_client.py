@@ -47,11 +47,18 @@ class LLMClient:
         return response.choices[0].message.content
 
     def _parse_json(self, text: str) -> dict:
-        # Strip markdown code fences if present
         text = text.strip()
-        fenced = re.search(r"```(?:json)?\s*([\s\S]+?)\s*```", text)
+        # Try fenced block (with or without closing fence — handles truncation)
+        fenced = re.search(r"```(?:json)?\s*([\s\S]+?)(?:\s*```|$)", text)
         if fenced:
-            text = fenced.group(1).strip()
+            candidate = fenced.group(1).strip()
+            if candidate.startswith(("{", "[")):
+                text = candidate
+        # If still not clean JSON, find the outermost { } or [ ]
+        if not text.startswith(("{", "[")):
+            match = re.search(r"(\{[\s\S]*\}|\[[\s\S]*\])", text)
+            if match:
+                text = match.group(1)
         try:
             return json.loads(text)
         except json.JSONDecodeError as e:
