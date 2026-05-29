@@ -11,6 +11,18 @@ import config
 SYSTEM = "あなたはアフィリエイト案件評価の専門家です。JSONのみで回答してください。"
 
 
+def _empty_validation() -> dict:
+    return {
+        "tested": False,
+        "status": "pending",
+        "posts_created": 0,
+        "clicks": 0,
+        "conversions": 0,
+        "revenue": 0,
+        "memo": "",
+    }
+
+
 def _compute_scores(
     case: CaseInput,
     lp_analysis: dict,
@@ -144,4 +156,5 @@ def build(
             "comments": None,
             "posted_at": None,
         },
+        "validation": _empty_validation(),
     }

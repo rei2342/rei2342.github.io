@@ -408,5 +408,226 @@ def rank_cases(cases_dir: str | None, output_dir: str | None):
     click.echo(f"  ランキングJSON: {out_file}\n")
 
 
+_EMPTY_VALIDATION = {
+    "tested": False,
+    "status": "pending",
+    "posts_created": 0,
+    "clicks": 0,
+    "conversions": 0,
+    "revenue": 0,
+    "memo": "",
+}
+
+_VALID_STATUSES = ("pending", "testing", "done", "paused")
+
+
+@cli.command("set-validation")
+@click.option("--file", "file_path", required=True, type=click.Path(exists=True), help="更新対象の案件JSONファイル")
+@click.option("--tested/--not-tested", default=None, help="検証済みフラグ")
+@click.option("--status", type=click.Choice(_VALID_STATUSES), default=None, help="ステータス")
+@click.option("--posts", "posts_created", type=int, default=None, help="投稿作成数")
+@click.option("--clicks", type=int, default=None, help="クリック数")
+@click.option("--conversions", type=int, default=None, help="CV数")
+@click.option("--revenue", type=int, default=None, help="売上（円）")
+@click.option("--memo", default=None, help="メモ")
+def set_validation(
+    file_path: str,
+    tested: bool | None,
+    status: str | None,
+    posts_created: int | None,
+    clicks: int | None,
+    conversions: int | None,
+    revenue: int | None,
+    memo: str | None,
+):
+    """案件JSONのvalidationフィールドを更新します"""
+    data = json.loads(Path(file_path).read_text(encoding="utf-8"))
+    v = data.setdefault("validation", dict(_EMPTY_VALIDATION))
+
+    if tested is not None:
+        v["tested"] = tested
+    if status is not None:
+        v["status"] = status
+    if posts_created is not None:
+        v["posts_created"] = posts_created
+    if clicks is not None:
+        v["clicks"] = clicks
+    if conversions is not None:
+        v["conversions"] = conversions
+    if revenue is not None:
+        v["revenue"] = revenue
+    if memo is not None:
+        v["memo"] = memo
+
+    Path(file_path).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    name = data.get("meta", {}).get("case_name", Path(file_path).stem)
+    click.echo(f"\n✓ {name} — validation 更新済み")
+    click.echo(f"  tested       : {v['tested']}")
+    click.echo(f"  status       : {v['status']}")
+    click.echo(f"  posts_created: {v['posts_created']}")
+    click.echo(f"  clicks       : {v['clicks']}")
+    click.echo(f"  conversions  : {v['conversions']}")
+    click.echo(f"  revenue      : ¥{v['revenue']:,}")
+    if v["memo"]:
+        click.echo(f"  memo         : {v['memo']}")
+    click.echo()
+
+
+def _load_cases_for_validation(cases_path: Path) -> tuple[list, list]:
+    """Returns (entries_with_validation, errors)."""
+    entries = []
+    errors = []
+    for f in sorted(cases_path.glob("*.json")):
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            entry = _extract_ranking_entry(data, str(f))
+            v = data.get("validation") or dict(_EMPTY_VALIDATION)
+            entry["validation"] = v
+            entries.append(entry)
+        except Exception as e:
+            errors.append((f.name, str(e)))
+    return entries, errors
+
+
+@cli.command("validate-ranking")
+@click.option("--cases-dir", default=None, type=click.Path(), help="分析済みJSONディレクトリ（デフォルト: outputs/cases/）")
+@click.option("--output-dir", default=None, type=click.Path(), help="保存先（デフォルト: outputs/rankings/）")
+def validate_ranking(cases_dir: str | None, output_dir: str | None):
+    """予測ランキングと実績ランキングを比較し、予測精度を検証します"""
+    base = Path(__file__).parent
+    cases_path = Path(cases_dir) if cases_dir else base / "outputs" / "cases"
+    rankings_path = Path(output_dir) if output_dir else base / "outputs" / "rankings"
+    rankings_path.mkdir(parents=True, exist_ok=True)
+
+    entries, errors = _load_cases_for_validation(cases_path)
+    if not entries:
+        click.echo(f"[エラー] {cases_path} にJSONファイルが見つかりません", err=True)
+        sys.exit(1)
+
+    # validationフィールドが未初期化の既存JSONを自動補完（上書き保存はしない、表示のみ）
+    tested_entries = [e for e in entries if e["validation"].get("tested")]
+
+    # 予測ランキング（priority_score順、全件）
+    predicted = sorted(entries, key=lambda x: x["priority_score"], reverse=True)
+
+    # 実績ランキング（revenue順、tested=Trueのみ）
+    actual = sorted(tested_entries, key=lambda x: x["validation"]["revenue"], reverse=True)
+
+    sep = "=" * 65
+    click.echo(f"\n{sep}")
+    click.echo(f"  検証レポート  予測 {len(predicted)}件 ／ 実績あり {len(actual)}件")
+    click.echo(sep)
+
+    # ── 予測ランキング ──
+    click.echo("\n【予測ランキング】  priority_score = case_score×0.3 + automation_fit×0.3 + startup_fit×0.4\n")
+    for rank, e in enumerate(predicted, start=1):
+        note = " ※概算" if e["priority_score_note"] else ""
+        tested_mark = " ✓検証済" if e["validation"].get("tested") else ""
+        click.echo(f"  #{rank:02d} {e['product_name']}{tested_mark}")
+        click.echo(f"       priority_score : {e['priority_score']}{note}")
+        click.echo(f"       startup_fit    : {e['startup_fit'] if e['startup_fit'] is not None else '未分析'}  "
+                   f"case_score: {e['case_score']}  automation_fit: {e['automation_fit']}")
+        v = e["validation"]
+        click.echo(f"       status         : {v['status']}  "
+                   f"posts: {v['posts_created']}  clicks: {v['clicks']}  cv: {v['conversions']}  revenue: ¥{v['revenue']:,}")
+        if v["memo"]:
+            click.echo(f"       memo           : {v['memo']}")
+
+    # ── 実績ランキング ──
+    click.echo(f"\n{'─' * 65}")
+    click.echo("\n【実績ランキング】  revenue順（tested=true のみ）\n")
+    if not actual:
+        click.echo("  まだ検証済み案件がありません。")
+        click.echo("  `python main.py set-validation --file <path> --tested --revenue <円>` で実績を記録してください。")
+    else:
+        for rank, e in enumerate(actual, start=1):
+            v = e["validation"]
+            cv_rate = f"{v['conversions']/v['clicks']*100:.1f}%" if v["clicks"] else "-%"
+            click.echo(f"  #{rank:02d} {e['product_name']}")
+            click.echo(f"       revenue        : ¥{v['revenue']:,}")
+            click.echo(f"       clicks         : {v['clicks']}  conversions: {v['conversions']}  CVR: {cv_rate}")
+            click.echo(f"       posts_created  : {v['posts_created']}")
+            if v["memo"]:
+                click.echo(f"       memo           : {v['memo']}")
+
+    # ── 予測誤差 ──
+    click.echo(f"\n{'─' * 65}")
+    click.echo("\n【予測誤差】  予測順位 vs 実績順位\n")
+    if len(actual) < 2:
+        click.echo("  比較には検証済み案件が2件以上必要です。")
+    else:
+        pred_rank_map = {e["product_name"]: rank for rank, e in enumerate(predicted, start=1)}
+        actual_rank_map = {e["product_name"]: rank for rank, e in enumerate(actual, start=1)}
+
+        deltas = []
+        for name in actual_rank_map:
+            pred_r = pred_rank_map.get(name, "-")
+            act_r = actual_rank_map[name]
+            if isinstance(pred_r, int):
+                delta = pred_r - act_r  # 正 = 予測より実績が上
+                deltas.append((name, pred_r, act_r, delta))
+            else:
+                deltas.append((name, pred_r, act_r, None))
+
+        deltas.sort(key=lambda x: (x[3] is None, abs(x[3]) if x[3] is not None else 0), reverse=True)
+
+        for name, pred_r, act_r, delta in deltas:
+            if delta is None:
+                click.echo(f"  {name:30s}  予測: -   実績: #{act_r:02d}  差: 不明")
+            else:
+                sign = f"+{delta}" if delta > 0 else str(delta)
+                direction = "予測より上" if delta > 0 else ("予測より下" if delta < 0 else "一致")
+                click.echo(f"  {name:30s}  予測: #{pred_r:02d}  実績: #{act_r:02d}  差: {sign:>4s}  ({direction})")
+
+        # 平均絶対誤差
+        numeric = [abs(d) for _, _, _, d in deltas if d is not None]
+        if numeric:
+            mae = sum(numeric) / len(numeric)
+            click.echo(f"\n  平均絶対誤差 (MAE): {mae:.2f}  ← 0に近いほど予測精度が高い")
+
+    click.echo(f"\n{sep}")
+
+    # JSON保存
+    today = datetime.now(timezone.utc).strftime("%Y%m%d")
+    out_file = rankings_path / f"validation_{today}.json"
+    doc = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "schema_version": config.SCHEMA_VERSION,
+        "total_cases": len(entries),
+        "tested_cases": len(actual),
+        "predicted_ranking": [
+            {"rank": i + 1, "product_name": e["product_name"],
+             "priority_score": e["priority_score"],
+             "case_score": e["case_score"],
+             "automation_fit": e["automation_fit"],
+             "startup_fit": e["startup_fit"],
+             "validation": e["validation"]}
+            for i, e in enumerate(predicted)
+        ],
+        "actual_ranking": [
+            {"rank": i + 1, "product_name": e["product_name"],
+             "revenue": e["validation"]["revenue"],
+             "conversions": e["validation"]["conversions"],
+             "clicks": e["validation"]["clicks"],
+             "posts_created": e["validation"]["posts_created"]}
+            for i, e in enumerate(actual)
+        ],
+    }
+    if len(actual) >= 2:
+        doc["rank_deltas"] = [
+            {"product_name": name, "predicted_rank": pred_r,
+             "actual_rank": act_r, "delta": delta}
+            for name, pred_r, act_r, delta in deltas
+        ]
+    out_file.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+    click.echo(f"  検証JSONを保存しました: {out_file}\n")
+
+    if errors:
+        click.echo(f"⚠ 読み込みエラー ({len(errors)}件):")
+        for fname, msg in errors:
+            click.echo(f"  {fname}: {msg}")
+
+
 if __name__ == "__main__":
     cli()
