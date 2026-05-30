@@ -1959,6 +1959,60 @@ def _compute_seed_hit_rate(expected: list, actual_seeds: list) -> tuple[int, int
     return hits, len(expected)
 
 
+def _estimate_actual_axis_scores(
+    performance: dict,
+    actual_seeds: list,
+    expected_seeds: list,
+) -> dict[str, int | None]:
+    """パフォーマンスデータから各評価軸の実測代理値を推定する（0〜100）。
+    直接測れない軸はプロキシで近似する。"""
+    save_rate  = performance.get("save_rate") or 0
+    citations  = performance.get("citations") or 0
+    followup   = performance.get("followup_count") or 0
+
+    h, t = _compute_seed_hit_rate(expected_seeds, actual_seeds)
+    seed_actual = round(h / t * 100) if t > 0 else None
+
+    # differentiation proxy: 引用数（他者が言及するほど差別化できている）+ 保存率
+    diff_proxy = min(100, round(citations * 5 + save_rate * 1.5)) if (citations > 0 or save_rate > 0) else None
+
+    # stackability proxy: 派生コンテンツ数（これを起点に次の記事が生まれたか）
+    stack_proxy = min(100, followup * 25) if followup is not None and followup > 0 else None
+
+    # durability proxy: 保存率（読み返す価値があると判断されたか）
+    dur_proxy = min(100, round(save_rate * 5)) if save_rate > 0 else None
+
+    return {
+        "seed_rate":      seed_actual,
+        "differentiation": diff_proxy,
+        "stackability":   stack_proxy,
+        "durability":     dur_proxy,
+    }
+
+
+def _generate_calibration_note(axis_records: dict[str, list[tuple[int, int]]]) -> str:
+    """評価軸ごとの予測 vs 実測から calibration note を生成する。"""
+    lines = []
+    for axis, pairs in axis_records.items():
+        if not pairs:
+            continue
+        pred_avg = round(sum(p for p, _ in pairs) / len(pairs))
+        act_avg  = round(sum(a for _, a in pairs) / len(pairs))
+        diff     = act_avg - pred_avg
+        if abs(diff) < 5:
+            note = "概ね正確"
+        elif diff < -15:
+            note = f"過大評価（{abs(diff)}pt）→ 次回予測を抑えめに"
+        elif diff > 15:
+            note = f"過小評価（{diff}pt）→ 次回予測を高めに"
+        elif diff < 0:
+            note = f"やや過大評価（{abs(diff)}pt）"
+        else:
+            note = f"やや過小評価（{diff}pt）"
+        lines.append(f"{axis:<16}: 予測平均{pred_avg:>3} vs 実測代理{act_avg:>3}  {note}")
+    return "\n".join(lines)
+
+
 def _display_asset_performance(assets: list, expected_seeds_map: dict) -> None:
     sep = "=" * 65
     click.echo(f"\n{sep}")
@@ -2044,6 +2098,82 @@ def _display_asset_performance(assets: list, expected_seeds_map: dict) -> None:
                 click.echo(f"  {atype:<16}  {bar:<20}  {pct:>3}%  ({h}/{t})  {bias}")
         else:
             click.echo(f"  （計測データが不足しています）")
+
+    # Layer3: 評価軸別 予測精度分析（Model Calibration）
+    if has_perf:
+        from collections import defaultdict
+        axis_records: dict[str, list[tuple[int, int]]] = defaultdict(list)
+        axes = ["seed_rate", "differentiation", "stackability", "durability"]
+
+        for a in has_perf:
+            cid      = a.get("candidate_id", "")
+            perf     = a.get("performance", {})
+            actual   = a.get("actual_seeds", [])
+            expected = expected_seeds_map.get(cid, [])
+            pred_bd  = a.get("predicted_breakdown", {})
+
+            actual_axes = _estimate_actual_axis_scores(perf, actual, expected)
+            for ax in axes:
+                pred_val = pred_bd.get(ax)
+                act_val  = actual_axes.get(ax)
+                if pred_val is not None and act_val is not None:
+                    axis_records[ax].append((int(pred_val), int(act_val)))
+
+        if any(axis_records.values()):
+            click.echo(f"\n{sep}")
+            click.echo(f"  Layer 3: Model Calibration  （評価軸の予測精度）")
+            click.echo(f"  ※ differentiation / stackability / durability は代理指標")
+            click.echo(sep)
+
+            calibration_lines = []
+            for ax in axes:
+                pairs = axis_records.get(ax, [])
+                if not pairs:
+                    click.echo(f"  {ax:<16}: データ不足（{len(has_perf)}件中）")
+                    continue
+                pred_avg = round(sum(p for p, _ in pairs) / len(pairs))
+                act_avg  = round(sum(a for _, a in pairs) / len(pairs))
+                diff     = act_avg - pred_avg
+                bar_p = "░" * min(pred_avg // 5, 20)
+                bar_a = "█" * min(act_avg // 5, 20)
+                if abs(diff) < 5:
+                    bias = "概ね正確"
+                elif diff <= -15:
+                    bias = f"過大評価 {diff:+d}pt ← 次回以降の予測を抑えめに"
+                elif diff >= 15:
+                    bias = f"過小評価 {diff:+d}pt ← 次回以降の予測を高めに"
+                elif diff < 0:
+                    bias = f"やや過大評価 {diff:+d}pt"
+                else:
+                    bias = f"やや過小評価 {diff:+d}pt"
+                click.echo(f"  {ax:<16}: 予測{pred_avg:>3} {bar_p}")
+                click.echo(f"  {'':16}  実測{act_avg:>3} {bar_a}  {bias}")
+                calibration_lines.append(f"{ax}: {bias}（予測{pred_avg} vs 実測{act_avg}）")
+
+            if calibration_lines:
+                click.echo(f"\n  ─ Calibration Prompt（次回のCandidate Engineに注入）──")
+                click.echo(f"  【モデルキャリブレーション（{len(has_perf)}件のデータより）】")
+                for line in calibration_lines:
+                    click.echo(f"  {line}")
+
+            # model_calibration.json に保存
+            base = Path(__file__).parent
+            cal_path = base / "outputs" / "model_calibration.json"
+            cal_data = {
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "sample_count": len(has_perf),
+                "axis_calibration": {
+                    ax: {
+                        "pred_avg": round(sum(p for p, _ in axis_records[ax]) / len(axis_records[ax])),
+                        "act_avg":  round(sum(a for _, a in axis_records[ax]) / len(axis_records[ax])),
+                        "diff":     round(sum(a - p for p, a in axis_records[ax]) / len(axis_records[ax])),
+                        "sample_n": len(axis_records[ax]),
+                    }
+                    for ax in axes if axis_records.get(ax)
+                },
+            }
+            cal_path.parent.mkdir(parents=True, exist_ok=True)
+            cal_path.write_text(json.dumps(cal_data, ensure_ascii=False, indent=2), encoding="utf-8")
 
     if pending:
         click.echo(f"\n  ─ 計測待ち {len(pending)}件 ─────────────────────────")
