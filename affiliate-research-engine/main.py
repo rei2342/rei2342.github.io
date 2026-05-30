@@ -642,6 +642,166 @@ def set_phase(phase: str):
     click.echo(f"  → rank-cases --phase {phase}  または  compare-top --phase {phase}  で確認できます\n")
 
 
+@cli.command("cluster-themes")
+@click.option("--cases-dir", default=None, type=click.Path(), help="分析済みJSONディレクトリ（デフォルト: outputs/cases/）")
+@click.option("--phase", "phase_num", default="1", type=click.Choice(["1", "2", "3", "4"]), show_default=True, help="phase_scoreの計算フェーズ")
+@click.option("--force", is_flag=True, default=False, help="既存クラスタを上書き")
+def cluster_themes(cases_dir: str | None, phase_num: str, force: bool):
+    """案件をテーマ別に自動クラスタリングします"""
+    base = Path(__file__).parent
+    cases_path = Path(cases_dir) if cases_dir else base / "outputs" / "cases"
+    out_path = base / "outputs" / "theme_clusters.json"
+
+    if out_path.exists() and not force:
+        click.echo(f"\n  既存クラスタを読み込み: {out_path}")
+        click.echo(f"  上書きする場合は --force を追加してください")
+        existing = json.loads(out_path.read_text(encoding="utf-8"))
+        _display_theme_clusters(existing, int(phase_num))
+        return
+
+    # 全案件ロード（重複排除）
+    json_files = sorted(cases_path.glob("*.json"))
+    if not json_files:
+        click.echo(f"[エラー] {cases_path} にJSONファイルが見つかりません", err=True)
+        sys.exit(1)
+
+    seen: dict[str, dict] = {}
+    for f in json_files:
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            cname = data.get("meta", {}).get("case_name") or data.get("basic_info", {}).get("case_name", f.stem)
+            seen[cname] = data
+        except Exception:
+            pass
+
+    entries = {cname: _extract_ranking_entry(data, "") for cname, data in seen.items()}
+    phase_int = int(phase_num)
+    for e in entries.values():
+        e["phase_score"] = _compute_phase_score(e, phase_int)
+
+    # クラスタリング用サマリー生成
+    cases_summary_lines = []
+    for cname, data in seen.items():
+        e = entries[cname]
+        bi = data.get("basic_info", {})
+        ws = data.get("winning_summary", {})
+        cf_bd = (data.get("creator_fit") or {}).get("breakdown", {}) if isinstance(data.get("creator_fit"), dict) else {}
+        cases_summary_lines.append(
+            f"- {cname}\n"
+            f"  カテゴリ: {bi.get('category','')}\n"
+            f"  勝ち筋: {ws.get('winning_angle','')[:60]}\n"
+            f"  creator_fit: {e.get('creator_fit','-')}  curiosity:{cf_bd.get('curiosity_fit','-')}  leverage:{cf_bd.get('leverage_fit','-')}"
+        )
+
+    creator_profile = {}
+    cp_path = base / "data" / "creator_profile.json"
+    if cp_path.exists():
+        creator_profile = json.loads(cp_path.read_text(encoding="utf-8"))
+
+    template = (base / "prompts" / "theme_cluster_prompt.md").read_text(encoding="utf-8")
+    prompt = (
+        template
+        .replace("{creator_profile}", json.dumps(creator_profile, ensure_ascii=False, indent=2))
+        .replace("{cases_summary}", "\n".join(cases_summary_lines))
+    )
+
+    click.echo(f"\ncluster-themes  {len(seen)}案件を分析中...")
+    llm = LLMClient()
+    result = llm.call_json(prompt, "あなたはコンテンツマーケティングの専門家です。JSONのみで回答してください。")
+    raw_themes = result.get("themes", {})
+
+    if not raw_themes:
+        click.echo("[エラー] テーマクラスタが取得できませんでした", err=True)
+        sys.exit(1)
+
+    # 各テーマにスコア統計を付与
+    themes_with_stats = {}
+    for theme_name, theme_data in raw_themes.items():
+        case_names = theme_data.get("cases", [])
+        theme_entries = [entries[c] for c in case_names if c in entries]
+
+        ph1_scores = [_compute_phase_score(e, 1) for e in theme_entries]
+        ph4_scores = [_compute_phase_score(e, 4) for e in theme_entries]
+        cf_scores  = [e.get("creator_fit") or 0 for e in theme_entries]
+        af_scores  = [e.get("account_fit") or 0 for e in theme_entries]
+
+        def avg(lst):
+            valid = [x for x in lst if x is not None]
+            return round(sum(valid) / len(valid)) if valid else None
+
+        themes_with_stats[theme_name] = {
+            **theme_data,
+            "stats": {
+                "case_count": len(case_names),
+                "avg_phase1": avg(ph1_scores),
+                "avg_phase4": avg(ph4_scores),
+                "avg_creator_fit": avg(cf_scores),
+                "avg_account_fit": avg(af_scores),
+            }
+        }
+
+    output = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "total_cases": len(seen),
+        "theme_count": len(themes_with_stats),
+        "themes": themes_with_stats,
+    }
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    _display_theme_clusters(output, phase_int)
+    click.echo(f"\n  クラスタJSON: {out_path}\n")
+
+
+def _display_theme_clusters(data: dict, phase_num: int = 1) -> None:
+    themes = data.get("themes", {})
+    sep = "=" * 65
+
+    click.echo(f"\n{sep}")
+    click.echo(f"  Theme Cluster  {data.get('total_cases','-')}案件 → {data.get('theme_count','-')}テーマ  （Phase {phase_num} スコア）")
+    click.echo(sep)
+
+    # テーマをavg_creator_fit降順で並べる
+    sorted_themes = sorted(
+        themes.items(),
+        key=lambda x: x[1].get("stats", {}).get("avg_creator_fit") or 0,
+        reverse=True
+    )
+
+    for rank, (theme_name, theme_data) in enumerate(sorted_themes, start=1):
+        stats = theme_data.get("stats", {})
+        ph1 = stats.get("avg_phase1")
+        ph4 = stats.get("avg_phase4")
+        cf  = stats.get("avg_creator_fit")
+        af  = stats.get("avg_account_fit")
+        n   = stats.get("case_count", 0)
+
+        # テーマヘッダー
+        stars = "★★★" if (cf or 0) >= 70 else ("★★" if (cf or 0) >= 40 else "★")
+        click.echo(f"\n  #{rank} {theme_name}  [{stars}]  {n}案件")
+        click.echo(f"       avg creator_fit : {cf if cf is not None else '-':>3}  account_fit: {af if af is not None else '-':>3}")
+        click.echo(f"       phase_score    → Phase1: {ph1 if ph1 is not None else '-':>3}  Phase4: {ph4 if ph4 is not None else '-':>3}")
+
+        desc = theme_data.get("description", "")
+        if desc:
+            click.echo(f"       {desc}")
+        axis = theme_data.get("content_axis", "")
+        if axis:
+            click.echo(f"       コンテンツ軸: {axis[:55]}")
+        note = theme_data.get("creator_fit_note", "")
+        if note:
+            click.echo(f"       発信者適合: {note[:50]}")
+
+        # 案件一覧
+        phase_data = _load_growth_phase()
+        weights = phase_data.get("phase_weights", {}).get(str(phase_num), {})
+        click.echo(f"       ─────────────────────────────────────────────")
+        for cname in theme_data.get("cases", []):
+            click.echo(f"         {cname}")
+
+    click.echo(f"\n{sep}")
+
+
 @cli.command("batch-analyze")
 @click.option("--cases-dir", default=None, type=click.Path(), help="入力JSONディレクトリ（デフォルト: data/cases/）")
 @click.option("--force", is_flag=True, default=False, help="分析済みでも再分析する")
