@@ -1715,5 +1715,194 @@ def validate_ranking(cases_dir: str | None, output_dir: str | None):
             click.echo(f"  {fname}: {msg}")
 
 
+def _display_asset_type_matrix(data: dict) -> None:
+    matrix = data.get("matrix", {})
+    sep = "=" * 65
+    click.echo(f"\n{sep}")
+    click.echo(f"  Asset Type Matrix")
+    click.echo(f"  breakdown: durability / stackability / differentiation / seed_rate")
+    click.echo(sep)
+
+    for theme_name, types in matrix.items():
+        click.echo(f"\n  【{theme_name}】")
+        sorted_types = sorted(types.items(), key=lambda x: x[1].get("score", 0), reverse=True)
+        for asset_type, td in sorted_types:
+            score = td.get("score", 0)
+            bd    = td.get("breakdown", {})
+            reason = td.get("reason", "")
+            bar   = "█" * min(score // 5, 20)
+            dur   = bd.get("durability", "-")
+            stk   = bd.get("stackability", "-")
+            dif   = bd.get("differentiation", "-")
+            seed  = bd.get("seed_rate", "-")
+            label = "◎" if score >= 80 else ("○" if score >= 60 else "△")
+            click.echo(f"    {label} {asset_type:<16} {bar:<20}  {score:>3}")
+            click.echo(f"         dur:{dur}  stack:{stk}  diff:{dif}  seed:{seed}  {reason[:30]}")
+
+    click.echo(f"\n{sep}")
+
+
+def _display_asset_candidates(data: dict, top_n: int = 15) -> None:
+    candidates = data.get("candidates", [])
+    sep = "=" * 65
+    click.echo(f"\n{sep}")
+    click.echo(f"  Asset Candidates  {len(candidates)}件  （Theme × Asset Type × First Hand Experience）")
+    click.echo(sep)
+
+    for i, c in enumerate(candidates[:top_n], start=1):
+        title      = c.get("title", "")
+        theme      = c.get("theme", "")
+        asset_type = c.get("asset_type", "")
+        score      = c.get("predicted_score", 0)
+        bd         = c.get("breakdown", {})
+        rationale  = c.get("rationale", "")
+        source     = c.get("source_experience", "")
+        bar        = "█" * min(score // 5, 20)
+
+        u = bd.get("uniqueness", "-")
+        d = bd.get("durability", "-")
+        s = bd.get("seed_rate", "-")
+
+        label = "◎ 最重点" if score >= 90 else ("○ 注目" if score >= 75 else "△ 補助")
+        click.echo(f"\n  #{i:>2}  [{label}]  {title}")
+        click.echo(f"        {theme}  ×  {asset_type}")
+        click.echo(f"        予測: {score:>3}  {bar}")
+        click.echo(f"        unique:{u}  dur:{d}  seed:{s}")
+        if source:
+            click.echo(f"        根拠: {source[:65]}")
+        if rationale:
+            click.echo(f"        {rationale[:65]}")
+
+    click.echo(f"\n{sep}")
+
+
+@cli.command("asset-type-matrix")
+@click.option("--force", is_flag=True, default=False, help="既存を上書き")
+def asset_type_matrix_cmd(force: bool):
+    """テーマ × 資産タイプの資産生成率マトリクスを生成します（戦略層・週1確認）"""
+    base = Path(__file__).parent
+    out_path      = base / "outputs" / "asset_type_matrix.json"
+    clusters_path = base / "outputs" / "theme_clusters.json"
+
+    if out_path.exists() and not force:
+        click.echo(f"\n  既存マトリクスを読み込み: {out_path}")
+        click.echo(f"  上書きする場合は --force を追加してください")
+        _display_asset_type_matrix(json.loads(out_path.read_text(encoding="utf-8")))
+        return
+
+    if not clusters_path.exists():
+        click.echo("[エラー] theme_clusters.json が見つかりません。先に cluster-themes を実行してください。", err=True)
+        sys.exit(1)
+
+    clusters = json.loads(clusters_path.read_text(encoding="utf-8"))
+
+    creator_profile = {}
+    cp_path = base / "data" / "creator_profile.json"
+    if cp_path.exists():
+        creator_profile = json.loads(cp_path.read_text(encoding="utf-8"))
+
+    themes_summary_lines = []
+    for theme_name, theme_data in clusters.get("themes", {}).items():
+        stats = theme_data.get("stats", {})
+        themes_summary_lines.append(
+            f"- {theme_name}\n"
+            f"  説明: {theme_data.get('description', '')}\n"
+            f"  creator_fit平均: {stats.get('avg_creator_fit', '-')}  theme_value: {stats.get('theme_value', '-')}"
+        )
+
+    template = (base / "prompts" / "asset_type_matrix_prompt.md").read_text(encoding="utf-8")
+    prompt = (
+        template
+        .replace("{creator_profile}", json.dumps(creator_profile, ensure_ascii=False, indent=2))
+        .replace("{themes_summary}", "\n".join(themes_summary_lines))
+    )
+
+    click.echo(f"\nasset-type-matrix  生成中...")
+    llm = LLMClient()
+    result = llm.call_json(prompt, "あなたはコンテンツ戦略の専門家です。JSONのみで回答してください。")
+
+    if not result.get("matrix"):
+        click.echo("[エラー] マトリクスが取得できませんでした", err=True)
+        sys.exit(1)
+
+    output = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "matrix": result["matrix"],
+    }
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    _display_asset_type_matrix(output)
+    click.echo(f"\n  JSON: {out_path}\n")
+
+
+@cli.command("asset-candidates")
+@click.option("--force", is_flag=True, default=False, help="既存を上書き")
+@click.option("--top", default=15, type=int, show_default=True, help="表示件数")
+@click.option("--min-type-score", default=70, type=int, show_default=True, help="候補生成対象のタイプ最低スコア")
+def asset_candidates_cmd(force: bool, top: int, min_type_score: int):
+    """一次情報ベースの具体的なコンテンツ資産候補を生成します（実行層・毎日確認）"""
+    base = Path(__file__).parent
+    out_path    = base / "outputs" / "asset_candidates.json"
+    matrix_path = base / "outputs" / "asset_type_matrix.json"
+
+    if out_path.exists() and not force:
+        click.echo(f"\n  既存候補を読み込み: {out_path}")
+        click.echo(f"  上書きする場合は --force を追加してください")
+        _display_asset_candidates(json.loads(out_path.read_text(encoding="utf-8")), top)
+        return
+
+    if not matrix_path.exists():
+        click.echo("[エラー] asset_type_matrix.json が見つかりません。先に asset-type-matrix を実行してください。", err=True)
+        sys.exit(1)
+
+    matrix_data = json.loads(matrix_path.read_text(encoding="utf-8"))
+
+    creator_profile = {}
+    cp_path = base / "data" / "creator_profile.json"
+    if cp_path.exists():
+        creator_profile = json.loads(cp_path.read_text(encoding="utf-8"))
+
+    # テーマごとに高スコアタイプ（閾値以上、最大4種）を絞り込む
+    top_types: dict[str, list] = {}
+    for theme_name, types in matrix_data.get("matrix", {}).items():
+        filtered = [
+            (t, d) for t, d in types.items()
+            if d.get("score", 0) >= min_type_score
+        ]
+        top_types[theme_name] = sorted(filtered, key=lambda x: x[1].get("score", 0), reverse=True)[:4]
+
+    template = (base / "prompts" / "asset_candidate_prompt.md").read_text(encoding="utf-8")
+    prompt = (
+        template
+        .replace("{creator_profile}", json.dumps(creator_profile, ensure_ascii=False, indent=2))
+        .replace("{top_types}", json.dumps(top_types, ensure_ascii=False, indent=2))
+    )
+
+    click.echo(f"\nasset-candidates  生成中...")
+    llm = LLMClient()
+    result = llm.call_json(prompt, "あなたはコンテンツ戦略の専門家です。JSONのみで回答してください。")
+
+    raw = result.get("candidates", [])
+    if not raw:
+        click.echo("[エラー] 候補が取得できませんでした", err=True)
+        sys.exit(1)
+
+    import uuid as uuid_lib
+    for c in raw:
+        c["id"] = str(uuid_lib.uuid4())
+        c.setdefault("status", "draft")
+
+    output = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "candidates": sorted(raw, key=lambda x: x.get("predicted_score", 0), reverse=True),
+    }
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    _display_asset_candidates(output, top)
+    click.echo(f"\n  JSON: {out_path}\n")
+
+
 if __name__ == "__main__":
     cli()
