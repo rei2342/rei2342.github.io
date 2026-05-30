@@ -735,6 +735,7 @@ def cluster_themes(cases_dir: str | None, phase_num: str, force: bool):
                 "case_count": len(case_names),
                 "avg_phase1": avg(ph1_scores),
                 "avg_phase4": avg(ph4_scores),
+                "compound_score": (avg(ph4_scores) - avg(ph1_scores)) if avg(ph4_scores) is not None and avg(ph1_scores) is not None else None,
                 "avg_creator_fit": avg(cf_scores),
                 "avg_account_fit": avg(af_scores),
             }
@@ -758,29 +759,51 @@ def _display_theme_clusters(data: dict, phase_num: int = 1) -> None:
     sep = "=" * 65
 
     click.echo(f"\n{sep}")
-    click.echo(f"  Theme Cluster  {data.get('total_cases','-')}案件 → {data.get('theme_count','-')}テーマ  （Phase {phase_num} スコア）")
+    click.echo(f"  Theme Cluster  {data.get('total_cases','-')}案件 → {data.get('theme_count','-')}テーマ")
+    click.echo(f"  compound_score = Phase4 - Phase1（正=積むほど強くなる、負=初速型）")
     click.echo(sep)
 
-    # テーマをavg_creator_fit降順で並べる
+    # compound_score降順でソート（資産型が上位に来る）
     sorted_themes = sorted(
         themes.items(),
-        key=lambda x: x[1].get("stats", {}).get("avg_creator_fit") or 0,
+        key=lambda x: x[1].get("stats", {}).get("compound_score") or -999,
         reverse=True
     )
 
     for rank, (theme_name, theme_data) in enumerate(sorted_themes, start=1):
         stats = theme_data.get("stats", {})
-        ph1 = stats.get("avg_phase1")
-        ph4 = stats.get("avg_phase4")
-        cf  = stats.get("avg_creator_fit")
-        af  = stats.get("avg_account_fit")
-        n   = stats.get("case_count", 0)
+        ph1      = stats.get("avg_phase1")
+        ph4      = stats.get("avg_phase4")
+        compound = stats.get("compound_score")
+        cf       = stats.get("avg_creator_fit")
+        af       = stats.get("avg_account_fit")
+        n        = stats.get("case_count", 0)
 
-        # テーマヘッダー
-        stars = "★★★" if (cf or 0) >= 70 else ("★★" if (cf or 0) >= 40 else "★")
-        click.echo(f"\n  #{rank} {theme_name}  [{stars}]  {n}案件")
-        click.echo(f"       avg creator_fit : {cf if cf is not None else '-':>3}  account_fit: {af if af is not None else '-':>3}")
-        click.echo(f"       phase_score    → Phase1: {ph1 if ph1 is not None else '-':>3}  Phase4: {ph4 if ph4 is not None else '-':>3}")
+        # compound_score の矢印表示
+        if compound is not None:
+            if compound > 0:
+                cmp_disp = f"+{compound}  ↑ 資産型（積むほど強くなる）"
+            elif compound == 0:
+                cmp_disp = f" {compound}  → 横ばい型"
+            else:
+                cmp_disp = f"{compound}  ↓ 初速型（積み上がらない）"
+        else:
+            cmp_disp = "-"
+
+        # bar graph for compound
+        if compound is not None:
+            bar_len = min(abs(compound) // 3, 15)
+            bar = ("+" if compound >= 0 else "-") * bar_len
+        else:
+            bar = ""
+
+        label = "資産型" if (compound or 0) > 0 else ("初速型" if (compound or 0) < 0 else "横ばい")
+        cf_stars = "★★★" if (cf or 0) >= 70 else ("★★" if (cf or 0) >= 40 else "★")
+
+        click.echo(f"\n  #{rank} {theme_name}  [{cf_stars}]  {n}案件  [{label}]")
+        click.echo(f"       compound_score : {cmp_disp}")
+        click.echo(f"       phase_score    : Phase1={ph1 if ph1 is not None else '-':>3}  →  Phase4={ph4 if ph4 is not None else '-':>3}  [{bar}]")
+        click.echo(f"       creator_fit avg: {cf if cf is not None else '-':>3}  account_fit avg: {af if af is not None else '-':>3}")
 
         desc = theme_data.get("description", "")
         if desc:
