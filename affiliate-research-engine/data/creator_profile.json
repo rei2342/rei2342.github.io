@@ -7,33 +7,105 @@
     "プロンプトエンジニアリング",
     "コンテンツ戦略AI化"
   ],
-  "first_hand_domains": [
-    "AIツール実務利用",
-    "Claude Codeによるシステム構築",
-    "エージェント設計・実行",
-    "副業×AI実験",
-    "案件スコアリング・検証プロセス"
-  ],
-  "proven_content_style": "実験ログ・データ公開・AI検証レポート・一次情報共有",
-  "current_projects": [
-    "Claude Codeを使ったアフィリエイト分析エンジン構築",
-    "13案件のスコアリング実験（case_score / CEF / account_fit / creator_fit）",
-    "AI予測と実CVのズレを検証する実験フロー設計",
-    "SNS投稿のAI自動設計"
-  ],
-  "sustainable_topics": [
-    "AI実務活用ログ",
-    "AIエージェント体験談",
-    "副業×AI実験記録",
-    "仕事効率化AI",
-    "アフィリエイト×AI検証プロセス公開",
-    "AIの予測精度を人間が検証する話"
-  ],
   "weak_domains": [
     "美容・コスメ実体験",
     "食品・サプリ摂取経験",
     "大型家電購入体験",
     "高価格帯家具・インテリア購入",
     "スピリチュアル・ジュエリー"
+  ],
+  "proven_content_style": "実験ログ・データ公開・AI検証レポート・一次情報共有",
+
+  "current_projects": [
+    {
+      "project": "Affiliate Research Engine（個人メディア経営OS）",
+      "current_state": "5000行超え、cluster-themes / asset-candidates / candidate-selection / asset-performance が実装済み・実運用直前",
+      "before_belief": "アフィリエイト案件を評価するツールを作ればいいと思っていた",
+      "actual_discovery": "案件評価より「どの種を積むと次の種が生まれるか」の方が重要だった。コンテンツOSというより知的資産複利運用エンジンになった",
+      "surprise": "予測エンジン（predicted_score）より Candidate Engine（何を書くか）の方が実務価値が高かった",
+      "mistake": "最初はPV最大化を目的にしていた。実際のKPIはseed_hit_rate（種の発生率）だった",
+      "current_insight": "creator_profile.jsonの粒度が候補品質のボトルネック。プロンプト改善より一次情報の構造化が先"
+    },
+    {
+      "project": "13案件のスコアリング実験",
+      "current_state": "case_score / CEF / account_fit / creator_fit / phase_score まで実装。AI副業案件が高スコアだったが実CV未確認",
+      "before_belief": "案件の単価と承認率が主要指標だと思っていた",
+      "actual_discovery": "creator_fit（発信者が語れるか）が最も重要な軸だった。account_fit=78でもcreator_fit=22の案件は実質使えない",
+      "surprise": "ULTORAのcreator_fitが22という数字。オーディエンス適合と発信者適合は全然別物だった",
+      "current_insight": "高スコア案件より「自分が語れる案件」を選ぶ方が長期的に強い"
+    }
+  ],
+
+  "recent_failures": [
+    {
+      "what": "最初のシステム設計でpromptの改善を主軸にした",
+      "expected": "プロンプトを磨けば候補品質が上がると思っていた",
+      "actual": "creator_profileの粒度が低いと何度プロンプトを改善しても一般論候補しか出なかった",
+      "learning": "LLMへの入力品質（一次情報の構造化）がアウトプット品質を決める"
+    },
+    {
+      "what": "theme_valueをasset × sizeで計算した",
+      "expected": "市場規模と資産化可能性の積で最良テーマが分かると思っていた",
+      "actual": "monetization_fitが入らないとガジェット（size=70）とAI仕事術（size=70）の差が出なかった",
+      "learning": "同じ市場規模でも「テーマ→商品→事業」への変換効率が全然違う"
+    }
+  ],
+
+  "recent_insights": [
+    {
+      "insight": "記事の価値は記事自体ではなく「次に生まれる種の数と質」にある",
+      "triggered_by": "asset-performance の設計中、PVではなくseed_hit_rateをKPIにしようと考えたとき",
+      "changed_belief": "コンテンツ運用の目的が「今週のPV最大化」から「Idea Graph の拡張」に変わった"
+    },
+    {
+      "insight": "予測精度の学習対象は評価軸スコアではなく観測可能な生データ（expected vs actual の比率）であるべき",
+      "triggered_by": "seed_rate=58という数値を実測値として保存しようとしたとき、それ自体が推定だと気づいた",
+      "changed_belief": "「推定 vs 推定」の比較では100件積んでも学習データが壊れる。事実ベースの設計に切り替えた"
+    },
+    {
+      "insight": "Phase設計の本質は「今存在しない軸（authority/moat）を現フェーズで評価しない」こと",
+      "triggered_by": "Phase1でauthority_fitを評価しようとして、「まだ存在しない」ことに気づいたとき",
+      "changed_belief": "能力の解放（unlock）ではなく蓄積の結果として権威が生まれる設計に変更した"
+    }
+  ],
+
+  "surprises": [
+    "candidate-selectionが「今週何を書くか」ではなく「来週の種を最大化するか」を最適化することに気づいたとき、評価対象がコンテンツからIdea Graphに移行した",
+    "creator_fitとaccount_fitが独立していた。ULTORAはアカウント適合=78でも発信者適合=22だった",
+    "theme_valueを導入した瞬間に評価対象が「案件」から「テーマ」に完全移行した",
+    "model_calibrationで学習対象を評価軸スコアではなく観測比率（expected/actual）にした瞬間、初めて「自己学習OS」と呼べる設計になった"
+  ],
+
+  "strong_opinions": [
+    {
+      "opinion": "アフィリエイトにおいて案件選択は最後の仕事。最初の仕事はテーマと資産タイプの選択",
+      "why_counter_intuitive": "多くの人は案件の単価・承認率で選ぶが、発信継続性とcreator_fitが長期収益を決める"
+    },
+    {
+      "opinion": "コンテンツ運用のKPIはPVでもCVでもなくseed_hit_rate（種の発生率）",
+      "why_counter_intuitive": "今週の数字より来週の候補数が増えているかどうかが資産型メディアの本質指標"
+    },
+    {
+      "opinion": "creator_profileを具体化する方がプロンプト改善より10倍効果が高い",
+      "why_counter_intuitive": "エンジニアはついコードやプロンプトを改善したくなるが、入力データの質がボトルネック"
+    }
+  ],
+
+  "first_hand_experiences": [
+    {
+      "experience": "Claude CodeでPythonシステムを5000行以上実装した",
+      "data": "affiliate-research-engine: cluster-themes / asset-type-matrix / asset-candidates / candidate-selection / asset-performance / model-calibration を実装",
+      "unique_to_me": "実際に設計・実装・リファクタリングを一人でやりきった実務ログを持っている"
+    },
+    {
+      "experience": "AIへの予測と現実のズレを設計レベルで検証した",
+      "data": "seed_rate予測 vs actual_seeds実測の比率（expected_seeds=70, actual_seeds=32, ratio=0.46 の構造を設計）",
+      "unique_to_me": "「推定 vs 推定」問題を発見し観測可能データへの移行設計を一人で決定した"
+    },
+    {
+      "experience": "案件評価から個人メディア経営OSへの設計進化を全記録している",
+      "data": "case_score → theme_value → asset_score → business_value への評価軸の進化をリアルタイムで設計",
+      "unique_to_me": "この進化のプロセス全体をログとして持っているのは自分だけ"
+    }
   ]
 }
