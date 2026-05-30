@@ -1944,15 +1944,32 @@ def _display_candidate_selection(data: dict) -> None:
     click.echo(f"\n{sep}")
 
 
+def _compute_seed_hit_rate(expected: list, actual_seeds: list) -> tuple[int, int]:
+    """(hit_count, total_expected) を返す。部分一致で判定。"""
+    if not expected:
+        return 0, 0
+    actual_lower = {s.lower() for s in actual_seeds}
+    hits = sum(
+        1 for es in expected
+        if any(
+            (es.get("title", str(es)) if isinstance(es, dict) else str(es))[:12].lower() in at
+            for at in actual_lower
+        )
+    )
+    return hits, len(expected)
+
+
 def _display_asset_performance(assets: list, expected_seeds_map: dict) -> None:
     sep = "=" * 65
     click.echo(f"\n{sep}")
     click.echo(f"  Asset Performance  {len(assets)}件  予測 vs 実測")
+    click.echo(f"  KPI: seed_hit_rate = 予測した種のうち実際に発生した割合")
     click.echo(sep)
 
     has_perf = [a for a in assets if a.get("performance")]
     pending  = [a for a in assets if not a.get("performance")]
 
+    # 個別資産の表示
     for a in has_perf:
         title   = a.get("title", "")
         theme   = a.get("theme", "")
@@ -1976,22 +1993,57 @@ def _display_asset_performance(assets: list, expected_seeds_map: dict) -> None:
         expected = expected_seeds_map.get(cid, [])
         actual   = a.get("actual_seeds", [])
         if expected:
+            hit_count, total = _compute_seed_hit_rate(expected, actual)
+            pct = round(hit_count / total * 100) if total else 0
+            click.echo(f"  ─ Seed 予測 vs 実測 ── seed_hit_rate: {hit_count}/{total}  ({pct}%)")
             actual_lower = {s.lower() for s in actual}
-            hit_count = 0
-            click.echo(f"  ─ Seed 予測 vs 実測 ───────────────────────")
             for es in expected:
                 es_title = es.get("title", str(es)) if isinstance(es, dict) else str(es)
                 conf     = es.get("confidence", "-") if isinstance(es, dict) else "-"
                 hit = any(es_title[:12].lower() in at for at in actual_lower)
                 mark = "✓" if hit else "✗"
-                if hit:
-                    hit_count += 1
-                click.echo(f"    {mark} [{conf:>3}%]  {es_title[:50]}")
-            click.echo(f"    適中率: {hit_count}/{len(expected)}")
+                click.echo(f"    {mark} [{conf:>3}%]  {es_title[:52]}")
         if actual:
             click.echo(f"  ─ 実際に生まれた種 ─────────────────────────")
             for s in actual:
                 click.echo(f"    → {s}")
+
+    # Asset Type 別 seed_hit_rate 集計（学習信号）
+    if has_perf:
+        click.echo(f"\n{sep}")
+        click.echo(f"  Asset Type 別 seed_hit_rate  （Candidate Engine の予測精度）")
+        click.echo(sep)
+
+        from collections import defaultdict
+        type_stats: dict[str, list[tuple[int, int]]] = defaultdict(list)
+        for a in has_perf:
+            atype    = a.get("asset_type", "不明")
+            cid      = a.get("candidate_id", "")
+            expected = expected_seeds_map.get(cid, [])
+            actual   = a.get("actual_seeds", [])
+            h, t = _compute_seed_hit_rate(expected, actual)
+            if t > 0:
+                type_stats[atype].append((h, t))
+
+        if type_stats:
+            rows = []
+            for atype, pairs in type_stats.items():
+                total_h = sum(h for h, _ in pairs)
+                total_t = sum(t for _, t in pairs)
+                pct = round(total_h / total_t * 100) if total_t else 0
+                rows.append((atype, total_h, total_t, pct))
+            rows.sort(key=lambda x: x[3], reverse=True)
+
+            for atype, h, t, pct in rows:
+                bar = "█" * min(pct // 5, 20)
+                bias = ""
+                if pct >= 70:
+                    bias = "← 予測精度高い"
+                elif pct <= 30:
+                    bias = "← 過大評価傾向 → seed_rate を下方修正検討"
+                click.echo(f"  {atype:<16}  {bar:<20}  {pct:>3}%  ({h}/{t})  {bias}")
+        else:
+            click.echo(f"  （計測データが不足しています）")
 
     if pending:
         click.echo(f"\n  ─ 計測待ち {len(pending)}件 ─────────────────────────")
