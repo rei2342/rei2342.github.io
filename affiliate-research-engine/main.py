@@ -1904,5 +1904,288 @@ def asset_candidates_cmd(force: bool, top: int, min_type_score: int):
     click.echo(f"\n  JSON: {out_path}\n")
 
 
+def _display_candidate_selection(data: dict) -> None:
+    sep = "=" * 65
+    selected = data.get("selected", [])
+    total_seeds = data.get("total_seed_count", 0)
+    logic = data.get("selection_logic", "")
+
+    click.echo(f"\n{sep}")
+    click.echo(f"  Candidate Selection  {len(selected)}件選択")
+    click.echo(f"  最適化: seed_rate → theme_balance → asset_type_balance → score")
+    click.echo(sep)
+
+    for i, s in enumerate(selected, start=1):
+        title   = s.get("title", "")
+        theme   = s.get("theme", "")
+        atype   = s.get("asset_type", "")
+        score   = s.get("predicted_score", 0)
+        sr      = s.get("seed_rate", 0)
+        reason  = s.get("selection_reason", "")
+        seeds   = s.get("expected_next_seeds", [])
+
+        bar = "█" * min(score // 5, 20)
+        click.echo(f"\n  #{i}  {title}")
+        click.echo(f"       {theme}  ×  {atype}")
+        click.echo(f"       score:{score}  {bar}  seed_rate:{sr}")
+        if reason:
+            click.echo(f"       理由: {reason[:65]}")
+        if seeds:
+            click.echo(f"       ↓ 予測種 ({len(seeds)}件):")
+            for sd in seeds[:5]:
+                conf   = sd.get("confidence", "-") if isinstance(sd, dict) else "-"
+                stitle = sd.get("title", str(sd)) if isinstance(sd, dict) else str(sd)
+                stype  = sd.get("asset_type", "") if isinstance(sd, dict) else ""
+                click.echo(f"         [{conf:>3}%]  {stitle[:48]}  ({stype})")
+
+    click.echo(f"\n  合計予測seed数 : {total_seeds}件")
+    if logic:
+        click.echo(f"  選択方針       : {logic[:70]}")
+    click.echo(f"\n{sep}")
+
+
+def _display_asset_performance(assets: list, expected_seeds_map: dict) -> None:
+    sep = "=" * 65
+    click.echo(f"\n{sep}")
+    click.echo(f"  Asset Performance  {len(assets)}件  予測 vs 実測")
+    click.echo(sep)
+
+    has_perf = [a for a in assets if a.get("performance")]
+    pending  = [a for a in assets if not a.get("performance")]
+
+    for a in has_perf:
+        title   = a.get("title", "")
+        theme   = a.get("theme", "")
+        atype   = a.get("asset_type", "")
+        p_score = a.get("predicted_score")
+        perf    = a.get("performance", {})
+        cid     = a.get("candidate_id", "")
+        pv      = perf.get("pv")
+        sr      = perf.get("save_rate")
+        cit     = perf.get("citations")
+        fup     = perf.get("followup_count")
+
+        click.echo(f"\n  {title}")
+        click.echo(f"  {theme}  ×  {atype}  （predicted: {p_score}）")
+        click.echo(f"  ─ Performance ─────────────────────────────")
+        if pv      is not None: click.echo(f"    PV        : {pv:,}")
+        if sr      is not None: click.echo(f"    保存率    : {sr}%")
+        if cit     is not None: click.echo(f"    引用数    : {cit}件")
+        if fup     is not None: click.echo(f"    派生数    : {fup}件")
+
+        expected = expected_seeds_map.get(cid, [])
+        actual   = a.get("actual_seeds", [])
+        if expected:
+            actual_lower = {s.lower() for s in actual}
+            hit_count = 0
+            click.echo(f"  ─ Seed 予測 vs 実測 ───────────────────────")
+            for es in expected:
+                es_title = es.get("title", str(es)) if isinstance(es, dict) else str(es)
+                conf     = es.get("confidence", "-") if isinstance(es, dict) else "-"
+                hit = any(es_title[:12].lower() in at for at in actual_lower)
+                mark = "✓" if hit else "✗"
+                if hit:
+                    hit_count += 1
+                click.echo(f"    {mark} [{conf:>3}%]  {es_title[:50]}")
+            click.echo(f"    適中率: {hit_count}/{len(expected)}")
+        if actual:
+            click.echo(f"  ─ 実際に生まれた種 ─────────────────────────")
+            for s in actual:
+                click.echo(f"    → {s}")
+
+    if pending:
+        click.echo(f"\n  ─ 計測待ち {len(pending)}件 ─────────────────────────")
+        for a in pending:
+            click.echo(f"    [{a.get('platform',''):8}]  {a.get('title','')}  id:{a.get('id','')[:8]}")
+
+    click.echo(f"\n{sep}")
+
+
+@cli.command("candidate-selection")
+@click.option("--n", default=3, type=int, show_default=True, help="選択件数")
+@click.option("--force", is_flag=True, default=False, help="既存を上書き")
+def candidate_selection_cmd(n: int, force: bool):
+    """資産候補からIdea Graph最大化の観点でN件を選択します"""
+    base = Path(__file__).parent
+    out_path   = base / "outputs" / "candidate_selection.json"
+    cands_path = base / "outputs" / "asset_candidates.json"
+
+    if out_path.exists() and not force:
+        click.echo(f"\n  既存選択を読み込み: {out_path}")
+        click.echo(f"  上書きする場合は --force を追加してください")
+        _display_candidate_selection(json.loads(out_path.read_text(encoding="utf-8")))
+        return
+
+    if not cands_path.exists():
+        click.echo("[エラー] asset_candidates.json が見つかりません。先に asset-candidates を実行してください。", err=True)
+        sys.exit(1)
+
+    cands_data = json.loads(cands_path.read_text(encoding="utf-8"))
+    draft = [c for c in cands_data.get("candidates", []) if c.get("status") == "draft"]
+    if not draft:
+        click.echo("[エラー] status=draft の候補が0件です。", err=True)
+        sys.exit(1)
+
+    creator_profile = {}
+    cp_path = base / "data" / "creator_profile.json"
+    if cp_path.exists():
+        creator_profile = json.loads(cp_path.read_text(encoding="utf-8"))
+
+    template = (base / "prompts" / "candidate_selection_prompt.md").read_text(encoding="utf-8")
+    prompt = (
+        template
+        .replace("{creator_profile}", json.dumps(creator_profile, ensure_ascii=False, indent=2))
+        .replace("{candidates_json}", json.dumps(draft, ensure_ascii=False, indent=2))
+        .replace("{n}", str(n))
+    )
+
+    click.echo(f"\ncandidate-selection  {len(draft)}候補から{n}件を選択中...")
+    llm = LLMClient()
+    result = llm.call_json(prompt, "あなたはコンテンツ戦略の専門家です。JSONのみで回答してください。")
+
+    output = {
+        "selected_at": datetime.now(timezone.utc).isoformat(),
+        "n_requested": n,
+        "draft_count": len(draft),
+        **result,
+    }
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    _display_candidate_selection(output)
+    click.echo(f"\n  JSON: {out_path}\n")
+
+
+@cli.command("publish-asset")
+@click.option("--candidate-id", required=True, help="asset_candidates.json の id")
+@click.option("--url", required=True, help="公開URL")
+@click.option("--platform", required=True,
+              type=click.Choice(["note", "x", "youtube", "zenn", "threads", "instagram", "other"]))
+def publish_asset_cmd(candidate_id: str, url: str, platform: str):
+    """候補を公開済みとしてマークします"""
+    import uuid as uuid_lib
+    base = Path(__file__).parent
+    cands_path = base / "outputs" / "asset_candidates.json"
+    pub_path   = base / "outputs" / "published_assets.json"
+
+    if not cands_path.exists():
+        click.echo("[エラー] asset_candidates.json が見つかりません。", err=True)
+        sys.exit(1)
+
+    cands_data = json.loads(cands_path.read_text(encoding="utf-8"))
+    target = None
+    for c in cands_data.get("candidates", []):
+        if c.get("id") == candidate_id:
+            c["status"] = "published"
+            target = c
+            break
+
+    if not target:
+        click.echo(f"[エラー] candidate_id={candidate_id} が見つかりません。", err=True)
+        sys.exit(1)
+
+    cands_path.write_text(json.dumps(cands_data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    pub_data = {"assets": []}
+    if pub_path.exists():
+        pub_data = json.loads(pub_path.read_text(encoding="utf-8"))
+
+    pub_data["assets"].append({
+        "id": str(uuid_lib.uuid4()),
+        "candidate_id": candidate_id,
+        "title": target.get("title", ""),
+        "theme": target.get("theme", ""),
+        "asset_type": target.get("asset_type", ""),
+        "predicted_score": target.get("predicted_score"),
+        "predicted_breakdown": target.get("breakdown", {}),
+        "url": url,
+        "platform": platform,
+        "published_at": datetime.now(timezone.utc).date().isoformat(),
+        "performance": None,
+        "actual_seeds": [],
+        "actual_score": None,
+    })
+
+    pub_path.parent.mkdir(parents=True, exist_ok=True)
+    pub_path.write_text(json.dumps(pub_data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    click.echo(f"\n  ✓ 公開済み登録: {target.get('title', '')}")
+    click.echo(f"    platform: {platform}")
+    click.echo(f"    url     : {url}\n")
+
+
+@cli.command("record-performance")
+@click.option("--asset-id", required=True, help="published_assets.json の id")
+@click.option("--pv", default=None, type=int, help="ページビュー数")
+@click.option("--save-rate", default=None, type=float, help="保存率（%）")
+@click.option("--comments", default=None, type=int, help="コメント数")
+@click.option("--citations", default=None, type=int, help="引用・被リンク数")
+@click.option("--followup-count", default=None, type=int, help="派生コンテンツ数")
+@click.option("--actual-seeds", multiple=True, help="実際に生まれた後続ネタのタイトル（複数可）")
+def record_performance_cmd(asset_id, pv, save_rate, comments, citations, followup_count, actual_seeds):
+    """公開済み資産のパフォーマンスと実測種を記録します"""
+    base = Path(__file__).parent
+    pub_path = base / "outputs" / "published_assets.json"
+
+    if not pub_path.exists():
+        click.echo("[エラー] published_assets.json が見つかりません。先に publish-asset を実行してください。", err=True)
+        sys.exit(1)
+
+    pub_data = json.loads(pub_path.read_text(encoding="utf-8"))
+    target = None
+    for asset in pub_data.get("assets", []):
+        if asset.get("id") == asset_id:
+            target = asset
+            break
+
+    if not target:
+        click.echo(f"[エラー] asset_id={asset_id} が見つかりません。", err=True)
+        sys.exit(1)
+
+    target["performance"] = {
+        "pv":             pv,
+        "save_rate":      save_rate,
+        "comments":       comments,
+        "citations":      citations,
+        "followup_count": followup_count,
+        "measured_at":    datetime.now(timezone.utc).date().isoformat(),
+    }
+    target["actual_seeds"] = list(actual_seeds)
+
+    pub_path.write_text(json.dumps(pub_data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    click.echo(f"\n  ✓ パフォーマンス記録: {target.get('title', '')}")
+    if pv            is not None: click.echo(f"    PV        : {pv:,}")
+    if save_rate     is not None: click.echo(f"    保存率    : {save_rate}%")
+    if citations     is not None: click.echo(f"    引用数    : {citations}件")
+    if followup_count is not None: click.echo(f"    派生数    : {followup_count}件")
+    if actual_seeds:               click.echo(f"    実測種    : {', '.join(actual_seeds)}")
+    click.echo()
+
+
+@cli.command("asset-performance")
+def asset_performance_cmd():
+    """予測 vs 実測の比較レポートを表示します"""
+    base = Path(__file__).parent
+    pub_path = base / "outputs" / "published_assets.json"
+    sel_path = base / "outputs" / "candidate_selection.json"
+
+    if not pub_path.exists():
+        click.echo("[エラー] published_assets.json が見つかりません。先に publish-asset を実行してください。", err=True)
+        sys.exit(1)
+
+    pub_data = json.loads(pub_path.read_text(encoding="utf-8"))
+
+    expected_seeds_map: dict[str, list] = {}
+    if sel_path.exists():
+        sel_data = json.loads(sel_path.read_text(encoding="utf-8"))
+        for s in sel_data.get("selected", []):
+            cid = s.get("candidate_id")
+            if cid:
+                expected_seeds_map[cid] = s.get("expected_next_seeds", [])
+
+    _display_asset_performance(pub_data.get("assets", []), expected_seeds_map)
+
+
 if __name__ == "__main__":
     cli()
