@@ -729,15 +729,24 @@ def cluster_themes(cases_dir: str | None, phase_num: str, force: bool):
             valid = [x for x in lst if x is not None]
             return round(sum(valid) / len(valid)) if valid else None
 
+        avg_ph4 = avg(ph4_scores)
+        avg_cf  = avg(cf_scores)
+        theme_size   = theme_data.get("theme_size", 50)
+        asset_score  = round(avg_ph4 * avg_cf / 100) if (avg_ph4 is not None and avg_cf is not None) else None
+        theme_value  = round(asset_score * theme_size / 100) if asset_score is not None else None
+
         themes_with_stats[theme_name] = {
             **theme_data,
             "stats": {
                 "case_count": len(case_names),
                 "avg_phase1": avg(ph1_scores),
-                "avg_phase4": avg(ph4_scores),
-                "compound_score": (avg(ph4_scores) - avg(ph1_scores)) if avg(ph4_scores) is not None and avg(ph1_scores) is not None else None,
-                "avg_creator_fit": avg(cf_scores),
+                "avg_phase4": avg_ph4,
+                "compound_score": (avg_ph4 - avg(ph1_scores)) if avg_ph4 is not None and avg(ph1_scores) is not None else None,
+                "avg_creator_fit": avg_cf,
                 "avg_account_fit": avg(af_scores),
+                "theme_size": theme_size,
+                "asset_score": asset_score,
+                "theme_value": theme_value,
             }
         }
 
@@ -760,50 +769,61 @@ def _display_theme_clusters(data: dict, phase_num: int = 1) -> None:
 
     click.echo(f"\n{sep}")
     click.echo(f"  Theme Cluster  {data.get('total_cases','-')}案件 → {data.get('theme_count','-')}テーマ")
-    click.echo(f"  compound_score = Phase4 - Phase1（正=積むほど強くなる、負=初速型）")
+    click.echo(f"  theme_value  = asset_score × theme_size / 100")
+    click.echo(f"  asset_score  = Phase4 × creator_fit / 100  （今の自分が積める資産量）")
+    click.echo(f"  compound     = Phase4 - Phase1  （資産の成長方向）")
     click.echo(sep)
 
-    # compound_score降順でソート（資産型が上位に来る）
+    # theme_value降順でソート（最終価値が高いテーマを優先）
     sorted_themes = sorted(
         themes.items(),
-        key=lambda x: x[1].get("stats", {}).get("compound_score") or -999,
+        key=lambda x: x[1].get("stats", {}).get("theme_value") or -999,
         reverse=True
     )
 
     for rank, (theme_name, theme_data) in enumerate(sorted_themes, start=1):
         stats = theme_data.get("stats", {})
-        ph1      = stats.get("avg_phase1")
-        ph4      = stats.get("avg_phase4")
-        compound = stats.get("compound_score")
-        cf       = stats.get("avg_creator_fit")
-        af       = stats.get("avg_account_fit")
-        n        = stats.get("case_count", 0)
+        ph1          = stats.get("avg_phase1")
+        ph4          = stats.get("avg_phase4")
+        compound     = stats.get("compound_score")
+        cf           = stats.get("avg_creator_fit")
+        af           = stats.get("avg_account_fit")
+        theme_size   = stats.get("theme_size")
+        asset_score  = stats.get("asset_score")
+        theme_value  = stats.get("theme_value")
+        n            = stats.get("case_count", 0)
 
-        # compound_score の矢印表示
+        # compound の矢印
         if compound is not None:
             if compound > 0:
-                cmp_disp = f"+{compound}  ↑ 資産型（積むほど強くなる）"
+                cmp_disp = f"+{compound} ↑"
             elif compound == 0:
-                cmp_disp = f" {compound}  → 横ばい型"
+                cmp_disp = f" {compound} →"
             else:
-                cmp_disp = f"{compound}  ↓ 初速型（積み上がらない）"
+                cmp_disp = f"{compound} ↓"
         else:
             cmp_disp = "-"
 
-        # bar graph for compound
-        if compound is not None:
-            bar_len = min(abs(compound) // 3, 15)
-            bar = ("+" if compound >= 0 else "-") * bar_len
+        # theme_value バー
+        if theme_value is not None:
+            bar_len = min(theme_value // 5, 20)
+            bar = "█" * bar_len
         else:
             bar = ""
 
-        label = "資産型" if (compound or 0) > 0 else ("初速型" if (compound or 0) < 0 else "横ばい")
+        tv_label = "◎ 最重点" if (theme_value or 0) >= 50 else ("○ 注目" if (theme_value or 0) >= 25 else "△ 補助")
         cf_stars = "★★★" if (cf or 0) >= 70 else ("★★" if (cf or 0) >= 40 else "★")
 
-        click.echo(f"\n  #{rank} {theme_name}  [{cf_stars}]  {n}案件  [{label}]")
-        click.echo(f"       compound_score : {cmp_disp}")
-        click.echo(f"       phase_score    : Phase1={ph1 if ph1 is not None else '-':>3}  →  Phase4={ph4 if ph4 is not None else '-':>3}  [{bar}]")
-        click.echo(f"       creator_fit avg: {cf if cf is not None else '-':>3}  account_fit avg: {af if af is not None else '-':>3}")
+        click.echo(f"\n  #{rank} {theme_name}  [{cf_stars}]  {n}案件  [{tv_label}]")
+
+        # theme_value メイン表示
+        tv_str   = f"{theme_value:>3}" if theme_value is not None else "  -"
+        as_str   = f"{asset_score:>3}" if asset_score is not None else "  -"
+        ts_str   = f"{theme_size:>3}" if theme_size is not None else "  -"
+        click.echo(f"       theme_value  : {tv_str}  {bar}")
+        click.echo(f"       asset_score  : {as_str}  ( Phase4={ph4 if ph4 is not None else '-':>3} × creator_fit={cf if cf is not None else '-':>3} )")
+        click.echo(f"       theme_size   : {ts_str}  compound={cmp_disp}  ( Phase1={ph1 if ph1 is not None else '-':>3} → Phase4={ph4 if ph4 is not None else '-':>3} )")
+        click.echo(f"       account_fit  : {af if af is not None else '-':>3}")
 
         desc = theme_data.get("description", "")
         if desc:
@@ -815,9 +835,6 @@ def _display_theme_clusters(data: dict, phase_num: int = 1) -> None:
         if note:
             click.echo(f"       発信者適合: {note[:50]}")
 
-        # 案件一覧
-        phase_data = _load_growth_phase()
-        weights = phase_data.get("phase_weights", {}).get(str(phase_num), {})
         click.echo(f"       ─────────────────────────────────────────────")
         for cname in theme_data.get("cases", []):
             click.echo(f"         {cname}")
