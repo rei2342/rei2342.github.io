@@ -1944,18 +1944,46 @@ def _display_candidate_selection(data: dict) -> None:
     click.echo(f"\n{sep}")
 
 
+def _slugify(text: str) -> str:
+    """タイトルを安定した snake_case 識別子に変換する（表記揺れ対策）"""
+    import re
+    text = text.lower()
+    text = re.sub(r'[^\w\s-]', '', text, flags=re.UNICODE)
+    text = re.sub(r'[\s\-]+', '_', text).strip('_')
+    return text[:40]
+
+
 def _compute_seed_hit_rate(expected: list, actual_seeds: list) -> tuple[int, int]:
-    """(hit_count, total_expected) を返す。部分一致で判定。"""
+    """(hit_count, total_expected) を返す。ID一致優先 → タイトル前方一致にフォールバック。
+    actual_seeds は {id, title} dict または文字列のどちらでも受け付ける。"""
     if not expected:
         return 0, 0
-    actual_lower = {s.lower() for s in actual_seeds}
-    hits = sum(
-        1 for es in expected
-        if any(
-            (es.get("title", str(es)) if isinstance(es, dict) else str(es))[:12].lower() in at
-            for at in actual_lower
-        )
-    )
+
+    actual_ids: set[str] = set()
+    actual_titles_lower: set[str] = set()
+    for s in actual_seeds:
+        if isinstance(s, dict):
+            if s.get("id"):
+                actual_ids.add(s["id"])
+            actual_titles_lower.add(s.get("title", "").lower())
+        else:
+            actual_ids.add(_slugify(str(s)))
+            actual_titles_lower.add(str(s).lower())
+
+    hits = 0
+    for es in expected:
+        if isinstance(es, dict):
+            es_id    = es.get("id") or _slugify(es.get("title", ""))
+            es_title = es.get("title", "")
+        else:
+            es_id    = _slugify(str(es))
+            es_title = str(es)
+
+        if es_id and es_id in actual_ids:
+            hits += 1
+        elif any(es_title[:12].lower() in at for at in actual_titles_lower):
+            hits += 1
+
     return hits, len(expected)
 
 
@@ -2366,7 +2394,11 @@ def record_performance_cmd(asset_id, pv, save_rate, comments, citations, followu
         "followup_count": followup_count,
         "measured_at":    datetime.now(timezone.utc).date().isoformat(),
     }
-    target["actual_seeds"] = list(actual_seeds)
+    # {id, title} 構造で保存（表記揺れ対策: ID で照合できるようにする）
+    target["actual_seeds"] = [
+        {"id": _slugify(s), "title": s}
+        for s in actual_seeds
+    ]
 
     pub_path.write_text(json.dumps(pub_data, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -2401,6 +2433,46 @@ def asset_performance_cmd():
                 expected_seeds_map[cid] = s.get("expected_next_seeds", [])
 
     _display_asset_performance(pub_data.get("assets", []), expected_seeds_map)
+
+
+@cli.command("list-candidates")
+@click.option("--status", default="all",
+              type=click.Choice(["draft", "published", "all"]), show_default=True)
+@click.option("--top", default=20, type=int, show_default=True)
+def list_candidates_cmd(status: str, top: int):
+    """候補一覧とIDを表示します（publish-asset --candidate-id の参照用）"""
+    base = Path(__file__).parent
+    cands_path = base / "outputs" / "asset_candidates.json"
+
+    if not cands_path.exists():
+        click.echo("[エラー] asset_candidates.json が見つかりません。先に asset-candidates を実行してください。", err=True)
+        sys.exit(1)
+
+    cands_data = json.loads(cands_path.read_text(encoding="utf-8"))
+    all_cands = cands_data.get("candidates", [])
+
+    if status != "all":
+        all_cands = [c for c in all_cands if c.get("status") == status]
+
+    sep = "=" * 65
+    click.echo(f"\n{sep}")
+    click.echo(f"  Candidates  {len(all_cands)}件  （status={status}）")
+    click.echo(f"  ※ publish-asset --candidate-id の値は下記 id を使用してください")
+    click.echo(sep)
+
+    for c in all_cands[:top]:
+        uid    = c.get("id", "")
+        title  = c.get("title", "")
+        theme  = c.get("theme", "")
+        atype  = c.get("asset_type", "")
+        score  = c.get("predicted_score", 0)
+        st     = c.get("status", "draft")
+        st_label = "✓公開済" if st == "published" else "  下書き"
+        click.echo(f"\n  [{st_label}]  {title}")
+        click.echo(f"    {theme}  ×  {atype}  score:{score}")
+        click.echo(f"    id: {uid}")
+
+    click.echo(f"\n{sep}\n")
 
 
 if __name__ == "__main__":

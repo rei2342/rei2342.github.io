@@ -39,6 +39,7 @@
       "selection_reason": "なぜこれを選んだか（30〜60字）",
       "expected_next_seeds": [
         {
+          "id": "snake_case_identifier（タイトルをsnake_caseで表現した安定識別子、例: cursor_rules_for_note）",
           "title": "次に生まれると予測されるコンテンツタイトル",
           "theme": "テーマ名",
           "asset_type": "資産タイプ名",
