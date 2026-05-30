@@ -615,6 +615,33 @@ def creator_fit_score_cmd(cases_dir: str | None, force: bool):
         click.echo("  → rank-cases または compare-top でcreator_fit込みランキングを確認できます\n")
 
 
+@cli.command("set-phase")
+@click.argument("phase", type=click.Choice(["1", "2", "3", "4"]))
+def set_phase(phase: str):
+    """現在の成長フェーズを設定します（phase_score算出に使用）
+
+    \b
+    Phase 1: ゼロ〜初CV       （case 50% + account 40% + curiosity 10%）
+    Phase 2: 初CV〜月1万円    （+authority解放）
+    Phase 3: 月1万〜月10万円  （+moat解放）
+    Phase 4: 月10万〜1人メディア（+leverage解放）
+    """
+    base = Path(__file__).parent
+    phase_path = base / "data" / "growth_phase.json"
+    data = json.loads(phase_path.read_text(encoding="utf-8")) if phase_path.exists() else {}
+    data["current_phase"] = int(phase)
+    phase_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    descriptions = {
+        "1": "ゼロ〜初CV：case 50% + account 40% + curiosity 10%",
+        "2": "初CV〜月1万円：+authority_fit 解放（30%）",
+        "3": "月1万〜月10万円：+moat_fit 解放（25%）",
+        "4": "月10万〜1人メディア：+leverage_fit 解放（35%）",
+    }
+    click.echo(f"\n✓ Phase {phase} に設定: {descriptions[phase]}")
+    click.echo(f"  → rank-cases --phase {phase}  または  compare-top --phase {phase}  で確認できます\n")
+
+
 @cli.command("batch-analyze")
 @click.option("--cases-dir", default=None, type=click.Path(), help="入力JSONディレクトリ（デフォルト: data/cases/）")
 @click.option("--force", is_flag=True, default=False, help="分析済みでも再分析する")
@@ -697,7 +724,8 @@ def batch_analyze(cases_dir: str | None, force: bool, max_cases: int | None):
 @cli.command("compare-top")
 @click.option("--cases-dir", default=None, type=click.Path(), help="分析済みJSONディレクトリ（デフォルト: outputs/cases/）")
 @click.option("--top", "top_n", default=10, show_default=True, help="表示件数")
-def compare_top(cases_dir: str | None, top_n: int):
+@click.option("--phase", "phase_num", default=None, type=click.Choice(["1", "2", "3", "4"]), help="フェーズ別スコアで表示（未指定=creator_ps）")
+def compare_top(cases_dir: str | None, top_n: int, phase_num: str | None):
     """TOP N 案件をスコア比較表で表示します"""
     base = Path(__file__).parent
     cases_path = Path(cases_dir) if cases_dir else base / "outputs" / "cases"
@@ -721,14 +749,25 @@ def compare_top(cases_dir: str | None, top_n: int):
         except Exception:
             pass
 
-    entries.sort(key=lambda x: x["priority_score"], reverse=True)
+    # Phase score computation
+    if phase_num:
+        phase_int = int(phase_num)
+        for e in entries:
+            e["phase_score"] = _compute_phase_score(e, phase_int)
+        sort_key = lambda x: x.get("phase_score") or 0
+        sort_label = f"phase_score（Phase {phase_num}）"
+    else:
+        sort_key = lambda x: x["priority_score"]
+        sort_label = "priority_score"
+
+    entries.sort(key=sort_key, reverse=True)
     top = entries[:top_n]
 
     W = 22  # column width
     sep = "=" * (W * min(len(top), 5) + 20)
 
     click.echo(f"\n{sep}")
-    click.echo(f"  compare-top  TOP{top_n}案件比較（priority_score順）  ※creator_psは7軸総合スコア")
+    click.echo(f"  compare-top  TOP{top_n}案件比較（{sort_label}順）  ※creator_psは7軸総合スコア")
     click.echo(sep)
 
     ROWS = [
@@ -744,6 +783,7 @@ def compare_top(cases_dir: str | None, top_n: int):
         ("account_fit",      lambda e: f"{e['account_fit']}/100" if e.get("account_fit") is not None else "未設定"),
         ("creator_fit",      lambda e: f"{e['creator_fit']}/100" if e.get("creator_fit") is not None else "未設定"),
         ("creator_ps",       lambda e: str(e["creator_priority_score"]) if e.get("creator_priority_score") is not None else "未分析"),
+        ("phase_score",      lambda e: str(e["phase_score"]) if e.get("phase_score") is not None else "-"),
         ("category",        lambda e: (e["category"] or "-")[:18]),
     ]
 
@@ -851,6 +891,10 @@ def compare_top(cases_dir: str | None, top_n: int):
             ("差別化力 /100",    "differentiation_potential"),
             ("体験語り /100",    "authentic_voice"),
             ("継続性 /100",      "longevity"),
+            ("好奇心 /100",      "curiosity_fit"),
+            ("権威積上 /100",    "authority_fit"),
+            ("参入障壁 /100",    "moat_fit"),
+            ("複利率 /100",      "leverage_fit"),
         ]
         for col_start in range(0, len(has_cf), chunk):
             cols = has_cf[col_start:col_start + chunk]
@@ -865,6 +909,33 @@ def compare_top(cases_dir: str | None, top_n: int):
             click.echo()
 
     click.echo(sep + "\n")
+
+
+def _load_growth_phase() -> dict:
+    p = Path(__file__).parent / "data" / "growth_phase.json"
+    if not p.exists():
+        return {}
+    return json.loads(p.read_text(encoding="utf-8"))
+
+
+def _compute_phase_score(entry: dict, phase: int) -> int | None:
+    phase_data = _load_growth_phase()
+    weights = phase_data.get("phase_weights", {}).get(str(phase))
+    if not weights:
+        return None
+
+    cf_bd = entry.get("creator_fit_breakdown") or {}
+    scores = {
+        "case_score":    entry.get("case_score") or 0,
+        "account_fit":   entry.get("account_fit") or 0,
+        "curiosity_fit": cf_bd.get("curiosity_fit") or 0,
+        "authority_fit": cf_bd.get("authority_fit") or 0,
+        "moat_fit":      cf_bd.get("moat_fit") or 0,
+        "leverage_fit":  cf_bd.get("leverage_fit") or 0,
+    }
+
+    total = sum(scores.get(k, 0) * w for k, w in weights.items())
+    return round(total)
 
 
 def _extract_ranking_entry(data: dict, path: str) -> dict:
@@ -971,7 +1042,8 @@ def _level_label(level: str | None) -> str:
     type=click.Path(),
     help="ランキングJSONの保存先（デフォルト: outputs/rankings/）",
 )
-def rank_cases(cases_dir: str | None, output_dir: str | None):
+@click.option("--phase", "phase_num", default=None, type=click.Choice(["1", "2", "3", "4"]), help="フェーズ別スコアで表示")
+def rank_cases(cases_dir: str | None, output_dir: str | None, phase_num: str | None):
     """分析済みJSON一覧からpriority_score順にランキングを表示・保存します"""
     base = Path(__file__).parent
     cases_path = Path(cases_dir) if cases_dir else base / "outputs" / "cases"
@@ -992,13 +1064,25 @@ def rank_cases(cases_dir: str | None, output_dir: str | None):
         except Exception as e:
             errors.append((f.name, str(e)))
 
-    entries.sort(key=lambda x: x["priority_score"], reverse=True)
+    if phase_num:
+        phase_int = int(phase_num)
+        for e in entries:
+            e["phase_score"] = _compute_phase_score(e, phase_int)
+        entries.sort(key=lambda x: x.get("phase_score") or 0, reverse=True)
+    else:
+        entries.sort(key=lambda x: x["priority_score"], reverse=True)
 
     # ターミナル表示
+    phase_data = _load_growth_phase()
+    phase_descs = phase_data.get("phase_descriptions", {})
     click.echo(f"\n{'=' * 65}")
     click.echo(f"  案件ランキング  ({len(entries)}件)")
-    click.echo(f"  priority_score     = case_score×0.3 + automation_fit×0.3 + startup_fit×0.4")
-    click.echo(f"  creator_priority   = (case_score + automation_fit + startup_fit + zero_cost_norm + CEF + account_fit + creator_fit) / 7")
+    if phase_num:
+        click.echo(f"  ソート: phase_score（Phase {phase_num}）")
+        click.echo(f"  {phase_descs.get(phase_num, '')}")
+    else:
+        click.echo(f"  priority_score     = case_score×0.3 + automation_fit×0.3 + startup_fit×0.4")
+        click.echo(f"  creator_priority   = (case_score + automation_fit + startup_fit + zero_cost_norm + CEF + account_fit + creator_fit) / 7")
     click.echo(f"{'=' * 65}")
 
     for rank, e in enumerate(entries, start=1):
@@ -1008,6 +1092,8 @@ def rank_cases(cases_dir: str | None, output_dir: str | None):
         zcv_bd = e.get("zero_cost_breakdown") or {}
 
         click.echo(f"\n  #{rank:02d} {e['product_name']}")
+        if phase_num and e.get("phase_score") is not None:
+            click.echo(f"       phase_score    : {e['phase_score']}  （Phase {phase_num}）")
         click.echo(f"       priority_score : {e['priority_score']}{note}")
 
         # zero_cost_validation_score を最重要指標として最上部に表示

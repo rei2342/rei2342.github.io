@@ -1,0 +1,65 @@
+{
+  "current_phase": 1,
+  "phase_descriptions": {
+    "1": "ゼロ〜初CV：案件力とフォロワー適合が主軸。authority/moat/leverageはまだ存在しない。",
+    "2": "初CV〜月1万円：発信を継続した結果、authorityが発生しうる段階。",
+    "3": "月1万〜月10万円：authorityが積み上がり、moatが形成されうる段階。",
+    "4": "月10万円〜1人メディア：moatが機能し、leverageが資産として複利し始める段階。"
+  },
+  "phase_axes": {
+    "1": [
+      "case_score",
+      "account_fit",
+      "curiosity_fit"
+    ],
+    "2": [
+      "case_score",
+      "account_fit",
+      "curiosity_fit",
+      "authority_fit"
+    ],
+    "3": [
+      "case_score",
+      "account_fit",
+      "curiosity_fit",
+      "authority_fit",
+      "moat_fit"
+    ],
+    "4": [
+      "case_score",
+      "account_fit",
+      "curiosity_fit",
+      "authority_fit",
+      "moat_fit",
+      "leverage_fit"
+    ]
+  },
+  "phase_weights": {
+    "1": {
+      "case_score": 0.5,
+      "account_fit": 0.4,
+      "curiosity_fit": 0.1
+    },
+    "2": {
+      "case_score": 0.3,
+      "account_fit": 0.3,
+      "curiosity_fit": 0.1,
+      "authority_fit": 0.3
+    },
+    "3": {
+      "case_score": 0.2,
+      "account_fit": 0.2,
+      "curiosity_fit": 0.1,
+      "authority_fit": 0.25,
+      "moat_fit": 0.25
+    },
+    "4": {
+      "case_score": 0.1,
+      "account_fit": 0.1,
+      "curiosity_fit": 0.1,
+      "authority_fit": 0.15,
+      "moat_fit": 0.2,
+      "leverage_fit": 0.35
+    }
+  }
+}
