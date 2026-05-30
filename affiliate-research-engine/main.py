@@ -1959,58 +1959,38 @@ def _compute_seed_hit_rate(expected: list, actual_seeds: list) -> tuple[int, int
     return hits, len(expected)
 
 
-def _estimate_actual_axis_scores(
-    performance: dict,
-    actual_seeds: list,
-    expected_seeds: list,
-) -> dict[str, int | None]:
-    """パフォーマンスデータから各評価軸の実測代理値を推定する（0〜100）。
-    直接測れない軸はプロキシで近似する。"""
-    save_rate  = performance.get("save_rate") or 0
-    citations  = performance.get("citations") or 0
-    followup   = performance.get("followup_count") or 0
+def _derive_calibration_from_observations(
+    obs_pairs: list[tuple[int, int]],
+    label: str,
+    axis_implication: str,
+) -> dict:
+    """観測可能な (expected_count, actual_count) ペアから補正情報を導出する。
+    seed_rate や stackability を直接測るのではなく、観測データの比率から含意を得る。"""
+    if not obs_pairs:
+        return {}
+    total_expected = sum(e for e, _ in obs_pairs)
+    total_actual   = sum(a for _, a in obs_pairs)
+    ratio = round(total_actual / total_expected, 2) if total_expected > 0 else None
 
-    h, t = _compute_seed_hit_rate(expected_seeds, actual_seeds)
-    seed_actual = round(h / t * 100) if t > 0 else None
-
-    # differentiation proxy: 引用数（他者が言及するほど差別化できている）+ 保存率
-    diff_proxy = min(100, round(citations * 5 + save_rate * 1.5)) if (citations > 0 or save_rate > 0) else None
-
-    # stackability proxy: 派生コンテンツ数（これを起点に次の記事が生まれたか）
-    stack_proxy = min(100, followup * 25) if followup is not None and followup > 0 else None
-
-    # durability proxy: 保存率（読み返す価値があると判断されたか）
-    dur_proxy = min(100, round(save_rate * 5)) if save_rate > 0 else None
+    if ratio is None:
+        implication = "データ不足"
+    elif ratio < 0.4:
+        implication = f"{axis_implication} 大幅過大評価 → 次回予測を {ratio:.2f}× に補正推奨"
+    elif ratio < 0.75:
+        implication = f"{axis_implication} やや過大評価 → 保守的見積もりを推奨（実現率 {round(ratio*100)}%）"
+    elif ratio > 1.5:
+        implication = f"{axis_implication} 過小評価 → より積極的な見積もりを推奨"
+    else:
+        implication = f"概ね正確（実現率 {round(ratio*100)}%）"
 
     return {
-        "seed_rate":      seed_actual,
-        "differentiation": diff_proxy,
-        "stackability":   stack_proxy,
-        "durability":     dur_proxy,
+        "label":          label,
+        "total_expected": total_expected,
+        "total_actual":   total_actual,
+        "ratio":          ratio,
+        "sample_n":       len(obs_pairs),
+        "implication":    implication,
     }
-
-
-def _generate_calibration_note(axis_records: dict[str, list[tuple[int, int]]]) -> str:
-    """評価軸ごとの予測 vs 実測から calibration note を生成する。"""
-    lines = []
-    for axis, pairs in axis_records.items():
-        if not pairs:
-            continue
-        pred_avg = round(sum(p for p, _ in pairs) / len(pairs))
-        act_avg  = round(sum(a for _, a in pairs) / len(pairs))
-        diff     = act_avg - pred_avg
-        if abs(diff) < 5:
-            note = "概ね正確"
-        elif diff < -15:
-            note = f"過大評価（{abs(diff)}pt）→ 次回予測を抑えめに"
-        elif diff > 15:
-            note = f"過小評価（{diff}pt）→ 次回予測を高めに"
-        elif diff < 0:
-            note = f"やや過大評価（{abs(diff)}pt）"
-        else:
-            note = f"やや過小評価（{diff}pt）"
-        lines.append(f"{axis:<16}: 予測平均{pred_avg:>3} vs 実測代理{act_avg:>3}  {note}")
-    return "\n".join(lines)
 
 
 def _display_asset_performance(assets: list, expected_seeds_map: dict) -> None:
@@ -2099,78 +2079,102 @@ def _display_asset_performance(assets: list, expected_seeds_map: dict) -> None:
         else:
             click.echo(f"  （計測データが不足しています）")
 
-    # Layer3: 評価軸別 予測精度分析（Model Calibration）
+    # Layer3: Model Calibration（観測可能データ → 評価軸の含意）
+    # seed_rate や stackability は仮説であり直接測れない。
+    # 観測可能な生データ（種の数、派生数）の比率から含意を導出する。
     if has_perf:
-        from collections import defaultdict
-        axis_records: dict[str, list[tuple[int, int]]] = defaultdict(list)
-        axes = ["seed_rate", "differentiation", "stackability", "durability"]
+        seed_obs:     list[tuple[int, int]] = []  # (expected_count, actual_count)
+        followup_obs: list[tuple[int, int]] = []  # (expected_seed_count, actual_followup_count)
+        citation_obs: list[int] = []
+        save_rate_obs: list[float] = []
 
         for a in has_perf:
             cid      = a.get("candidate_id", "")
             perf     = a.get("performance", {})
-            actual   = a.get("actual_seeds", [])
+            actual_s = a.get("actual_seeds", [])
             expected = expected_seeds_map.get(cid, [])
-            pred_bd  = a.get("predicted_breakdown", {})
 
-            actual_axes = _estimate_actual_axis_scores(perf, actual, expected)
-            for ax in axes:
-                pred_val = pred_bd.get(ax)
-                act_val  = actual_axes.get(ax)
-                if pred_val is not None and act_val is not None:
-                    axis_records[ax].append((int(pred_val), int(act_val)))
+            if expected:
+                seed_obs.append((len(expected), len(actual_s)))
+                followup = perf.get("followup_count")
+                if followup is not None:
+                    followup_obs.append((len(expected), int(followup)))
+            if perf.get("citations") is not None:
+                citation_obs.append(int(perf["citations"]))
+            if perf.get("save_rate") is not None:
+                save_rate_obs.append(float(perf["save_rate"]))
 
-        if any(axis_records.values()):
+        seed_cal     = _derive_calibration_from_observations(seed_obs,     "予測seed数", "seed_rate")
+        followup_cal = _derive_calibration_from_observations(followup_obs, "派生コンテンツ数", "stackability")
+
+        if seed_cal or followup_cal:
             click.echo(f"\n{sep}")
-            click.echo(f"  Layer 3: Model Calibration  （評価軸の予測精度）")
-            click.echo(f"  ※ differentiation / stackability / durability は代理指標")
+            click.echo(f"  Layer 3: Model Calibration")
+            click.echo(f"  観測可能データの比率 → 評価軸への含意（推定ではなく事実ベース）")
             click.echo(sep)
 
-            calibration_lines = []
-            for ax in axes:
-                pairs = axis_records.get(ax, [])
-                if not pairs:
-                    click.echo(f"  {ax:<16}: データ不足（{len(has_perf)}件中）")
+            for cal in [seed_cal, followup_cal]:
+                if not cal:
                     continue
-                pred_avg = round(sum(p for p, _ in pairs) / len(pairs))
-                act_avg  = round(sum(a for _, a in pairs) / len(pairs))
-                diff     = act_avg - pred_avg
-                bar_p = "░" * min(pred_avg // 5, 20)
-                bar_a = "█" * min(act_avg // 5, 20)
-                if abs(diff) < 5:
-                    bias = "概ね正確"
-                elif diff <= -15:
-                    bias = f"過大評価 {diff:+d}pt ← 次回以降の予測を抑えめに"
-                elif diff >= 15:
-                    bias = f"過小評価 {diff:+d}pt ← 次回以降の予測を高めに"
-                elif diff < 0:
-                    bias = f"やや過大評価 {diff:+d}pt"
-                else:
-                    bias = f"やや過小評価 {diff:+d}pt"
-                click.echo(f"  {ax:<16}: 予測{pred_avg:>3} {bar_p}")
-                click.echo(f"  {'':16}  実測{act_avg:>3} {bar_a}  {bias}")
-                calibration_lines.append(f"{ax}: {bias}（予測{pred_avg} vs 実測{act_avg}）")
+                label  = cal["label"]
+                exp    = cal["total_expected"]
+                act    = cal["total_actual"]
+                ratio  = cal["ratio"]
+                n      = cal["sample_n"]
+                impl   = cal["implication"]
+                ratio_pct = round(ratio * 100) if ratio is not None else 0
+                bar_e  = "░" * min(exp // 3, 20)
+                bar_a  = "█" * min(act // 3, 20)
+                click.echo(f"\n  【{label}】  n={n}件")
+                click.echo(f"    予測合計: {exp:>4}  {bar_e}")
+                click.echo(f"    実測合計: {act:>4}  {bar_a}  実現率 {ratio_pct}%")
+                click.echo(f"    含意: {impl}")
 
-            if calibration_lines:
-                click.echo(f"\n  ─ Calibration Prompt（次回のCandidate Engineに注入）──")
-                click.echo(f"  【モデルキャリブレーション（{len(has_perf)}件のデータより）】")
-                for line in calibration_lines:
+            if citation_obs:
+                avg_cit = round(sum(citation_obs) / len(citation_obs), 1)
+                click.echo(f"\n  【引用数平均】  {avg_cit}件/記事  n={len(citation_obs)}件")
+                click.echo(f"    含意: differentiation の代理指標（引用されるほど差別化できている）")
+            if save_rate_obs:
+                avg_sr = round(sum(save_rate_obs) / len(save_rate_obs), 1)
+                click.echo(f"\n  【保存率平均】  {avg_sr}%  n={len(save_rate_obs)}件")
+                click.echo(f"    含意: durability の代理指標（保存されるほど長期価値がある）")
+
+            # Calibration Prompt（次回の Candidate Engine に注入する文章）
+            prompt_lines = []
+            if seed_cal and seed_cal.get("ratio") is not None:
+                r = seed_cal["ratio"]
+                if r < 0.75:
+                    prompt_lines.append(
+                        f"seed_rate: 過去{seed_cal['sample_n']}件の実績から、予測した種の"
+                        f"{round(r*100)}%しか実現しない傾向があります。seed_rateの予測を抑えめにしてください。"
+                    )
+            if followup_cal and followup_cal.get("ratio") is not None:
+                r = followup_cal["ratio"]
+                if r < 0.75:
+                    prompt_lines.append(
+                        f"stackability: 過去{followup_cal['sample_n']}件の実績から、予測した派生数の"
+                        f"{round(r*100)}%しか実現しない傾向があります。stackabilityの予測を抑えめにしてください。"
+                    )
+
+            if prompt_lines:
+                click.echo(f"\n  ─ Calibration Prompt（asset-candidates 呼び出し時に注入）──")
+                click.echo(f"  【{len(has_perf)}件のデータより導出】")
+                for line in prompt_lines:
                     click.echo(f"  {line}")
 
-            # model_calibration.json に保存
+            # model_calibration.json に生データで保存（仮説スコアではなく観測比率）
             base = Path(__file__).parent
             cal_path = base / "outputs" / "model_calibration.json"
             cal_data = {
-                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at":   datetime.now(timezone.utc).isoformat(),
                 "sample_count": len(has_perf),
-                "axis_calibration": {
-                    ax: {
-                        "pred_avg": round(sum(p for p, _ in axis_records[ax]) / len(axis_records[ax])),
-                        "act_avg":  round(sum(a for _, a in axis_records[ax]) / len(axis_records[ax])),
-                        "diff":     round(sum(a - p for p, a in axis_records[ax]) / len(axis_records[ax])),
-                        "sample_n": len(axis_records[ax]),
-                    }
-                    for ax in axes if axis_records.get(ax)
+                "raw_observations": {
+                    "seed_generation":   seed_cal or {},
+                    "followup_creation": followup_cal or {},
+                    "avg_citations":     round(sum(citation_obs) / len(citation_obs), 1) if citation_obs else None,
+                    "avg_save_rate":     round(sum(save_rate_obs) / len(save_rate_obs), 1) if save_rate_obs else None,
                 },
+                "calibration_prompt": "\n".join(prompt_lines) if prompt_lines else "",
             }
             cal_path.parent.mkdir(parents=True, exist_ok=True)
             cal_path.write_text(json.dumps(cal_data, ensure_ascii=False, indent=2), encoding="utf-8")
