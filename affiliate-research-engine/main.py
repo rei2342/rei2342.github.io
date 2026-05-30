@@ -1863,6 +1863,11 @@ def asset_candidates_cmd(force: bool, top: int, min_type_score: int):
     if cp_path.exists():
         creator_profile = json.loads(cp_path.read_text(encoding="utf-8"))
 
+    creator_memory = {}
+    cm_path = base / "data" / "creator_memory.json"
+    if cm_path.exists():
+        creator_memory = json.loads(cm_path.read_text(encoding="utf-8"))
+
     # テーマごとに高スコアタイプ（閾値以上、最大4種）を絞り込む
     top_types: dict[str, list] = {}
     for theme_name, types in matrix_data.get("matrix", {}).items():
@@ -1876,6 +1881,7 @@ def asset_candidates_cmd(force: bool, top: int, min_type_score: int):
     prompt = (
         template
         .replace("{creator_profile}", json.dumps(creator_profile, ensure_ascii=False, indent=2))
+        .replace("{creator_memory}", json.dumps(creator_memory, ensure_ascii=False, indent=2))
         .replace("{top_types}", json.dumps(top_types, ensure_ascii=False, indent=2))
     )
 

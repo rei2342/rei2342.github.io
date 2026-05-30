@@ -1,0 +1,65 @@
+{
+  "description": "変化の履歴ログ。発見・失敗・驚き・学びを時系列で蓄積する。candidate-engineはこのファイルから「その人にしか書けない変化」を引き出す。",
+  "entries": [
+    {
+      "id": "affiliate_engine_candidate_insight",
+      "date": "2026-05-30",
+      "project": "Affiliate Research Engine",
+      "type": "insight",
+      "before_belief": "アフィリエイト案件を評価するツールを作ればいいと思っていた",
+      "discovery": "案件評価より「どの種を積むと次の種が生まれるか」の方が重要だった",
+      "surprise": "予測エンジン（predicted_score）より Candidate Engine（何を書くか）の方が実務価値が高かった",
+      "confidence": 0.95
+    },
+    {
+      "id": "affiliate_engine_kpi_shift",
+      "date": "2026-05-30",
+      "project": "Affiliate Research Engine",
+      "type": "failure",
+      "before_belief": "コンテンツ運用のKPIはPVとCVだと思っていた",
+      "discovery": "seed_hit_rate（予測した種のうち実際に生まれた割合）の方が資産型メディアの本質指標",
+      "surprise": "今週の数字より来週の候補数が増えているかどうかが重要だった",
+      "confidence": 0.9
+    },
+    {
+      "id": "creator_fit_vs_account_fit",
+      "date": "2026-05-30",
+      "project": "13案件スコアリング実験",
+      "type": "surprise",
+      "before_belief": "アカウントのオーディエンス適合が高ければ案件は使えると思っていた",
+      "discovery": "creator_fit（発信者が語れるか）とaccount_fit（オーディエンス適合）は完全に独立していた",
+      "surprise": "ULTORAのaccount_fit=78でもcreator_fit=22だった。高スコア案件でも語れない案件は実質使えない",
+      "confidence": 0.95
+    },
+    {
+      "id": "prediction_vs_observation_design",
+      "date": "2026-05-30",
+      "project": "Affiliate Research Engine",
+      "type": "insight",
+      "before_belief": "評価軸スコア（seed_rate=82）を実績値と比較すれば学習できると思っていた",
+      "discovery": "seed_rateは仮説であり直接測れない。観測可能な生データ（expected_seeds vs actual_seeds）の比率から含意を導出するべきだった",
+      "surprise": "「推定 vs 推定」の比較では100件積んでも学習データが壊れる。設計を全面変更した",
+      "confidence": 0.9
+    },
+    {
+      "id": "theme_value_evaluation_shift",
+      "date": "2026-05-30",
+      "project": "Affiliate Research Engine",
+      "type": "insight",
+      "before_belief": "theme_value = asset × sizeで最良テーマが分かると思っていた",
+      "discovery": "同じ市場規模でもガジェット（レビュー→アフィで終わり）とAI仕事術（講座→コンサル→コミュニティ）では収益化効率が10倍以上違う",
+      "surprise": "theme_valueを導入した瞬間に評価対象が「案件」から「テーマ」に完全移行した",
+      "confidence": 0.85
+    },
+    {
+      "id": "creator_profile_bottleneck",
+      "date": "2026-05-30",
+      "project": "Affiliate Research Engine",
+      "type": "failure",
+      "before_belief": "プロンプトを改善すれば候補品質が上がると思っていた",
+      "discovery": "creator_profile.jsonの粒度が低いと何度プロンプトを改善しても一般論候補しか出なかった",
+      "surprise": "LLMへの入力品質（一次情報の構造化）がアウトプット品質を決める。コードより入力データが重要だった",
+      "confidence": 0.9
+    }
+  ]
+}
