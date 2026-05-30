@@ -1988,6 +1988,7 @@ def _derive_calibration_from_observations(
         "total_expected": total_expected,
         "total_actual":   total_actual,
         "ratio":          ratio,
+        "absolute_error": total_expected - total_actual,  # 読み違えた絶対数（ratio と合わせてサンプルサイズを判断）
         "sample_n":       len(obs_pairs),
         "implication":    implication,
     }
@@ -2120,6 +2121,7 @@ def _display_asset_performance(assets: list, expected_seeds_map: dict) -> None:
                 exp    = cal["total_expected"]
                 act    = cal["total_actual"]
                 ratio  = cal["ratio"]
+                abs_err = cal.get("absolute_error", 0)
                 n      = cal["sample_n"]
                 impl   = cal["implication"]
                 ratio_pct = round(ratio * 100) if ratio is not None else 0
@@ -2127,7 +2129,7 @@ def _display_asset_performance(assets: list, expected_seeds_map: dict) -> None:
                 bar_a  = "█" * min(act // 3, 20)
                 click.echo(f"\n  【{label}】  n={n}件")
                 click.echo(f"    予測合計: {exp:>4}  {bar_e}")
-                click.echo(f"    実測合計: {act:>4}  {bar_a}  実現率 {ratio_pct}%")
+                click.echo(f"    実測合計: {act:>4}  {bar_a}  実現率 {ratio_pct}%  読み違え {abs_err:+d}個")
                 click.echo(f"    含意: {impl}")
 
             if citation_obs:
@@ -2162,6 +2164,33 @@ def _display_asset_performance(assets: list, expected_seeds_map: dict) -> None:
                 for line in prompt_lines:
                     click.echo(f"  {line}")
 
+            # per-seed matching（「Cursor Rules系を過大評価」レベルの粒度）
+            seed_prediction_detail = []
+            for a in has_perf:
+                cid      = a.get("candidate_id", "")
+                actual_s = a.get("actual_seeds", [])
+                expected = expected_seeds_map.get(cid, [])
+                if not expected:
+                    continue
+                actual_lower = {s.lower() for s in actual_s}
+                predictions = []
+                for es in expected:
+                    es_title = es.get("title", str(es)) if isinstance(es, dict) else str(es)
+                    es_type  = es.get("asset_type", "") if isinstance(es, dict) else ""
+                    es_conf  = es.get("confidence") if isinstance(es, dict) else None
+                    materialized = any(es_title[:12].lower() in at for at in actual_lower)
+                    predictions.append({
+                        "title":        es_title,
+                        "asset_type":   es_type,
+                        "confidence":   es_conf,
+                        "materialized": materialized,
+                    })
+                seed_prediction_detail.append({
+                    "candidate_title": a.get("title", ""),
+                    "asset_type":      a.get("asset_type", ""),
+                    "predictions":     predictions,
+                })
+
             # model_calibration.json に生データで保存（仮説スコアではなく観測比率）
             base = Path(__file__).parent
             cal_path = base / "outputs" / "model_calibration.json"
@@ -2174,6 +2203,7 @@ def _display_asset_performance(assets: list, expected_seeds_map: dict) -> None:
                     "avg_citations":     round(sum(citation_obs) / len(citation_obs), 1) if citation_obs else None,
                     "avg_save_rate":     round(sum(save_rate_obs) / len(save_rate_obs), 1) if save_rate_obs else None,
                 },
+                "seed_prediction_detail": seed_prediction_detail,
                 "calibration_prompt": "\n".join(prompt_lines) if prompt_lines else "",
             }
             cal_path.parent.mkdir(parents=True, exist_ok=True)
