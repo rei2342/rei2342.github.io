@@ -43,7 +43,7 @@ creator_memoryの各エントリには before_belief → discovery → surprise 
 predicted_score = 3軸の平均値（整数）
 
 ## 出力形式
-高スコア（score≥70）の各テーマ × 資産タイプごとに3〜5件の候補を生成。
+各テーマ × 資産タイプごとに5〜8件の候補を生成（score≥70のテーマ×タイプは8件、score<70は3件）。
 以下のJSONのみを返してください。
 
 {

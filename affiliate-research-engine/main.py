@@ -1868,14 +1868,14 @@ def asset_candidates_cmd(force: bool, top: int, min_type_score: int):
     if cm_path.exists():
         creator_memory = json.loads(cm_path.read_text(encoding="utf-8"))
 
-    # テーマごとに高スコアタイプ（閾値以上、最大4種）を絞り込む
+    # テーマごとに高スコアタイプ（閾値以上、最大8種）を絞り込む
     top_types: dict[str, list] = {}
     for theme_name, types in matrix_data.get("matrix", {}).items():
         filtered = [
             (t, d) for t, d in types.items()
             if d.get("score", 0) >= min_type_score
         ]
-        top_types[theme_name] = sorted(filtered, key=lambda x: x[1].get("score", 0), reverse=True)[:4]
+        top_types[theme_name] = sorted(filtered, key=lambda x: x[1].get("score", 0), reverse=True)[:8]
 
     template = (base / "prompts" / "asset_candidate_prompt.md").read_text(encoding="utf-8")
     prompt = (

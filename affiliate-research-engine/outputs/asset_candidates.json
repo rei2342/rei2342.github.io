@@ -1,0 +1,785 @@
+{
+  "generated_at": "2026-05-31T00:20:12.672371+00:00",
+  "candidates": [
+    {
+      "title": "5000行作って最後に気づいた：予測エンジンより「次のネタを生むエンジン」の方が100倍重要だった",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "実践記録",
+      "predicted_score": 97,
+      "breakdown": {
+        "uniqueness": 99,
+        "durability": 95,
+        "seed_rate": 97
+      },
+      "rationale": "5000行実装を経た設計思想の転換は唯一無二。predicted_score型からcandidate_engine型への移行体験は再現不可。",
+      "source_experience": "creator_memory[affiliate_engine_candidate_insight]: before_belief「案件評価ツールを作ればいい」→discovery「どの種を積むと次の種が生まれるかの方が重要」＋current_projects「Affiliate Research Engine（5000行超え）」",
+      "id": "0eb2bce8-c864-4d7d-bc87-08cd0577606a",
+      "status": "draft"
+    },
+    {
+      "title": "「推定 vs 推定」の罠：100件積んでも学習データが壊れる設計ミスを犯した話",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "実践記録",
+      "predicted_score": 96,
+      "breakdown": {
+        "uniqueness": 99,
+        "durability": 94,
+        "seed_rate": 95
+      },
+      "rationale": "seed_rate=82という仮説値同士の比較が学習データを汚染するという設計失敗は実装者にしか語れない。",
+      "source_experience": "creator_memory[prediction_vs_observation_design]: before_belief「評価軸スコアを実績値と比較すれば学習できる」→discovery「観測可能な生データ（expected_seeds vs actual_seeds）の比率から含意を導出するべきだった」→surprise「設計を全面変更した」",
+      "id": "a826d5a1-ae85-4605-87d9-19a22c8ff7ce",
+      "status": "draft"
+    },
+    {
+      "title": "PVもCVも捨てた：資産型メディアの本質KPIは『seed_hit_rate』だという結論に至るまで",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "実践記録",
+      "predicted_score": 96,
+      "breakdown": {
+        "uniqueness": 98,
+        "durability": 95,
+        "seed_rate": 96
+      },
+      "rationale": "「今週の数字より来週の候補数」という逆転発見は実運用システム開発者にしか生まれない指標哲学。",
+      "source_experience": "creator_memory[affiliate_engine_kpi_shift]: before_belief「KPIはPVとCV」→discovery「seed_hit_rateが資産型メディアの本質指標」→surprise「今週の数字より来週の候補数が増えているかどうかが重要だった」",
+      "id": "48efa4a9-61bb-45b0-b362-5938f830c23f",
+      "status": "draft"
+    },
+    {
+      "title": "LLMへの入力品質がすべてだった：プロンプト100回改善しても候補が一般論だった理由",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "実践記録",
+      "predicted_score": 95,
+      "breakdown": {
+        "uniqueness": 98,
+        "durability": 94,
+        "seed_rate": 94
+      },
+      "rationale": "creator_profile.jsonの粒度がLLM出力品質を決めるという発見はシステム開発実体験からしか生まれない。",
+      "source_experience": "creator_memory[creator_profile_bottleneck]: before_belief「プロンプトを改善すれば候補品質が上がる」→discovery「creator_profile.jsonの粒度が低いと何度改善しても一般論候補しか出ない」→surprise「コードより入力データが重要だった」",
+      "id": "0ecd5ea5-5401-4675-83a9-2951c87c5ccc",
+      "status": "draft"
+    },
+    {
+      "title": "案件スコア78点でも「使えない」：creator_fitとaccount_fitが完全に独立していた衝撃",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "実践記録",
+      "predicted_score": 95,
+      "breakdown": {
+        "uniqueness": 99,
+        "durability": 93,
+        "seed_rate": 93
+      },
+      "rationale": "ULTORA案件でaccount_fit=78・creator_fit=22という実測値は13案件スコアリング実験の具体データ。",
+      "source_experience": "creator_memory[creator_fit_vs_account_fit]: discovery「creator_fitとaccount_fitは完全に独立」→surprise「ULTORAのaccount_fit=78でもcreator_fit=22。高スコア案件でも語れない案件は実質使えない」＋current_projects「13案件のスコアリング実験（case_score / CEF / account_fit / creator_fit / phase_score）」",
+      "id": "e05a6f61-a57a-45bf-9745-3cd1366a8a3b",
+      "status": "draft"
+    },
+    {
+      "title": "AIコンテンツ候補エンジンのテンプレート：creator_profile.jsonから自動的に「次に書くべきもの」を生成する構造",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "テンプレート",
+      "predicted_score": 95,
+      "breakdown": {
+        "uniqueness": 97,
+        "durability": 95,
+        "seed_rate": 94
+      },
+      "rationale": "実運用Candidate Engineから抽出したJSONテンプレは実装者のみが配布できる独自資産。",
+      "source_experience": "creator_memory[creator_profile_bottleneck]「creator_profile.jsonの粒度が低いと一般論候補しか出ない」＋creator_memory[affiliate_engine_candidate_insight]「Candidate Engine（何を書くか）の方が実務価値が高かった」",
+      "id": "0e252e8e-6f93-4c0c-b9b1-b0bb2484f00d",
+      "status": "draft"
+    },
+    {
+      "title": "アフィリエイト案件5軸評価テンプレ：creator_fit / account_fit / case_score / CEF / phase_scoreを自分のアカウントに適用する方法",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "テンプレート",
+      "predicted_score": 94,
+      "breakdown": {
+        "uniqueness": 96,
+        "durability": 93,
+        "seed_rate": 93
+      },
+      "rationale": "13案件実験で検証済みの評価テンプレは汎用配布可能で再利用需要が高い。",
+      "source_experience": "current_projects「13案件のスコアリング実験（case_score / CEF / account_fit / creator_fit / phase_score）」＋creator_memory[creator_fit_vs_account_fit]「creator_fitとaccount_fitは完全に独立していた」",
+      "id": "341634e1-5a57-47b7-8039-2c433ca6abef",
+      "status": "draft"
+    },
+    {
+      "title": "「案件を評価する」な、「テーマを評価せよ」：資産型メディア運用のフレームワーク",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "フレームワーク/法則",
+      "predicted_score": 94,
+      "breakdown": {
+        "uniqueness": 96,
+        "durability": 95,
+        "seed_rate": 92
+      },
+      "rationale": "theme_value導入で評価対象が案件からテーマに移行した体験を法則化した唯一性の高いフレーム。",
+      "source_experience": "creator_memory[theme_value_evaluation_shift]「theme_valueを導入した瞬間に評価対象が『案件』から『テーマ』に完全移行した」＋「ガジェット vs AI仕事術で収益化効率10倍以上違う」",
+      "id": "7000d2aa-cd80-4e61-a5fc-00e17cb74091",
+      "status": "draft"
+    },
+    {
+      "title": "「案件を選ぶ」から「テーマを選ぶ」へ：theme_valueを1行追加した瞬間に評価軸が変わった",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "実践記録",
+      "predicted_score": 93,
+      "breakdown": {
+        "uniqueness": 97,
+        "durability": 90,
+        "seed_rate": 93
+      },
+      "rationale": "ガジェットとAI仕事術で収益化効率10倍差という実測インサイトはテーマ評価システム実装者のみが語れる。",
+      "source_experience": "creator_memory[theme_value_evaluation_shift]: before_belief「theme_value = asset × sizeで最良テーマが分かる」→discovery「同じ市場規模でもガジェット（レビュー→アフィで終わり）とAI仕事術（講座→コンサル→コミュニティ）では収益化効率が10倍以上違う」→surprise「評価対象が案件からテーマに完全移行した」",
+      "id": "4d9d88b2-783e-4818-b252-9033ee727201",
+      "status": "draft"
+    },
+    {
+      "title": "AIで自作した案件評価システムの全設計：5軸スコアリング（case_score/CEF/account_fit/creator_fit/phase_score）の仕様書公開",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "実践記録",
+      "predicted_score": 93,
+      "breakdown": {
+        "uniqueness": 99,
+        "durability": 92,
+        "seed_rate": 89
+      },
+      "rationale": "13案件を実際に通した5軸評価システムの全仕様公開は他者再現不可の一次資産。",
+      "source_experience": "current_projects「13案件のスコアリング実験（case_score / CEF / account_fit / creator_fit / phase_score）」＋「AI予測と実CVのズレを検証する実験フロー設計」",
+      "id": "bda5a610-dd75-43a3-a2f1-2b57ee2dfe3a",
+      "status": "draft"
+    },
+    {
+      "title": "seed_hit_rate管理テンプレ：「今週PV」を捨てて「来週の候補数」で運用するメディア管理シート",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "テンプレート",
+      "predicted_score": 93,
+      "breakdown": {
+        "uniqueness": 95,
+        "durability": 92,
+        "seed_rate": 93
+      },
+      "rationale": "PV/CVを捨てたKPI転換の実体験から生まれた管理フォーマットは思想ごと配布できる。",
+      "source_experience": "creator_memory[affiliate_engine_kpi_shift]「seed_hit_rate（予測した種のうち実際に生まれた割合）の方が資産型メディアの本質指標」→「今週の数字より来週の候補数が増えているかどうかが重要」",
+      "id": "6cd94241-029f-4c24-9f4f-d46b7fbcf063",
+      "status": "draft"
+    },
+    {
+      "title": "観測可能な指標 vs 推定値：AIシステムに学習させるデータ設計の正しいテンプレート（壊れる設計と壊れない設計の対比）",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "テンプレート",
+      "predicted_score": 93,
+      "breakdown": {
+        "uniqueness": 96,
+        "durability": 94,
+        "seed_rate": 90
+      },
+      "rationale": "「推定vs推定」でデータが壊れる失敗から導出した設計テンプレは実装者しか作れない。",
+      "source_experience": "creator_memory[prediction_vs_observation_design]「seed_rateは仮説であり直接測れない。観測可能な生データ（expected_seeds vs actual_seeds）の比率から含意を導出するべきだった」→「設計を全面変更した」",
+      "id": "5c09f2c0-216e-46b0-b4ad-3d559ad1c15e",
+      "status": "draft"
+    },
+    {
+      "title": "AIコンテンツ運用の3層構造：種を積む→種が芽吹く→芽が種を生むサイクル設計論",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "フレームワーク/法則",
+      "predicted_score": 93,
+      "breakdown": {
+        "uniqueness": 95,
+        "durability": 94,
+        "seed_rate": 92
+      },
+      "rationale": "「どの種を積むと次の種が生まれるか」という発見を体系化したフレームは実装者のみが構築できる。",
+      "source_experience": "creator_memory[affiliate_engine_candidate_insight]「案件評価より『どの種を積むと次の種が生まれるか』の方が重要だった」＋creator_memory[affiliate_engine_kpi_shift]「seed_hit_rateが資産型メディアの本質指標」",
+      "id": "82b3acff-af30-4cc0-8d27-d08bf2b68ba8",
+      "status": "draft"
+    },
+    {
+      "title": "LLM活用システム設計の鉄則：「コードより入力データを先に完成させる」逆転フレームワーク",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "フレームワーク/法則",
+      "predicted_score": 93,
+      "breakdown": {
+        "uniqueness": 95,
+        "durability": 93,
+        "seed_rate": 91
+      },
+      "rationale": "プロンプト改善の限界という失敗体験から導出した設計優先順位の逆転法則は実装者のみが語れる。",
+      "source_experience": "creator_memory[creator_profile_bottleneck]「コードより入力データが重要だった」→「LLMへの入力品質（一次情報の構造化）がアウトプット品質を決める」＋first_hand_domains「Claude Codeによるシステム構築」",
+      "id": "1648fe25-b0b6-47fe-a02a-ed18d46ccc62",
+      "status": "draft"
+    },
+    {
+      "title": "Claude Codeで5000行超えのシステムを一人で作る方法：実装フローから設計変更の乗り越え方まで",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "ノウハウ/How-to",
+      "predicted_score": 93,
+      "breakdown": {
+        "uniqueness": 96,
+        "durability": 91,
+        "seed_rate": 92
+      },
+      "rationale": "Affiliate Research Engine実装という実績に裏付けられたClaude Code活用手順は需要が高く連鎖する。",
+      "source_experience": "current_projects「Affiliate Research Engine（5000行超え・実運用直前）」＋expertise「Claude Code・エージェント開発」＋first_hand_domains「Claude Codeによるシステム構築」",
+      "id": "e0b4de19-c496-4e80-8e3c-b32f4abd829a",
+      "status": "draft"
+    },
+    {
+      "title": "Affiliate Research Engine 開発ログ：実運用直前の全実装記録（5000行・設計変更履歴付き）",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "実践記録",
+      "predicted_score": 92,
+      "breakdown": {
+        "uniqueness": 99,
+        "durability": 90,
+        "seed_rate": 88
+      },
+      "rationale": "5000行超の実装と複数回の設計全面変更を経た開発ログは再現性ゼロの資産。",
+      "source_experience": "current_projects「Affiliate Research Engine（5000行超え・実運用直前）」＋creator_memory[prediction_vs_observation_design]「設計を全面変更した」",
+      "id": "b9a19f8d-0545-45cc-87e0-57a3c131d6c3",
+      "status": "draft"
+    },
+    {
+      "title": "AIエージェントに「自分のこと」を正確に伝えるcreator_profile.json設計テンプレ：粒度の低い自己紹介がLLMを壊す",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "テンプレート",
+      "predicted_score": 92,
+      "breakdown": {
+        "uniqueness": 96,
+        "durability": 91,
+        "seed_rate": 90
+      },
+      "rationale": "「入力データ品質がアウトプットを決める」という失敗から導出した構造化テンプレは汎用性が高い。",
+      "source_experience": "creator_memory[creator_profile_bottleneck]「creator_profile.jsonの粒度が低いと何度プロンプトを改善しても一般論候補しか出なかった」→「LLMへの入力品質（一次情報の構造化）がアウトプット品質を決める。コードより入力データが重要だった」",
+      "id": "0f7e3224-68ab-464a-a764-15ea8584fbc2",
+      "status": "draft"
+    },
+    {
+      "title": "アフィリエイト案件評価の2軸独立モデル：creator_fit × account_fitで「使える案件」を正確に絞り込む方法",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "フレームワーク/法則",
+      "predicted_score": 92,
+      "breakdown": {
+        "uniqueness": 96,
+        "durability": 91,
+        "seed_rate": 90
+      },
+      "rationale": "ULTORA案件の実測値（account_fit=78・creator_fit=22）から導出した2軸独立モデルは実験データ付き。",
+      "source_experience": "creator_memory[creator_fit_vs_account_fit]「creator_fit（発信者が語れるか）とaccount_fit（オーディエンス適合）は完全に独立していた」＋「ULTORAのaccount_fit=78でもcreator_fit=22だった」",
+      "id": "c105c62b-b2b0-4733-9db8-313c38444237",
+      "status": "draft"
+    },
+    {
+      "title": "資産型メディアのKPI再設計論：PV・CVを捨てて「seed_hit_rate」で運用することの理論的根拠",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "フレームワーク/法則",
+      "predicted_score": 92,
+      "breakdown": {
+        "uniqueness": 94,
+        "durability": 93,
+        "seed_rate": 90
+      },
+      "rationale": "実運用システム開発中に発見したKPI転換の思想を体系化。測定設計まで含めた完結フレームが強み。",
+      "source_experience": "creator_memory[affiliate_engine_kpi_shift]「seed_hit_rate（予測した種のうち実際に生まれた割合）の方が資産型メディアの本質指標」＋current_projects「AI予測と実CVのズレを検証する実験フロー設計」",
+      "id": "1ed558c6-2db0-4b37-906c-a3965396d527",
+      "status": "draft"
+    },
+    {
+      "title": "AIエージェントで案件スコアリングシステムを作る実装手順：Affiliate Research Engineの構築プロセス完全解説",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "ノウハウ/How-to",
+      "predicted_score": 92,
+      "breakdown": {
+        "uniqueness": 97,
+        "durability": 90,
+        "seed_rate": 90
+      },
+      "rationale": "13案件スコアリングの実装プロセスを公開するHow-toはエージェント開発の唯一の一次情報。",
+      "source_experience": "current_projects「13案件のスコアリング実験（case_score / CEF / account_fit / creator_fit / phase_score）」＋first_hand_domains「エージェント設計・実行」",
+      "id": "583a4568-2893-40a6-b5a8-c29735f8547c",
+      "status": "draft"
+    },
+    {
+      "title": "creator_profile.jsonを「LLMが使えるレベル」に構造化する方法：粒度の設計から記述方法まで",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "ノウハウ/How-to",
+      "predicted_score": 92,
+      "breakdown": {
+        "uniqueness": 95,
+        "durability": 91,
+        "seed_rate": 92
+      },
+      "rationale": "粒度不足で一般論しか出なかった失敗体験から逆引きしたHow-toは実装者のみが書ける。",
+      "source_experience": "creator_memory[creator_profile_bottleneck]「creator_profile.jsonの粒度が低いと何度プロンプトを改善しても一般論候補しか出なかった」＋「一次情報の構造化がアウトプット品質を決める」",
+      "id": "646e9077-220b-432c-a918-e829ebbbe8d2",
+      "status": "draft"
+    },
+    {
+      "title": "Claude Codeでシステム開発するときのプロジェクト構造テンプレ：5000行超えても崩れないディレクトリ設計",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "テンプレート",
+      "predicted_score": 91,
+      "breakdown": {
+        "uniqueness": 94,
+        "durability": 92,
+        "seed_rate": 88
+      },
+      "rationale": "Affiliate Research Engine実装で検証されたClaude Code運用構造は再現需要が高い。",
+      "source_experience": "current_projects「Affiliate Research Engine（5000行超え・実運用直前）」＋expertise「Claude Codeによるシステム構築」＋first_hand_domains「Claude Codeによるシステム構築」",
+      "id": "2d9bfb48-b0b1-4f22-a0b0-c4e619335e98",
+      "status": "draft"
+    },
+    {
+      "title": "テーマ×収益ポテンシャル評価テンプレ：ガジェットとAI仕事術で10倍差が出た「theme_value設計シート」",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "テンプレート",
+      "predicted_score": 91,
+      "breakdown": {
+        "uniqueness": 93,
+        "durability": 92,
+        "seed_rate": 89
+      },
+      "rationale": "実測で10倍差を確認したtheme_value計算式をテンプレ化した資産は他者が作れない。",
+      "source_experience": "creator_memory[theme_value_evaluation_shift]「theme_value = asset × size」＋「ガジェット（レビュー→アフィで終わり）とAI仕事術（講座→コンサル→コミュニティ）では収益化効率が10倍以上違う」",
+      "id": "157b454e-1f9c-4fdd-acd0-c1a7017df845",
+      "status": "draft"
+    },
+    {
+      "title": "AIシステムに「学習させる」設計 vs「壊れる」設計の分岐点：観測可能性の法則",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "フレームワーク/法則",
+      "predicted_score": 91,
+      "breakdown": {
+        "uniqueness": 95,
+        "durability": 91,
+        "seed_rate": 88
+      },
+      "rationale": "「推定vs推定」で学習データが壊れるという設計失敗から抽出した観測可能性の原則は再現不可。",
+      "source_experience": "creator_memory[prediction_vs_observation_design]「推定 vs 推定の比較では100件積んでも学習データが壊れる」→「観測可能な生データ（expected_seeds vs actual_seeds）の比率から含意を導出するべきだった」",
+      "id": "87e88c6f-3e94-4364-8b57-4a38f3cc15b9",
+      "status": "draft"
+    },
+    {
+      "title": "AI予測と実CVのズレを計測する実験フローの設計手順：「検証できる形」でデータを積む方法",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "ノウハウ/How-to",
+      "predicted_score": 91,
+      "breakdown": {
+        "uniqueness": 95,
+        "durability": 91,
+        "seed_rate": 90
+      },
+      "rationale": "「推定vs推定」の失敗を経て設計した検証フローは実装者のみが具体的に語れる。",
+      "source_experience": "current_projects「AI予測と実CVのズレを検証する実験フロー設計」＋creator_memory[prediction_vs_observation_design]「設計を全面変更した」",
+      "id": "f32249ee-030a-492a-96bf-f396fca26d95",
+      "status": "draft"
+    },
+    {
+      "title": "テーマ収益ポテンシャルの3段階評価：市場規模×拡張可能性×一次情報適合の掛け算フレームワーク",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "フレームワーク/法則",
+      "predicted_score": 90,
+      "breakdown": {
+        "uniqueness": 92,
+        "durability": 92,
+        "seed_rate": 87
+      },
+      "rationale": "theme_value = asset × sizeの不完全さへの気づきから発展させたフレームは実験データが裏付け。",
+      "source_experience": "creator_memory[theme_value_evaluation_shift]「theme_value = asset × sizeで最良テーマが分かると思っていた」→「同じ市場規模でもガジェットとAI仕事術では収益化効率が10倍以上違う」",
+      "id": "8c70fb87-1534-40b1-8de6-ca99f582570a",
+      "status": "draft"
+    },
+    {
+      "title": "SNS運用をAIで自動化する実装手順：Claude Codeとエージェント設計で実現した実務フロー",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "ノウハウ/How-to",
+      "predicted_score": 90,
+      "breakdown": {
+        "uniqueness": 93,
+        "durability": 89,
+        "seed_rate": 90
+      },
+      "rationale": "SNS運用自動化の実務経験を持つ発信者が具体的な実装手順を開示できる。",
+      "source_experience": "expertise「SNS運用自動化」＋first_hand_domains「Claude Codeによるシステム構築」「エージェント設計・実行」",
+      "id": "b89c5904-58b3-4bb8-b271-8bfd49f25982",
+      "status": "draft"
+    },
+    {
+      "title": "アフィリエイト案件を「語れるか判定」する方法：creator_fitスコアを自分で算出する手順",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "ノウハウ/How-to",
+      "predicted_score": 90,
+      "breakdown": {
+        "uniqueness": 94,
+        "durability": 89,
+        "seed_rate": 89
+      },
+      "rationale": "creator_fitという評価軸を実務で使った経験から具体的な算出手順を伝えられる。",
+      "source_experience": "creator_memory[creator_fit_vs_account_fit]「creator_fit（発信者が語れるか）とaccount_fitは完全に独立」＋current_projects「13案件のスコアリング実験（creator_fit）」",
+      "id": "a94b09b4-35cd-45ef-9eb2-24790497edf3",
+      "status": "draft"
+    },
+    {
+      "title": "コンテンツ戦略AIエージェントをゼロから作る手順：プロンプト設計からJSON出力まで",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "ノウハウ/How-to",
+      "predicted_score": 89,
+      "breakdown": {
+        "uniqueness": 92,
+        "durability": 89,
+        "seed_rate": 87
+      },
+      "rationale": "Affiliate Research Engine実装とエージェント設計の実体験からClaude Code活用手順を詳述できる。",
+      "source_experience": "expertise「AIエージェント開発」「プロンプトエンジニアリング」「コンテンツ戦略AI化」＋first_hand_domains「エージェント設計・実行」",
+      "id": "8bf68583-5ef3-42fd-91a0-f834d4f8ac45",
+      "status": "draft"
+    },
+    {
+      "title": "AIシステムを5000行作り続けた副業実験者の正直な話：失敗・設計変更・発見の全記録",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "体験談",
+      "predicted_score": 89,
+      "breakdown": {
+        "uniqueness": 95,
+        "durability": 85,
+        "seed_rate": 88
+      },
+      "rationale": "複数回の設計全面変更と失敗を伴う実体験の告白は感情共鳴を生む高独自性コンテンツ。",
+      "source_experience": "current_projects「Affiliate Research Engine（5000行超え・実運用直前）」＋creator_memory全エントリの失敗・発見・驚きの記録",
+      "id": "4f727eeb-61ba-4e83-a0ab-fcd584c220c6",
+      "status": "draft"
+    },
+    {
+      "title": "「完成させる前に設計を変えた」：Affiliate Research Engineで3回構造を変えた理由と気づき",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "体験談",
+      "predicted_score": 88,
+      "breakdown": {
+        "uniqueness": 95,
+        "durability": 84,
+        "seed_rate": 87
+      },
+      "rationale": "設計の全面変更という実体験は挫折と再設計の両方を含む感情的な独自エピソード。",
+      "source_experience": "creator_memory[prediction_vs_observation_design]「設計を全面変更した」＋creator_memory[affiliate_engine_candidate_insight]「予測エンジンよりCandidate Engineの方が実務価値が高かった」",
+      "id": "d44f6769-b1ee-4a37-9306-eba3122c5e60",
+      "status": "draft"
+    },
+    {
+      "title": "ガジェットとAI仕事術：同じ市場規模でも収益化効率が10倍違う理由を実データで比較",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "比較",
+      "predicted_score": 88,
+      "breakdown": {
+        "uniqueness": 93,
+        "durability": 87,
+        "seed_rate": 85
+      },
+      "rationale": "theme_value実験から得た10倍差という実データは実務視点での差別化が鮮明な比較コンテンツ。",
+      "source_experience": "creator_memory[theme_value_evaluation_shift]「ガジェット（レビュー→アフィで終わり）とAI仕事術（講座→コンサル→コミュニティ）では収益化効率が10倍以上違う」",
+      "id": "74fe32a5-91e5-496b-a989-f05a3de5914c",
+      "status": "draft"
+    },
+    {
+      "title": "「オーディエンスに刺さる案件」と「自分が語れる案件」は別物だった：ULTORA案件の体験談",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "体験談",
+      "predicted_score": 87,
+      "breakdown": {
+        "uniqueness": 94,
+        "durability": 83,
+        "seed_rate": 85
+      },
+      "rationale": "ULTORA案件での具体的数値（78 vs 22）を伴った体験談は感情共鳴と情報価値を両立。",
+      "source_experience": "creator_memory[creator_fit_vs_account_fit]「ULTORAのaccount_fit=78でもcreator_fit=22だった。高スコア案件でも語れない案件は実質使えない」",
+      "id": "c7a4f929-b6f3-4d31-bd6b-2f477fbefa13",
+      "status": "draft"
+    },
+    {
+      "title": "プロンプトを100回変えても変わらなかった：LLMの一般論病の原因が「自分の自己紹介」だった体験",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "体験談",
+      "predicted_score": 87,
+      "breakdown": {
+        "uniqueness": 93,
+        "durability": 83,
+        "seed_rate": 86
+      },
+      "rationale": "プロンプト改善の無力さと入力データ品質の重要性の発見は多くのAI活用者が共感する失敗体験。",
+      "source_experience": "creator_memory[creator_profile_bottleneck]「プロンプトを改善すれば候補品質が上がると思っていた」→「creator_profile.jsonの粒度が低いと何度改善しても一般論候補しか出なかった」",
+      "id": "994301bc-f9bf-45eb-af23-6c3e317c18bf",
+      "status": "draft"
+    },
+    {
+      "title": "Candidate Engine vs Predicted Score Engine：5000行の実装が教えた「作るべきだったもの」の比較",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "比較",
+      "predicted_score": 87,
+      "breakdown": {
+        "uniqueness": 94,
+        "durability": 85,
+        "seed_rate": 84
+      },
+      "rationale": "実装後に発見した設計思想の分岐を対比する比較コンテンツは実装者のみが書ける。",
+      "source_experience": "creator_memory[affiliate_engine_candidate_insight]「予測エンジン（predicted_score）よりCandidate Engine（何を書くか）の方が実務価値が高かった」",
+      "id": "4a059114-c76e-4cd3-970b-eec0ce334501",
+      "status": "draft"
+    },
+    {
+      "title": "creator_fit vs account_fit：アフィリエイト案件評価で混同してはいけない2つのスコアを13案件で比較",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "比較",
+      "predicted_score": 87,
+      "breakdown": {
+        "uniqueness": 93,
+        "durability": 86,
+        "seed_rate": 83
+      },
+      "rationale": "ULTORA案件の実測値を含む13案件データで2軸を比較できる実データコンテンツ。",
+      "source_experience": "creator_memory[creator_fit_vs_account_fit]「creator_fitとaccount_fitは完全に独立していた」＋current_projects「13案件のスコアリング実験」",
+      "id": "b3240e63-bf05-48c5-b52b-dac62ae97c7b",
+      "status": "draft"
+    },
+    {
+      "title": "「学習できる」設計 vs「壊れる」設計：seed_rate推定値 vs expected_seeds実測値の比較実験",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "比較",
+      "predicted_score": 86,
+      "breakdown": {
+        "uniqueness": 94,
+        "durability": 84,
+        "seed_rate": 81
+      },
+      "rationale": "設計変更前後の比較は具体的な失敗データを伴い実装者のみが示せるコンテンツ。",
+      "source_experience": "creator_memory[prediction_vs_observation_design]「seed_rateは仮説であり直接測れない」vs「観測可能な生データ（expected_seeds vs actual_seeds）」→「設計を全面変更した」",
+      "id": "367f1b35-0fab-4db5-b28e-76491b335ce0",
+      "status": "draft"
+    },
+    {
+      "title": "AIで副業システムを作り続けた半年：PVゼロでも続けられた理由とseed_hit_rateへの転換",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "体験談",
+      "predicted_score": 85,
+      "breakdown": {
+        "uniqueness": 91,
+        "durability": 82,
+        "seed_rate": 83
+      },
+      "rationale": "副業×AI実験という一次情報領域での長期継続体験は感情共鳴とKPI転換の思想を同時に伝えられる。",
+      "source_experience": "first_hand_domains「副業×AI実験」＋creator_memory[affiliate_engine_kpi_shift]「今週の数字より来週の候補数が増えているかどうかが重要だった」",
+      "id": "3681d90a-f105-4f52-a432-a64cda2e48f5",
+      "status": "draft"
+    },
+    {
+      "title": "PV・CV・seed_hit_rate：資産型メディア3種のKPIを実運用システムで比較した結果",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "比較",
+      "predicted_score": 85,
+      "breakdown": {
+        "uniqueness": 91,
+        "durability": 84,
+        "seed_rate": 81
+      },
+      "rationale": "Affiliate Research Engine実運用でKPI転換を体験した発信者のみが実務視点で比較できる。",
+      "source_experience": "creator_memory[affiliate_engine_kpi_shift]「PVとCV」vs「seed_hit_rate」＋current_projects「Affiliate Research Engine（実運用直前）」",
+      "id": "7d74859a-8f55-4d29-8999-14bad48ed44f",
+      "status": "draft"
+    },
+    {
+      "title": "Affiliate Research Engine レビュー：実運用直前の5000行システムを自分で評価してみた",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "レビュー",
+      "predicted_score": 82,
+      "breakdown": {
+        "uniqueness": 95,
+        "durability": 75,
+        "seed_rate": 78
+      },
+      "rationale": "自作システムの自己レビューは完全な一次情報であり実装者にしか書けない独自コンテンツ。",
+      "source_experience": "current_projects「Affiliate Research Engine（5000行超え・実運用直前）」＋creator_memory全エントリの発見・失敗記録",
+      "id": "85740366-6f7b-4861-9280-2620c9dc5ab3",
+      "status": "draft"
+    },
+    {
+      "title": "Claude Code vs 他のAIコーディングツール：5000行実装者が実務で感じた差を正直に比較",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "比較",
+      "predicted_score": 81,
+      "breakdown": {
+        "uniqueness": 89,
+        "durability": 76,
+        "seed_rate": 79
+      },
+      "rationale": "5000行実装という実績に裏付けられたClaude Code比較は実務視点で差別化できる。",
+      "source_experience": "expertise「AI活用（Claude Code・エージェント開発）」＋current_projects「Affiliate Research Engine（5000行超え）」＋first_hand_domains「Claude Codeによるシステム構築」",
+      "id": "2659c430-c2c8-4aa2-9677-31fa5b1c54a8",
+      "status": "draft"
+    },
+    {
+      "title": "Claude Codeを実務で3ヶ月使い続けた正直レビュー：できること・できないこと・壊れた設計",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "レビュー",
+      "predicted_score": 79,
+      "breakdown": {
+        "uniqueness": 90,
+        "durability": 72,
+        "seed_rate": 76
+      },
+      "rationale": "Affiliate Research Engine実装という具体的実績に裏付けられたClaude Code実務レビュー。",
+      "source_experience": "expertise「AI活用（Claude Code・エージェント開発）」＋first_hand_domains「Claude Codeによるシステム構築」「AIツール実務利用」",
+      "id": "eeea00b7-d2bd-48ac-a819-e19317898eda",
+      "status": "draft"
+    },
+    {
+      "title": "13案件スコアリング実験のレビュー：AIが高評価した案件を実際に使ってみた検証結果",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "レビュー",
+      "predicted_score": 78,
+      "breakdown": {
+        "uniqueness": 92,
+        "durability": 70,
+        "seed_rate": 74
+      },
+      "rationale": "AI評価と実際の使用感のズレを記録した実験レビューは実データ付きで差別化できる。",
+      "source_experience": "current_projects「13案件のスコアリング実験」「AI予測と実CVのズレを検証する実験フロー設計」",
+      "id": "441999e6-796e-40f9-aca6-4129312cb813",
+      "status": "draft"
+    },
+    {
+      "title": "AIが選んだ案件vs自分の感覚で選んだ案件：どちらが実際に機能したか",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "レビュー",
+      "predicted_score": 76,
+      "breakdown": {
+        "uniqueness": 89,
+        "durability": 68,
+        "seed_rate": 72
+      },
+      "rationale": "AIスコアと実体験の乖離を記録した比較レビューは実験参加者のみが書ける。",
+      "source_experience": "current_projects「AI予測と実CVのズレを検証する実験フロー設計」＋creator_memory[creator_fit_vs_account_fit]「高スコア案件でも語れない案件は実質使えない」",
+      "id": "521dfde9-c988-48cb-9827-02059e6a053e",
+      "status": "draft"
+    },
+    {
+      "title": "Affiliate Research Engine開発中の速報：設計を全面変更した理由と新アーキテクチャ",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "ニュース/速報",
+      "predicted_score": 63,
+      "breakdown": {
+        "uniqueness": 90,
+        "durability": 30,
+        "seed_rate": 70
+      },
+      "rationale": "設計変更という開発ニュースは発信者固有だが耐久性は低い。連鎖は生む。",
+      "source_experience": "creator_memory[prediction_vs_observation_design]「設計を全面変更した」＋current_projects「Affiliate Research Engine（実運用直前）」",
+      "id": "6abf0dd9-059e-4a6b-835b-36017d6c1731",
+      "status": "draft"
+    },
+    {
+      "title": "AIで副業案件評価を自動化する試み：ガジェット×AI比較コンテンツの作り方",
+      "theme": "ガジェット・デジタルギア比較",
+      "asset_type": "実践記録",
+      "predicted_score": 62,
+      "breakdown": {
+        "uniqueness": 72,
+        "durability": 58,
+        "seed_rate": 56
+      },
+      "rationale": "AIシステムでガジェット比較を自動生成する実装記録はAI文脈と絡めて差別化できる。",
+      "source_experience": "expertise「AI活用（Claude Code・エージェント開発）」＋creator_memory[theme_value_evaluation_shift]「ガジェット（レビュー→アフィで終わり）」",
+      "id": "a8dff589-64fc-4d4b-b389-bc97b65d77aa",
+      "status": "draft"
+    },
+    {
+      "title": "速報：Affiliate Research Engine実運用開始——初週のseed_hit_rateは何%だったか",
+      "theme": "AI仕事術・AIガジェット実験",
+      "asset_type": "ニュース/速報",
+      "predicted_score": 61,
+      "breakdown": {
+        "uniqueness": 92,
+        "durability": 22,
+        "seed_rate": 70
+      },
+      "rationale": "実運用開始という固有イベントの速報は唯一性は高いが耐久性は最低。",
+      "source_experience": "current_projects「Affiliate Research Engine（実運用直前）」＋creator_memory[affiliate_engine_kpi_shift]「seed_hit_rate」",
+      "id": "fa690f2d-bef8-40af-ada0-4c3eb3e7efee",
+      "status": "draft"
+    },
+    {
+      "title": "theme_valueが低いジャンルで戦う理由：ガジェット比較をAI文脈で再設計した実験記録",
+      "theme": "ガジェット・デジタルギア比較",
+      "asset_type": "実践記録",
+      "predicted_score": 60,
+      "breakdown": {
+        "uniqueness": 70,
+        "durability": 56,
+        "seed_rate": 54
+      },
+      "rationale": "ガジェットのtheme_value限界を認識した上でAI活用と組み合わせる実験はAI文脈で独自性を出せる。",
+      "source_experience": "creator_memory[theme_value_evaluation_shift]「ガジェット vs AI仕事術で収益化効率10倍差」＋first_hand_domains「AIツール実務利用」",
+      "id": "86cf3f1e-0b4c-4119-8d6b-07f75f90f15b",
+      "status": "draft"
+    },
+    {
+      "title": "AIスコアリングでガジェット案件を評価してみた：account_fitが高くてもcreator_fitが低い案件ばかりだった",
+      "theme": "ガジェット・デジタルギア比較",
+      "asset_type": "実践記録",
+      "predicted_score": 59,
+      "breakdown": {
+        "uniqueness": 72,
+        "durability": 52,
+        "seed_rate": 54
+      },
+      "rationale": "13案件スコアリングでのガジェット評価経験をAI視点から語れる一次情報コンテンツ。",
+      "source_experience": "current_projects「13案件のスコアリング実験」＋creator_memory[creator_fit_vs_account_fit]「高スコア案件でも語れない案件は実質使えない」",
+      "id": "1c69fb4b-a577-4a51-844e-32e07f097691",
+      "status": "draft"
+    },
+    {
+      "title": "ガジェット案件のcreator_fit評価軸：AI仕事術発信者がガジェットを扱う際の適合スコア設計",
+      "theme": "ガジェット・デジタルギア比較",
+      "asset_type": "フレームワーク/法則",
+      "predicted_score": 57,
+      "breakdown": {
+        "uniqueness": 68,
+        "durability": 60,
+        "seed_rate": 44
+      },
+      "rationale": "creator_fit概念をガジェット選定に応用したフレームはAI文脈での独自切り口を持つ。",
+      "source_experience": "creator_memory[creator_fit_vs_account_fit]「creator_fitとaccount_fitは完全に独立」＋first_hand_domains「案件スコアリング・検証プロセス」",
+      "id": "0a2dd9a5-de0e-4188-8ded-2e855e0872bc",
+      "status": "draft"
+    },
+    {
+      "title": "AI仕事術発信者のガジェット選定軸：「AI作業効率を上げるか」だけで選ぶ比較基準",
+      "theme": "ガジェット・デジタルギア比較",
+      "asset_type": "比較",
+      "predicted_score": 56,
+      "breakdown": {
+        "uniqueness": 66,
+        "durability": 50,
+        "seed_rate": 52
+      },
+      "rationale": "AI活用という強み文脈をガジェット比較に組み込む独自切り口で差別化できる。",
+      "source_experience": "expertise「AI活用（Claude Code・エージェント開発）」＋first_hand_domains「AIツール実務利用」",
+      "id": "e9244571-7b86-4722-8a30-4200c629f0d1",
+      "status": "draft"
+    },
+    {
+      "title": "AI副業環境のガジェット選定テンプレ：Claude Code作業に最適なデジタルギア選びの評価軸",
+      "theme": "ガジェット・デジタルギア比較",
+      "asset_type": "テンプレート",
+      "predicted_score": 53,
+      "breakdown": {
+        "uniqueness": 62,
+        "durability": 54,
+        "seed_rate": 44
+      },
+      "rationale": "AI実務作業環境というニッチな文脈でのガジェット選定テンプレはAI文脈に絡めた独自性を持つ。",
+      "source_experience": "first_hand_domains「AIツール実務利用」「Claude Codeによるシステム構築」＋expertise「AI活用（Claude Code・エージェント開発）」",
+      "id": "7d850237-e1d5-4755-a649-c05f89d275e4",
+      "status": "draft"
+    }
+  ]
+}
