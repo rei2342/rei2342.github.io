@@ -252,6 +252,66 @@
       "discovery": "実際は人生の選択肢を増やすものだった。お金より自由度が価値を決めていた",
       "surprise": "副業収入が月5万円でも、会社を辞められる精神的余裕の方が年収100万円より価値が大きかった",
       "confidence": 0.85
+    },
+    {
+      "id": "note_seo_vs_follower_funnel",
+      "date": "2026-06-01",
+      "project": "note運営実験",
+      "type": "insight",
+      "domain": "note運営",
+      "importance": 5,
+      "before_belief": "noteはSEOで検索流入を増やすものだと思っていた",
+      "discovery": "SNSフォロワー導線の方が重要だった。SEO流入よりSNSからの流入の方が購読・CV率が圧倒的に高い",
+      "surprise": "SEOで上位表示されても購読に繋がらず、SNSフォロワーからの流入の方がCV率が10倍以上高かった",
+      "confidence": 0.9
+    },
+    {
+      "id": "note_series_sells_over_single",
+      "date": "2026-06-01",
+      "project": "note運営実験",
+      "type": "insight",
+      "domain": "note運営",
+      "importance": 5,
+      "before_belief": "noteは売れる記事を1本ずつ丁寧に書けば収益が上がると思っていた",
+      "discovery": "シリーズで書いた方が売れた。1本完結より連続する世界観の方が購読と有料転換率が高い",
+      "surprise": "単発の完成度を上げるより「続きが気になる」シリーズ設計の方が収益に直結した",
+      "confidence": 0.9
+    },
+    {
+      "id": "note_magazine_unit_over_article",
+      "date": "2026-06-01",
+      "project": "note運営実験",
+      "type": "insight",
+      "domain": "note運営",
+      "importance": 4,
+      "before_belief": "noteは記事単体のPVと質で評価するものだと思っていた",
+      "discovery": "マガジン単位で評価するべきだった。記事単体のPVよりマガジン購読率と継続率が本質指標",
+      "surprise": "単記事のPVが高くてもマガジン購読に繋がらない記事は収益貢献がほぼゼロだった",
+      "confidence": 0.85
+    },
+    {
+      "id": "note_free_content_drives_paid",
+      "date": "2026-06-01",
+      "project": "note運営実験",
+      "type": "insight",
+      "domain": "note運営",
+      "importance": 5,
+      "before_belief": "noteは有料記事を増やせば収益が上がると思っていた",
+      "discovery": "無料記事が一番重要だった。無料コンテンツの質と量が有料転換率と購読者獲得を決める",
+      "surprise": "有料記事を増やしても無料が弱いと全く売れなかった。無料が先、有料が後だった",
+      "confidence": 0.9
+    },
+    {
+      "id": "note_depth_over_breadth",
+      "date": "2026-06-01",
+      "project": "note運営実験",
+      "type": "insight",
+      "domain": "note運営",
+      "importance": 4,
+      "before_belief": "毎週新しいテーマで記事を書き続ければ幅広い読者に届くと思っていた",
+      "discovery": "同じテーマを角度を変えて掘り続ける方が伸びた。深さが専門家としての信頼になる",
+      "surprise": "テーマを広げるより1テーマを掘り続けた方が、フォロワー増加と購読率が両方上がった",
+      "confidence": 0.85
     }
   ]
 }
