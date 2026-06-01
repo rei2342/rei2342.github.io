@@ -144,6 +144,114 @@
       "discovery": "転職は自己理解ゲームだった。自分が何に満足するかを知らないまま会社を変えても同じ失敗を繰り返した",
       "surprise": "会社を変えても同じ不満が出てきた。問題は会社ではなく自分の設計にあった",
       "confidence": 0.85
+    },
+    {
+      "id": "sns_content_quality_over_frequency",
+      "date": "2026-06-01",
+      "project": "SNS運用実験",
+      "type": "insight",
+      "domain": "SNS運用",
+      "importance": 4,
+      "before_belief": "SNSは毎日投稿し続ければ伸びると思っていた",
+      "discovery": "「何を投稿するか」のコンテンツ設計の方が投稿頻度より重要だった",
+      "surprise": "1投稿でも伸びる人は毎日投稿し続けた人より速く伸びた。頻度より中身だった",
+      "confidence": 0.9
+    },
+    {
+      "id": "sns_funnel_design_over_followers",
+      "date": "2026-06-01",
+      "project": "SNS運用実験",
+      "type": "insight",
+      "domain": "SNS運用",
+      "importance": 5,
+      "before_belief": "フォロワー数が多ければ収益に繋がると思っていた",
+      "discovery": "集客より導線設計が先だった。フォロワー数より商品・サービスへの接続設計が収益を決める",
+      "surprise": "フォロワー1万人でも売れない人と、フォロワー1000人でも売れる人が同時に存在した。導線の有無だった",
+      "confidence": 0.9
+    },
+    {
+      "id": "side_hustle_market_selection",
+      "date": "2026-06-01",
+      "project": "副業実験",
+      "type": "insight",
+      "domain": "副業",
+      "importance": 5,
+      "before_belief": "副業は努力量のゲームで、頑張れば頑張るほど稼げると思っていた",
+      "discovery": "実際は市場選びのゲームだった。同じ努力量でも参入市場によって収益は10倍以上変わる",
+      "surprise": "努力量を2倍にするより市場を変える方が収益が上がった。努力は市場選択後にかけるものだった",
+      "confidence": 0.9
+    },
+    {
+      "id": "note_series_over_single",
+      "date": "2026-06-01",
+      "project": "note運営実験",
+      "type": "insight",
+      "domain": "コンテンツ設計",
+      "importance": 4,
+      "before_belief": "noteは良い記事を単体で書けば読まれると思っていた",
+      "discovery": "実際はシリーズで戦うものだった。単発記事より連続した思想・世界観が読者の信頼を積む",
+      "surprise": "単発の完成度より連続性の方が読者の購読率と信頼蓄積に直結していた",
+      "confidence": 0.85
+    },
+    {
+      "id": "content_seed_generation_value",
+      "date": "2026-06-01",
+      "project": "コンテンツ資産設計",
+      "type": "insight",
+      "domain": "コンテンツ設計",
+      "importance": 5,
+      "before_belief": "コンテンツはPVで評価するものだと思っていた",
+      "discovery": "次のネタを生む力で評価するべきだった。種を生まない記事は資産にならない",
+      "surprise": "PVが高くても次の記事に繋がらない記事は長期的に無価値だった。PVは消費、種は投資だった",
+      "confidence": 0.9
+    },
+    {
+      "id": "ai_quality_bounded_by_input_resolution",
+      "date": "2026-06-01",
+      "project": "AI活用実験",
+      "type": "insight",
+      "domain": "AI活用",
+      "importance": 5,
+      "before_belief": "Claude Codeに情報を渡せば良いコンテンツが出てくると思っていた",
+      "discovery": "自分の経験を構造化して渡さないと一般論しか出ない。AIの質は入力者の解像度を超えない",
+      "surprise": "どんなに良いモデルでも、抽象的な入力では出力が平均的になった。AIはミラーだった",
+      "confidence": 0.95
+    },
+    {
+      "id": "career_growth_curve_over_conditions",
+      "date": "2026-06-01",
+      "project": "キャリア実験",
+      "type": "insight",
+      "domain": "キャリア",
+      "importance": 4,
+      "before_belief": "転職は給与・福利厚生などの条件で決めるものだと思っていた",
+      "discovery": "市場価値が積み上がる環境で選ぶべきだった。年収より成長曲線の方が3年後の選択肢を決める",
+      "surprise": "年収が高い環境より成長曲線が急な環境の方が3年後の年収も高かった",
+      "confidence": 0.85
+    },
+    {
+      "id": "content_sales_change_over_knowledge",
+      "date": "2026-06-01",
+      "project": "コンテンツ販売実験",
+      "type": "insight",
+      "domain": "コンテンツ販売",
+      "importance": 5,
+      "before_belief": "コンテンツ販売はノウハウを売る仕事だと思っていた",
+      "discovery": "実際は変化を売る仕事だった。情報量より「読者がどう変わるか」の結果設計が重要だった",
+      "surprise": "情報量が少なくても結果設計が明確なコンテンツの方が高値で売れた。量より変化の明確さだった",
+      "confidence": 0.9
+    },
+    {
+      "id": "side_hustle_freedom_over_income",
+      "date": "2026-06-01",
+      "project": "副業実験",
+      "type": "insight",
+      "domain": "副業",
+      "importance": 4,
+      "before_belief": "副業は収入源を増やすものだと思っていた",
+      "discovery": "実際は人生の選択肢を増やすものだった。お金より自由度が価値を決めていた",
+      "surprise": "副業収入が月5万円でも、会社を辞められる精神的余裕の方が年収100万円より価値が大きかった",
+      "confidence": 0.85
     }
   ]
 }
