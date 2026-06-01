@@ -1877,6 +1877,24 @@ def asset_candidates_cmd(force: bool, top: int, min_type_score: int):
         ]
         top_types[theme_name] = sorted(filtered, key=lambda x: x[1].get("score", 0), reverse=True)[:8]
 
+    # creator_memoryのdomainをテーマとして自動追加（matrixにないドメインのみ）
+    memory_domains = set()
+    for entry in creator_memory.get("entries", []):
+        domain = entry.get("domain", "")
+        if domain:
+            memory_domains.add(domain)
+    matrix_themes_normalized = {t.replace("・", "").replace(" ", "") for t in top_types}
+    for domain in sorted(memory_domains):
+        # すでにmatrixにある類似テーマは追加しない
+        if domain.replace("・", "").replace(" ", "") not in matrix_themes_normalized:
+            # 資産タイプはメモリドメインに適した上位4種をデフォルト設定
+            top_types[domain] = [
+                ("実践記録",    {"score": 88, "reason": "一次体験記録"}),
+                ("体験談",      {"score": 85, "reason": "感情共鳴・変化体験"}),
+                ("フレームワーク/法則", {"score": 82, "reason": "体系化・再利用"}),
+                ("ノウハウ/How-to",    {"score": 78, "reason": "手順・実践方法"}),
+            ]
+
     template = (base / "prompts" / "asset_candidate_prompt.md").read_text(encoding="utf-8")
     prompt = (
         template
