@@ -1,0 +1,46 @@
+{
+  "_comment": "Claude Code MCP設定テンプレート（第7章 テク27-30）。実際に使うときは .mcp.json にコピーし、{{ }} を埋める。APIキーは環境変数で渡すのが安全。",
+  "mcpServers": {
+    "firecrawl": {
+      "_purpose": "テク27: 競合LP/サイトをMarkdown化",
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "{{FIRECRAWL_API_KEY}}"
+      }
+    },
+    "supadata": {
+      "_purpose": "テク28: 動画トランスクリプト抽出",
+      "command": "npx",
+      "args": ["-y", "@supadata/mcp"],
+      "env": {
+        "SUPADATA_API_KEY": "{{SUPADATA_API_KEY}}"
+      }
+    },
+    "memory": {
+      "_purpose": "テク29: 永続記憶（CLAUDE.mdと併用）",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": {
+        "MEMORY_FILE_PATH": "./playbook/workspace/memory.json"
+      }
+    },
+    "notion": {
+      "_purpose": "テク30: 案件管理DB・収益データ（テク34が依存）",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "NOTION_TOKEN": "{{NOTION_INTERNAL_INTEGRATION_TOKEN}}"
+      }
+    },
+    "slack": {
+      "_purpose": "Routines(テク31-35)の通知先。任意。",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "{{SLACK_BOT_TOKEN}}",
+        "SLACK_TEAM_ID": "{{SLACK_TEAM_ID}}"
+      }
+    }
+  }
+}
