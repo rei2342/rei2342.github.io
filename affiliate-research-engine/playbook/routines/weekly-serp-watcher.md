@@ -12,10 +12,9 @@
 ③下落キーワードごとに、上位記事との差分を分析する:
   見出し構造 / 文字数 / E-E-A-T要素 の3点。
 ④優先度順(下落幅×想定収益)にリライト候補レポートを作る。
-⑤./workspace/reports/serp-YYYY-MM-DD.md に保存し、Slackに通知する。
+⑤./workspace/reports/serp-YYYY-MM-DD.md に保存する。
 ⑥keywords.csv の last_rank と checked_at を最新値に更新する。
 ```
 
 ## 依存
-- `workspace/keywords.csv`（用意済み。順位は手入力か順位取得MCP/API）
-- 任意: Slack MCP
+- `workspace/keywords.csv`（Track B 初期10件投入済み。順位は手入力か順位取得MCP/API）

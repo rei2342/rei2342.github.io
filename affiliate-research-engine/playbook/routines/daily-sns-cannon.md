@@ -13,10 +13,9 @@
   押し売り感を出さない。NGリスト(冒頭挨拶禁止/同語尾3連禁止)を守る。
 ③各投稿の末尾に note 記事への自然なCTAを差し込む(続き気になる型/悩み言語化型/ベネフィット型のいずれか)。
 ④予約投稿ツールにAPI送信する。未接続なら ./workspace/drafts/sns-YYYY-MM-DD.md に保存する。
-⑤完成リストを Slack に通知する(未接続なら保存のみ)。
+⑤./workspace/drafts/sns-YYYY-MM-DD.md に保存する。
 ```
 
 ## 依存
 - `workspace/content-bank/`（フック集。テク14で生成して置く）
-- `../CLAUDE.md`
-- 任意: 予約投稿ツールAPI / Slack MCP
+- `../CLAUDE.md`（Track B: 英語コーチング・留学）

@@ -24,11 +24,12 @@
 ④CLAUDE.md の「稼働中の案件」「主要ペルソナ」「NGの訴求軸」を参照し、
   ペルソナに合った実体験ディテール(数字・固有名詞)を差し込む。
 ⑤./workspace/drafts/YYYY-MM-DD.md として保存する。
-⑥完成したら Slack MCP で「本日のドラフト完成: <タイトル>」と通知する。
-  Slack未接続なら ./workspace/drafts/ に保存するだけでよい。
+⑥./workspace/drafts/ に保存する。
+  Notion MCP が使えるなら「案件管理」DB（ID: 375e0ec8-90e1-80cf-b15d-f1360a14ce33）の
+  該当案件の「メモ」列に「ドラフト生成済: <タイトル> YYYY-MM-DD」と追記する。
 ```
 
 ## 依存
-- `workspace/keyword-queue/` または `workspace/keywords.csv`（用意済み）
-- `../CLAUDE.md`（メモリ）
-- 任意: Slack MCP
+- `workspace/keyword-queue/` または `workspace/keywords.csv`（初期キーワード投入済み）
+- `../CLAUDE.md`（Track B: 英語コーチング・留学）
+- Notion MCP（.mcp.json 設定済み）

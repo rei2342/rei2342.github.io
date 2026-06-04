@@ -15,7 +15,7 @@
   ・改修方向性3つ
   ・工数見積
   をまとめる。
-④優先度順(下落幅×収益寄与)に並べて Slack へ通知する(未接続なら ./workspace/reports/ に保存)。
+④優先度順(下落幅×収益寄与)に並べて ./workspace/reports/failure-YYYY-MM-DD.md に保存する。
 ```
 
 ## 依存
