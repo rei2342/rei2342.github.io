@@ -92,6 +92,7 @@ jobs:
           git push
 
       - name: Post to WordPress as draft
+        continue-on-error: true
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
         run: |
@@ -153,6 +154,7 @@ jobs:
               'https://sakura-eigo.com/wp-json/wp/v2/posts',
               auth=(username, password),
               json={'title': title, 'content': html, 'status': 'draft'},
+              headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'},
               verify=False
           )
 
@@ -165,6 +167,7 @@ jobs:
           PYEOF
 
       - name: Post to X (Twitter)
+        continue-on-error: true
         env:
           ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
