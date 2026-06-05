@@ -1,0 +1,44 @@
+name: Daily Article Drafter
+
+on:
+  schedule:
+    - cron: '0 21 * * *'  # 毎日06:00 JST (= 21:00 UTC)
+  workflow_dispatch:       # 手動実行も可能
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Daily Article Drafter
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.REI_AFFSAKU }}
+          allowed_tools: "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch"
+          prompt: |
+            affiliate-research-engine/playbook/routines/daily-article-drafter.md の手順に従い、本日分の記事ドラフトを生成してください。
+
+            作業ディレクトリ: affiliate-research-engine/
+
+            手順:
+            1. affiliate-research-engine/playbook/workspace/keyword-queue/ から本日分キーワードを取得。なければ affiliate-research-engine/playbook/workspace/keywords.csv の status=todo から1件選ぶ。
+            2. そのキーワードでSERP上位10件の見出し構造を分析（共通構造・論点TOP5・抜け穴）。
+            3. 上位を抜く独自構造（H2×6、H3×各3）で4000字以上のドラフトを生成。
+               NG: 「〜について」「〜することが大切」禁止 / 箇条書きで逃げない / 同語尾3連続禁止 / 冒頭挨拶禁止
+            4. affiliate-research-engine/CLAUDE.md の「稼働中の案件」「主要ペルソナ」を参照し、実体験ディテール（数字・固有名詞）を差し込む。
+            5. affiliate-research-engine/playbook/workspace/drafts/$(date +%Y-%m-%d).md として保存。
+            6. keywords.csv の該当キーワードの status を todo → done に更新。
+
+      - name: Commit draft
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/drafts/
+          git add affiliate-research-engine/playbook/workspace/keywords.csv
+          git diff --staged --quiet || git commit -m "chore: daily article draft $(date +%Y-%m-%d)"
+          git push

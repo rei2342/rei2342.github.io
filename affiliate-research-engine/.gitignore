@@ -1,0 +1,8 @@
+__pycache__/
+**/__pycache__/
+.env
+outputs/
+
+# playbook: 実APIキーを含む実設定とローカル記憶はコミットしない（雛形 mcp.example.json は追跡）
+playbook/mcp/.mcp.json
+playbook/workspace/memory.json

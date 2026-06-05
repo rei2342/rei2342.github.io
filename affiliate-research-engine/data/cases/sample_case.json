@@ -1,0 +1,21 @@
+{
+  "case_name": "sample_ai_tool",
+  "affiliate_url": "https://example.com",
+  "lp_text": "AIを使った副業で月収10万円を目指す。初心者でも3ステップで始められる。今すぐ無料登録して、AIアシスタントの力を体験してください。毎日30分の作業で、スキマ時間に収入を作る新しい方法です。",
+  "asp_name": "A8",
+  "reward": 3000,
+  "category": "AIツール",
+  "conversion_condition": "無料登録完了",
+  "restrictions": "SNS投稿可。リスティング不可。誇大広告禁止。PR表記必須。",
+  "sns_allowed": true,
+  "listing_allowed": false,
+  "pr_required": true,
+  "sns_examples": [
+    "AIを使い始めて3ヶ月で副業月収5万超えた。正直最初は半信半疑だったけど、使ってみたら作業時間が1/3に。具体的に何やったかはプロフのリンクから。",
+    "AIツール使ってない人、来年かなり差がつくと思う。今すぐじゃなくていいけど、知っておくだけでも損はない。"
+  ],
+  "competitor_examples": [
+    "【AIで副業】初心者が3ヶ月で月5万稼いだ方法を全公開",
+    "ChatGPTを使った副業10選｜実際に稼いだ人のリアルな声"
+  ]
+}
