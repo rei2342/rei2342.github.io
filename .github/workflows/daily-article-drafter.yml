@@ -62,7 +62,6 @@ jobs:
           with open(draft_file, 'r') as f:
               raw = f.read()
 
-          # Strip YAML frontmatter (--- ... ---)
           title = 'Draft'
           content = raw
           if raw.startswith('---'):
@@ -79,16 +78,9 @@ jobs:
               if m:
                   title = m.group(1).strip()
 
-          # Remove first H1
           content = re.sub(r'^#\s+.+\n?', '', content, count=1).lstrip('\n')
-
-          # Strip H2-X/H3-X-X labels
           content = re.sub(r'^(#{2,6})\s+H\d[\d-]*\s*[｜|]\s*', r'\1 ', content, flags=re.MULTILINE)
-
-          # Strip affiliate disclaimer
           content = re.sub(r'\n---\n+\*?本記事のアフィリエイト.*$', '', content, flags=re.DOTALL)
-
-          # Strip SERP memo
           content = re.split(r'^### SERP分析メモ', content, maxsplit=1, flags=re.MULTILINE)[0].rstrip()
 
           html = markdown2.markdown(content, extras=['fenced-code-blocks', 'tables', 'break-on-newline'])
@@ -113,15 +105,17 @@ jobs:
 
       - name: Post to X (Twitter)
         env:
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
         run: |
-          pip install tweepy -q
+          pip install tweepy anthropic -q
           python3 << 'PYEOF'
           import os, datetime, sys, re
           import tweepy
+          import anthropic
 
           date_str = datetime.date.today().strftime('%Y-%m-%d')
           draft_file = f"affiliate-research-engine/playbook/workspace/drafts/{date_str}.md"
@@ -133,46 +127,64 @@ jobs:
           with open(draft_file, 'r') as f:
               raw = f.read()
 
-          # Extract title
+          # Extract keyword and title from frontmatter
+          keyword = ''
           title = ''
           if raw.startswith('---'):
               end = raw.find('\n---', 3)
               if end != -1:
-                  m = re.search(r'^title:\s*(.+)$', raw[:end+4], re.MULTILINE)
+                  fm = raw[:end+4]
+                  m = re.search(r'^keyword:\s*(.+)$', fm, re.MULTILINE)
+                  if m:
+                      keyword = m.group(1).strip()
+                  m = re.search(r'^title:\s*(.+)$', fm, re.MULTILINE)
                   if m:
                       title = m.group(1).strip()
-                  body = raw[end+4:].lstrip('\n')
-          else:
-              body = raw
 
-          if not title:
-              m = re.search(r'^#\s+(.+)$', body, re.MULTILINE)
-              title = m.group(1).strip() if m else ''
+          theme = keyword or title
 
-          # Extract first paragraph (hook)
-          body_clean = re.sub(r'^#.*$', '', body, flags=re.MULTILINE)
-          body_clean = re.sub(r'^---.*$', '', body_clean, flags=re.MULTILINE)
-          paragraphs = [p.strip() for p in body_clean.split('\n\n') if p.strip() and not p.strip().startswith('#')]
-          hook = paragraphs[0] if paragraphs else ''
-          if len(hook) > 100:
-              hook = hook[:97] + '...'
+          # Generate tweet with Claude
+          ai = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
+          msg = ai.messages.create(
+              model='claude-haiku-4-5-20251001',
+              max_tokens=200,
+              messages=[{
+                  'role': 'user',
+                  'content': f"""あなたは「さくら」（27歳・営業事務・東京）というキャラクターです。
+英語を　5年後回しにしてきて、ワーホリを説められず、今動き始めた女性です。
+英語スクールで計4.5万円溈かした失敗歴があります。
 
-          tweet = f"""{hook}
+今日の記事テーマ: {theme}
 
-英語5年後回しにしてきた27歳の記録を正直に書いています。
+このテーマに関連したさくらの日常のつぶやきを1つ書いてください。
 
-#英語学習 #ワーホリ #社会人英語 """.strip()
+条件:
+- 280文字以内
+- 短い行に区切る
+- 絵文字1。2個（🥲😮‍💨✈️🌸💸などさくららしいもの）
+- 記事URLは貼らない
+- 「後回し」「スクール失敗」「4.5万」「ワーホリ」「27歳」「30歳タイムリミット」などのエピソードを自然に絡める
+- ハッシュタグは最後に2個まで（#英語学習 #ワーホリ など）
+- 広告っぽくない、自然な日常語
 
+つぶやきのテキストだけ出力してください。"""
+              }]
+          )
+
+          tweet = msg.content[0].text.strip()
           if len(tweet) > 280:
               tweet = tweet[:277] + '...'
 
-          client = tweepy.Client(
+          print(f"Generated tweet:\n{tweet}")
+
+          # Post to X
+          x_client = tweepy.Client(
               consumer_key=os.environ['X_API_KEY'],
               consumer_secret=os.environ['X_API_SECRET'],
               access_token=os.environ['X_ACCESS_TOKEN'],
               access_token_secret=os.environ['X_ACCESS_TOKEN_SECRET']
           )
 
-          response = client.create_tweet(text=tweet)
-          print(f"Tweeted: {response.data['id']}")
+          response = x_client.create_tweet(text=tweet)
+          print(f"Tweeted ID: {response.data['id']}")
           PYEOF
