@@ -44,8 +44,12 @@ jobs:
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
         run: |
+          pip install requests -q
           python3 << 'PYEOF'
-          import os, json, base64, urllib.request, urllib.error, datetime, sys
+          import os, json, base64, datetime, sys
+          import requests
+          import urllib3
+          urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
           date_str = datetime.date.today().strftime('%Y-%m-%d')
           draft_file = f"affiliate-research-engine/playbook/workspace/drafts/{date_str}.md"
@@ -62,28 +66,18 @@ jobs:
 
           username = 'rei.00pt2342@gmail.com'
           password = os.environ['WP_APP_PASSWORD']
-          credentials = base64.b64encode(f"{username}:{password}".encode()).decode()
 
-          data = json.dumps({
-              'title': title,
-              'content': content,
-              'status': 'draft'
-          }).encode('utf-8')
-
-          req = urllib.request.Request(
+          resp = requests.post(
               'https://sakura-eigo.com/wp-json/wp/v2/posts',
-              data=data,
-              headers={
-                  'Authorization': f'Basic {credentials}',
-                  'Content-Type': 'application/json'
-              }
+              auth=(username, password),
+              json={'title': title, 'content': content, 'status': 'draft'},
+              verify=False
           )
 
-          try:
-              with urllib.request.urlopen(req) as resp:
-                  result = json.load(resp)
-                  print(f"Posted: {result.get('id')} / {result.get('link')}")
-          except urllib.error.HTTPError as e:
-              print(f"HTTP Error {e.code}: {e.read().decode()}")
+          if resp.status_code in (200, 201):
+              result = resp.json()
+              print(f"Posted: {result.get('id')} / {result.get('link')}")
+          else:
+              print(f"Error {resp.status_code}: {resp.text[:500]}")
               sys.exit(1)
           PYEOF
