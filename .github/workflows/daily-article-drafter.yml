@@ -31,12 +31,90 @@ jobs:
             --allowedTools "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch" \
             --dangerously-skip-permissions
 
+      - name: Generate Instagram caption
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+        run: |
+          pip install anthropic -q
+          python3 << 'PYEOF'
+          import os, datetime, sys, re
+          import anthropic
+
+          date_str = datetime.date.today().strftime('%Y-%m-%d')
+          draft_file = f"affiliate-research-engine/playbook/workspace/drafts/{date_str}.md"
+
+          if not os.path.exists(draft_file):
+              print("Draft file not found, skipping Instagram caption")
+              sys.exit(0)
+
+          with open(draft_file, 'r') as f:
+              raw = f.read()
+
+          keyword = ''
+          title = ''
+          if raw.startswith('---'):
+              end = raw.find('\n---', 3)
+              if end != -1:
+                  fm = raw[:end+4]
+                  m = re.search(r'^keyword:\s*(.+)$', fm, re.MULTILINE)
+                  if m:
+                      keyword = m.group(1).strip()
+                  m = re.search(r'^title:\s*(.+)$', fm, re.MULTILINE)
+                  if m:
+                      title = m.group(1).strip()
+
+          theme = keyword or title
+
+          ai = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
+          msg = ai.messages.create(
+              model='claude-haiku-4-5-20251001',
+              max_tokens=400,
+              messages=[{
+                  'role': 'user',
+                  'content': f"""あなたは「さくら」（27歳・営業事務・東京）というキャラクターです。
+英語を5年後回しにしてきて、ワーホリを説められず、今動き始めた女性です。
+英語スクールで計4.5万円溈かした失敗歴があります。
+
+今日の記事テーマ: {theme}
+
+Instagramの投稿キャプションを書いてください。
+
+条件:
+- 5、8行程度、短い行に区切る
+- 絵文字を適度使う（🌸🥲😮‍💨✈️💸 など）
+- 「後回し」「スクール失敗」「4.5万」「ワーホリ」「27歳」「30歳タイムリミット」を自然に絡める
+- 読んでる人が「わかる…」と思える内容
+- 最後にハッシュタグを8～10個（#英語学習 #ワーホリ準備 #社会人英語 #英会話 #留学 #ワーキングホリデー #英語勉強 #英語初心者 など）
+- 広告っぽくない、自然な日常語
+- URLは含めない
+
+キャプションのテキストだけ出力してください。"""
+              }]
+          )
+
+          caption = msg.content[0].text.strip()
+
+          # Save to instagram folder
+          os.makedirs('affiliate-research-engine/playbook/workspace/instagram', exist_ok=True)
+          out_file = f'affiliate-research-engine/playbook/workspace/instagram/{date_str}.md'
+          with open(out_file, 'w') as f:
+              f.write(f'# Instagram {date_str}\n\n')
+              f.write(f'**キーワード**: {theme}\n\n')
+              f.write('---\n\n')
+              f.write(caption)
+              f.write('\n')
+
+          print(f"Instagram caption saved: {out_file}")
+          print(f"\n--- Caption ---\n{caption}")
+          PYEOF
+
       - name: Commit draft
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add affiliate-research-engine/playbook/workspace/drafts/
           git add affiliate-research-engine/playbook/workspace/keywords.csv
+          git add affiliate-research-engine/playbook/workspace/instagram/
           git diff --staged --quiet || git commit -m "chore: daily article draft $(date +%Y-%m-%d)"
           git push
 
@@ -127,7 +205,6 @@ jobs:
           with open(draft_file, 'r') as f:
               raw = f.read()
 
-          # Extract keyword and title from frontmatter
           keyword = ''
           title = ''
           if raw.startswith('---'):
@@ -143,7 +220,6 @@ jobs:
 
           theme = keyword or title
 
-          # Generate tweet with Claude
           ai = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
           msg = ai.messages.create(
               model='claude-haiku-4-5-20251001',
@@ -151,7 +227,7 @@ jobs:
               messages=[{
                   'role': 'user',
                   'content': f"""あなたは「さくら」（27歳・営業事務・東京）というキャラクターです。
-英語を　5年後回しにしてきて、ワーホリを説められず、今動き始めた女性です。
+英語を5年後回しにしてきて、ワーホリを説められず、今動き始めた女性です。
 英語スクールで計4.5万円溈かした失敗歴があります。
 
 今日の記事テーマ: {theme}
@@ -161,7 +237,7 @@ jobs:
 条件:
 - 280文字以内
 - 短い行に区切る
-- 絵文字1。2個（🥲😮‍💨✈️🌸💸などさくららしいもの）
+- 絵文字1。2個（🥲😮‍💨✈️🌸💸 などさくららしいもの）
 - 記事URLは貼らない
 - 「後回し」「スクール失敗」「4.5万」「ワーホリ」「27歳」「30歳タイムリミット」などのエピソードを自然に絡める
 - ハッシュタグは最後に2個まで（#英語学習 #ワーホリ など）
@@ -177,7 +253,6 @@ jobs:
 
           print(f"Generated tweet:\n{tweet}")
 
-          # Post to X
           x_client = tweepy.Client(
               consumer_key=os.environ['X_API_KEY'],
               consumer_secret=os.environ['X_API_SECRET'],
