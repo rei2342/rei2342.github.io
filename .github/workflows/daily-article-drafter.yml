@@ -86,8 +86,8 @@ jobs:
           # Strip internal structural labels from headings (H2-1｜, H3-1-1｜, etc.)
           content = re.sub(r'^(#{2,6})\s+H\d[\d-]*\s*[｜|]\s*', r'\1 ', content, flags=re.MULTILINE)
 
-          # Strip affiliate disclaimer blocks between --- markers
-          content = re.sub(r'\n---\n\*本記事のアフィリエイト.*?\*\n\n---', '', content, flags=re.DOTALL)
+          # Strip affiliate disclaimer block (from --- before 本記事のアフィリ to end)
+          content = re.sub(r'\n---\n+\*?本記事のアフィリエイト.*$', '', content, flags=re.DOTALL)
 
           # Remove internal memo sections (marked for deletion before publish)
           content = re.split(r'^### SERP分析メモ', content, maxsplit=1, flags=re.MULTILINE)[0].rstrip()
