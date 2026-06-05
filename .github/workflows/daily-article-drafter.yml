@@ -26,22 +26,10 @@ jobs:
       - name: Run Daily Article Drafter
         env:
           ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
-          CLAUDE_CODE_USE_BEDROCK: '0'
         run: |
-          PROMPT=$(cat <<'PROMPT_EOF'
-          affiliate-research-engine/playbook/workspace/keywords.csv の status=todo から1件キーワードを選び、以下の手順で記事ドラフトを生成してください。
-
-          手順:
-          1. keywords.csv の status=todo から1件キーワードを選ぶ。
-          2. そのキーワードでWeb検索しSERP上位の見出し構造・論点TOP5・抜け穴を分析する。
-          3. 上位を抜く独自構造（H2×6、H3×各3）で4000字以上のドラフトを生成。
-             NG: 「〜について」「〜することが大切」禁止 / 箇条書きで逃げない / 同語尾3連続禁止 / 冒頭挨拶禁止
-          4. affiliate-research-engine/CLAUDE.md の「稼働中の案件」「主要ペルソナ」を参照し実体験ディテール（数字・固有名詞）を差し込む。
-          5. affiliate-research-engine/playbook/workspace/drafts/$(date +%Y-%m-%d).md として保存する。
-          6. keywords.csv の該当キーワードの status を todo → done に更新する。
-          PROMPT_EOF
-          )
-          claude --print --allowedTools "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch" "$PROMPT"
+          claude -p "affiliate-research-engine/playbook/workspace/keywords.csv の status=todo から1件キーワードを選び、以下の手順で記事ドラフトを生成してください。手順: 1.keywords.csvのstatus=todoから1件選ぶ。2.そのキーワードでWeb検索しSERP上位の見出し構造・論点TOP5・抜け穴を分析。3.上位を抜く独自構造(H2x6,H3x各3)で4000字以上のドラフト生成。NG:「〜について」「〜することが大切」禁止/箇条書きで逃げない/同語尾3連続禁止/冒頭挨拶禁止。4.affiliate-research-engine/CLAUDE.mdの稼働中の案件・主要ペルソナを参照し実体験ディテール(数字・固有名詞)を差し込む。5.affiliate-research-engine/playbook/workspace/drafts/$(date +%Y-%m-%d).mdとして保存。6.keywords.csvの該当キーワードのstatusをtodo→doneに更新。" \
+            --allowedTools "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch" \
+            --dangerously-skip-permissions
 
       - name: Commit draft
         run: |
