@@ -44,27 +44,46 @@ jobs:
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
         run: |
-          DRAFT_FILE="affiliate-research-engine/playbook/workspace/drafts/$(date +%Y-%m-%d).md"
-          if [ ! -f "$DRAFT_FILE" ]; then
-            echo "Draft file not found, skipping WordPress post"
-            exit 0
-          fi
+          python3 << 'PYEOF'
+          import os, json, base64, urllib.request, urllib.error, datetime, sys
 
-          # タイトル（1行目の # を除去）
-          TITLE=$(head -1 "$DRAFT_FILE" | sed 's/^# //')
+          date_str = datetime.date.today().strftime('%Y-%m-%d')
+          draft_file = f"affiliate-research-engine/playbook/workspace/drafts/{date_str}.md"
 
-          # 本文（Markdownをそのまま送る）
-          CONTENT=$(cat "$DRAFT_FILE")
+          if not os.path.exists(draft_file):
+              print("Draft file not found, skipping")
+              sys.exit(0)
 
-          # WordPress REST API で下書き投稿
-          CREDENTIALS="rei.00pt2342@gmail.com:${WP_APP_PASSWORD}"
-          ENCODED=$(echo -n "$CREDENTIALS" | base64 -w 0)
+          with open(draft_file, 'r') as f:
+              content = f.read()
 
-          curl -s -X POST "https://sakura-eigo.com/wp-json/wp/v2/posts" \
-            -H "Authorization: Basic ${ENCODED}" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"title\": $(echo "$TITLE" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read().strip()))'),
-              \"content\": $(echo "$CONTENT" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))'),
-              \"status\": \"draft\"
-            }" | python3 -c "import json,sys; r=json.load(sys.stdin); print('Posted: ' + str(r.get('id','')) + ' / ' + r.get('link',''))"
+          lines = content.split('\n')
+          title = lines[0].lstrip('# ').strip() if lines else 'Draft'
+
+          username = 'rei.00pt2342@gmail.com'
+          password = os.environ['WP_APP_PASSWORD']
+          credentials = base64.b64encode(f"{username}:{password}".encode()).decode()
+
+          data = json.dumps({
+              'title': title,
+              'content': content,
+              'status': 'draft'
+          }).encode('utf-8')
+
+          req = urllib.request.Request(
+              'https://sakura-eigo.com/wp-json/wp/v2/posts',
+              data=data,
+              headers={
+                  'Authorization': f'Basic {credentials}',
+                  'Content-Type': 'application/json'
+              }
+          )
+
+          try:
+              with urllib.request.urlopen(req) as resp:
+                  result = json.load(resp)
+                  print(f"Posted: {result.get('id')} / {result.get('link')}")
+          except urllib.error.HTTPError as e:
+              print(f"HTTP Error {e.code}: {e.read().decode()}")
+              sys.exit(1)
+          PYEOF
