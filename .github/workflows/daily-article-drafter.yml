@@ -18,7 +18,7 @@ jobs:
       - name: Run Daily Article Drafter
         uses: anthropics/claude-code-action@beta
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_api_key: ${{ secrets.REI_AFFSAKU }}
           allowed_tools: "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch"
           prompt: |
             affiliate-research-engine/playbook/routines/daily-article-drafter.md の手順に従い、本日分の記事ドラフトを生成してください。
