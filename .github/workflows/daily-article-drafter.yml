@@ -2,8 +2,8 @@ name: Daily Article Drafter
 
 on:
   schedule:
-    - cron: '0 21 * * *'  # 毎日06:00 JST (= 21:00 UTC)
-  workflow_dispatch: {}    # 手動実行も可能
+    - cron: '0 21 * * *'
+  workflow_dispatch: {}
 
 jobs:
   draft:
@@ -27,7 +27,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
         run: |
-          claude -p "affiliate-research-engine/playbook/workspace/keywords.csv の status=todo から1件キーワードを選び、以下の手順で記事ドラフトを生成してください。手順: 1.keywords.csvのstatus=todoから1件選ぶ。2.そのキーワードでWeb検索しSERP上位の見出し構造・論点TOP5・抜け穴を分析。3.上位を抜く独自構造(H2x6,H3x各3)で4000字以上のドラフト生成。NG:「〜について」「〜することが大切」禁止/箇条書きで逃げない/同語尾3連続禁止/冒頭挨拶禁止。4.affiliate-research-engine/CLAUDE.mdの稼働中の案件・主要ペルソナを参照し実体験ディテール(数字・固有名詞)を差し込む。5.affiliate-research-engine/playbook/workspace/drafts/$(date +%Y-%m-%d).mdとして保存。6.keywords.csvの該当キーワードのstatusをtodo→doneに更新。" \
+          claude -p "affiliate-research-engine/playbook/workspace/keywords.csv の status=todo から1件キーワードを選び記事ドラフトを生成してください。手順: 1.keywords.csvのstatus=todoから1件選ぶ。2.そのキーワードでWeb検索しSERP上位の見出し構造・論点TOP5・抜け穴を分析。3.上位を抜く独自構造(H2x6,H3x各3)で4000字以上のドラフト生成。NG:「〜について」「〜することが大切」禁止/箇条書きで逃げない/同語尾3連続禁止/冒頭挨拶禁止。4.affiliate-research-engine/CLAUDE.mdの稼働中の案件・主要ペルソナを参照し実体験ディテール(数字・固有名詞)を差し込む。5.affiliate-research-engine/playbook/workspace/drafts/$(date +%Y-%m-%d).mdとして保存。6.keywords.csvの該当キーワードのstatusをtodo→doneに更新。" \
             --allowedTools "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch" \
             --dangerously-skip-permissions
 
@@ -55,19 +55,19 @@ jobs:
                   if m2:
                       theme = m2.group(1).strip()
 
+          prompt = (
+              "田中さくら（27歳・営業事務・東京）として、Instagramに投稿するキャプションを書いて。\n"
+              f"今日のテーマ: {theme}\n"
+              "条件: 5〜8行・絵文字を自然に使う（多すぎず）・共感を呼ぶ等身大の言葉（大げさにしない）"
+              "・ハッシュタグ8〜10個（最後にまとめて）・リンクなし・宣伝色なし・ナチュラルに\n"
+              "キャプション本文だけ出力して。余計な説明不要。"
+          )
+
           ai = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
           msg = ai.messages.create(
               model='claude-haiku-4-5-20251001',
               max_tokens=400,
-              messages=[{'role': 'user', 'content': f"""田中さくら（27歳・営業事務・東京）として、Instagramに投稿するキャプションを書いて。
-今日のテーマ: {theme}
-条件:
-- 5〜8行
-- 絵文字を自然に使う（多すぎず）
-- 共感を呼ぶ等身大の言葉（大げさにしない）
-- ハッシュタグ8〜10個（最後にまとめて）
-- リンクなし・宣伝色なし・ナチュラルに
-キャプション本文だけ出力して。余計な説明不要。"""}]
+              messages=[{'role': 'user', 'content': prompt}]
           )
           caption = msg.content[0].text.strip()
 
@@ -75,7 +75,7 @@ jobs:
           os.makedirs(out_dir, exist_ok=True)
           out_file = f"{out_dir}/{date_str}.md"
           with open(out_file, 'w') as f:
-              f.write(f"# Instagram caption — {date_str}\n\n")
+              f.write(f"# Instagram caption -- {date_str}\n\n")
               f.write(caption)
               f.write("\n")
           print(f"Caption saved: {out_file}")
@@ -99,9 +99,7 @@ jobs:
           pip install requests markdown2 -q
           python3 << 'PYEOF'
           import os, datetime, sys, re
-          import requests
-          import markdown2
-          import urllib3
+          import requests, markdown2, urllib3
           urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
           date_str = datetime.date.today().strftime('%Y-%m-%d')
@@ -114,7 +112,6 @@ jobs:
           with open(draft_file, 'r') as f:
               raw = f.read()
 
-          # Strip YAML frontmatter (--- ... ---)
           title = 'Draft'
           content = raw
           if raw.startswith('---'):
@@ -126,43 +123,30 @@ jobs:
                       title = m.group(1).strip()
                   content = raw[end+4:].lstrip('\n')
 
-          # Extract title from first H1 if not found in frontmatter
           if title == 'Draft':
               m = re.search(r'^#\s+(.+)$', content, re.MULTILINE)
               if m:
                   title = m.group(1).strip()
 
-          # Remove first H1 (WordPress displays title separately)
           content = re.sub(r'^#\s+.+\n?', '', content, count=1).lstrip('\n')
-
-          # Strip H2-X｜/H3-X-X｜ internal structural labels from headings
-          content = re.sub(r'^(#{2,6})\s+H\d[\d-]*\s*[｜|]\s*', r'\1 ', content, flags=re.MULTILINE)
-
-          # Strip affiliate disclaimer block (--- followed by 本記事のアフィリエイト)
+          content = re.sub(r'^(#{2,6})\s+H\d[\d-]*\s*[|]\s*', r'\1 ', content, flags=re.MULTILINE)
           content = re.sub(r'\n---\n+\*?本記事のアフィリエイト.*', '', content, flags=re.DOTALL)
-
-          # Strip SERP memo section
           content = re.split(r'^### SERP分析メモ', content, maxsplit=1, flags=re.MULTILINE)[0].rstrip()
 
-          # Convert Markdown to HTML
           html = markdown2.markdown(content, extras=['fenced-code-blocks', 'tables', 'break-on-newline'])
-
-          username = 'rei.00pt2342@gmail.com'
-          password = os.environ['WP_APP_PASSWORD']
 
           resp = requests.post(
               'https://sakura-eigo.com/wp-json/wp/v2/posts',
-              auth=(username, password),
+              auth=('rei.00pt2342@gmail.com', os.environ['WP_APP_PASSWORD']),
               json={'title': title, 'content': html, 'status': 'draft'},
-              headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'},
+              headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'},
               verify=False
           )
 
           if resp.status_code in (200, 201):
-              result = resp.json()
-              print(f"Posted: {result.get('id')} / {result.get('link')}")
+              print(f"Posted: {resp.json().get('id')} / {resp.json().get('link')}")
           else:
-              print(f"Error {resp.status_code}: {resp.text[:500]}")
+              print(f"Error {resp.status_code}: {resp.text[:300]}")
               sys.exit(1)
           PYEOF
 
@@ -178,8 +162,7 @@ jobs:
           pip install anthropic tweepy -q
           python3 << 'PYEOF'
           import os, datetime, re
-          import anthropic
-          import tweepy
+          import anthropic, tweepy
 
           date_str = datetime.date.today().strftime('%Y-%m-%d')
           draft_file = f"affiliate-research-engine/playbook/workspace/drafts/{date_str}.md"
@@ -196,22 +179,21 @@ jobs:
                   if m2:
                       theme = m2.group(1).strip()
 
+          prompt = (
+              "田中さくら（27歳・営業事務・東京）として、Xに投稿するツイートを1つ書いて。\n"
+              f"今日のテーマ: {theme}\n"
+              "条件: 200字以内（絶対に超えない）・絵文字2〜3個・等身大のリアルな一言（説教くさくない）"
+              "・ハッシュタグなし・リンクなし・友達に話しかけるような自然なトーン\n"
+              "ツイート本文だけ出力して。余計な説明不要。"
+          )
+
           ai = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
           msg = ai.messages.create(
               model='claude-haiku-4-5-20251001',
               max_tokens=200,
-              messages=[{'role': 'user', 'content': f"""田中さくら（27歳・営業事務・東京）として、Xに投稿するツイートを1つ書いて。
-今日のテーマ: {theme}
-条件:
-- 200字以内（絶対に超えない）
-- 絵文字2〜3個
-- 等身大のリアルな一言（説教くさくない、押しつけがましくない）
-- ハッシュタグなし・リンクなし
-- 友達に話しかけるような自然なトーン
-ツイート本文だけ出力して。余計な説明不要。"""}]
+              messages=[{'role': 'user', 'content': prompt}]
           )
           tweet = msg.content[0].text.strip()
-          # Ensure under 280 chars
           if len(tweet) > 280:
               tweet = tweet[:277] + '...'
 
