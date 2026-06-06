@@ -3,7 +3,7 @@ name: Daily Article Drafter
 on:
   schedule:
     - cron: '0 21 * * *'  # 毎日06:00 JST (= 21:00 UTC)
-  workflow_dispatch:       # 手動実行も可能
+  workflow_dispatch: {}    # 手動実行も可能
 
 jobs:
   draft:
