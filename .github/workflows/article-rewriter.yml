@@ -1,0 +1,43 @@
+name: Rewrite Articles
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'ドライラン（ファイル保存のみ・WP更新なし）'
+        type: boolean
+        default: true
+
+jobs:
+  rewrite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic requests -q
+
+      - name: Rewrite articles
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/article_rewriter.py
+
+      - name: Commit rewrites and report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/rewrites/
+          git diff --staged --quiet || git commit -m "feat: article rewrites $(date +%Y-%m-%d)"
+          git push origin claude/affiliate-research-engine-XQ0LF
