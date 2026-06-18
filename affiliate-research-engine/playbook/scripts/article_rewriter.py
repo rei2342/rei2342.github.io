@@ -122,16 +122,21 @@ def strip_html(html):
     return re.sub(r'<[^>]+>', '', html)
 
 def classify(title, content_snippet):
-    t = (title + " " + content_snippet).lower()
+    # Use title only to avoid content keywords polluting classification
+    t = title.lower()
     if "toeic" in t: return "toeic"
     if "フィリピン" in t: return "philippines"
-    if "コーチング" in t: return "coaching"
     if "2000" in t: return "hours_2000"
     if "エージェント" in t and "無料" in t: return "agent_free"
     if "エージェント" in t: return "agent_general"
+    if "コーチング" in t: return "coaching"
     if "仕事" in t and "英語" in t: return "work_english"
     if "続かない" in t: return "habit"
     if "費用" in t or "現実" in t: return "cost"
+    if "独学" in t: return "default"
+    if "上達" in t or "伸びない" in t: return "habit"
+    if "ワーホリ" in t or "貯金" in t: return "cost"
+    if "ビジネス英語" in t: return "work_english"
     return "default"
 
 def existing_links(content):
