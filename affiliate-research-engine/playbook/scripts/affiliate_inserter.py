@@ -15,9 +15,11 @@ WP_PASS = os.environ.get("WP_APP_PASSWORD", "")
 DRY_RUN = os.environ.get("DRY_RUN", "true").lower() == "true"
 OUT_DIR = Path("affiliate-research-engine/playbook/workspace/affiliate_inserts")
 
-TARGET_IDS = [27, 67, 64, 61, 19, 18, 32, 42, 40, 41, 37, 33, 28, 23]
+_DEFAULT_IDS = [27, 67, 64, 61, 19, 18, 32, 42, 40, 41, 37, 33, 28, 23]
+_env_ids = os.environ.get("POST_IDS", "")
+TARGET_IDS = [int(x) for x in _env_ids.split(",") if x.strip()] if _env_ids else _DEFAULT_IDS
 
-# ── Affiliate links ────────────────────────────────────────────────────────────
+# ── Affiliate links ──────────────────────────────────────────────────
 LINKS = {
     "speek": (
         "speek",

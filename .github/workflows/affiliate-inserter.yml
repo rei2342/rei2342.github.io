@@ -3,6 +3,10 @@ name: Affiliate Inserter
 on:
   workflow_dispatch:
     inputs:
+      post_ids:
+        description: '対象記事IDをカンマ区切りで（空欄=全記事デフォルト）'
+        default: ''
+        required: false
       dry_run:
         description: 'ドライラン（プレビュー保存のみ・WP更新なし）'
         type: boolean
@@ -31,6 +35,7 @@ jobs:
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           DRY_RUN: ${{ inputs.dry_run }}
+          POST_IDS: ${{ inputs.post_ids }}
         run: python affiliate-research-engine/playbook/scripts/affiliate_inserter.py
 
       - name: Commit previews and report
