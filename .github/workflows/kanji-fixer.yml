@@ -1,0 +1,48 @@
+name: Kanji Numeral Fixer
+
+on:
+  workflow_dispatch:
+    inputs:
+      post_ids:
+        description: '対象記事IDをカンマ区切りで（例: 117,118）'
+        default: '117'
+        required: true
+      dry_run:
+        description: 'ドライラン（プレビューのみ・WP更新なし）'
+        type: boolean
+        default: true
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests -q
+
+      - name: Fix kanji numerals
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          POST_IDS: ${{ inputs.post_ids }}
+        run: python affiliate-research-engine/playbook/scripts/fix_kanji_numerals.py
+
+      - name: Commit report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/kanji_fixes/
+          git diff --staged --quiet || git commit -m "fix: kanji numeral fix report $(date +%Y-%m-%d)"
+          git pull --rebase origin main
+          git push origin HEAD:main
