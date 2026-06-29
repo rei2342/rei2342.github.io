@@ -160,9 +160,12 @@ def get_post(post_id):
                      headers=UA, verify=False, timeout=30)
     return r.json() if r.status_code == 200 else None
 
-def update_post(post_id, content):
+def update_post(post_id, content, title=None):
+    payload = {"content": content}
+    if title is not None:
+        payload["title"] = title
     r = requests.post(f"{WP_BASE}/posts/{post_id}", auth=(WP_USER, WP_PASS),
-                      json={"content": content}, headers=UA, verify=False, timeout=30)
+                      json=payload, headers=UA, verify=False, timeout=30)
     return r.status_code in (200, 201)
 
 def get_all_post_ids():
@@ -209,12 +212,16 @@ def main():
         title   = post["title"]["rendered"]
         content = post["content"]["rendered"]
         new_content, log = convert_text(content)
-        new_content, dash_n = clean_dashes(new_content)   # —— 除去
+        new_content, dash_n = clean_dashes(new_content)   # 本文の —— 除去
+        # タイトルも同様に処理（漢数字 + —— 除去）
+        new_title, tlog = convert_text(title)
+        new_title, tdash_n = clean_dashes(new_title)
 
-        if not log and dash_n == 0:
-            print(f"  {title}\n  → 変更なし、スキップ")
-            report.append(f"- [{post_id}] {title} — NO CHANGES\n")
+        if not log and dash_n == 0 and not tlog and tdash_n == 0:
+            print(f"  {new_title}\n  → 変更なし、スキップ")
+            report.append(f"- [{post_id}] {new_title} — NO CHANGES\n")
             continue
+        log += tlog  # タイトル分の漢数字置換もログへ
 
         # 重複ログを集約
         seen, uniq = set(), []
@@ -222,19 +229,20 @@ def main():
             if (o, n) not in seen:
                 seen.add((o, n)); uniq.append((o, n))
 
-        print(f"  {title}\n  → 漢数字{len(log)}箇所 / ——除去{dash_n}箇所:")
+        dash_total = dash_n + tdash_n
+        print(f"  {new_title}\n  → 漢数字{len(log)}箇所 / ——除去{dash_total}箇所:")
         for o, n in uniq[:40]:
             print(f"      {o} → {n}")
 
         (OUT_DIR / f"{post_id}_kanji_fixed.html").write_text(new_content, encoding="utf-8")
 
         if not DRY_RUN:
-            status = "✓ UPDATED" if update_post(post_id, new_content) else "✗ WP FAILED"
+            status = "✓ UPDATED" if update_post(post_id, new_content, new_title) else "✗ WP FAILED"
         else:
             status = "DRY RUN — preview saved"
 
         report.append(
-            f"- [{post_id}] {title} — 漢数字{len(log)} / ——除去{dash_n}\n"
+            f"- [{post_id}] {new_title} — 漢数字{len(log)} / ——除去{dash_total}\n"
             + "\n".join(f"  - `{o}` → `{n}`" for o, n in uniq)
             + f"\n  → **{status}**\n\n"
         )
