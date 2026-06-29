@@ -101,11 +101,17 @@ def convert_text(text: str):
     text = re.sub(f"({_RUN})・({_RUN})", repl_dec, text)
 
     # --- パス1: ラン(+単位) を1パスで変換（再走査しないので万の二重処理が起きない）---
+    # 「十分」直後が以下なら じゅうぶん(=十分) とみなして保護。それ以外は 10分 に変換。
+    _JUUBUN_NEXT = re.compile(r"^(に|な|の|だ|です|でしょ|だっ|では|でない|でなく|すぎ|とは|でき|条件|時間)")
+
     def repl_main(m):
         run, unit = m.group(1), (m.group(2) or "")
         if unit:
-            if run == "十" and unit == "分":      # 「十分」(じゅうぶん)を保護
-                return m.group(0)
+            if run == "十" and unit == "分":      # 「十分」= じゅうぶん か 10分 か文脈判定
+                tail = m.string[m.end():m.end()+4]
+                if _JUUBUN_NEXT.match(tail):       # 十分に / 十分な / 十分すぎ → じゅうぶん保護
+                    return m.group(0)
+                # それ以外（十分から / 十分ずつ / 一日十分 等）は 10分
             if not _has_digit(run):                # 「万円」等の単独大単位は触らない
                 return m.group(0)
             out = _convert_run(run) + unit
@@ -134,6 +140,20 @@ def convert_text(text: str):
 
     return text, log
 
+# ── em ダッシュ（——）除去：AIっぽさを消す ─────────────────────────
+# 1) 挿入句を囲う対 ——…—— は（…）へ。 2) 残りは読点へ。 3) 閉じ括弧/句点直前は削除。
+_DASH = "—"  # —（EM DASH）
+def clean_dashes(text: str):
+    n = 0
+    # 対で挿入句を囲うケース → （挿入句）。挿入句に文末/括弧/鉤括弧は含めない
+    pat_pair = re.compile(f"{_DASH}{{2,}}([^{_DASH}。！？\\n\\r「」（）]+?){_DASH}{{2,}}")
+    text, c = pat_pair.subn(lambda m: "（" + m.group(1) + "）", text); n += c
+    # 閉じ記号の直前にある —— は不要 → 削除
+    text, c = re.subn(f"{_DASH}{{1,}}(?=[」』。、，））])", "", text); n += c
+    # 残りの長ダッシュ・単独ダッシュ → 読点
+    text, c = re.subn(f"{_DASH}{{1,}}", "、", text); n += c
+    return text, n
+
 # ── WP I/O ────────────────────────────────────────────────────
 def get_post(post_id):
     r = requests.get(f"{WP_BASE}/posts/{post_id}", auth=(WP_USER, WP_PASS),
@@ -146,10 +166,12 @@ def update_post(post_id, content):
     return r.status_code in (200, 201)
 
 def get_all_post_ids():
+    # 公開・下書き・予約・レビュー待ち・非公開すべて（もれなく）
     ids, page = [], 1
     while True:
         r = requests.get(f"{WP_BASE}/posts", auth=(WP_USER, WP_PASS),
-                         params={"per_page": 100, "page": page, "status": "publish",
+                         params={"per_page": 100, "page": page,
+                                 "status": "publish,draft,pending,future,private",
                                  "_fields": "id"},
                          headers=UA, verify=False, timeout=30)
         if r.status_code != 200:
@@ -187,9 +209,10 @@ def main():
         title   = post["title"]["rendered"]
         content = post["content"]["rendered"]
         new_content, log = convert_text(content)
+        new_content, dash_n = clean_dashes(new_content)   # —— 除去
 
-        if not log:
-            print(f"  {title}\n  → 漢数字なし、スキップ")
+        if not log and dash_n == 0:
+            print(f"  {title}\n  → 変更なし、スキップ")
             report.append(f"- [{post_id}] {title} — NO CHANGES\n")
             continue
 
@@ -199,7 +222,7 @@ def main():
             if (o, n) not in seen:
                 seen.add((o, n)); uniq.append((o, n))
 
-        print(f"  {title}\n  → {len(log)}箇所置換 ({len(uniq)}種):")
+        print(f"  {title}\n  → 漢数字{len(log)}箇所 / ——除去{dash_n}箇所:")
         for o, n in uniq[:40]:
             print(f"      {o} → {n}")
 
@@ -211,7 +234,7 @@ def main():
             status = "DRY RUN — preview saved"
 
         report.append(
-            f"- [{post_id}] {title} — {len(log)}箇所\n"
+            f"- [{post_id}] {title} — 漢数字{len(log)} / ——除去{dash_n}\n"
             + "\n".join(f"  - `{o}` → `{n}`" for o, n in uniq)
             + f"\n  → **{status}**\n\n"
         )

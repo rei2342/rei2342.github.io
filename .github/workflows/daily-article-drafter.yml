@@ -27,7 +27,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
         run: |
-          claude -p "affiliate-research-engine/playbook/workspace/keywords.csv の status=todo から1件キーワードを選び記事ドラフトを生成してください。手順: 1.keywords.csvのstatus=todoから1件選ぶ。2.そのキーワードでWeb検索しSERP上位の見出し構造・論点TOP5・抜け穴を分析。3.上位を抜く独自構造(H2x6,H3x各3)で4000字以上のドラフト生成。NG:「〜について」「〜することが大切」禁止/箇条書きで逃げない/同語尾3連続禁止/冒頭挨拶禁止。4.affiliate-research-engine/CLAUDE.mdの稼働中の案件・主要ペルソナを参照し実体験ディテール(数字・固有名詞)を差し込む。5.affiliate-research-engine/playbook/workspace/drafts/$(date +%Y-%m-%d).mdとして保存。6.keywords.csvの該当キーワードのstatusをtodo→doneに更新。" \
+          claude -p "affiliate-research-engine/playbook/workspace/keywords.csv の status=todo から1件キーワードを選び記事ドラフトを生成してください。手順: 1.keywords.csvのstatus=todoから1件選ぶ。2.そのキーワードでWeb検索しSERP上位の見出し構造・論点TOP5・抜け穴を分析。3.上位を抜く独自構造(H2x6,H3x各3)で4000字以上のドラフト生成。NG:「〜について」「〜することが大切」禁止/箇条書きで逃げない/同語尾3連続禁止/冒頭挨拶禁止/「——」(emダッシュ・二倍ダッシュ)禁止(AIっぽい・挿入句は（）読点句点で)/漢数字でなくアラビア数字(27歳・3ヶ月・15万)。4.affiliate-research-engine/CLAUDE.mdの稼働中の案件・主要ペルソナを参照し実体験ディテール(数字・固有名詞)を差し込む。5.affiliate-research-engine/playbook/workspace/drafts/$(date +%Y-%m-%d).mdとして保存。6.keywords.csvの該当キーワードのstatusをtodo→doneに更新。" \
             --allowedTools "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch" \
             --dangerously-skip-permissions
 
