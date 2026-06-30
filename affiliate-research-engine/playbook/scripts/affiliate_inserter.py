@@ -17,7 +17,12 @@ OUT_DIR = Path("affiliate-research-engine/playbook/workspace/affiliate_inserts")
 
 _DEFAULT_IDS = [27, 67, 64, 61, 19, 18, 32, 42, 40, 41, 37, 33, 28, 23]
 _env_ids = os.environ.get("POST_IDS", "")
-TARGET_IDS = [int(x) for x in _env_ids.split(",") if x.strip()] if _env_ids else _DEFAULT_IDS
+if _env_ids.strip().upper() == "ALL":
+    TARGET_IDS = []                      # main() が get_all_post_ids() を使う
+elif _env_ids.strip():
+    TARGET_IDS = [int(x) for x in _env_ids.split(",") if x.strip()]
+else:
+    TARGET_IDS = _DEFAULT_IDS
 
 # ── Affiliate links ──────────────────────────────────────────────────
 LINKS = {
