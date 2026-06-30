@@ -61,6 +61,14 @@ LINKS = {
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640987&p_id=4201&pc_id=10658&pl_id=57293"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
+    "sptr": (
+        "5640981",
+        '<a href="//af.moshimo.com/af/c/click?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559&url=https%3A%2F%2Fsptr.jp"'
+        ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
+        '→ スパトレ（第二言語習得論ベースの英語トレーニング）の7日間無料体験を見る</a>'
+        '<img src="//i.moshimo.com/af/i/impression?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559"'
+        ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
+    ),
 }
 
 # ── Topic → max 2 programs, priority order ────────────────────────────────────
@@ -69,11 +77,12 @@ TOPIC_MAP = {
     "workingholiday": ["johokan", "ugaku"],
     "study_abroad":   ["johokan", "ugaku"],
     "agent":          ["johokan", "ugaku"],
-    "coaching":       ["speek"],
-    "toeic":          ["speek"],
-    "pronunciation":  ["speek"],
+    "coaching":       ["speek", "sptr"],
+    "toeic":          ["speek", "sptr"],
+    "pronunciation":  ["speek", "sptr"],
+    "training":       ["sptr", "speek"],
     "domestic":       ["ugaku"],
-    "default":        ["speek"],
+    "default":        ["speek", "sptr"],
 }
 
 def classify(title):
@@ -92,6 +101,8 @@ def classify(title):
         return "toeic"
     if any(k in t for k in ["発音", "スピーキング", "speaking"]):
         return "pronunciation"
+    if any(k in t for k in ["スパトレ", "トレーニング", "第二言語習得", "独学", "続かない", "アプリ"]):
+        return "training"
     if any(k in t for k in ["国内", "短期集中"]):
         return "domestic"
     return "default"
