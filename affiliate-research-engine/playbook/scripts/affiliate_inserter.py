@@ -107,32 +107,30 @@ def classify(title):
         return "domestic"
     return "default"
 
-def detect_existing(content):
-    present = set()
-    for key, (aid, _) in LINKS.items():
-        if aid in content:
-            present.add(key)
-    return present
+# 既存CTAボックス（先頭の<hr>含む）を丸ごと除去する正規表現
+_BOX_RE = re.compile(
+    r'(?:\s*<hr\s*/?>)?\s*'
+    r'<div style="background:#f9f9f9;border-left:4px solid #27ae60;[^"]*">.*?</div>',
+    re.DOTALL,
+)
 
-def build_cta(topic, existing):
-    programs = TOPIC_MAP.get(topic, ["speek"])
-    new_progs = [p for p in programs if p not in existing]
-    if not new_progs:
-        return None, []
+def strip_box(content):
+    """既存の『さくらが確かめた・次の一手』ボックスを除去（あれば）。"""
+    return _BOX_RE.sub('', content).rstrip()
 
-    items = []
-    for p in new_progs[:2]:
-        items.append(f'<p>{LINKS[p][1]}</p>')
-
+def build_cta(topic):
+    """そのトピックの全案件（最大2件）を1つの箱にまとめて返す。"""
+    programs = TOPIC_MAP.get(topic, ["speek"])[:2]
+    items = '\n'.join(f'<p>{LINKS[p][1]}</p>' for p in programs)
     block = (
         '\n<hr>\n'
         '<div style="background:#f9f9f9;border-left:4px solid #27ae60;padding:16px 20px;margin:32px 0">\n'
         '<p style="margin-top:0;font-weight:bold">▶ さくらが確かめた・次の一手（すべて無料）</p>\n'
-        + '\n'.join(items) +
+        + items +
         '\n<p style="margin-bottom:0;font-size:0.8em;color:#999">※本記事にはアフィリエイトリンクが含まれます（PR）</p>\n'
         '</div>'
     )
-    return block, new_progs
+    return block, programs
 
 def get_post(post_id):
     r = requests.get(
@@ -153,11 +151,36 @@ def update_post(post_id, content):
     )
     return r.status_code in (200, 201)
 
+def get_all_post_ids():
+    ids, page = [], 1
+    while True:
+        r = requests.get(
+            f"{WP_BASE}/posts", auth=(WP_USER, WP_PASS),
+            params={"per_page": 100, "page": page,
+                    "status": "publish,draft,pending,future,private", "_fields": "id"},
+            headers={"User-Agent": "Mozilla/5.0"}, verify=False, timeout=30)
+        if r.status_code != 200:
+            break
+        batch = r.json()
+        if not batch:
+            break
+        ids += [p["id"] for p in batch]
+        if len(batch) < 100:
+            break
+        page += 1
+    return ids
+
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     report = [f"# Affiliate Insert Report\nMode: {'DRY RUN' if DRY_RUN else 'LIVE'}\n\n"]
 
-    for post_id in TARGET_IDS:
+    if _env_ids.strip().upper() == "ALL":
+        ids = get_all_post_ids()
+        print(f"ALL mode: {len(ids)} posts")
+    else:
+        ids = TARGET_IDS
+
+    for post_id in ids:
         print(f"\n[{post_id}] Fetching...")
         post = get_post(post_id)
         if not post:
@@ -168,31 +191,28 @@ def main():
         title   = post["title"]["rendered"]
         content = post["content"]["rendered"]
         topic   = classify(title)
-        existing = detect_existing(content)
 
-        print(f"  {title}")
-        print(f"  topic={topic}  existing={existing or 'none'}")
+        # 既存ボックスを除去 → そのトピックの全案件で1つの箱を作り直す（冪等・統合）
+        base = strip_box(content)
+        cta_block, progs = build_cta(topic)
+        new_content = base + cta_block
 
-        cta_block, inserted = build_cta(topic, existing)
-        if cta_block is None:
-            print("  → all relevant links already present, skip")
-            report.append(f"- [{post_id}] {title} ({topic}) — SKIPPED (links present)\n")
+        print(f"  {title}\n  topic={topic}  programs={progs}")
+
+        if new_content == content:
+            print("  → 既に最新の統合ボックス、変更なし")
+            report.append(f"- [{post_id}] {title} ({topic}) — NO CHANGE\n")
             continue
 
-        new_content = content + cta_block
-
-        # Save preview
-        out = OUT_DIR / f"{post_id}_{topic}.html"
-        out.write_text(f"<!-- {post_id} | {title} | {topic} -->\n{cta_block}")
-        print(f"  ✓ CTA saved: {', '.join(inserted)}")
+        (OUT_DIR / f"{post_id}_{topic}.html").write_text(
+            f"<!-- {post_id} | {title} | {topic} -->\n{cta_block}")
 
         if not DRY_RUN:
-            ok = update_post(post_id, new_content)
-            status = "✓ UPDATED" if ok else "✗ WP FAILED"
+            status = "✓ UPDATED" if update_post(post_id, new_content) else "✗ WP FAILED"
         else:
             status = "DRY RUN"
 
-        report.append(f"- [{post_id}] {title} ({topic}) — inserted: {', '.join(inserted)} — {status}\n")
+        report.append(f"- [{post_id}] {title} ({topic}) — box: {', '.join(progs)} — {status}\n")
         print(f"  {status}")
         time.sleep(5)
 
