@@ -1,0 +1,165 @@
+name: X Poster (sakura, human-like)
+
+# さくらのX投稿を「2日に1回くらい・時間バラバラ・botっぽくない」頻度で回す。
+# 記事生成(daily-article-drafter)からは切り離し、複数スロット×確率×最小間隔で自然化する。
+
+on:
+  schedule:
+    # 1日5スロット（JSTの生活時間・分は半端に）。実際に投稿するかは中で確率判定。
+    - cron: '10 22 * * *'   # 07:10 JST 出勤前
+    - cron: '40 3 * * *'    # 12:40 JST 昼休み
+    - cron: '30 10 * * *'   # 19:30 JST 退勤後
+    - cron: '50 13 * * *'   # 22:50 JST 夜
+    - cron: '20 15 * * *'   # 00:20 JST 深夜たまに
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '確率・間隔を無視して必ず投稿する'
+        type: boolean
+        default: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Decide & post
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          pip install anthropic tweepy -q
+          python3 << 'PYEOF'
+          import os, json, random, glob, re, sys
+          from datetime import datetime, timezone, timedelta
+
+          STATE = "affiliate-research-engine/playbook/workspace/x_state.json"
+          now = datetime.now(timezone.utc)
+          force = os.environ.get("FORCE", "false").lower() == "true"
+
+          # ── 頻度パラメータ（ここを変えれば頻度調整できる）────────────
+          POST_PROB   = 0.55          # 間隔クリア後、各スロットで投稿する確率
+          GAP_MIN_H   = 40            # 前回からの最小間隔（時間）
+          GAP_MAX_H   = 54            # 次回許可までの最大間隔（時間）
+          OVERDUE_H   = 20            # next_allowed をこれ以上過ぎたら強制投稿
+
+          def load():
+              try:
+                  with open(STATE) as f: return json.load(f)
+              except Exception:
+                  return {"last_post": None, "next_allowed": None, "last_text": ""}
+
+          st = load()
+          def parse(x):
+              return datetime.fromisoformat(x) if x else None
+          next_allowed = parse(st.get("next_allowed"))
+
+          # ── 投稿するか判定 ───────────────────────────────────────
+          if not force:
+              if next_allowed and now < next_allowed:
+                  print(f"skip: まだ間隔内（next_allowed={next_allowed.isoformat()}）")
+                  sys.exit(0)
+              overdue = next_allowed and now > next_allowed + timedelta(hours=OVERDUE_H)
+              if not overdue and random.random() > POST_PROB:
+                  print("skip: このスロットは確率でパス（bot回避のゆらぎ）")
+                  sys.exit(0)
+
+          # ── テーマ：直近ドラフトのタイトルを緩い着想に（半分は素の関心事）──
+          theme = "英語・ワーホリ・30歳までの焦り"
+          drafts = sorted(glob.glob("affiliate-research-engine/playbook/workspace/drafts/*.md"))
+          if drafts and random.random() < 0.5:
+              try:
+                  raw = open(drafts[-1], encoding="utf-8").read()
+                  m = re.search(r'^title:\s*(.+)$', raw, re.MULTILINE) or re.search(r'^#\s+(.+)$', raw, re.MULTILINE)
+                  if m: theme = m.group(1).strip()
+              except Exception:
+                  pass
+
+          # ── 文体モードをランダムに（毎回同じトーンにしない）──────────
+          mode = random.choice([
+              "ふとした気づきをこぼす",
+              "しんどさ・弱音をぽつり",
+              "自分を茶化す自虐まじり",
+              "小さく前進したことの報告",
+              "同じ悩みの人へ問いかける",
+              "日常の一コマから英語の話へ",
+              "過去の自分へのツッコミ",
+          ])
+          length = random.choice(["40字前後で短く", "70字前後", "100字くらい少し長め"])
+          emoji_n = random.choice([2, 2, 3])   # 2個寄り
+
+          prompt = "\n".join([
+              "あなたは田中さくら（27歳・営業事務・東京）。英語を5年後回しにしてきて、ワーホリしたいと言い続けて27歳。30歳のタイムリミットが迫っている。過去に英語スクールで計4.5万円を溶かした。",
+              "",
+              f"今日の気分の入り口: {theme}",
+              f"今回のトーン: {mode}",
+              f"長さ: {length}",
+              "",
+              "このトーンで、さくらが今ふと思ったことを1ツイート書いて。",
+              "",
+              "ルール:",
+              "・口語。「〜みたいな」「〜て」「〜だった」など。主語省略OK",
+              "・宣伝しない。告知しない（「今日は○○を書きました」的なのは禁止）。頭の中のつぶやき",
+              "・冒頭挨拶なし・ハッシュタグなし・リンクなし・URLなし",
+              "・「——」(emダッシュ)禁止。区切りは読点か句点で",
+              "・漢数字でなくアラビア数字（27歳・3ヶ月・15万）",
+              f"・絵文字を{emoji_n}個、感情が動いた直後か前半後半に散らす。文末2連続は避ける",
+              "　使う絵文字はこの中から: 🥹 🫠 😮‍💨 😭 😳 ☺️ ✨ 🌸 💭 🫶 👀 🤔 ✈️ 🌱 ⏰ ☕ 🌙",
+              "・毎回同じ言い回しにしない",
+              "",
+              "ツイート本文だけ出力して。説明不要。",
+          ])
+
+          import anthropic, tweepy
+          ai = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+          msg = ai.messages.create(
+              model="claude-haiku-4-5-20251001",
+              max_tokens=300,
+              messages=[{"role": "user", "content": prompt}],
+          )
+          tweet = msg.content[0].text.strip().strip('"').strip("「」")
+          # 保険: emダッシュが混ざったら除去
+          tweet = tweet.replace("——", "、").replace("—", "、")
+          if len(tweet) > 140:
+              tweet = tweet[:139]
+
+          client = tweepy.Client(
+              consumer_key=os.environ["X_API_KEY"],
+              consumer_secret=os.environ["X_API_SECRET"],
+              access_token=os.environ["X_ACCESS_TOKEN"],
+              access_token_secret=os.environ["X_ACCESS_TOKEN_SECRET"],
+          )
+          resp = client.create_tweet(text=tweet)
+          print(f"Tweeted ({mode} / {length} / 絵文字{emoji_n}): {tweet}")
+
+          # ── 次回許可時刻を 40〜54h 後にランダム設定 ─────────────────
+          gap = random.uniform(GAP_MIN_H, GAP_MAX_H)
+          st["last_post"] = now.isoformat()
+          st["next_allowed"] = (now + timedelta(hours=gap)).isoformat()
+          st["last_text"] = tweet
+          with open(STATE, "w") as f:
+              json.dump(st, f, ensure_ascii=False, indent=2)
+          print(f"next_allowed = {st['next_allowed']} (gap {gap:.1f}h)")
+          PYEOF
+
+      - name: Commit state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/x_state.json
+          git diff --staged --quiet || git commit -m "chore: X post state $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
