@@ -95,12 +95,32 @@ jobs:
         continue-on-error: true
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
         run: |
-          pip install requests markdown2 -q
+          pip install requests markdown2 anthropic -q
           python3 << 'PYEOF'
           import os, datetime, sys, re
           import requests, markdown2, urllib3
           urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+          def make_slug(title, keyword=""):
+              """日本語タイトルから短い英語スラッグを生成（失敗時は空=WP自動）。"""
+              try:
+                  import anthropic
+                  ai = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+                  msg = ai.messages.create(
+                      model="claude-haiku-4-5-20251001", max_tokens=40,
+                      messages=[{"role": "user", "content":
+                          "次の日本語記事タイトルを、SEOに適した短い英語スラッグにして。"
+                          "ルール: 半角小文字英数字とハイフンのみ / 3〜6語 / 内容を表す / 説明や引用符なしでスラッグだけ出力。\n"
+                          f"タイトル: {title}\nキーワード: {keyword}"}],
+                  )
+                  s = msg.content[0].text.strip().lower()
+                  s = re.sub(r'[^a-z0-9\-]+', '-', s).strip('-')
+                  return s[:60] if s else ""
+              except Exception as e:
+                  print(f"slug gen failed: {e}")
+                  return ""
 
           date_str = datetime.date.today().strftime('%Y-%m-%d')
           draft_file = f"affiliate-research-engine/playbook/workspace/drafts/{date_str}.md"
@@ -135,10 +155,16 @@ jobs:
 
           html = markdown2.markdown(content, extras=['fenced-code-blocks', 'tables', 'break-on-newline'])
 
+          slug = make_slug(title)
+          payload = {'title': title, 'content': html, 'status': 'draft'}
+          if slug:
+              payload['slug'] = slug
+              print(f"slug: {slug}")
+
           resp = requests.post(
               'https://sakura-eigo.com/wp-json/wp/v2/posts',
               auth=('rei.00pt2342@gmail.com', os.environ['WP_APP_PASSWORD']),
-              json={'title': title, 'content': html, 'status': 'draft'},
+              json=payload,
               headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'},
               verify=False
           )
