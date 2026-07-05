@@ -74,6 +74,14 @@ LINKS = {
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
+    "dmm": (
+        "5640982",
+        '<a href="//af.moshimo.com/af/c/click?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962"'
+        ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
+        '→ DMM英会話のオンライン無料体験レッスンを受けてみる</a>'
+        '<img src="//i.moshimo.com/af/i/impression?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962"'
+        ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
+    ),
 }
 
 # ── Topic → max 2 programs, priority order ────────────────────────────────────
@@ -86,8 +94,9 @@ TOPIC_MAP = {
     "toeic":          ["speek", "sptr"],
     "pronunciation":  ["speek", "sptr"],
     "training":       ["sptr", "speek"],
+    "eikaiwa":        ["dmm", "speek"],   # オンライン英会話系は DMM 主力
     "domestic":       ["ugaku"],
-    "default":        ["speek", "sptr"],
+    "default":        ["speek", "dmm"],   # 汎用にも DMM を露出（sptrはtoeic/training等で担保）
 }
 
 def classify(title):
@@ -106,6 +115,8 @@ def classify(title):
         return "toeic"
     if any(k in t for k in ["発音", "スピーキング", "speaking"]):
         return "pronunciation"
+    if any(k in t for k in ["オンライン英会話", "英会話", "DMM", "ネイティブ", "毎日 英語"]):
+        return "eikaiwa"
     if any(k in t for k in ["スパトレ", "トレーニング", "第二言語習得", "独学", "続かない", "アプリ"]):
         return "training"
     if any(k in t for k in ["国内", "短期集中"]):
