@@ -17,6 +17,10 @@ on:
         description: '確率・間隔を無視して必ず投稿する'
         type: boolean
         default: false
+      text:
+        description: '指定テキストをそのまま投稿（空なら自動生成）'
+        type: string
+        default: ''
 
 jobs:
   post:
@@ -40,6 +44,7 @@ jobs:
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
           FORCE: ${{ inputs.force }}
+          MANUAL_TEXT: ${{ inputs.text }}
         run: |
           pip install anthropic tweepy -q
           python3 << 'PYEOF'
@@ -49,6 +54,30 @@ jobs:
           STATE = "affiliate-research-engine/playbook/workspace/x_state.json"
           now = datetime.now(timezone.utc)
           force = os.environ.get("FORCE", "false").lower() == "true"
+          manual_text = os.environ.get("MANUAL_TEXT", "").strip()
+
+          # ── 指定テキストがあればそれをそのまま投稿（生成・判定スキップ）──
+          if manual_text:
+              import tweepy, json as _json
+              tw = manual_text.replace("——", "、").replace("—", "、").strip()
+              client = tweepy.Client(
+                  consumer_key=os.environ["X_API_KEY"],
+                  consumer_secret=os.environ["X_API_SECRET"],
+                  access_token=os.environ["X_ACCESS_TOKEN"],
+                  access_token_secret=os.environ["X_ACCESS_TOKEN_SECRET"],
+              )
+              client.create_tweet(text=tw)
+              print(f"Tweeted (manual): {tw}")
+              try:
+                  st = _json.load(open(STATE))
+              except Exception:
+                  st = {}
+              gap = 47
+              st["last_post"] = now.isoformat()
+              st["next_allowed"] = (now + timedelta(hours=gap)).isoformat()
+              st["last_text"] = tw
+              _json.dump(st, open(STATE, "w"), ensure_ascii=False, indent=2)
+              sys.exit(0)
 
           # ── 頻度パラメータ（ここを変えれば頻度調整できる）────────────
           POST_PROB   = 0.55          # 間隔クリア後、各スロットで投稿する確率
