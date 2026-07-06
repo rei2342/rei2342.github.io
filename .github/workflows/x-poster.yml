@@ -98,7 +98,7 @@ jobs:
               "日常の一コマから英語の話へ",
               "過去の自分へのツッコミ",
           ])
-          length = random.choice(["40字前後で短く", "70字前後", "100字くらい少し長め"])
+          length = random.choice(["20字前後でひと言", "30字前後で短く", "40字前後で短く", "50字前後"])
           emoji_n = random.choice([2, 2, 3])   # 2個寄り
 
           prompt = "\n".join([
@@ -111,6 +111,8 @@ jobs:
               "このトーンで、さくらが今ふと思ったことを1ツイート書いて。",
               "",
               "ルール:",
+              "・短く。ひと言〜二言で言い切る。情報や理由を詰め込まない。長い文は書かない（最長でも90字）",
+              "・1ツイート1つの気持ちだけ。説明しようとしない",
               "・口語。「〜みたいな」「〜て」「〜だった」など。主語省略OK",
               "・宣伝しない。告知しない（「今日は○○を書きました」的なのは禁止）。頭の中のつぶやき",
               "・冒頭挨拶なし・ハッシュタグなし・リンクなし・URLなし",
@@ -132,9 +134,16 @@ jobs:
           )
           tweet = msg.content[0].text.strip().strip('"').strip("「」")
           # 保険: emダッシュが混ざったら除去
-          tweet = tweet.replace("——", "、").replace("—", "、")
-          if len(tweet) > 140:
-              tweet = tweet[:139]
+          tweet = tweet.replace("——", "、").replace("—", "、").strip()
+          # 長すぎる場合は「文の切れ目」で切る（語の途中でぶった切らない）
+          LIMIT = 128
+          if len(tweet) > LIMIT:
+              cut = max(tweet.rfind(p, 0, LIMIT) for p in "。！？…!?")
+              if cut < 25:                       # 文末が見つからなければ読点で
+                  cut = tweet.rfind("、", 0, LIMIT)
+              tweet = tweet[:cut + 1].rstrip("、") if cut >= 25 else tweet[:LIMIT]
+              # 句点の直後に絵文字が続いていたら1つだけ拾って余韻を残す
+              tail = tweet_full[len(tweet):len(tweet) + 2] if (tweet_full := (msg.content[0].text)) else ""
 
           client = tweepy.Client(
               consumer_key=os.environ["X_API_KEY"],
