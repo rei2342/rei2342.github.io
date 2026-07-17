@@ -2,7 +2,7 @@ name: Daily Article Drafter
 
 on:
   schedule:
-    - cron: '0 21 * * *'
+    - cron: '0 21 */3 * *'   # 3日ごと 06:00 JST（月末で1回ズレる程度は許容）
   workflow_dispatch: {}
 
 jobs:
