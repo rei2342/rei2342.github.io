@@ -8,6 +8,12 @@
 - 設計図と実装手順は `playbook/` にある。全体像は `playbook/README.md`。
 - 既存の研究エンジン（`main.py` / `analyzers/` / `generators/`）は案件分析・投稿生成に使う下層ツール。
   playbook はその上の「月50万を12ヶ月安定させる運用レイヤー」。
+- **案件クローリング自動システム**（規約セーフ）: `.github/workflows/affiliate-collector.yml`。
+  毎週月曜9時JST（＋手動 workflow_dispatch）に `claude -p` ＋ WebSearch/WebFetch で
+  英語×留学ニッチの新規案件を**公開情報のみ**から発見し、
+  `playbook/workspace/program_candidates.csv`（機械可読）と `program_candidates.md`（申請おすすめTOP＋申請前チェック）を更新する。
+  **ASP会員エリアへのログイン/スクレイピングは絶対にしない**（BAN回避）。
+  承認難易度 low を上位に出す。承認された候補は CLAUDE.md の主力/稼働中リストへ手動で昇格させる。
 
 ## 運用は2路線（路線で分ける／トーンが逆向きなので絶対に混ぜない）
 
