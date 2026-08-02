@@ -280,6 +280,7 @@ jobs:
           html = markdown2.markdown(content, extras=['fenced-code-blocks', 'tables', 'break-on-newline'])
 
           # アフィリエイトCTAボックスを生成時に自動挿入（手動トリガー不要に）
+          topic = 'default'
           try:
               sys.path.insert(0, "affiliate-research-engine/playbook/scripts")
               import affiliate_inserter as af
@@ -295,6 +296,19 @@ jobs:
           if slug:
               payload['slug'] = slug
               print(f"slug: {slug}")
+
+          # トピックに対応するカテゴリを付ける。Uncategorized のまま溜めない。
+          try:
+              import wp_categorizer as wc
+              cats = wc.get_categories()
+              cat = wc.pick_category(topic, cats)
+              if cat:
+                  payload['categories'] = [cat['id']]
+                  print(f"category: {cat['name']} (id={cat['id']})")
+              else:
+                  print(f"category: 該当なし (topic={topic})")
+          except Exception as e:
+              print(f"category skipped: {e}")
 
           resp = requests.post(
               'https://sakura-eigo.com/wp-json/wp/v2/posts',
