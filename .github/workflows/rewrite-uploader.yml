@@ -1,0 +1,64 @@
+name: 検証済みリライトをWPへ反映
+
+# workspace/rewrites/ にある確認済みのHTMLをそのままWordPressへ載せる。
+# article-rewriter を LIVE で回すと本文を作り直してしまい、確認したものと
+# 別の記事が載る。生成と反映を分けて、見たものだけを載せる。
+# title / status / slug は送らないので、タイトル・公開状態・URLは変わらない。
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_ids:
+        description: '対象の記事ID（カンマ区切り）'
+        required: true
+      dry_run:
+        description: 'ドライラン（検査だけしてWPは更新しない）'
+        type: boolean
+        default: true
+
+concurrency:
+  group: wp-write
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests anthropic -q
+
+      - name: Upload rewrites to WordPress
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          TARGET_IDS: ${{ inputs.target_ids }}
+          MIN_CHARS: '5000'
+        run: python affiliate-research-engine/playbook/scripts/rewrite_uploader.py
+
+      - name: Commit report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/rewrites/UPLOAD_REPORT.md || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: rewrite upload report $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
