@@ -81,12 +81,31 @@ def get_post(post_id):
     r = requests.get(
         f"{WP_BASE}/posts/{post_id}",
         auth=(WP_USER, WP_PASS),
-        params={"_fields": "id,title,categories"},
+        params={"_fields": "id,title,categories,content"},
         headers={"User-Agent": "Mozilla/5.0"},
         verify=False,
         timeout=30,
     )
     return r.json() if r.status_code == 200 else None
+
+
+def classify_post(post):
+    """タイトルで判定し、決まらなければ本文で判定する。
+
+    classify() はタイトルだけを見るが、2026-08-02にタイトルを
+    「短い一人称＋数字」型へ書き換えた結果、判定に使うキーワード
+    （フィリピン・ワーホリ等）がタイトルから消えた。
+    本文には残っているので、既定値に落ちたときは本文で見直す。
+    """
+    title = post["title"]["rendered"]
+    topic = _ai.classify(title)
+    if topic != "default":
+        return topic, "タイトル"
+
+    body = re.sub(r"<[^>]+>", " ", post.get("content", {}).get("rendered", ""))
+    # 見出し付近に主題が出るので先頭を厚めに見る
+    topic = _ai.classify(body[:3000])
+    return topic, ("本文" if topic != "default" else "判定不能")
 
 
 def set_category(post_id, cat_id):
@@ -147,7 +166,7 @@ def main():
             continue
 
         title = post["title"]["rendered"]
-        topic = _ai.classify(title)
+        topic, src = classify_post(post)
         cat = pick_category(topic, cats)
 
         if not cat:
@@ -162,8 +181,9 @@ def main():
             skip += 1
             continue
 
-        print(f"[{pid}] {title[:34]} → {cat['name']} (topic={topic})")
-        report.append(f"- [{pid}] {title[:40]} → **{cat['name']}** (topic={topic})\n")
+        print(f"[{pid}] {title[:34]} → {cat['name']} (topic={topic}/{src})")
+        report.append(
+            f"- [{pid}] {title[:40]} → **{cat['name']}** (topic={topic}, 判定={src})\n")
 
         if DRY_RUN:
             ok += 1

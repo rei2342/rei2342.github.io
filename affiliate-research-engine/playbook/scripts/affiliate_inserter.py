@@ -244,7 +244,13 @@ def main():
             report.append(f"- [{post_id}] {title} — SKIPPED (内部メモ)\n")
             continue
 
-        topic   = classify(title)
+        # タイトルで判定し、既定値に落ちたら本文で見直す。
+        # 2026-08-02にタイトルを「短い一人称＋数字」型へ書き換えた結果、
+        # 判定キーワード（フィリピン・ワーホリ等）がタイトルから消えたため。
+        topic = classify(title)
+        if topic == "default":
+            body = re.sub(r"<[^>]+>", " ", content)
+            topic = classify(body[:3000])
 
         # 既存ボックスを除去 → そのトピックの全案件で1つの箱を作り直す（冪等・統合）
         base = strip_box(content)
