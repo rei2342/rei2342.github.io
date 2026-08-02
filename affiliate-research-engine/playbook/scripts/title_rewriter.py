@@ -123,7 +123,12 @@ def make_title(title, excerpt):
         messages=[{"role": "user", "content": PROMPT.format(title=title, excerpt=excerpt)}],
     )
     out = msg.content[0].text.strip()
-    out = out.split("\n")[0].strip().strip('"').strip("「」")
+    out = out.split("\n")[0].strip().strip('"')
+    # タイトル全体が「」で囲まれている場合だけ外す。
+    # 無条件に strip すると本文中の正当な引用符（例: 「意味ない」を5回検索）まで
+    # 剥がれて片方だけ残るので、対応が取れている場合に限る。
+    if out.startswith("「") and out.endswith("」") and out.count("「") == 1:
+        out = out[1:-1]
     out = out.replace("——", "、").replace("—", "、")
     return out.rstrip("。.")
 

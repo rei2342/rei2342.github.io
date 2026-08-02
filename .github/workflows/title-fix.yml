@@ -1,0 +1,47 @@
+name: タイトルを個別修正
+
+# workspace/title_rewrites/fixes.json に書いた {記事ID: タイトル} をそのまま反映する。
+# 一括生成の不具合の手当てや、人間が決めたタイトルの反映に使う。
+# スラッグは送らないのでURLは変わらない。
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'ドライラン（差分を出すだけでWPは更新しない）'
+        type: boolean
+        default: true
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests -q
+
+      - name: Fix titles
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/title_fix.py
+
+      - name: Commit report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/title_rewrites/
+          git diff --staged --quiet || git commit -m "chore: title fix report $(date +%Y-%m-%d)"
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
