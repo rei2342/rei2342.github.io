@@ -36,11 +36,11 @@ LINKS = {
     ),
     "phil_navi": (
         "5640986",
-        '<a href="//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=83663"'
+        '<a href="//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992"'
         ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '<img src="//image.moshimo.com/af-img/6196/000000083663.png" width="300" height="250" style="border:none;" alt="フィリピン留学ナビ"></a>'
-        '<img src="//i.moshimo.com/af/i/impression?a_id=5640986&p_id=6385&pc_id=18040&pl_id=83663"'
-        ' width="1" height="1" style="border:none;" loading="lazy">'
+        '→ フィリピン留学ナビの無料相談会に申し込む</a>'
+        '<img src="//i.moshimo.com/af/i/impression?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992"'
+        ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
     "ugaku": (
         "5640988",
