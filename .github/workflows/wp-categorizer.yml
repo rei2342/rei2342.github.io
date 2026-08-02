@@ -1,0 +1,70 @@
+name: カテゴリを設定
+
+# 記事のトピック分類（affiliate_inserter.classify）にもとづいて、
+# サイトに実在するカテゴリへ振り分ける。
+# mode=list  … 実在カテゴリと対応表を出すだけ（変更しない）
+# mode=apply … TARGET_IDS の記事にカテゴリを設定する
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: '動作モード'
+        type: choice
+        options: [list, apply]
+        default: list
+      target_ids:
+        description: '対象の記事ID（カンマ区切り。mode=apply のとき必須）'
+        required: false
+        default: ''
+      dry_run:
+        description: 'ドライラン（設定内容を出すだけ）'
+        type: boolean
+        default: true
+
+concurrency:
+  group: wp-write
+  cancel-in-progress: false
+
+jobs:
+  categorize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests anthropic -q
+
+      - name: Categorize
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          MODE: ${{ inputs.mode }}
+          TARGET_IDS: ${{ inputs.target_ids }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/wp_categorizer.py
+
+      - name: Commit report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/categories/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: category report $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
