@@ -14,13 +14,12 @@
 |---|---|
 | philippines | 海外留学・ワーホリ (id=6) |
 | workingholiday | 海外留学・ワーホリ (id=6) |
-| agent_general | 海外留学・ワーホリ (id=6) |
-| agent_free | 海外留学・ワーホリ (id=6) |
+| study_abroad | 海外留学・ワーホリ (id=6) |
+| agent | 海外留学・ワーホリ (id=6) |
+| domestic | 海外留学・ワーホリ (id=6) |
 | coaching | 英語コーチング (id=5) |
-| toeic | 該当なし（設定しない） |
+| toeic | 英語学習法 (id=4) |
+| pronunciation | 英語学習法 (id=4) |
 | training | 英語学習法 (id=4) |
-| habit | 英会話サービス比較 (id=7) |
-| work_english | 該当なし（設定しない） |
-| hours_2000 | 英語学習法 (id=4) |
-| cost | 該当なし（設定しない） |
-| default | 英語コーチング (id=5) |
+| eikaiwa | 英会話サービス比較 (id=7) |
+| default | 英語学習法 (id=4) |
