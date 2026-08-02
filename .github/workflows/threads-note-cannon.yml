@@ -1,0 +1,62 @@
+name: Threads / note Cannon
+
+# 勝ちループ（Threads 3行フック → note 数字告白 → アフィ記事）の量産ライン。
+# 2026-08-01の検証で勝った型を踏襲して、note原稿とThreads投稿文をセットで生成する。
+# Threads APIは未接続のため自動投稿はしない（実運用どおり、生成 → 人間が手直しして投稿）。
+# 生成物: playbook/workspace/threads/YYYY-MM-DD.md
+
+on:
+  schedule:
+    - cron: '0 21 * * 1,4'   # 月・木 06:00 JST
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: '今回のテーマ（任意。空ならTOEIC優先で自動選択）'
+        required: false
+        default: ''
+
+jobs:
+  cannon:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Generate note + Threads set
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          TOPIC: ${{ github.event.inputs.topic }}
+        run: |
+          claude -p "田中さくらのnote原稿とThreads投稿文をセットで生成する。2026-08-01の検証で勝った型を必ず踏襲すること。
+
+          手順:
+          1. affiliate-research-engine/playbook/workspace/reports/reaction-analysis_2026-08-01.md と affiliate-research-engine/CLAUDE.md を読み、勝ちフォーマットとさくらのペルソナ・トーン・NGを把握する。
+          2. テーマを決める。環境変数 TOPIC (\$TOPIC) が空でなければそれを使う。空なら勝ちトピックであるTOEIC系を優先して選ぶ(TOEICが直近3回連続で続いていたら留学/ワーホリ/オンライン英会話に振る)。affiliate-research-engine/playbook/workspace/threads/ の既存ファイルを見て、直近と同じ切り口の重複を避ける。
+          3. note原稿を書く。タイトルは30〜45字の短い一人称+数字型(例『TOEIC 600点で2年止まった私が、やめた3つのことと、やり直した1つのこと』)。リードは数字を主役にした一人称の告白から入る(例『595点、610点、600点。3回受けても動かなかった』)。引き算フレーム(やめたN個のこと)を構成の軸にする。本文は2000〜3000字。芯は共感(あなたのせいでなく型のせい)+意外な真因+小さく動ける一歩。150字級の抽象・反論エッセイ型タイトルは禁止。
+          4. Threads投稿文を書く。3行フックで始める: 1行目=今の状態(数字入り)、2行目=試したこと、3行目=意外な真因のtease(『〜じゃなかった』で止める)。500字以内だが短いほど良い。句点で静かに区切る告白トーン。押し売り禁止。末尾はnoteへのやわらかい導線(『続きはnoteに書いた』程度)。ハッシュタグ・URL羅列なし。
+          5. 添えるビジュアル案を1つ書く(スコア推移・費用表・before/afterなど、数字が見える画像)。CLAUDE.mdのアイキャッチ様式に沿ったChatGPT生成プロンプトも添える。
+          6. note→どのアフィリエイト記事(sakura-eigo.com)へ繋ぐかの導線案を書く。紐付ける案件は稼働中のもののみ(TOEIC/コーチング/発音系ならspeekとスパトレ、留学/ワーホリなら留学情報館とU-GAKU、フィリピンならフィリピン留学ナビとCEBRIDGE、オンライン英会話ならDMM英会話)。未承認の案件(スタディサプリ等)のリンクは絶対に作らない。
+          7. 全体NG厳守: 「——」(emダッシュ)禁止、漢数字禁止(アラビア数字)、冒頭挨拶禁止、同語尾3連続禁止、誇大・断定表現禁止(薬機法/景表法)。
+          8. affiliate-research-engine/playbook/workspace/threads/\$(date +%Y-%m-%d).md に、## note原稿 / ## Threads投稿文 / ## ビジュアル案 / ## アフィ導線 の見出しで保存する(ディレクトリが無ければ作る)。" \
+            --allowedTools "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch" \
+            --dangerously-skip-permissions
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/threads/
+          git diff --staged --quiet || git commit -m "chore: threads/note set $(date -u +%Y-%m-%d)"
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
