@@ -237,6 +237,13 @@ def main():
 
         title   = post["title"]["rendered"]
         content = post["content"]["rendered"]
+
+        # 内部メモ（Threads投稿文の下書き等）は記事ではないのでCTAを入れない
+        if any(mark in title for mark in ("【Threads用】", "【メモ】", "【社内")):
+            print(f"  - スキップ（内部メモ）: {title}")
+            report.append(f"- [{post_id}] {title} — SKIPPED (内部メモ)\n")
+            continue
+
         topic   = classify(title)
 
         # 既存ボックスを除去 → そのトピックの全案件で1つの箱を作り直す（冪等・統合）
