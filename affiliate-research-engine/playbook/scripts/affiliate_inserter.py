@@ -82,14 +82,18 @@ LINKS = {
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
+    "nativecamp_ryugaku": (
+        "a8_s00000014758002",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE" rel="nofollow">→ ネイティブキャンプ留学で留学費用の無料見積もりを取る</a><img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=4B9W9D+27S3UA+35VG+BWVTE" alt="" loading="lazy">'
+    ),
 }
 
 # ── Topic → max 2 programs, priority order ────────────────────────────────────
 TOPIC_MAP = {
     "philippines":    ["phil_navi", "cebridge"],
-    "workingholiday": ["johokan", "ugaku"],
-    "study_abroad":   ["johokan", "ugaku"],
-    "agent":          ["johokan", "ugaku"],
+    "workingholiday": ["nativecamp_ryugaku", "johokan"],
+    "study_abroad":   ["nativecamp_ryugaku", "johokan"],
+    "agent":          ["nativecamp_ryugaku", "johokan"],
     "coaching":       ["speek", "sptr"],
     "toeic":          ["speek", "sptr"],
     "pronunciation":  ["speek", "sptr"],
