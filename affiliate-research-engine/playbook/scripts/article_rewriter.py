@@ -19,40 +19,31 @@ OUT_DIR  = Path("affiliate-research-engine/playbook/workspace/rewrites")
 
 TARGET_IDS = [27, 67, 64, 61, 19, 18, 32, 42, 40, 41, 37, 33, 28, 23]
 
-# ── Affiliate links ───────────────────────────────────────────────────────────
-LINKS = {
-    "speek": '<a href="//af.moshimo.com/af/c/click?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>→ スピークの無料トライアルを試す（完全無料・AI英会話）</a><img src="//i.moshimo.com/af/i/impression?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056" width="1" height="1" style="border:none;" loading="lazy">',
-    "phil_navi": '<a href="//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>フィリピン留学ナビで無料相談を予約する（完全無料）</a><img src="//i.moshimo.com/af/i/impression?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992" width="1" height="1" style="border:none;" loading="lazy">',
-    "ugaku":    '<a href="//af.moshimo.com/af/c/click?a_id=5640988&p_id=4449&pc_id=11553&pl_id=59973&url=https%3A%2F%2Fu-gaku.jp%2F%3Futm_source%3Dmoshimo%26utm_medium%3Daffiliate%26utm_campaign%3Dimg01" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>→ U-GAKUで無料オンライン個別相談を予約する（完全無料）</a><img src="//i.moshimo.com/af/i/impression?a_id=5640988&p_id=4449&pc_id=11553&pl_id=59973" width="1" height="1" style="border:none;" loading="lazy">',
-    "johokan":  '<a href="//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F%2Fwww.ryugaku-johokan.com%2Findex_mr.php%3Futm_source%3Dmoshimo%26utm_medium%3Daffiliate%26utm_campaign%3Dcounseling" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>→ 留学情報館で無料カウンセリングを申し込む（完全無料）</a><img src="//i.moshimo.com/af/i/impression?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884" width="1" height="1" style="border:none;" loading="lazy">',
-    "cebridge":  '<a href="//af.moshimo.com/af/c/click?a_id=5640987&p_id=4201&pc_id=10658&pl_id=57293&url=https%3A%2F%2Fcebridge.jp%2F" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>→ CEBRIDGEでフィリピン留学の無料カウンセリングを予約する</a><img src="//i.moshimo.com/af/i/impression?a_id=5640987&p_id=4201&pc_id=10658&pl_id=57293" width="1" height="1" style="border:none;" loading="lazy">',
-    "liberty":  "<!-- LIBERTY_LINK_HERE -->",
-    "yumekana": "<!-- YUMEKANA_LINK_HERE -->",
-}
+# ── Affiliate links（affiliate_inserter.py を単一の情報源として参照）──────────
+# 却下・未承認の案件を混入させないため、リンク表とトピック分類はこちらに一本化する。
+sys.path.insert(0, str(Path(__file__).parent))
+import affiliate_inserter as _ai
 
+LINKS      = {k: v[1] for k, v in _ai.LINKS.items()}
 LINK_NAMES = {
-    "speek":    "スピーク（AI英会話）",
-    "phil_navi":"フィリピン留学ナビ",
-    "ugaku":    "U-GAKU（留学無料相談）",
-    "johokan":  "留学情報館（無料カウンセリング）",
-    "cebridge":  "CEBRIDGE（フィリピン留学）",
-    "liberty":  "LIBERTYコーチング",
-    "yumekana": "夢カナ留学",
+    "speek": "speek（発音矯正）",
+    "sptr": "スパトレ",
+    "dmm": "DMM英会話",
+    "phil_navi": "フィリピン留学ナビ",
+    "cebridge": "CEBRIDGE",
+    "ugaku": "U-GAKU（国内留学）",
+    "johokan": "留学情報館",
+    "nativecamp_ryugaku": "ネイティブキャンプ留学",
+    "qq_english": "QQ English",
+    "nativecamp": "ネイティブキャンプ",
+    "rarejob": "レアジョブ英会話",
+    "sapuri_nichijo": "スタディサプリENGLISH 新日常英会話コース",
+    "sapuri_setplan": "スタディサプリENGLISH 新日常英会話セットプラン",
 }
 
-# ── Topic → programs ──────────────────────────────────────────────────────────
-TOPIC_PROGRAMS = {
-    "toeic":        ["speek", "liberty"],
-    "coaching":     ["speek", "liberty"],
-    "hours_2000":   ["speek", "liberty"],
-    "work_english": ["speek", "liberty"],
-    "habit":        ["speek", "liberty"],
-    "philippines":  ["phil_navi", "cebridge", "ugaku"],
-    "agent_general":["ugaku", "johokan", "yumekana"],
-    "agent_free":   ["ugaku", "johokan", "yumekana"],
-    "cost":         ["ugaku", "johokan", "yumekana"],
-    "default":      ["speek"],
-}
+TOPIC_PROGRAMS = {k: list(v) for k, v in _ai.TOPIC_MAP.items()}
+
+
 
 # ── Structure types ───────────────────────────────────────────────────────────
 STRUCTURES = {
@@ -122,28 +113,19 @@ def strip_html(html):
     return re.sub(r'<[^>]+>', '', html)
 
 def classify(title, content_snippet):
-    # Use title only to avoid content keywords polluting classification
-    t = title.lower()
-    if "toeic" in t: return "toeic"
-    if "フィリピン" in t: return "philippines"
-    if "2000" in t: return "hours_2000"
-    if "エージェント" in t and "無料" in t: return "agent_free"
-    if "エージェント" in t: return "agent_general"
-    if "コーチング" in t: return "coaching"
-    if "仕事" in t and "英語" in t: return "work_english"
-    if "続かない" in t: return "habit"
-    if "費用" in t or "現実" in t: return "cost"
-    if "独学" in t: return "default"
-    if "上達" in t or "伸びない" in t: return "habit"
-    if "ワーホリ" in t or "貯金" in t: return "cost"
-    if "ビジネス英語" in t: return "work_english"
-    return "default"
+    """affiliate_inserter と同じ分類を使う（タイトルのみで判定）。"""
+    return _ai.classify(title)
+
 
 def existing_links(content):
+    """本文に既に入っている案件を検出する（リンク重複を避けるため）。"""
     found = set()
-    if "5640991" in content: found.add("speek")
-    if "5640986" in content: found.add("phil_navi")
+    for key, html in LINKS.items():
+        m = re.search(r'a_id=(\d+)', html) or re.search(r'a8mat=([A-Z0-9+]+)', html)
+        if m and m.group(1) in content:
+            found.add(key)
     return found
+
 
 def build_link_block(programs, already_present):
     lines = []
