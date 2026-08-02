@@ -1,0 +1,101 @@
+name: 案件を昇格（承認されたら実行）
+
+# ASPで提携が承認された案件を「稼働中」に登録する。
+# Actions画面のフォームに入力して実行するだけ。ターミナル不要。
+# 実行すると、以降その分野の記事に自動でその案件のリンクが入るようになる。
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: '案件名（例: スタディサプリENGLISH TOEIC）'
+        required: true
+      link:
+        description: 'ASPからコピーしたリンクのHTML（<a ...>〜</a> ごと貼る）'
+        required: true
+      topic:
+        description: 'どの分野の記事に出すか'
+        required: true
+        type: choice
+        options:
+          - toeic
+          - coaching
+          - pronunciation
+          - training
+          - eikaiwa
+          - study_abroad
+          - workingholiday
+          - agent
+          - philippines
+          - domestic
+          - default
+      asp:
+        description: 'ASP名（もしも / A8 / afb など）'
+        required: false
+        default: 'もしも'
+      reward:
+        description: '成果報酬（円・数字だけ）'
+        required: false
+        default: '0'
+      keywords:
+        description: '追加したい記事ネタ（カンマ区切り・任意）'
+        required: false
+        default: ''
+      dry_run:
+        description: '確認だけして書き換えない'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Promote
+        env:
+          IN_NAME: ${{ github.event.inputs.name }}
+          IN_LINK: ${{ github.event.inputs.link }}
+          IN_TOPIC: ${{ github.event.inputs.topic }}
+          IN_ASP: ${{ github.event.inputs.asp }}
+          IN_REWARD: ${{ github.event.inputs.reward }}
+          IN_KEYWORDS: ${{ github.event.inputs.keywords }}
+          IN_DRY: ${{ github.event.inputs.dry_run }}
+        run: |
+          # 案件名から内部キーを自動生成（英数字以外は除去、無ければ日付）
+          KEY=$(python3 -c "
+          import os, re, hashlib
+          n = os.environ['IN_NAME']
+          k = re.sub(r'[^a-zA-Z0-9]+', '_', n).strip('_').lower()
+          print(k if k else 'prog_' + hashlib.md5(n.encode()).hexdigest()[:8])
+          ")
+          echo "内部キー: $KEY"
+
+          ARGS=""
+          if [ "$IN_DRY" = "true" ]; then ARGS="--dry-run"; fi
+
+          cd affiliate-research-engine/playbook/scripts
+          python3 promote_program.py \
+            --key "$KEY" \
+            --name "$IN_NAME" \
+            --link "$IN_LINK" \
+            --topic "$IN_TOPIC" \
+            --asp "$IN_ASP" \
+            --reward "$IN_REWARD" \
+            --keywords "$IN_KEYWORDS" \
+            $ARGS
+
+      - name: Commit
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --staged --quiet || git commit -m "chore: 案件昇格 ${{ github.event.inputs.name }}"
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true

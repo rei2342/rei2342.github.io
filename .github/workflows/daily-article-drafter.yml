@@ -27,7 +27,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
         run: |
-          claude -p "affiliate-research-engine/playbook/workspace/keywords.csv の status=todo から1件キーワードを選び記事ドラフトを生成してください。手順: 1.keywords.csvのstatus=todoから1件選ぶ。2.そのキーワードでWeb検索しSERP上位の見出し構造・論点TOP5・抜け穴を分析。3.上位を抜く独自構造(H2x6,H3x各3)で4000字以上のドラフト生成。有益性ファースト:各H2に読者がすぐ使える具体策(手順・数字・実例のどれか)を必ず1つ入れる。批判や問題提起だけで終わらせず、各セクションと記事末は前向きな出口(次の一手)で締める。ネガティブ一辺倒にしない。NG:「〜について」「〜することが大切」禁止/箇条書きで逃げない/同語尾3連続禁止/冒頭挨拶禁止/「——」(emダッシュ・二倍ダッシュ)禁止(AIっぽい・挿入句は（）読点句点で)/漢数字でなくアラビア数字(27歳・3ヶ月・15万)。4.affiliate-research-engine/CLAUDE.mdの稼働中の案件・主要ペルソナを参照し実体験ディテール(数字・固有名詞)を差し込む。5.affiliate-research-engine/playbook/workspace/drafts/$(date +%Y-%m-%d).mdとして保存。6.keywords.csvの該当キーワードのstatusをtodo→doneに更新。" \
+          claude -p "affiliate-research-engine/playbook/workspace/keywords.csv の status=todo から1件キーワードを選び記事ドラフトを生成してください。手順: 1.keywords.csvのstatus=todoから1件選ぶ。2.そのキーワードでWeb検索しSERP上位の見出し構造・論点TOP5・抜け穴を分析。3.上位を抜く独自構造(H2x6,H3x各3)で4000字以上のドラフト生成。有益性ファースト:各H2に読者がすぐ使える具体策(手順・数字・実例のどれか)を必ず1つ入れる。批判や問題提起だけで終わらせず、各セクションと記事末は前向きな出口(次の一手)で締める。ネガティブ一辺倒にしない。★タイトルとリードは2026-08-01検証で勝った型を必ず踏襲する(詳細は playbook/workspace/reports/reaction-analysis_2026-08-01.md)。タイトルは30〜45字の短い一人称+数字型(例『TOEIC 600点から伸びない社会人が、2年の停滞を抜けた勉強の作り直し方』)にする。150字級の長い抽象・反論エッセイ型タイトル(『〜で並ぶ…は、どれも…を採点しているだけで、…に一行も答えない』型)は反応が薄いので禁止。リード文は数字を主役にした一人称の告白から入る(例『595点、610点、600点。3回受けてもスコアはほとんど動かなかった』)。可能なら引き算フレーム(やめたN個のこと)を構成に入れる。読者に渡す芯は共感(あなたのせいでなく型のせい)+意外な真因+小さく動ける一歩。NG:「〜について」「〜することが大切」禁止/箇条書きで逃げない/同語尾3連続禁止/冒頭挨拶禁止/「——」(emダッシュ・二倍ダッシュ)禁止(AIっぽい・挿入句は（）読点句点で)/漢数字でなくアラビア数字(27歳・3ヶ月・15万)。4.affiliate-research-engine/CLAUDE.mdの稼働中の案件・主要ペルソナを参照し実体験ディテール(数字・固有名詞)を差し込む。5.affiliate-research-engine/playbook/workspace/drafts/$(date +%Y-%m-%d).mdとして保存。6.keywords.csvの該当キーワードのstatusをtodo→doneに更新。" \
             --allowedTools "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch" \
             --dangerously-skip-permissions
 
@@ -81,6 +81,129 @@ jobs:
           print(f"Caption saved: {out_file}")
           PYEOF
 
+      - name: Generate Threads post from the article
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: |
+          pip install anthropic requests -q
+          python3 << 'PYEOF'
+          import os, datetime, re
+          import anthropic
+
+          date_str = datetime.date.today().strftime('%Y-%m-%d')
+          draft_file = f"affiliate-research-engine/playbook/workspace/drafts/{date_str}.md"
+
+          if not os.path.exists(draft_file):
+              print("draft not found; skip")
+              raise SystemExit(0)
+
+          raw = open(draft_file, encoding='utf-8').read()
+
+          # front matter を落として本文だけにする
+          body = re.sub(r'^---.*?^---\s*', '', raw, flags=re.DOTALL | re.MULTILINE)
+          # SERP分析メモ以降は社内用なので捨てる
+          body = re.split(r'^###?\s*SERP分析メモ', body, maxsplit=1, flags=re.MULTILINE)[0]
+
+          m = re.search(r'^title:\s*(.+)$', raw, re.MULTILINE) or re.search(r'^#\s+(.+)$', body, re.MULTILINE)
+          title = m.group(1).strip() if m else "英語学習"
+
+          # 記事が長いので冒頭を渡す（フックは冒頭に宿るため）
+          excerpt = body[:3000]
+
+          prompt = (
+              "あなたは田中さくら（27歳・営業事務・東京）。英語を5年後回しにしてきて、"
+              "過去にスクールで4.5万円を溶かした経験がある。30歳になる前に動こうとしている。\n\n"
+              f"下の記事から、Threadsの投稿文を作って。\n\n"
+              f"記事タイトル: {title}\n"
+              f"記事本文（冒頭）:\n{excerpt}\n\n"
+              "【必ず守る型（2026-08-01の検証で最も反応が良かった型）】\n"
+              "・3行フックで始める。1行目=今の状態（必ず具体的な数字を入れる）、"
+              "2行目=試したこと（替えた・入れた等）、3行目=意外な真因を『〜じゃなかった』で止めて続きを気にさせる\n"
+              "・記事の中から実際の数字を拾って使う（スコア・年数・金額）。数字が主役\n"
+              "・一人称の告白体。句点で静かに区切る。説教・情報提供臭を出さない\n"
+              "・短いほど良い（300字以内目安）\n"
+              "・末尾はnoteへのやわらかい導線（『続きはnoteに書いた』程度）。押し売り禁止\n"
+              "・ハッシュタグ・URL羅列は入れない\n"
+              "・「——」(emダッシュ)禁止。漢数字禁止（27歳・3ヶ月のようにアラビア数字）\n"
+              "・絵文字は入れても2個まで。無理に入れない\n\n"
+              "【出力形式】以下の3ブロックだけを出力する。説明不要。\n"
+              "===THREADS===\n（Threads投稿文）\n"
+              "===NOTE_TITLE===\n（noteのタイトル案。30〜45字の短い一人称+数字型。"
+              "150字級の抽象・反論エッセイ型は禁止）\n"
+              "===VISUAL===\n（添える画像の案を1行。スコア推移・費用表など数字が見えるもの）\n"
+          )
+
+          ai = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
+          msg = ai.messages.create(
+              model='claude-haiku-4-5-20251001',
+              max_tokens=800,
+              messages=[{'role': 'user', 'content': prompt}]
+          )
+          out = msg.content[0].text.strip().replace("——", "、").replace("—", "、")
+
+          def section(tag, text):
+              m = re.search(rf'==={tag}===\s*(.*?)(?====[A-Z_]+===|$)', text, re.DOTALL)
+              return m.group(1).strip() if m else ""
+
+          threads = section('THREADS', out)
+          note_title = section('NOTE_TITLE', out)
+          visual = section('VISUAL', out)
+
+          out_dir = "affiliate-research-engine/playbook/workspace/threads"
+          os.makedirs(out_dir, exist_ok=True)
+          out_file = f"{out_dir}/{date_str}.md"
+          with open(out_file, 'w', encoding='utf-8') as f:
+              f.write(f"# Threads / note セット -- {date_str}\n\n")
+              f.write(f"元記事: {title}\n")
+              f.write(f"元ドラフト: `{draft_file}`\n\n")
+              f.write("## Threads投稿文\n\n")
+              f.write((threads or out) + "\n\n")
+              if note_title:
+                  f.write("## note タイトル案\n\n" + note_title + "\n\n")
+              if visual:
+                  f.write("## ビジュアル案\n\n" + visual + "\n")
+          print(f"Threads set saved: {out_file}")
+
+          # ── WordPressの下書きにも出す（GitHubを見に行かなくて済むように）──
+          wp_pass = os.environ.get('WP_APP_PASSWORD', '')
+          if wp_pass and threads:
+              import requests, urllib3, html as htmlmod
+              urllib3.disable_warnings()
+
+              def block(label, text, mono=False):
+                  if not text:
+                      return ""
+                  style = ("background:#f6f6f6;padding:16px 20px;border-radius:6px;"
+                           "white-space:pre-wrap;font-size:1.05em;line-height:1.9")
+                  return (f"<h3>{label}</h3>\n<div style=\"{style}\">"
+                          f"{htmlmod.escape(text)}</div>\n")
+
+              body = (
+                  "<p style=\"color:#c0392b;font-weight:bold\">"
+                  "※これは投稿用メモです。公開せず、コピーして使ったら削除してください。</p>\n"
+                  + block("Threads投稿文（そのままコピー）", threads)
+                  + block("note タイトル案", note_title)
+                  + block("ビジュアル案", visual)
+                  + f"<p style=\"font-size:0.85em;color:#999\">元記事: {htmlmod.escape(title)}</p>"
+              )
+
+              try:
+                  r = requests.post(
+                      'https://sakura-eigo.com/wp-json/wp/v2/posts',
+                      auth=('rei.00pt2342@gmail.com', wp_pass),
+                      json={'title': f'【Threads用】{date_str}', 'content': body, 'status': 'draft'},
+                      headers={'User-Agent': 'Mozilla/5.0'},
+                      verify=False, timeout=30,
+                  )
+                  if r.status_code in (200, 201):
+                      print(f"Threads memo posted to WP: {r.json().get('link')}")
+                  else:
+                      print(f"WP post failed {r.status_code}: {r.text[:200]}")
+              except Exception as e:
+                  print(f"WP post skipped: {e}")
+          PYEOF
+
       - name: Commit draft and caption
         run: |
           git config user.name "github-actions[bot]"
@@ -88,6 +211,7 @@ jobs:
           git add affiliate-research-engine/playbook/workspace/drafts/
           git add affiliate-research-engine/playbook/workspace/keywords.csv
           git add affiliate-research-engine/playbook/workspace/instagram/
+          git add affiliate-research-engine/playbook/workspace/threads/
           git diff --staged --quiet || git commit -m "chore: daily article draft $(date +%Y-%m-%d)"
           git push
 
