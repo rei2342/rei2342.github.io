@@ -84,8 +84,9 @@ jobs:
       - name: Generate Threads post from the article
         env:
           ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
         run: |
-          pip install anthropic -q
+          pip install anthropic requests -q
           python3 << 'PYEOF'
           import os, datetime, re
           import anthropic
@@ -163,6 +164,44 @@ jobs:
               if visual:
                   f.write("## ビジュアル案\n\n" + visual + "\n")
           print(f"Threads set saved: {out_file}")
+
+          # ── WordPressの下書きにも出す（GitHubを見に行かなくて済むように）──
+          wp_pass = os.environ.get('WP_APP_PASSWORD', '')
+          if wp_pass and threads:
+              import requests, urllib3, html as htmlmod
+              urllib3.disable_warnings()
+
+              def block(label, text, mono=False):
+                  if not text:
+                      return ""
+                  style = ("background:#f6f6f6;padding:16px 20px;border-radius:6px;"
+                           "white-space:pre-wrap;font-size:1.05em;line-height:1.9")
+                  return (f"<h3>{label}</h3>\n<div style=\"{style}\">"
+                          f"{htmlmod.escape(text)}</div>\n")
+
+              body = (
+                  "<p style=\"color:#c0392b;font-weight:bold\">"
+                  "※これは投稿用メモです。公開せず、コピーして使ったら削除してください。</p>\n"
+                  + block("Threads投稿文（そのままコピー）", threads)
+                  + block("note タイトル案", note_title)
+                  + block("ビジュアル案", visual)
+                  + f"<p style=\"font-size:0.85em;color:#999\">元記事: {htmlmod.escape(title)}</p>"
+              )
+
+              try:
+                  r = requests.post(
+                      'https://sakura-eigo.com/wp-json/wp/v2/posts',
+                      auth=('rei.00pt2342@gmail.com', wp_pass),
+                      json={'title': f'【Threads用】{date_str}', 'content': body, 'status': 'draft'},
+                      headers={'User-Agent': 'Mozilla/5.0'},
+                      verify=False, timeout=30,
+                  )
+                  if r.status_code in (200, 201):
+                      print(f"Threads memo posted to WP: {r.json().get('link')}")
+                  else:
+                      print(f"WP post failed {r.status_code}: {r.text[:200]}")
+              except Exception as e:
+                  print(f"WP post skipped: {e}")
           PYEOF
 
       - name: Commit draft and caption
