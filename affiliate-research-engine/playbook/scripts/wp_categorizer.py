@@ -32,21 +32,21 @@ MODE = os.environ.get("MODE", "list")
 DRY_RUN = os.environ.get("DRY_RUN", "true").lower() == "true"
 OUT = Path("affiliate-research-engine/playbook/workspace/categories")
 
-# トピック → カテゴリを探すためのキーワード（優先順）。
-# WP側のカテゴリ名/スラッグにこの語が含まれていれば、それを使う。
-TOPIC_KEYWORDS = {
-    "philippines":   ["フィリピン", "セブ", "philippin", "cebu", "留学"],
-    "workingholiday": ["ワーホリ", "ワーキングホリデー", "working", "holiday", "留学"],
-    "agent_general": ["エージェント", "留学", "agent"],
-    "agent_free":    ["エージェント", "留学", "agent"],
-    "coaching":      ["コーチング", "coaching", "スクール"],
-    "toeic":         ["TOEIC", "toeic", "スコア", "試験"],
-    "training":      ["アプリ", "教材", "トレーニング", "学習", "勉強"],
-    "habit":         ["継続", "習慣", "オンライン英会話", "英会話"],
-    "work_english":  ["ビジネス", "仕事", "business"],
-    "hours_2000":    ["学習", "勉強", "時間"],
-    "cost":          ["費用", "お金", "料金", "cost"],
-    "default":       ["英語", "学習", "勉強"],
+# トピック → カテゴリ名。キーは affiliate_inserter.TOPIC_MAP と同じものを使う。
+# 部分一致で推測させると default が「英語コーチング」に吸われるなど事故るので、
+# サイトに実在する4カテゴリへ明示的に対応づける。
+TOPIC_CATEGORY = {
+    "philippines":    "海外留学・ワーホリ",
+    "workingholiday": "海外留学・ワーホリ",
+    "study_abroad":   "海外留学・ワーホリ",
+    "agent":          "海外留学・ワーホリ",
+    "domestic":       "海外留学・ワーホリ",   # 国内留学もこの箱しかない
+    "coaching":       "英語コーチング",
+    "toeic":          "英語学習法",
+    "pronunciation":  "英語学習法",
+    "training":       "英語学習法",
+    "eikaiwa":        "英会話サービス比較",
+    "default":        "英語学習法",
 }
 
 
@@ -63,12 +63,17 @@ def get_categories():
 
 
 def pick_category(topic, cats):
-    """トピックに最も合うカテゴリを選ぶ。見つからなければ None。"""
-    for kw in TOPIC_KEYWORDS.get(topic, []):
-        low = kw.lower()
-        for c in cats:
-            if low in c["name"].lower() or low in c["slug"].lower():
-                return c
+    """トピックに対応するカテゴリを返す。見つからなければ None（設定しない）。"""
+    want = TOPIC_CATEGORY.get(topic)
+    if not want:
+        return None
+    for c in cats:
+        if c["name"] == want:
+            return c
+    # カテゴリ名が変更された場合の保険。前方一致で拾う。
+    for c in cats:
+        if want[:4] in c["name"]:
+            return c
     return None
 
 
@@ -113,7 +118,7 @@ def main():
     lines.append("\n## トピック→カテゴリの対応\n\n")
     lines.append("| トピック | 割り当て先 |\n|---|---|\n")
     print("\nトピック→カテゴリの対応:")
-    for topic in TOPIC_KEYWORDS:
+    for topic in TOPIC_CATEGORY:
         c = pick_category(topic, cats)
         label = f"{c['name']} (id={c['id']})" if c else "該当なし（設定しない）"
         print(f"  {topic:16} → {label}")
