@@ -1,0 +1,53 @@
+name: タイトルを勝ち型に書き換え
+
+# 2026-08-01の検証で、150字級の抽象・反論エッセイ型タイトルは
+# 表示は取れてもクリック0だった。勝っていたのは短い一人称＋数字＋引き算型。
+# スラッグ（URL）は変更しないのでリンクは切れない。
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'ドライラン（提案だけ出してWPは更新しない）'
+        type: boolean
+        default: true
+      keep_under:
+        description: 'この文字数以下のタイトルは触らない'
+        default: '56'
+        required: false
+
+jobs:
+  rewrite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests anthropic -q
+
+      - name: Rewrite titles
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          KEEP_UNDER: ${{ inputs.keep_under }}
+        run: python affiliate-research-engine/playbook/scripts/title_rewriter.py
+
+      - name: Commit report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/title_rewrites/
+          git diff --staged --quiet || git commit -m "chore: title rewrite report $(date +%Y-%m-%d)"
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
