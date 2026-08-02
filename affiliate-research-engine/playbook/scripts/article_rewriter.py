@@ -19,6 +19,14 @@ OUT_DIR  = Path("affiliate-research-engine/playbook/workspace/rewrites")
 
 TARGET_IDS = [27, 67, 64, 61, 19, 18, 32, 42, 40, 41, 37, 33, 28, 23]
 
+# 環境変数 TARGET_IDS で対象を上書きできる（例: "292,289,286"）。
+# フェーズごとに対象を切り替えて流すため。
+if os.environ.get("TARGET_IDS", "").strip():
+    TARGET_IDS = [int(x) for x in os.environ["TARGET_IDS"].replace(" ", "").split(",") if x]
+
+MODEL = os.environ.get("REWRITE_MODEL", "claude-opus-4-8")
+MIN_CHARS = int(os.environ.get("MIN_CHARS", "4000"))
+
 # ── Affiliate links（affiliate_inserter.py を単一の情報源として参照）──────────
 # 却下・未承認の案件を混入させないため、リンク表とトピック分類はこちらに一本化する。
 sys.path.insert(0, str(Path(__file__).parent))
@@ -138,7 +146,7 @@ def build_link_block(programs, already_present):
             lines.append(f"- {name}: 本文で言及した直後にこのHTMLをそのまま挿入:\n  {html}")
     return "\n".join(lines)
 
-def rewrite(title, content_html, topic):
+def rewrite(title, content_html, topic, retry_issues=None):
     structure  = STRUCTURES.get(topic, STRUCTURES["default"])
     programs   = TOPIC_PROGRAMS.get(topic, ["speek"])
     already    = existing_links(content_html)
@@ -154,25 +162,85 @@ def rewrite(title, content_html, topic):
 {snippet}
 
 ## 要件
-1. 4000字以上のHTML（<h2>/<h3>/<p>/<hr>タグのみ）
-2. H2×6、H3×各2〜3（**現在の記事と異なるH2テーマ**を使う）
+1. {MIN_CHARS}字以上のHTML（<h2>/<h3>/<p>/<hr>タグのみ）
+2. **現在の記事と異なるH2テーマ**を使う
 3. さくらのエピソードは現在の記事と**別のシーン・別の失敗**を使う
 4. 数字はすべてアラビア数字（27歳・3ヶ月・25万円）
 5. アフィリエイトリンク:
 {link_block}
 
+## ★AIっぽさ排除（既存53本の実測から策定・最優先で守る）
+既存記事を計測したら、53本すべてが同じ語彙・同じ骨格でできていた。これが最大の弱点。
+- **「ではなく」「〜のほうだ」は記事全体で2回まで**（既存は1本あたり平均11回、最多22回）
+- **「設計」「構造」「物差し」「本質」は各1回まで**（既存は「設計」が1本で最多22回）
+- **『「〈検索キーワード〉」で検索する人は…』という書き出しを使わない**（既存は49/53本がこの型）。
+  情景・数字・体験の一場面から始める。読者がいる具体的な場面を1行目に置く
+- **H2の本数を固定しない。内容に応じて4〜7本で決める**（既存は3本か6本の2種類しかなかった）。
+  H3の数も各H2で揃えず、必要な数だけ置く
+- 見出しに「H2-1｜」のような**採番ラベルを付けない**
+- **スクールで4.5万円溶かした話は記事全体で1回まで**（全記事共通のプロフィールなので使い回すと同じ顔になる）
+- **「上位記事はXと言うが本当はYだ」という論法だけで押し切らない**。
+  体験ログ型・比較検証型・失敗告白型・手順型など、記事ごとに骨格そのものを変える
+- 「つまり」「結局」「一行も」「そのものが」を多用しない
+- 同じ段落構造（短い断定→逆接→言い換え）を繰り返さない。段落の長さに緩急をつける
+
 HTMLのみ出力。前置き・説明・```マーカー不要。"""
 
+    if retry_issues:
+        prompt += (
+            "\n\n## 直前の生成で以下に違反した。今度は必ず守ること\n"
+            + "\n".join(f"- {i}" for i in retry_issues)
+        )
+
     msg = CLAUDE.messages.create(
-        model="claude-opus-4-8",
-        max_tokens=8000,
-        system="アフィリエイトブログ「sakura-eigo.com」ライター。ペルソナ: 田中さくら/27歳/営業事務/東京/英語5年後回し/スクール失敗4.5万/30歳タイムリミット。NG: 「〜について」禁止/箇条書き逃げ禁止/同語尾3連続禁止/冒頭挨拶禁止/漢数字禁止/誇大虚偽禁止。",
+        model=MODEL,
+        max_tokens=16000,
+        system="アフィリエイトブログ「sakura-eigo.com」ライター。ペルソナ: 田中さくら/27歳/営業事務/東京/英語5年後回し/スクール失敗4.5万/30歳タイムリミット。NG: 「〜について」禁止/箇条書き逃げ禁止/同語尾3連続禁止/冒頭挨拶禁止/漢数字禁止/誇大虚偽禁止/「——」(emダッシュ)禁止。★AIっぽさ排除を最優先: 「ではなく」「〜のほうだ」は記事全体で2回まで、「設計」「構造」「物差し」「本質」は各1回まで、検索キーワードのかぎ括弧で書き出さない、H2の本数を固定せず内容に応じて4〜7本、4.5万円のスクール失敗談は1回まで、「上位記事はXと言うが本当はYだ」の論法だけで押し切らない。",
         messages=[{"role": "user", "content": prompt}]
     )
     result = msg.content[0].text.strip()
     result = re.sub(r'^```html?\n?', '', result)
     result = re.sub(r'\n?```$', '', result)
     return fix_kanji(result)
+
+def audit(html):
+    """生成物がAIっぽさ排除ルールを守れているか検査する。
+    守れていない項目を文字列のリストで返す（空なら合格）。"""
+    text = strip_html(html)
+    issues = []
+
+    n = text.count("ではなく") + text.count("のほうだ")
+    if n > 2:
+        issues.append(f"対比構文が{n}回（上限2）")
+
+    for w in ("設計", "構造", "物差し", "本質"):
+        c = text.count(w)
+        if c > 1:
+            issues.append(f"「{w}」が{c}回（上限1）")
+
+    c = text.count("4.5万") + text.count("4万5千")
+    if c > 1:
+        issues.append(f"スクール失敗談が{c}回（上限1）")
+
+    h2 = len(re.findall(r"<h2", html))
+    if not 4 <= h2 <= 7:
+        issues.append(f"H2が{h2}本（4〜7本の範囲外）")
+
+    first = re.search(r"<p>(.+?)</p>", html, re.DOTALL)
+    if first and strip_html(first.group(1)).lstrip().startswith("「"):
+        issues.append("検索キーワードのかぎ括弧で書き出している")
+
+    if re.search(r"<h[23][^>]*>\s*H\d", html):
+        issues.append("見出しに採番ラベルが付いている")
+
+    if "——" in text:
+        issues.append("emダッシュが混入")
+
+    if len(text) < MIN_CHARS * 0.85:
+        issues.append(f"本文{len(text)}字（目標{MIN_CHARS}字に対して不足）")
+
+    return issues
+
 
 def get_post(post_id):
     r = requests.get(f"{WP_BASE}/posts/{post_id}",
@@ -207,9 +275,28 @@ def main():
         except Exception as e:
             print(f"  ✗ Rewrite error: {e}"); report.append(f"- [{post_id}] {title} — ERROR: {e}\n"); continue
 
+        # AIっぽさ検査。落ちたら指摘を渡して1回だけ書き直させる。
+        issues = audit(new_content)
+        if issues:
+            print(f"  ! 検査NG: {' / '.join(issues)} → 再生成")
+            try:
+                new_content = rewrite(title, content, topic, retry_issues=issues)
+                issues = audit(new_content)
+            except Exception as e:
+                print(f"  ✗ 再生成エラー: {e}")
+
         out = OUT_DIR / f"{post_id}_{topic}.html"
         out.write_text(f"<!-- {post_id} | {title} | {topic} -->\n" + new_content)
         print(f"  ✓ Saved {out.name}")
+
+        if issues:
+            # 2回試して基準未達のものはWPに触らせない（劣化を防ぐ）
+            print(f"  ✗ 検査NGのまま: {' / '.join(issues)} — WP更新をスキップ")
+            report.append(f"- [{post_id}] {title} ({topic}) — SKIPPED 検査NG: {' / '.join(issues)}\n")
+            time.sleep(8)
+            continue
+
+        print("  ✓ 検査OK")
 
         if not DRY_RUN:
             ok = update_post(post_id, new_content)

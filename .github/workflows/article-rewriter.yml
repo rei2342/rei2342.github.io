@@ -7,11 +7,19 @@ on:
         description: 'ドライラン（ファイル保存のみ・WP更新なし）'
         type: boolean
         default: true
+      target_ids:
+        description: '対象の記事ID（カンマ区切り。空ならスクリプト既定の一覧）'
+        required: false
+        default: ''
+      min_chars:
+        description: '本文の目標文字数'
+        required: false
+        default: '4000'
 
 jobs:
   rewrite:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     permissions:
       contents: write
 
@@ -32,6 +40,8 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           DRY_RUN: ${{ inputs.dry_run }}
+          TARGET_IDS: ${{ inputs.target_ids }}
+          MIN_CHARS: ${{ inputs.min_chars }}
         run: python affiliate-research-engine/playbook/scripts/article_rewriter.py
 
       - name: Commit rewrites and report
