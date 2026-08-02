@@ -86,6 +86,10 @@ LINKS = {
         "a8_s00000014758002",
         '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE" rel="nofollow">→ ネイティブキャンプ留学で留学費用の無料見積もりを取る</a><img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=4B9W9D+27S3UA+35VG+BWVTE" alt="" loading="lazy">'
     ),
+    "qq_english": (
+        "a8_s00000020929001",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2IHWQA+4HHM+669JM" rel="nofollow">→ QQ English（セブ島発・教師は全員正社員）の無料体験レッスンを予約する</a><img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=4B9W9D+2IHWQA+4HHM+669JM" alt="" loading="lazy">'
+    ),
 }
 
 # ── Topic → max 2 programs, priority order ────────────────────────────────────
@@ -98,7 +102,7 @@ TOPIC_MAP = {
     "toeic":          ["speek", "sptr"],
     "pronunciation":  ["speek", "sptr"],
     "training":       ["sptr", "speek"],
-    "eikaiwa":        ["dmm", "speek"],   # オンライン英会話系は DMM 主力
+    "eikaiwa":        ["qq_english", "dmm"],   # オンライン英会話系は DMM 主力
     "domestic":       ["ugaku"],
     "default":        ["speek", "dmm"],   # 汎用にも DMM を露出（sptrはtoeic/training等で担保）
 }
