@@ -90,6 +90,22 @@ LINKS = {
         "a8_s00000020929001",
         '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2IHWQA+4HHM+669JM" rel="nofollow">→ QQ English（セブ島発・教師は全員正社員）の無料体験レッスンを予約する</a><img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=4B9W9D+2IHWQA+4HHM+669JM" alt="" loading="lazy">'
     ),
+    "nativecamp": (
+        "a8_s00000014758001",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28DJG2+35VG+64JTE" rel="nofollow">→ ネイティブキャンプ（予約不要・レッスン回数無制限）の無料トライアルを試す</a><img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4B9W9D+28DJG2+35VG+64JTE" alt="" loading="lazy">'
+    ),
+    "rarejob": (
+        "a8_s00000008409001",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" rel="nofollow">→ レアジョブ英会話（マンツーマン・早朝6時から深夜1時まで）の無料体験レッスンを受ける</a><img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" alt="" loading="lazy">'
+    ),
+    "sapuri_nichijo": (
+        "a8_s00000015388006",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" rel="nofollow">→ スタディサプリENGLISH 新日常英会話コースを無料体験する</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" alt="" loading="lazy">'
+    ),
+    "sapuri_setplan": (
+        "a8_s00000015388008",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" rel="nofollow">→ スタディサプリENGLISH 新日常英会話セットプラン（アプリ＋英会話）を無料で体験する</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" alt="" loading="lazy">'
+    ),
 }
 
 # ── Topic → max 2 programs, priority order ────────────────────────────────────
@@ -101,10 +117,13 @@ TOPIC_MAP = {
     "coaching":       ["speek", "sptr"],
     "toeic":          ["speek", "sptr"],
     "pronunciation":  ["speek", "sptr"],
-    "training":       ["sptr", "speek"],
-    "eikaiwa":        ["qq_english", "dmm"],   # オンライン英会話系は DMM 主力
+    "training":       ["sptr", "sapuri_nichijo"],    # スパトレ(第二言語習得論)＋スタサプ(アプリ学習)
+    "eikaiwa":        ["qq_english", "nativecamp"],  # QQ(確定率97.45%)＋NC(初成果ボーナス対象)
     "domestic":       ["ugaku"],
-    "default":        ["speek", "dmm"],   # 汎用にも DMM を露出（sptrはtoeic/training等で担保）
+    "default":        ["speek", "dmm"],              # 汎用は高単価speek＋DMMを露出
+    # 控え（LINKSには登録済み。実績を見て入れ替える）:
+    #   rarejob        … 確定率39%と低いため主力から外す。本人OK/セルフバック可なので原体験づくり用
+    #   sapuri_setplan … sapuri_nichijo と役割が重複するため控え
 }
 
 def classify(title):
