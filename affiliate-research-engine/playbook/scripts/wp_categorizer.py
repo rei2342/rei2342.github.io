@@ -98,14 +98,10 @@ def classify_post(post):
     本文には残っているので、既定値に落ちたときは本文で見直す。
     """
     title = post["title"]["rendered"]
-    topic = _ai.classify(title)
-    if topic != "default":
-        return topic, "タイトル"
-
-    body = re.sub(r"<[^>]+>", " ", post.get("content", {}).get("rendered", ""))
-    # 見出し付近に主題が出るので先頭を厚めに見る
-    topic = _ai.classify(body[:3000])
-    return topic, ("本文" if topic != "default" else "判定不能")
+    body = post.get("content", {}).get("rendered", "")
+    by_title = _ai.classify(title)
+    topic = _ai.classify_full(title, body)
+    return topic, ("タイトル" if topic == by_title else "本文で補正")
 
 
 def set_category(post_id, cat_id):

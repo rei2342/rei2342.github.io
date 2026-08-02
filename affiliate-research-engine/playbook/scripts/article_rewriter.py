@@ -162,8 +162,15 @@ def strip_html(html):
     return re.sub(r'<[^>]+>', '', html)
 
 def classify(title, content_snippet):
-    """affiliate_inserter と同じ分類を使う（タイトルのみで判定）。"""
-    return _ai.classify(title)
+    """affiliate_inserter と同じ分類を使う。
+
+    classify() はタイトルのキーワードで判定するが、2026-08-02に
+    タイトルを「短い一人称＋数字」型へ書き換えた結果、判定に使う語
+    （フィリピン・ワーホリ等）がタイトルから消えた。
+    既定値に落ちたら本文で判定し直す。ここを誤ると構成タイプも
+    アフィリエイト案件も間違ったものが入る。
+    """
+    return _ai.classify_full(title, content_snippet or "")
 
 
 def existing_links(content):
@@ -194,6 +201,11 @@ def rewrite(title, content_html, topic, retry_issues=None):
     link_block = build_link_block(programs, already)
     snippet    = strip_html(content_html)[:2000]
 
+    # 目標字数からH2の本数と1セクションあたりの分量を逆算して示す。
+    # 「N字以上」とだけ言うと届かないので、達成できる割り方を渡す。
+    h2_hint = "4〜6" if MIN_CHARS <= 5000 else "6〜7"
+    per_h2 = MIN_CHARS // (5 if MIN_CHARS <= 5000 else 6)
+
     prompt = f"""以下の記事を完全にリライトしてください。
 
 タイトル（変更禁止）: {title}
@@ -204,7 +216,9 @@ def rewrite(title, content_html, topic, retry_issues=None):
 
 ## 要件
 1. **タグを除いた本文が{MIN_CHARS}字以上**のHTML（<h2>/<h3>/<p>/<hr>タグのみ）。
-   これは下限であって目安ではない。短く終わらせず、各H2セクションに具体例・場面描写・数字を足して満たすこと
+   これは下限であって目安ではない。**{MIN_CHARS}字に届かない原稿は不合格**として弾かれる。
+   H2を{h2_hint}本立て、各H2の中身を{per_h2}字前後にすれば自然に届く。
+   薄いまま終わらせず、各セクションに「実際の場面の描写」「具体的な数字」「読者が今日できる手順」を入れて厚みを出すこと
 2. **現在の記事と異なるH2テーマ**を使う
 3. さくらのエピソードは現在の記事と**別のシーン・別の失敗**を使う
 4. **数字はすべてアラビア数字**。漢数字は一切使わない。

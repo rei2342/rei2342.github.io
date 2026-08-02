@@ -154,6 +154,47 @@ def classify(title):
         return "domestic"
     return "default"
 
+
+# 留学系はこのサイトの主力（ネイティブキャンプ留学・フィリピン留学ナビ等）。
+# ここを取り違えると案件も構成も外れるので、本文の証拠で救済する。
+_RYUGAKU = {"philippines", "workingholiday", "study_abroad", "agent", "domestic"}
+_RYUGAKU_SIGNALS = ("フィリピン", "セブ", "ワーホリ", "ワーキングホリデー",
+                    "留学エージェント", "語学学校", "海外移住")
+
+
+def classify_full(title, body=""):
+    """タイトルと本文の両方を見て分類する。
+
+    classify() はタイトルのキーワードだけを見る。2026-08-02に
+    タイトルを「短い一人称＋数字」型へ書き換えたことで判定語が
+    タイトルから消え、以下の2種類の取り違えが起きた。
+
+      1. 判定語がなく default に落ちる
+         例「帰国後の床がないまま、5校を比べた2ヶ月を捨てた」→ 実際はフィリピン留学
+      2. 別トピックの語を拾って誤判定する
+         例「TOEIC600点より先に…」→ toeic と出るが実際はワーホリ記事
+
+    本文は書き換えていないので判定語が残っている。本文を根拠に補正する。
+    """
+    topic = classify(title)
+    if not body:
+        return topic
+
+    text = re.sub(r"<[^>]+>", " ", body)[:4000]
+
+    if topic == "default":
+        return classify(text)
+
+    # 本文に留学系の語が繰り返し出るのに留学系でないなら、本文を採る。
+    # 1回だけの言及で乗っ取られないよう3回以上を条件にする。
+    if topic not in _RYUGAKU:
+        hits = sum(text.count(k) for k in _RYUGAKU_SIGNALS)
+        if hits >= 3:
+            body_topic = classify(text)
+            if body_topic in _RYUGAKU:
+                return body_topic
+    return topic
+
 # 既存CTAボックス（先頭の<hr>含む）を丸ごと除去する正規表現
 _BOX_RE = re.compile(
     r'(?:\s*<hr\s*/?>)?\s*'
@@ -244,13 +285,7 @@ def main():
             report.append(f"- [{post_id}] {title} — SKIPPED (内部メモ)\n")
             continue
 
-        # タイトルで判定し、既定値に落ちたら本文で見直す。
-        # 2026-08-02にタイトルを「短い一人称＋数字」型へ書き換えた結果、
-        # 判定キーワード（フィリピン・ワーホリ等）がタイトルから消えたため。
-        topic = classify(title)
-        if topic == "default":
-            body = re.sub(r"<[^>]+>", " ", content)
-            topic = classify(body[:3000])
+        topic = classify_full(title, content)
 
         # 既存ボックスを除去 → そのトピックの全案件で1つの箱を作り直す（冪等・統合）
         base = strip_box(content)
