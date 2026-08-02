@@ -81,6 +81,90 @@ jobs:
           print(f"Caption saved: {out_file}")
           PYEOF
 
+      - name: Generate Threads post from the article
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+        run: |
+          pip install anthropic -q
+          python3 << 'PYEOF'
+          import os, datetime, re
+          import anthropic
+
+          date_str = datetime.date.today().strftime('%Y-%m-%d')
+          draft_file = f"affiliate-research-engine/playbook/workspace/drafts/{date_str}.md"
+
+          if not os.path.exists(draft_file):
+              print("draft not found; skip")
+              raise SystemExit(0)
+
+          raw = open(draft_file, encoding='utf-8').read()
+
+          # front matter を落として本文だけにする
+          body = re.sub(r'^---.*?^---\s*', '', raw, flags=re.DOTALL | re.MULTILINE)
+          # SERP分析メモ以降は社内用なので捨てる
+          body = re.split(r'^###?\s*SERP分析メモ', body, maxsplit=1, flags=re.MULTILINE)[0]
+
+          m = re.search(r'^title:\s*(.+)$', raw, re.MULTILINE) or re.search(r'^#\s+(.+)$', body, re.MULTILINE)
+          title = m.group(1).strip() if m else "英語学習"
+
+          # 記事が長いので冒頭を渡す（フックは冒頭に宿るため）
+          excerpt = body[:3000]
+
+          prompt = (
+              "あなたは田中さくら（27歳・営業事務・東京）。英語を5年後回しにしてきて、"
+              "過去にスクールで4.5万円を溶かした経験がある。30歳になる前に動こうとしている。\n\n"
+              f"下の記事から、Threadsの投稿文を作って。\n\n"
+              f"記事タイトル: {title}\n"
+              f"記事本文（冒頭）:\n{excerpt}\n\n"
+              "【必ず守る型（2026-08-01の検証で最も反応が良かった型）】\n"
+              "・3行フックで始める。1行目=今の状態（必ず具体的な数字を入れる）、"
+              "2行目=試したこと（替えた・入れた等）、3行目=意外な真因を『〜じゃなかった』で止めて続きを気にさせる\n"
+              "・記事の中から実際の数字を拾って使う（スコア・年数・金額）。数字が主役\n"
+              "・一人称の告白体。句点で静かに区切る。説教・情報提供臭を出さない\n"
+              "・短いほど良い（300字以内目安）\n"
+              "・末尾はnoteへのやわらかい導線（『続きはnoteに書いた』程度）。押し売り禁止\n"
+              "・ハッシュタグ・URL羅列は入れない\n"
+              "・「——」(emダッシュ)禁止。漢数字禁止（27歳・3ヶ月のようにアラビア数字）\n"
+              "・絵文字は入れても2個まで。無理に入れない\n\n"
+              "【出力形式】以下の3ブロックだけを出力する。説明不要。\n"
+              "===THREADS===\n（Threads投稿文）\n"
+              "===NOTE_TITLE===\n（noteのタイトル案。30〜45字の短い一人称+数字型。"
+              "150字級の抽象・反論エッセイ型は禁止）\n"
+              "===VISUAL===\n（添える画像の案を1行。スコア推移・費用表など数字が見えるもの）\n"
+          )
+
+          ai = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
+          msg = ai.messages.create(
+              model='claude-haiku-4-5-20251001',
+              max_tokens=800,
+              messages=[{'role': 'user', 'content': prompt}]
+          )
+          out = msg.content[0].text.strip().replace("——", "、").replace("—", "、")
+
+          def section(tag, text):
+              m = re.search(rf'==={tag}===\s*(.*?)(?====[A-Z_]+===|$)', text, re.DOTALL)
+              return m.group(1).strip() if m else ""
+
+          threads = section('THREADS', out)
+          note_title = section('NOTE_TITLE', out)
+          visual = section('VISUAL', out)
+
+          out_dir = "affiliate-research-engine/playbook/workspace/threads"
+          os.makedirs(out_dir, exist_ok=True)
+          out_file = f"{out_dir}/{date_str}.md"
+          with open(out_file, 'w', encoding='utf-8') as f:
+              f.write(f"# Threads / note セット -- {date_str}\n\n")
+              f.write(f"元記事: {title}\n")
+              f.write(f"元ドラフト: `{draft_file}`\n\n")
+              f.write("## Threads投稿文\n\n")
+              f.write((threads or out) + "\n\n")
+              if note_title:
+                  f.write("## note タイトル案\n\n" + note_title + "\n\n")
+              if visual:
+                  f.write("## ビジュアル案\n\n" + visual + "\n")
+          print(f"Threads set saved: {out_file}")
+          PYEOF
+
       - name: Commit draft and caption
         run: |
           git config user.name "github-actions[bot]"
@@ -88,6 +172,7 @@ jobs:
           git add affiliate-research-engine/playbook/workspace/drafts/
           git add affiliate-research-engine/playbook/workspace/keywords.csv
           git add affiliate-research-engine/playbook/workspace/instagram/
+          git add affiliate-research-engine/playbook/workspace/threads/
           git diff --staged --quiet || git commit -m "chore: daily article draft $(date +%Y-%m-%d)"
           git push
 

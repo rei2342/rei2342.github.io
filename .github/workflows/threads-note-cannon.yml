@@ -7,7 +7,7 @@ name: Threads / note Cannon
 
 on:
   schedule:
-    - cron: '0 21 * * 1,4'   # 月・木 06:00 JST
+    - cron: '0 21 * * 6'   # 土 06:00 JST（記事と別軸で単発生成したい時の予備。主線は daily-article-drafter に統合済み）
   workflow_dispatch:
     inputs:
       topic:
