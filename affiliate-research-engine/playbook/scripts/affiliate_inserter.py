@@ -110,7 +110,8 @@ LINKS = {
 
 # ── Topic → max 2 programs, priority order ────────────────────────────────────
 TOPIC_MAP = {
-    "philippines":    ["phil_navi", "cebridge"],
+    # NC留学はセブのスクールを取り扱う（公式リリースで確認済み）ため主力に
+    "philippines":    ["nativecamp_ryugaku", "phil_navi"],
     "workingholiday": ["nativecamp_ryugaku", "johokan"],
     "study_abroad":   ["nativecamp_ryugaku", "johokan"],
     "agent":          ["nativecamp_ryugaku", "johokan"],
@@ -144,7 +145,10 @@ def classify(title):
         return "pronunciation"
     if any(k in t for k in ["オンライン英会話", "英会話", "DMM", "ネイティブ", "毎日 英語"]):
         return "eikaiwa"
-    if any(k in t for k in ["スパトレ", "トレーニング", "第二言語習得", "独学", "続かない", "アプリ"]):
+    if any(k in t for k in ["ビジネス英語", "仕事 英語", "会議"]):
+        return "eikaiwa"
+    if any(k in t for k in ["スパトレ", "トレーニング", "第二言語習得", "独学", "続かない", "アプリ",
+                            "モチベ", "ゼロから", "勉強法", "やり直し"]):
         return "training"
     if any(k in t for k in ["国内", "短期集中"]):
         return "domestic"
