@@ -183,15 +183,18 @@ def existing_links(content):
     return found
 
 
-def build_link_block(programs, already_present):
+def build_link_block(programs, already_present=None):
+    """挿入すべきリンクを列挙する。
+
+    以前は「元の本文にリンクがあれば重複を避けてテキストのみ言及」と
+    指示していたが、リライトは本文を丸ごと作り直すので元のリンクは
+    残らない。その結果、リンクが1本も入らない記事ができていた
+    （289・288が該当）。全面書き換えである以上、毎回入れさせる。
+    """
     lines = []
     for prog in programs[:3]:
-        name = LINK_NAMES[prog]
-        html = LINKS[prog]
-        if prog in already_present:
-            lines.append(f"- {name}: すでに挿入済み。テキストのみ言及（リンク重複不要）")
-        else:
-            lines.append(f"- {name}: 本文で言及した直後にこのHTMLをそのまま挿入:\n  {html}")
+        lines.append(
+            f"- {LINK_NAMES[prog]}: 本文で言及した直後にこのHTMLをそのまま挿入:\n  {LINKS[prog]}")
     return "\n".join(lines)
 
 def rewrite(title, content_html, topic, retry_issues=None):
@@ -274,7 +277,9 @@ HTMLのみ出力。前置き・説明・```マーカー不要。"""
 def audit(html):
     """生成物がAIっぽさ排除ルールを守れているか検査する。
     守れていない項目を文字列のリストで返す（空なら合格）。"""
-    text = strip_html(html)
+    # CTAボックスは全記事共通の定型文なので、文体の検査対象から外す。
+    # 箱の中の「さくらが確かめた・次の一手」を三人称と誤検知していた。
+    text = strip_html(_ai.strip_box(html))
     issues = []
 
     # 対比構文は密度で測る。旧記事は390字に1回という異常な密度だった。
@@ -327,6 +332,11 @@ def audit(html):
 
     if len(text) < MIN_CHARS * 0.85:
         issues.append(f"本文{len(text)}字（目標{MIN_CHARS}字に対して不足）")
+
+    # 収益導線が無い記事を作っても意味がないので、リンクの有無も見る。
+    links = len(re.findall(r"af\.moshimo\.com/af/c/click|px\.a8\.net/svt/ejp", html))
+    if links == 0:
+        issues.append("アフィリエイトリンクが1本も入っていない")
 
     return issues
 

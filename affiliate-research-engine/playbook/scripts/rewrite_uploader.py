@@ -23,6 +23,7 @@ urllib3.disable_warnings()
 
 sys.path.insert(0, str(Path(__file__).parent))
 import article_rewriter as _ar
+import affiliate_inserter as _ai
 
 WP_BASE = "https://sakura-eigo.com/wp-json/wp/v2"
 WP_USER = "rei.00pt2342@gmail.com"
@@ -71,7 +72,15 @@ def main():
 
         html = path.read_text(encoding="utf-8")
         # 先頭のコメント行（<!-- id | title | topic -->）は本文に含めない
+        head = re.match(r"^<!--(.*?)-->", html, flags=re.DOTALL)
+        title = head.group(1).split("|")[1].strip() if head and "|" in head.group(1) else ""
         body = re.sub(r"^<!--.*?-->\s*", "", html, count=1, flags=re.DOTALL)
+
+        # リライトは本文を丸ごと差し替えるので、他の記事に付いている
+        # 統一CTAボックスが消える。反映と同時に付け直して体裁を揃える。
+        topic = _ai.classify_full(title, body)
+        cta, progs = _ai.build_cta(topic)
+        body = _ai.strip_box(body) + cta
 
         issues = _ar.audit(body)
         if issues:
