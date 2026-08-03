@@ -1,0 +1,66 @@
+name: 下書きを公開
+
+# 公開は取り消しの効きにくい操作なので、出す前に機械で確かめる。
+# アイキャッチ・カテゴリ・本文量・CTAのどれかが欠けていれば公開しない。
+# 内部メモ（【Threads用】等）は対象から自動で外れる。
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_ids:
+        description: '公開する記事ID（カンマ区切り）'
+        required: true
+      dry_run:
+        description: 'ドライラン（確認だけして公開しない）'
+        type: boolean
+        default: true
+      min_chars:
+        description: '公開を許す本文の下限文字数'
+        required: false
+        default: '3000'
+
+concurrency:
+  group: wp-write
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests -q
+
+      - name: Publish
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          TARGET_IDS: ${{ inputs.target_ids }}
+          MIN_CHARS: ${{ inputs.min_chars }}
+        run: python affiliate-research-engine/playbook/scripts/wp_publisher.py
+
+      - name: Commit report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/publish/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: publish report $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
