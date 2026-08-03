@@ -141,6 +141,10 @@ jobs:
               messages=[{'role': 'user', 'content': prompt}]
           )
           out = msg.content[0].text.strip().replace("——", "、").replace("—", "、")
+          # 絵文字の直前の半角スペースを落とす（指示しても入ることがある）
+          out = re.sub(
+              r'(?<=[ぁ-んァ-ヴ一-龥ー、。！？…])[  ]+(?=[\U0001F000-\U0001FAFF☀-➿←-⇿⬀-⯿])',
+              '', out)
 
           def section(tag, text):
               m = re.search(rf'==={tag}===\s*(.*?)(?====[A-Z_]+===|$)', text, re.DOTALL)
