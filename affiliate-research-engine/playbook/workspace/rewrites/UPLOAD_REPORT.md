@@ -1,12 +1,10 @@
 # Rewrite Upload Report
 Mode: LIVE
 
-- [137] UPDATED（4633字）
-- [138] UPDATED（4505字）
-- [151] UPDATED（4562字）
-- [278] UPDATED（5439字）
+- [232] UPDATED（4546字）
+- [64] UPDATED（4493字）
 
 ## 集計
-- 反映: 4件
+- 反映: 2件
 - 検査NGで見送り: 0件
 - 失敗: 0件
