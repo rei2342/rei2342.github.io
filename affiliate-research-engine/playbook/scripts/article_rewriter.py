@@ -385,6 +385,12 @@ def main():
                 print(f"  ✗ 再生成エラー: {e}")
 
         out = OUT_DIR / f"{post_id}_{topic}.html"
+        # 分類が変わると別名のファイルができ、古い分類のものが残る。
+        # 名前順で拾うと古い方を反映してしまうので、1記事1ファイルに保つ。
+        for stale in OUT_DIR.glob(f"{post_id}_*.html"):
+            if stale != out:
+                stale.unlink()
+                print(f"  - 旧分類のファイルを削除: {stale.name}")
         out.write_text(f"<!-- {post_id} | {title} | {topic} -->\n" + new_content)
         print(f"  ✓ Saved {out.name}")
 

@@ -37,7 +37,18 @@ TARGET_IDS = [
 
 
 def find_file(post_id):
+    """その記事の生成物を1つだけ返す。
+
+    分類が変わると別名のファイルができる（305_toeic → 305_philippines）。
+    名前順で拾うと古い分類の本文を載せてしまうので、
+    複数ある場合は選ばずに止める。取り違えて公開するより安全。
+    """
     hits = sorted(SRC.glob(f"{post_id}_*.html"))
+    if len(hits) > 1:
+        names = ", ".join(h.name for h in hits)
+        print(f"[{post_id}] ✗ 生成物が{len(hits)}個ある（{names}）。"
+              f"どれが最新か判別できないので反映しない")
+        return None
     return hits[0] if hits else None
 
 
