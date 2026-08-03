@@ -12,9 +12,9 @@ on:
         required: false
         default: ''
       min_chars:
-        description: '本文の目標文字数'
+        description: '本文の目標文字数（5000が実績のある水準。6000以上は未達が増える）'
         required: false
-        default: '4000'
+        default: '5000'
 
 # 同じファイルを書くジョブが重なるとリベースで衝突し、生成結果が丸ごと失われる。
 # 実際に40分ぶんの生成が捨てられたので、多重起動は待たせる。
