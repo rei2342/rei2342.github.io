@@ -1,0 +1,55 @@
+name: Search Consoleの数字を取る
+
+# 記事別のアクセスを取得し、どの案件を載せた記事が読まれているかまで集計する。
+# ASPの管理画面では案件別の内訳しか出ないので、その手前を埋める。
+
+on:
+  schedule:
+    - cron: '0 22 * * 0'      # 毎週月曜 07:00 JST
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '集計する日数'
+        required: false
+        default: '28'
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests google-auth -q
+
+      - name: Fetch
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DAYS: ${{ inputs.days || '28' }}
+        run: python affiliate-research-engine/playbook/scripts/gsc_fetch.py
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/gsc/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: GSC report $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
