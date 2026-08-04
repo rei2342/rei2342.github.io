@@ -19,6 +19,7 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: write
+      issues: write
 
     steps:
       - name: Checkout
@@ -38,6 +39,39 @@ jobs:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           DAYS: ${{ inputs.days || '28' }}
         run: python affiliate-research-engine/playbook/scripts/gsc_fetch.py
+
+      # レポートはリポジトリに置くだけだと見に行かないと気づけない。
+      # Issue に投稿すると通知メールが届くので、開くだけで数字が読める。
+      - name: Issueに投稿
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY=affiliate-research-engine/playbook/workspace/gsc/LATEST.md
+          [ -f "$BODY" ] || { echo "レポートが無い"; exit 0; }
+
+          # 表示が0の週は読む価値がないので通知しない（毎週空メールが来ると見なくなる）
+          if grep -q '合計表示: \*\*0\*\*' "$BODY"; then
+            echo "データが0件のため通知しない"
+            exit 0
+          fi
+
+          # Issue本文の上限に収まるよう念のため切り詰める
+          head -c 60000 "$BODY" > /tmp/issue.md
+          printf '\n\n---\n自動生成。読んだら閉じてください。\n' >> /tmp/issue.md
+
+          # 本文にバッククォートや引用符が混ざるので jq に組み立てさせる
+          jq -n --arg t "週次レポート $(date +%Y-%m-%d) — Search Console" \
+                --rawfile b /tmp/issue.md \
+                '{title:$t, body:$b}' > /tmp/payload.json
+
+          curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues" \
+            -d @/tmp/payload.json \
+            | head -c 200
+          echo ""
 
       - name: Commit
         if: always()
