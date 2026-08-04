@@ -81,195 +81,6 @@ jobs:
           print(f"Caption saved: {out_file}")
           PYEOF
 
-      - name: Generate Threads post from the article
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
-          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
-        run: |
-          pip install anthropic requests -q
-          python3 << 'PYEOF'
-          import os, datetime, re
-          import anthropic
-
-          date_str = datetime.date.today().strftime('%Y-%m-%d')
-          draft_file = f"affiliate-research-engine/playbook/workspace/drafts/{date_str}.md"
-
-          if not os.path.exists(draft_file):
-              print("draft not found; skip")
-              raise SystemExit(0)
-
-          raw = open(draft_file, encoding='utf-8').read()
-
-          # front matter を落として本文だけにする
-          body = re.sub(r'^---.*?^---\s*', '', raw, flags=re.DOTALL | re.MULTILINE)
-          # SERP分析メモ以降は社内用なので捨てる
-          body = re.split(r'^###?\s*SERP分析メモ', body, maxsplit=1, flags=re.MULTILINE)[0]
-
-          m = re.search(r'^title:\s*(.+)$', raw, re.MULTILINE) or re.search(r'^#\s+(.+)$', body, re.MULTILINE)
-          title = m.group(1).strip() if m else "英語学習"
-
-          # 記事が長いので冒頭を渡す（フックは冒頭に宿るため）
-          excerpt = body[:3000]
-
-          prompt = (
-              "あなたは田中さくら（27歳・営業事務・東京）。英語を5年後回しにしてきて、"
-              "過去にスクールで4.5万円を溶かした経験がある。30歳になる前に動こうとしている。\n\n"
-              f"下の記事から、Threadsの投稿文を作って。\n\n"
-              f"記事タイトル: {title}\n"
-              f"記事本文（冒頭）:\n{excerpt}\n\n"
-              "【投稿はスレッド3連で作る】\n"
-              "1投稿目=フック。最後を『これだけ↓』のように次へ送る形で止める。リンクは入れない\n"
-              "2投稿目=中身。手順・結果・読者への翻訳。ここに価値を全部入れる\n"
-              "3投稿目=noteのリンクだけ（本文では書かない。こちらで差し込む）\n"
-              "1投稿目にリンクを入れると表示が伸びないので必ず分ける\n\n"
-              "【お手本】2026-08-04に人間が推敲して決めた理想形。この見た目と密度を再現する。\n"
-              "--- 1投稿目 ---\n"
-              "セブ島留学\n"
-              "8コマ入れて3日でパンクした\n"
-              "\n"
-              "授業を6コマに減らした\n"
-              "浮いた2時間はこれだけ↓\n"
-              "--- 2投稿目 ---\n"
-              "・その日出た表現を3つ選ぶ\n"
-              "・声に出して10回\n"
-              "・翌朝もう1回\n"
-              "\n"
-              "4日目\n"
-              "前の日の表現が勝手に口から出た\n"
-              "\n"
-              "日本でもできる\n"
-              "教材は増やさない\n"
-              "\n"
-              "学校選びは「1日何コマか」を見る\n"
-              "8コマは多い\n"
-              "\n"
-              "コマ数の話は長くなるからnoteに\n"
-              "---\n\n"
-              "【必ず守る型】\n"
-              "・**句点（。）を使わない**。改行が句点の代わり。お手本に句点は1つも無い\n"
-              "・**1行は20字前後**。読点（、）は1行に1個まで。1行に情報を2つ入れない\n"
-              "  （×『8コマ⇒6コマに減らして復習に2時間回した。』→ 2行に割る）\n"
-              "・意味のまとまりごとに**空行**を入れる\n"
-              "・**有益性が芯**。読者が今日できる手順を必ず入れる。\n"
-              "  手順は箇条書きで独立させ、真似できる粒度にする（『3つ選ぶ／10回／翌朝1回』のように数える形）\n"
-              "・**読者への翻訳を1行入れる**。体験談で終わらせず『日本でもできる』『◯◯を見る』など持ち帰れる形にする\n"
-              "・数字は**記事に実際に書かれているもの**だけ使う。作らない。\n"
-              "  冒頭に数字を3つ並べない（『35万円、120コマ、28日。』は演出になる）\n"
-              "・短いほど良い（300字以内目安）\n"
-              "・末尾はnoteへのやわらかい導線（『noteに書いた』程度）。押し売り禁止\n"
-              "・ハッシュタグ・URL羅列は入れない\n"
-              "【禁止】\n"
-              "・**対比構文**（『〜じゃなかった』『〜ではなく』『〜のほうだ』）は使わない\n"
-              "・**「設計」「構造」「物差し」「本質」**を使わない\n"
-              "・教訓や説教で締めない（×『27歳のいま動かないと30歳で後悔する』）\n"
-              "・感情を演出しない（×『泣きそうになった』）。事実を淡々と置けば感情は伝わる\n"
-              "・「——」(emダッシュ)禁止。漢数字禁止（27歳・3ヶ月のようにアラビア数字）\n"
-              "・金額の表記を混ぜない（35万円と45000円を同じ投稿に置かない）\n"
-              "・絵文字は入れても2個まで。無理に入れない。絵文字の直前に半角スペースを入れない(×『音声入力 💡』 ○『音声入力💡』)\n"
-              "・**記事に再現できる手順が無ければ、無理に作らず THREADS を空にする**。"
-              "有益性の無い投稿を出すより出さないほうがよい\n\n"
-              "【出力形式】以下のブロックだけを出力する。説明不要。\n"
-              "===THREADS_1===\n（1投稿目・フック。最後は『↓』で次へ送る。リンク禁止）\n"
-              "===THREADS_2===\n（2投稿目・中身。手順の箇条書きと読者への翻訳を必ず入れる）\n"
-              "===NOTE_TITLE===\n（noteのタイトル案。30〜45字の短い一人称+数字型。"
-              "150字級の抽象・反論エッセイ型は禁止）\n"
-              "===VISUAL===\n（添える画像の案を1行。スコア推移・費用表など数字が見えるもの）\n"
-          )
-
-          ai = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
-          msg = ai.messages.create(
-              model='claude-haiku-4-5-20251001',
-              max_tokens=800,
-              messages=[{'role': 'user', 'content': prompt}]
-          )
-          out = msg.content[0].text.strip().replace("——", "、").replace("—", "、")
-          # 絵文字の直前の半角スペースを落とす（指示しても入ることがある）
-          out = re.sub(
-              r'(?<=[ぁ-んァ-ヴ一-龥ー、。！？…])[  ]+(?=[\U0001F000-\U0001FAFF☀-➿←-⇿⬀-⯿])',
-              '', out)
-
-          def section(tag, text):
-              m = re.search(rf'==={tag}===\s*(.*?)(?====[A-Z_]+===|$)', text, re.DOTALL)
-              return m.group(1).strip() if m else ""
-
-          threads_1 = section('THREADS_1', out)
-          threads_2 = section('THREADS_2', out)
-          threads = (threads_1 + "\n\n" + threads_2).strip() if threads_2 else threads_1
-          note_title = section('NOTE_TITLE', out)
-          visual = section('VISUAL', out)
-
-          out_dir = "affiliate-research-engine/playbook/workspace/threads"
-          os.makedirs(out_dir, exist_ok=True)
-          out_file = f"{out_dir}/{date_str}.md"
-          with open(out_file, 'w', encoding='utf-8') as f:
-              f.write(f"# Threads / note セット -- {date_str}\n\n")
-              f.write(f"元記事: {title}\n")
-              f.write(f"元ドラフト: `{draft_file}`\n\n")
-              f.write("## ① 1投稿目（フック・リンクなし）\n\n")
-              f.write((threads_1 or out) + "\n\n")
-              if threads_2:
-                  f.write("## ② 2投稿目（スレッドに続けて投稿）\n\n")
-                  f.write(threads_2 + "\n\n")
-              f.write("## ③ 3投稿目（noteのリンクだけ）\n\n")
-              f.write("（noteのURLを貼る）\n\n")
-              if note_title:
-                  f.write("## note タイトル案\n\n" + note_title + "\n\n")
-              if visual:
-                  f.write("## ビジュアル案\n\n" + visual + "\n")
-          print(f"Threads set saved: {out_file}")
-
-          # ── WordPressの下書きにも出す（GitHubを見に行かなくて済むように）──
-          wp_pass = os.environ.get('WP_APP_PASSWORD', '')
-          if wp_pass and threads:
-              import requests, urllib3, html as htmlmod
-              urllib3.disable_warnings()
-
-              def block(label, text, mono=False):
-                  if not text:
-                      return ""
-                  style = ("background:#f6f6f6;padding:16px 20px;border-radius:6px;"
-                           "white-space:pre-wrap;font-size:1.05em;line-height:1.9")
-                  return (f"<h3>{label}</h3>\n<div style=\"{style}\">"
-                          f"{htmlmod.escape(text)}</div>\n")
-
-              body = (
-                  "<p style=\"color:#c0392b;font-weight:bold\">"
-                  "※これは投稿用メモです。公開せず、コピーして使ったら削除してください。</p>\n"
-                  + block("① 1投稿目（フック・リンクなし）", threads_1)
-                  + block("② 2投稿目（スレッドに続けて）", threads_2)
-                  + block("③ 3投稿目", "noteのURLだけを貼る")
-                  + block("note タイトル案", note_title)
-                  + block("ビジュアル案", visual)
-                  + f"<p style=\"font-size:0.85em;color:#999\">元記事: {htmlmod.escape(title)}</p>"
-              )
-
-              try:
-                  r = requests.post(
-                      'https://sakura-eigo.com/wp-json/wp/v2/posts',
-                      auth=('rei.00pt2342@gmail.com', wp_pass),
-                      json={'title': f'【Threads用】{date_str}', 'content': body, 'status': 'draft'},
-                      headers={'User-Agent': 'Mozilla/5.0'},
-                      verify=False, timeout=30,
-                  )
-                  if r.status_code in (200, 201):
-                      print(f"Threads memo posted to WP: {r.json().get('link')}")
-                  else:
-                      print(f"WP post failed {r.status_code}: {r.text[:200]}")
-              except Exception as e:
-                  print(f"WP post skipped: {e}")
-          PYEOF
-
-      - name: Commit draft and caption
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add affiliate-research-engine/playbook/workspace/drafts/
-          git add affiliate-research-engine/playbook/workspace/keywords.csv
-          git add affiliate-research-engine/playbook/workspace/instagram/
-          git add affiliate-research-engine/playbook/workspace/threads/
-          git diff --staged --quiet || git commit -m "chore: daily article draft $(date +%Y-%m-%d)"
-          git push
-
       - name: Post to WordPress as draft
         continue-on-error: true
         env:
@@ -375,7 +186,209 @@ jobs:
 
           if resp.status_code in (200, 201):
               print(f"Posted: {resp.json().get('id')} / {resp.json().get('link')}")
+              # Threads生成で使うので記事URLを渡す
+              with open('/tmp/article_url.txt', 'w') as uf:
+                  uf.write(resp.json().get('link', ''))
           else:
               print(f"Error {resp.status_code}: {resp.text[:300]}")
               sys.exit(1)
           PYEOF
+
+      - name: Generate Threads post from the article
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: |
+          pip install anthropic requests -q
+          python3 << 'PYEOF'
+          import os, datetime, re
+          import anthropic
+
+          date_str = datetime.date.today().strftime('%Y-%m-%d')
+          draft_file = f"affiliate-research-engine/playbook/workspace/drafts/{date_str}.md"
+
+          if not os.path.exists(draft_file):
+              print("draft not found; skip")
+              raise SystemExit(0)
+
+          raw = open(draft_file, encoding='utf-8').read()
+
+          # 直前のステップで投稿した記事のURL。どこから来た読者か分けて測れるよう印を付ける。
+          article_url = ""
+          if os.path.exists('/tmp/article_url.txt'):
+              u = open('/tmp/article_url.txt', encoding='utf-8').read().strip()
+              if u:
+                  article_url = u + ("&" if "?" in u else "?") + "utm_source=threads"
+          link_line = article_url or "（記事URLを貼る）"
+
+          # front matter を落として本文だけにする
+          body = re.sub(r'^---.*?^---\s*', '', raw, flags=re.DOTALL | re.MULTILINE)
+          # SERP分析メモ以降は社内用なので捨てる
+          body = re.split(r'^###?\s*SERP分析メモ', body, maxsplit=1, flags=re.MULTILINE)[0]
+
+          m = re.search(r'^title:\s*(.+)$', raw, re.MULTILINE) or re.search(r'^#\s+(.+)$', body, re.MULTILINE)
+          title = m.group(1).strip() if m else "英語学習"
+
+          # 記事が長いので冒頭を渡す（フックは冒頭に宿るため）
+          excerpt = body[:3000]
+
+          prompt = (
+              "あなたは田中さくら（27歳・営業事務・東京）。英語を5年後回しにしてきて、"
+              "過去にスクールで4.5万円を溶かした経験がある。30歳になる前に動こうとしている。\n\n"
+              f"下の記事から、Threadsの投稿文を作って。\n\n"
+              f"記事タイトル: {title}\n"
+              f"記事本文（冒頭）:\n{excerpt}\n\n"
+              "【投稿はスレッド3連で作る】\n"
+              "1投稿目=フック。最後を『これだけ↓』のように次へ送る形で止める。リンクは入れない\n"
+              "2投稿目=中身。手順・結果・読者への翻訳。ここに価値を全部入れる\n"
+              "3投稿目=記事のリンクだけ（本文では書かない。こちらで差し込む）\n"
+              "1投稿目にリンクを入れると表示が伸びないので必ず分ける\n\n"
+              "【お手本】2026-08-04に人間が推敲して決めた理想形。この見た目と密度を再現する。\n"
+              "--- 1投稿目 ---\n"
+              "セブ島留学\n"
+              "8コマ入れて3日でパンクした\n"
+              "\n"
+              "授業を6コマに減らした\n"
+              "浮いた2時間はこれだけ↓\n"
+              "--- 2投稿目 ---\n"
+              "・その日出た表現を3つ選ぶ\n"
+              "・声に出して10回\n"
+              "・翌朝もう1回\n"
+              "\n"
+              "4日目\n"
+              "前の日の表現が勝手に口から出た\n"
+              "\n"
+              "日本でもできる\n"
+              "教材は増やさない\n"
+              "\n"
+              "学校選びは「1日何コマか」を見る\n"
+              "8コマは多い\n"
+              "\n"
+              "コマ数の決め方はブログにまとめた\n"
+              "---\n\n"
+              "【必ず守る型】\n"
+              "・**句点（。）を使わない**。改行が句点の代わり。お手本に句点は1つも無い\n"
+              "・**1行は20字前後**。読点（、）は1行に1個まで。1行に情報を2つ入れない\n"
+              "  （×『8コマ⇒6コマに減らして復習に2時間回した。』→ 2行に割る）\n"
+              "・意味のまとまりごとに**空行**を入れる\n"
+              "・**有益性が芯**。読者が今日できる手順を必ず入れる。\n"
+              "  手順は箇条書きで独立させ、真似できる粒度にする（『3つ選ぶ／10回／翌朝1回』のように数える形）\n"
+              "・**読者への翻訳を1行入れる**。体験談で終わらせず『日本でもできる』『◯◯を見る』など持ち帰れる形にする\n"
+              "・数字は**記事に実際に書かれているもの**だけ使う。作らない。\n"
+              "  冒頭に数字を3つ並べない（『35万円、120コマ、28日。』は演出になる）\n"
+              "・短いほど良い（300字以内目安）\n"
+              "・最終行は**その投稿で扱った具体の続き**を予告する形にする\n"
+              "  （○『コマ数の決め方はブログにまとめた』『学校選びの基準はブログに書いた』）\n"
+              "  『noteに書いた』『続きはこちら』のような固定文言は使わない。押し売りもしない\n"
+              "・ハッシュタグ・URL羅列は入れない\n"
+              "【禁止】\n"
+              "・**対比構文**（『〜じゃなかった』『〜ではなく』『〜のほうだ』）は使わない\n"
+              "・**「設計」「構造」「物差し」「本質」**を使わない\n"
+              "・教訓や説教で締めない（×『27歳のいま動かないと30歳で後悔する』）\n"
+              "・感情を演出しない（×『泣きそうになった』）。事実を淡々と置けば感情は伝わる\n"
+              "・「——」(emダッシュ)禁止。漢数字禁止（27歳・3ヶ月のようにアラビア数字）\n"
+              "・金額の表記を混ぜない（35万円と45000円を同じ投稿に置かない）\n"
+              "・絵文字は入れても2個まで。無理に入れない。絵文字の直前に半角スペースを入れない(×『音声入力 💡』 ○『音声入力💡』)\n"
+              "・**記事に再現できる手順が無ければ、無理に作らず THREADS を空にする**。"
+              "有益性の無い投稿を出すより出さないほうがよい\n\n"
+              "【出力形式】以下のブロックだけを出力する。説明不要。\n"
+              "===THREADS_1===\n（1投稿目・フック。最後は『↓』で次へ送る。リンク禁止）\n"
+              "===THREADS_2===\n（2投稿目・中身。手順の箇条書きと読者への翻訳を必ず入れる）\n"
+              "===NOTE_TITLE===\n（noteのタイトル案。30〜45字の短い一人称+数字型。"
+              "150字級の抽象・反論エッセイ型は禁止）\n"
+              "===VISUAL===\n（添える画像の案を1行。スコア推移・費用表など数字が見えるもの）\n"
+          )
+
+          ai = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
+          msg = ai.messages.create(
+              model='claude-haiku-4-5-20251001',
+              max_tokens=800,
+              messages=[{'role': 'user', 'content': prompt}]
+          )
+          out = msg.content[0].text.strip().replace("——", "、").replace("—", "、")
+          # 絵文字の直前の半角スペースを落とす（指示しても入ることがある）
+          out = re.sub(
+              r'(?<=[ぁ-んァ-ヴ一-龥ー、。！？…])[  ]+(?=[\U0001F000-\U0001FAFF☀-➿←-⇿⬀-⯿])',
+              '', out)
+
+          def section(tag, text):
+              m = re.search(rf'==={tag}===\s*(.*?)(?====[A-Z_]+===|$)', text, re.DOTALL)
+              return m.group(1).strip() if m else ""
+
+          threads_1 = section('THREADS_1', out)
+          threads_2 = section('THREADS_2', out)
+          threads = (threads_1 + "\n\n" + threads_2).strip() if threads_2 else threads_1
+          note_title = section('NOTE_TITLE', out)
+          visual = section('VISUAL', out)
+
+          out_dir = "affiliate-research-engine/playbook/workspace/threads"
+          os.makedirs(out_dir, exist_ok=True)
+          out_file = f"{out_dir}/{date_str}.md"
+          with open(out_file, 'w', encoding='utf-8') as f:
+              f.write(f"# Threads / note セット -- {date_str}\n\n")
+              f.write(f"元記事: {title}\n")
+              f.write(f"元ドラフト: `{draft_file}`\n\n")
+              f.write("## ① 1投稿目（フック・リンクなし）\n\n")
+              f.write((threads_1 or out) + "\n\n")
+              if threads_2:
+                  f.write("## ② 2投稿目（スレッドに続けて投稿）\n\n")
+                  f.write(threads_2 + "\n\n")
+              f.write("## ③ 3投稿目（記事リンクだけ）\n\n")
+              f.write(link_line + "\n\n")
+              if note_title:
+                  f.write("## note タイトル案\n\n" + note_title + "\n\n")
+              if visual:
+                  f.write("## ビジュアル案\n\n" + visual + "\n")
+          print(f"Threads set saved: {out_file}")
+
+          # ── WordPressの下書きにも出す（GitHubを見に行かなくて済むように）──
+          wp_pass = os.environ.get('WP_APP_PASSWORD', '')
+          if wp_pass and threads:
+              import requests, urllib3, html as htmlmod
+              urllib3.disable_warnings()
+
+              def block(label, text, mono=False):
+                  if not text:
+                      return ""
+                  style = ("background:#f6f6f6;padding:16px 20px;border-radius:6px;"
+                           "white-space:pre-wrap;font-size:1.05em;line-height:1.9")
+                  return (f"<h3>{label}</h3>\n<div style=\"{style}\">"
+                          f"{htmlmod.escape(text)}</div>\n")
+
+              body = (
+                  "<p style=\"color:#c0392b;font-weight:bold\">"
+                  "※これは投稿用メモです。公開せず、コピーして使ったら削除してください。</p>\n"
+                  + block("① 1投稿目（フック・リンクなし）", threads_1)
+                  + block("② 2投稿目（スレッドに続けて）", threads_2)
+                  + block("③ 3投稿目（このURLだけ貼る）", link_line)
+                  + block("note タイトル案", note_title)
+                  + block("ビジュアル案", visual)
+                  + f"<p style=\"font-size:0.85em;color:#999\">元記事: {htmlmod.escape(title)}</p>"
+              )
+
+              try:
+                  r = requests.post(
+                      'https://sakura-eigo.com/wp-json/wp/v2/posts',
+                      auth=('rei.00pt2342@gmail.com', wp_pass),
+                      json={'title': f'【Threads用】{date_str}', 'content': body, 'status': 'draft'},
+                      headers={'User-Agent': 'Mozilla/5.0'},
+                      verify=False, timeout=30,
+                  )
+                  if r.status_code in (200, 201):
+                      print(f"Threads memo posted to WP: {r.json().get('link')}")
+                  else:
+                      print(f"WP post failed {r.status_code}: {r.text[:200]}")
+              except Exception as e:
+                  print(f"WP post skipped: {e}")
+          PYEOF
+
+      - name: Commit draft and caption
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/drafts/
+          git add affiliate-research-engine/playbook/workspace/keywords.csv
+          git add affiliate-research-engine/playbook/workspace/instagram/
+          git add affiliate-research-engine/playbook/workspace/threads/
+          git diff --staged --quiet || git commit -m "chore: daily article draft $(date +%Y-%m-%d)"
+          git push
