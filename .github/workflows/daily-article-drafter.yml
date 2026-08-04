@@ -117,14 +117,19 @@ jobs:
               f"下の記事から、Threadsの投稿文を作って。\n\n"
               f"記事タイトル: {title}\n"
               f"記事本文（冒頭）:\n{excerpt}\n\n"
+              "【投稿はスレッド3連で作る】\n"
+              "1投稿目=フック。最後を『これだけ↓』のように次へ送る形で止める。リンクは入れない\n"
+              "2投稿目=中身。手順・結果・読者への翻訳。ここに価値を全部入れる\n"
+              "3投稿目=noteのリンクだけ（本文では書かない。こちらで差し込む）\n"
+              "1投稿目にリンクを入れると表示が伸びないので必ず分ける\n\n"
               "【お手本】2026-08-04に人間が推敲して決めた理想形。この見た目と密度を再現する。\n"
-              "---\n"
+              "--- 1投稿目 ---\n"
               "セブ島留学\n"
               "8コマ入れて3日でパンクした\n"
               "\n"
               "授業を6コマに減らした\n"
-              "浮いた2時間はこれだけ\n"
-              "\n"
+              "浮いた2時間はこれだけ↓\n"
+              "--- 2投稿目 ---\n"
               "・その日出た表現を3つ選ぶ\n"
               "・声に出して10回\n"
               "・翌朝もう1回\n"
@@ -138,7 +143,7 @@ jobs:
               "学校選びは「1日何コマか」を見る\n"
               "8コマは多い\n"
               "\n"
-              "noteに書いた\n"
+              "コマ数の話は長くなるからnoteに\n"
               "---\n\n"
               "【必ず守る型】\n"
               "・**句点（。）を使わない**。改行が句点の代わり。お手本に句点は1つも無い\n"
@@ -163,8 +168,9 @@ jobs:
               "・絵文字は入れても2個まで。無理に入れない。絵文字の直前に半角スペースを入れない(×『音声入力 💡』 ○『音声入力💡』)\n"
               "・**記事に再現できる手順が無ければ、無理に作らず THREADS を空にする**。"
               "有益性の無い投稿を出すより出さないほうがよい\n\n"
-              "【出力形式】以下の3ブロックだけを出力する。説明不要。\n"
-              "===THREADS===\n（Threads投稿文）\n"
+              "【出力形式】以下のブロックだけを出力する。説明不要。\n"
+              "===THREADS_1===\n（1投稿目・フック。最後は『↓』で次へ送る。リンク禁止）\n"
+              "===THREADS_2===\n（2投稿目・中身。手順の箇条書きと読者への翻訳を必ず入れる）\n"
               "===NOTE_TITLE===\n（noteのタイトル案。30〜45字の短い一人称+数字型。"
               "150字級の抽象・反論エッセイ型は禁止）\n"
               "===VISUAL===\n（添える画像の案を1行。スコア推移・費用表など数字が見えるもの）\n"
@@ -186,7 +192,9 @@ jobs:
               m = re.search(rf'==={tag}===\s*(.*?)(?====[A-Z_]+===|$)', text, re.DOTALL)
               return m.group(1).strip() if m else ""
 
-          threads = section('THREADS', out)
+          threads_1 = section('THREADS_1', out)
+          threads_2 = section('THREADS_2', out)
+          threads = (threads_1 + "\n\n" + threads_2).strip() if threads_2 else threads_1
           note_title = section('NOTE_TITLE', out)
           visual = section('VISUAL', out)
 
@@ -197,8 +205,13 @@ jobs:
               f.write(f"# Threads / note セット -- {date_str}\n\n")
               f.write(f"元記事: {title}\n")
               f.write(f"元ドラフト: `{draft_file}`\n\n")
-              f.write("## Threads投稿文\n\n")
-              f.write((threads or out) + "\n\n")
+              f.write("## ① 1投稿目（フック・リンクなし）\n\n")
+              f.write((threads_1 or out) + "\n\n")
+              if threads_2:
+                  f.write("## ② 2投稿目（スレッドに続けて投稿）\n\n")
+                  f.write(threads_2 + "\n\n")
+              f.write("## ③ 3投稿目（noteのリンクだけ）\n\n")
+              f.write("（noteのURLを貼る）\n\n")
               if note_title:
                   f.write("## note タイトル案\n\n" + note_title + "\n\n")
               if visual:
@@ -222,7 +235,9 @@ jobs:
               body = (
                   "<p style=\"color:#c0392b;font-weight:bold\">"
                   "※これは投稿用メモです。公開せず、コピーして使ったら削除してください。</p>\n"
-                  + block("Threads投稿文（そのままコピー）", threads)
+                  + block("① 1投稿目（フック・リンクなし）", threads_1)
+                  + block("② 2投稿目（スレッドに続けて）", threads_2)
+                  + block("③ 3投稿目", "noteのURLだけを貼る")
                   + block("note タイトル案", note_title)
                   + block("ビジュアル案", visual)
                   + f"<p style=\"font-size:0.85em;color:#999\">元記事: {htmlmod.escape(title)}</p>"
