@@ -1,0 +1,66 @@
+name: サイトの状態を調べる
+
+# サイトマップのURLなど、外形的に確認したいことを調べる。
+# ローカル環境からは sakura-eigo.com へ出られないため、Actions から叩く。
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Probe
+        run: |
+          mkdir -p affiliate-research-engine/playbook/workspace/site
+          OUT=affiliate-research-engine/playbook/workspace/site/PROBE.md
+          echo "# サイト外形チェック $(date +%Y-%m-%d\ %H:%M)" > $OUT
+          echo "" >> $OUT
+
+          echo "## robots.txt" >> $OUT
+          echo '```' >> $OUT
+          curl -sS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/robots.txt >> $OUT || echo "(取得失敗)" >> $OUT
+          echo '```' >> $OUT
+          echo "" >> $OUT
+
+          echo "## サイトマップ候補のHTTPステータス" >> $OUT
+          echo "| URL | ステータス | 種類 |" >> $OUT
+          echo "|---|---|---|" >> $OUT
+          for p in wp-sitemap.xml sitemap_index.xml sitemap.xml sitemap-index.xml \
+                   sitemap.xml.gz wp-sitemap-posts-post-1.xml feed; do
+            url="https://sakura-eigo.com/$p"
+            code=$(curl -sS -o /tmp/body -w "%{http_code}" -A "Mozilla/5.0" --max-time 20 "$url" || echo "ERR")
+            ctype=$(head -c 200 /tmp/body 2>/dev/null | tr -d '\n' | cut -c1-60)
+            echo "| $p | $code | \`$ctype\` |" >> $OUT
+          done
+          echo "" >> $OUT
+
+          echo "## トップページの head 抜粋（SEOプラグイン判定）" >> $OUT
+          echo '```' >> $OUT
+          curl -sS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ \
+            | grep -ioE '(rank.?math|yoast|seo.simple.pack|all.in.one.seo|google-site-verification[^>]*)' \
+            | sort -u | head -20 >> $OUT || echo "(判定できず)" >> $OUT
+          echo '```' >> $OUT
+
+          cat $OUT
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/site/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: site probe $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
