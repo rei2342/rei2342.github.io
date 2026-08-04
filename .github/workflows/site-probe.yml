@@ -24,9 +24,27 @@ jobs:
           echo "# サイト外形チェック $(date +%Y-%m-%d\ %H:%M)" > $OUT
           echo "" >> $OUT
 
+          echo "## 接続診断" >> $OUT
+          echo '```' >> $OUT
+          echo "--- 通常接続 ---" >> $OUT
+          curl -sS -o /dev/null -w "http_code=%{http_code} ssl_verify=%{ssl_verify_result}\n" \
+            -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ 2>&1 >> $OUT || true
+          echo "--- 証明書検証を無効化 ---" >> $OUT
+          curl -skS -o /dev/null -w "http_code=%{http_code}\n" \
+            -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ 2>&1 >> $OUT || true
+          echo "--- 証明書の内容 ---" >> $OUT
+          echo | timeout 20 openssl s_client -connect sakura-eigo.com:443 \
+            -servername sakura-eigo.com 2>/dev/null \
+            | openssl x509 -noout -subject -issuer -dates 2>&1 >> $OUT || echo "(証明書を取得できず)" >> $OUT
+          echo "--- www 側 ---" >> $OUT
+          curl -sS -o /dev/null -w "http_code=%{http_code}\n" \
+            -A "Mozilla/5.0" --max-time 20 https://www.sakura-eigo.com/ 2>&1 >> $OUT || true
+          echo '```' >> $OUT
+          echo "" >> $OUT
+
           echo "## robots.txt" >> $OUT
           echo '```' >> $OUT
-          curl -sS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/robots.txt >> $OUT || echo "(取得失敗)" >> $OUT
+          curl -skS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/robots.txt >> $OUT || echo "(取得失敗)" >> $OUT
           echo '```' >> $OUT
           echo "" >> $OUT
 
@@ -36,7 +54,7 @@ jobs:
           for p in wp-sitemap.xml sitemap_index.xml sitemap.xml sitemap-index.xml \
                    sitemap.xml.gz wp-sitemap-posts-post-1.xml feed; do
             url="https://sakura-eigo.com/$p"
-            code=$(curl -sS -o /tmp/body -w "%{http_code}" -A "Mozilla/5.0" --max-time 20 "$url" || echo "ERR")
+            code=$(curl -skS -o /tmp/body -w "%{http_code}" -A "Mozilla/5.0" --max-time 20 "$url" || echo "ERR")
             ctype=$(head -c 200 /tmp/body 2>/dev/null | tr -d '\n' | cut -c1-60)
             echo "| $p | $code | \`$ctype\` |" >> $OUT
           done
@@ -44,7 +62,7 @@ jobs:
 
           echo "## トップページの head 抜粋（SEOプラグイン判定）" >> $OUT
           echo '```' >> $OUT
-          curl -sS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ \
+          curl -skS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ \
             | grep -ioE '(rank.?math|yoast|seo.simple.pack|all.in.one.seo|google-site-verification[^>]*)' \
             | sort -u | head -20 >> $OUT || echo "(判定できず)" >> $OUT
           echo '```' >> $OUT
