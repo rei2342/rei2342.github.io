@@ -1,0 +1,49 @@
+name: Threads投稿を作り直す
+
+# 公開済みの記事から、スレッド3連の投稿文を作り直して投稿用メモを更新する。
+# 3投稿目には実際の記事URL（?utm_source=threads 付き）が入る。
+
+on:
+  workflow_dispatch:
+    inputs:
+      article_id:
+        description: '元になる記事のID'
+        required: true
+      memo_id:
+        description: '更新する【Threads用】メモのID（空なら新規作成）'
+        required: false
+        default: ''
+      dry_run:
+        description: 'ドライラン（生成して表示するだけ）'
+        type: boolean
+        default: true
+
+concurrency:
+  group: wp-write
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests anthropic -q
+
+      - name: Build
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          ARTICLE_ID: ${{ inputs.article_id }}
+          MEMO_ID: ${{ inputs.memo_id }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/threads_builder.py
