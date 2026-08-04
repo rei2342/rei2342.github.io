@@ -2,7 +2,7 @@ name: Daily Article Drafter
 
 on:
   schedule:
-    - cron: '0 21 */3 * *'   # 3日ごと 06:00 JST（月末で1回ズレる程度は許容）
+    - cron: '30 20 */3 * *'   # 3日ごと 05:30 JST（起床時にメモが揃っているように。月末で1回ズレる程度は許容）
   workflow_dispatch: {}
 
 jobs:
@@ -150,7 +150,8 @@ jobs:
           try:
               sys.path.insert(0, "affiliate-research-engine/playbook/scripts")
               import affiliate_inserter as af
-              topic = af.classify(title)
+              # タイトルだけだと分類を外すので本文も見る（classify_full）
+              topic = af.classify_full(title, html)
               cta, progs = af.build_cta(topic)
               html = af.strip_box(html) + cta
               print(f"affiliate box: {topic} → {progs}")
