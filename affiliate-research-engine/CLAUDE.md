@@ -115,6 +115,23 @@ Clean kawaii flat illustration style. 16:9 aspect ratio.
   - ワーホリ費用 → `[SCENE]`=holding piggy bank / `[TEXT]`=費用シミュレーション
   - 英語コーチング → `[SCENE]`=talking to laptop screen / `[TEXT]`=3ヶ月プラン
 
+## さくら（Track B）のアカウント情報
+
+| | |
+|---|---|
+| サイト | https://sakura-eigo.com （WordPress・ConoHa WING） |
+| X | **@sakura_eigo30**（2026-08-04に @saukra_eigo から変更。綴り間違いだった） |
+| Threads | @sakura_eigo30 |
+| note | 記事を共感版に変換して掲載（アフィリンクなし・末尾からWPへ導線） |
+
+導線の設計:
+- **Threads → WordPress 直リンク**（`?utm_source=threads` を付けて計測する）
+- **X → note**（従来どおり）。noteの末尾からWPへ送る
+- 記事のCTAはWordPress側にしか無いので、最終的にWPへ着地させる
+
+ハンドル名はスクリプトに埋め込んでいない（X APIはトークンで動く）。
+変更しても此処の記載を直すだけでよい。
+
 ## X投稿 絵文字ルール（Track B・さくらアカウント）
 - **数**: 1投稿につき2〜3個（短文は2個・長めは3個）
 - **配置**: 気持ちが動いた直後 or 前半1・後半1に分散。文末2連続は避ける
