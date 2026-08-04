@@ -152,6 +152,17 @@ def main():
     if kuten:
         print(f"\n注意: 句点が{kuten}個混ざっている")
 
+    # 結果をファイルにも残す（ログが取りにくいので確認用）
+    from pathlib import Path
+    out_dir = Path("affiliate-research-engine/playbook/workspace/threads")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / f"built_{ARTICLE_ID}.md").write_text(
+        f"# Threads 3連 — [{ARTICLE_ID}] {title}\n\n"
+        f"## ① 1投稿目（フック・リンクなし）\n\n```\n{t1}\n```\n\n"
+        f"## ② 2投稿目（スレッドに続けて）\n\n```\n{t2}\n```\n\n"
+        f"## ③ 3投稿目（このURLだけ貼る）\n\n{link_line}\n\n"
+        f"句点の混入: {kuten}個\n", encoding="utf-8")
+
     if DRY_RUN:
         print("\nDRY RUN のため更新しない")
         return
