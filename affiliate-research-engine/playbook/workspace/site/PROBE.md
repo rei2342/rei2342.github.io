@@ -1,45 +1,54 @@
-# サイト外形チェック 2026-08-04 01:11
+# サイト外形チェック 2026-08-04 01:26
 
 ## 接続診断
 ```
 --- 通常接続 ---
-http_code=000 ssl_verify=20
+http_code=000 ssl_verify=1
 --- 証明書検証を無効化 ---
-http_code=200
+http_code=503
 --- 証明書の内容 ---
-subject=CN = sakura-eigo.com
-issuer=C = US, O = Let's Encrypt, CN = YR2
-notBefore=Jun  4 03:01:37 2026 GMT
-notAfter=Sep  2 03:01:36 2026 GMT
+subject=CN = *.conohawing.com
+issuer=C = BE, O = GlobalSign nv-sa, CN = GlobalSign GCC R3 DV TLS CA 2020
+notBefore=Nov  5 04:02:51 2025 GMT
+notAfter=Dec  7 04:02:50 2026 GMT
 --- www 側 ---
 http_code=000
 ```
 
 ## robots.txt
 ```
-User-agent: *
-Disallow: /wp-admin/
-Allow: /wp-admin/admin-ajax.php
-
-Sitemap: https://sakura-eigo.com/sitemap.xml
-Sitemap: https://sakura-eigo.com/sitemap.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Error</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>An error occurred.</h1>
+<p>Sorry, the page you are looking for is currently unavailable.<br/>
+Please try again later.</p>
+<p>If you are the system administrator of this resource then you should check
+the error log for details.</p>
+<p><em>Faithfully yours, nginx.</em></p>
+</body>
+</html>
 ```
 
 ## サイトマップ候補のHTTPステータス
 | URL | ステータス | 種類 |
 |---|---|---|
-| wp-sitemap.xml | 200 | `<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet type=` |
-| sitemap_index.xml | 200 | `<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type=` |
-| sitemap.xml | 200 | `<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet type=` |
-| sitemap-index.xml | 404 | `<!doctype html><html lang="ja" prefix="og: https://ogp.me/ns` |
-| sitemap.xml.gz | 200 | `<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet type=` |
-| wp-sitemap-posts-post-1.xml | 301 | `` |
-| feed | 301 | `` |
+| wp-sitemap.xml | 503 | `<!DOCTYPE html><html><head><title>Error</title><style>html {` |
+| sitemap_index.xml | 503 | `<!DOCTYPE html><html><head><title>Error</title><style>html {` |
+| sitemap.xml | 503 | `<!DOCTYPE html><html><head><title>Error</title><style>html {` |
+| sitemap-index.xml | 503 | `<!DOCTYPE html><html><head><title>Error</title><style>html {` |
+| sitemap.xml.gz | 503 | `<!DOCTYPE html><html><head><title>Error</title><style>html {` |
+| wp-sitemap-posts-post-1.xml | 503 | `<!DOCTYPE html><html><head><title>Error</title><style>html {` |
+| feed | 503 | `<!DOCTYPE html><html><head><title>Error</title><style>html {` |
 
 ## トップページの head 抜粋（SEOプラグイン判定）
 ```
-Rank Math
-google-site-verification" content="0pIyGHA4AeIZq9eodvR2t-pASqbzlL9kA4FzGZ_78GU" /
-rank-math
-rankmath
 ```
