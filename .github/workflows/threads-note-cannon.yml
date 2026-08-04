@@ -6,8 +6,10 @@ name: Threads / note Cannon
 # 生成物: playbook/workspace/threads/YYYY-MM-DD.md
 
 on:
-  schedule:
-    - cron: '0 21 * * 6'   # 土 06:00 JST（記事と別軸で単発生成したい時の予備。主線は daily-article-drafter に統合済み）
+  # 定期実行は停止した（2026-08-04）。
+  # 主線の daily-article-drafter が記事と同時にThreadsメモを作るため、
+  # 土曜に動かすと同じ日に2つメモが立って紛らわしい。
+  # 記事と別軸で単発生成したいときだけ手動で回す。
   workflow_dispatch:
     inputs:
       topic:
