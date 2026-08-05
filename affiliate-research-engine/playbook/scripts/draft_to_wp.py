@@ -29,6 +29,8 @@ WP_USER = "rei.00pt2342@gmail.com"
 WP_PASS = os.environ.get("WP_APP_PASSWORD", "")
 DRAFT = os.environ.get("DRAFT_FILE", "")
 DRY_RUN = os.environ.get("DRY_RUN", "true").lower() == "true"
+# 指定すると新規作成ではなく既存記事の本文を差し替える
+POST_ID = os.environ.get("POST_ID", "").strip()
 
 
 def make_slug(title):
@@ -104,11 +106,18 @@ def main():
         print("\nDRY RUN のため投稿しない")
         return
 
-    r = requests.post(f"{WP_BASE}/posts", auth=(WP_USER, WP_PASS), json=payload,
-                      headers={"User-Agent": "Mozilla/5.0"}, verify=False, timeout=60)
+    if POST_ID:
+        # 既存記事の更新。タイトル・スラッグ・公開状態は動かさず本文だけ差し替える
+        r = requests.post(f"{WP_BASE}/posts/{POST_ID}", auth=(WP_USER, WP_PASS),
+                          json={"content": payload["content"]},
+                          headers={"User-Agent": "Mozilla/5.0"}, verify=False, timeout=60)
+    else:
+        r = requests.post(f"{WP_BASE}/posts", auth=(WP_USER, WP_PASS), json=payload,
+                          headers={"User-Agent": "Mozilla/5.0"}, verify=False, timeout=60)
     if r.status_code in (200, 201):
         d = r.json()
-        print(f"\n下書きを作成: id={d.get('id')} / {d.get('link')}")
+        verb = "更新" if POST_ID else "下書きを作成"
+        print(f"\n{verb}: id={d.get('id')} / {d.get('link')}")
     else:
         print(f"\n失敗 HTTP {r.status_code}: {r.text[:300]}")
         sys.exit(1)

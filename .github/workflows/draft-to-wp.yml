@@ -11,6 +11,10 @@ on:
       draft_file:
         description: '下書きのパス（例: affiliate-research-engine/playbook/workspace/drafts/claim_2026-08-05.md）'
         required: true
+      post_id:
+        description: '既存記事のID（指定すると本文だけ差し替える。空なら新規作成）'
+        required: false
+        default: ''
       dry_run:
         description: 'ドライラン（内容を出すだけで投稿しない）'
         type: boolean
@@ -42,5 +46,6 @@ jobs:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
           DRAFT_FILE: ${{ inputs.draft_file }}
+          POST_ID: ${{ inputs.post_id }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: python affiliate-research-engine/playbook/scripts/draft_to_wp.py
