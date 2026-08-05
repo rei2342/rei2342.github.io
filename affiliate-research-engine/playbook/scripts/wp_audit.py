@@ -58,7 +58,10 @@ def audit(post):
     issues = []
     title = post["title"]["rendered"]
     body = post.get("content", {}).get("rendered", "")
-    text = re.sub(r"<[^>]+>", "", body)
+    # タグを詰めて消すと、表の別セルの数字が繋がって偽の金額になる
+    # （<td>5</td><td>980円</td> → 5980円）。空白で区切る。
+    # 価格語と額が別セルにあっても正規表現側が空白を許容するので検出は落ちない。
+    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", body)).strip()
 
     if any(m in title for m in SKIP_MARKS):
         issues.append("内部メモが公開されている")
