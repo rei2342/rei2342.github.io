@@ -1,0 +1,53 @@
+name: インデックス状況を調べる
+
+# 検索パフォーマンスが0のとき、データ未処理なのか本当に登録されていないのかを
+# 切り分けるためにURL検査APIで1本ずつ実際の状態を見る。
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: '調べる記事数（上限）'
+        required: false
+        default: '50'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests google-auth -q
+
+      - name: Check
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          LIMIT: ${{ inputs.limit }}
+        run: python affiliate-research-engine/playbook/scripts/gsc_index_check.py
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/gsc/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: index check $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
