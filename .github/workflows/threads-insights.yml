@@ -2,6 +2,10 @@ name: Threadsの数字を取る
 
 # 投稿直後の数字は当てにならない（11だった投稿が翌日34になった実例がある）。
 # 毎日取って履歴を積み、24時間・48時間・7日で見比べられるようにする。
+#
+# さくら・AKIRA・ひぐらしをまとめて取れる。コードは共通で、
+# トークンだけアカウントごとに要る（Metaのアプリは1つでよい）。
+# 1つのトークンが切れても、他のアカウントの取得は続行する。
 
 on:
   schedule:
@@ -34,8 +38,10 @@ jobs:
 
       - name: Fetch
         env:
+          # 複数アカウントをまとめて取る場合はこちら（JSON）
+          THREADS_ACCOUNTS: ${{ secrets.THREADS_ACCOUNTS }}
+          # 1アカウントだけのときはこちらでよい
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
-          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
           LIMIT: ${{ inputs.limit }}
         run: python affiliate-research-engine/playbook/scripts/threads_insights.py
 
