@@ -1,0 +1,52 @@
+name: 直近の投稿を一覧する
+
+# 記事IDを調べるための小さな道具。
+# Threads作り直し・X告知はどちらも記事IDを引数に取るので、その手前で使う。
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: '何件表示するか'
+        required: false
+        default: '15'
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests -q
+
+      - name: List
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          LIMIT: ${{ inputs.limit }}
+        run: python affiliate-research-engine/playbook/scripts/wp_recent.py
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/site/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: recent posts $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
