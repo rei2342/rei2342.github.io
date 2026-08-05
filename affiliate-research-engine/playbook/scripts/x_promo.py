@@ -100,6 +100,16 @@ def main():
     print(f"元記事: [{ARTICLE_ID}] {title}")
     print(f"\n--- 投稿内容（{len(tweet)}字）---\n{tweet}\n")
 
+    # 結果をファイルにも残す（ジョブログが取りにくいので確認用）
+    from pathlib import Path
+    out_dir = Path("affiliate-research-engine/playbook/workspace/x_promo")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / f"promo_{ARTICLE_ID}.md").write_text(
+        f"# X告知 — [{ARTICLE_ID}] {title}\n\n"
+        f"Mode: {'DRY RUN' if DRY_RUN else 'LIVE'}\n\n"
+        f"```\n{tweet}\n```\n\n"
+        f"文字数: {len(tweet)}\n", encoding="utf-8")
+
     if DRY_RUN:
         print("DRY RUN のため投稿しない")
         return
