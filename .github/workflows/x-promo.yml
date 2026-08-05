@@ -15,6 +15,10 @@ on:
         description: 'ドライラン（内容を出すだけで投稿しない）'
         type: boolean
         default: true
+      post_text:
+        description: '手入れした本文（空なら自動生成。リンクは書かない）'
+        required: false
+        default: ''
 
 jobs:
   promo:
@@ -45,6 +49,7 @@ jobs:
           X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
           ARTICLE_ID: ${{ inputs.article_id }}
           DRY_RUN: ${{ inputs.dry_run }}
+          POST_TEXT: ${{ inputs.post_text }}
         run: python affiliate-research-engine/playbook/scripts/x_promo.py
 
       - name: Commit state

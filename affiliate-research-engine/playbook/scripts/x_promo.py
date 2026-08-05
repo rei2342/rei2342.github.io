@@ -27,6 +27,8 @@ WP_USER = "rei.00pt2342@gmail.com"
 WP_PASS = os.environ.get("WP_APP_PASSWORD", "")
 ARTICLE_ID = os.environ.get("ARTICLE_ID", "")
 DRY_RUN = os.environ.get("DRY_RUN", "true").lower() == "true"
+# 生成に任せず、人が推敲した文をそのまま投稿したいとき用
+POST_TEXT = os.environ.get("POST_TEXT", "").strip()
 STATE = "affiliate-research-engine/playbook/workspace/x_state.json"
 
 RULES = """【実測で伸びた投稿】2026-08-04時点の表示回数。この短さと質感を真似る。
@@ -82,23 +84,33 @@ def main():
     body = re.sub(r"\n{3,}", "\n\n", body).strip()
     url = art["link"] + ("&" if "?" in art["link"] else "?") + "utm_source=x"
 
-    ai = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-    msg = ai.messages.create(
-        model="claude-opus-4-8",
-        max_tokens=600,
-        messages=[{"role": "user", "content":
-                   "あなたは田中さくら（27歳・営業事務・東京）。\n\n"
-                   f"下の記事を X で告知する投稿を1つ書いて。\n\n"
-                   f"記事タイトル: {title}\n\n記事本文:\n{body[:4000]}\n\n" + RULES}],
-    )
-    text = msg.content[0].text.strip().replace("——", "、").replace("—", "、")
+    if POST_TEXT:
+        text = POST_TEXT
+        print("（手入れしたテキストを使用。生成はスキップ）")
+    else:
+        ai = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+        msg = ai.messages.create(
+            model="claude-opus-4-8",
+            max_tokens=600,
+            messages=[{"role": "user", "content":
+                       "あなたは田中さくら（27歳・営業事務・東京）。\n\n"
+                       f"下の記事を X で告知する投稿を1つ書いて。\n\n"
+                       f"記事タイトル: {title}\n\n記事本文:\n{body[:4000]}\n\n" + RULES}],
+        )
+        text = msg.content[0].text
+    text = text.strip().replace("——", "、").replace("—", "、")
     text = re.sub(r"(?<=[ぁ-んァ-ヴ一-龥ー、。！？…])[  ]+"
                   r"(?=[\U0001F000-\U0001FAFF☀-➿←-⇿⬀-⯿])", "", text)
     text = re.sub(r"https?://\S+", "", text).strip()   # 本文中のURLは落とす
 
-    tweet = f"{text}\n\n{url}"
+    # 1投稿目に本文、2投稿目（返信）にリンク。Threadsと形を揃える。
+    # ※実測ではリンクを本文に入れた投稿が伸びていた（平均43 vs 25）。
+    #   返信に分けるとカードが出ないぶん不利かもしれないので、
+    #   ?utm_source=x で後から比較できるようにしてある。
+    tweet = text
     print(f"元記事: [{ARTICLE_ID}] {title}")
-    print(f"\n--- 投稿内容（{len(tweet)}字）---\n{tweet}\n")
+    print(f"\n--- 1投稿目（{len(tweet)}字）---\n{tweet}")
+    print(f"\n--- 2投稿目（返信）---\n{url}\n")
 
     # 結果をファイルにも残す（ジョブログが取りにくいので確認用）
     from pathlib import Path
@@ -107,8 +119,9 @@ def main():
     (out_dir / f"promo_{ARTICLE_ID}.md").write_text(
         f"# X告知 — [{ARTICLE_ID}] {title}\n\n"
         f"Mode: {'DRY RUN' if DRY_RUN else 'LIVE'}\n\n"
-        f"```\n{tweet}\n```\n\n"
-        f"文字数: {len(tweet)}\n", encoding="utf-8")
+        f"## 1投稿目\n\n```\n{tweet}\n```\n\n"
+        f"## 2投稿目（返信・リンクだけ）\n\n{url}\n\n"
+        f"1投稿目の文字数: {len(tweet)}\n", encoding="utf-8")
 
     if DRY_RUN:
         print("DRY RUN のため投稿しない")
@@ -121,8 +134,10 @@ def main():
         access_token=os.environ["X_ACCESS_TOKEN"],
         access_token_secret=os.environ["X_ACCESS_TOKEN_SECRET"],
     )
-    client.create_tweet(text=tweet)
-    print("投稿した")
+    first = client.create_tweet(text=tweet)
+    first_id = first.data["id"]
+    client.create_tweet(text=url, in_reply_to_tweet_id=first_id)
+    print(f"投稿した（スレッド2連 / 1投稿目 id={first_id}）")
 
     # 直後に自動投稿が重ならないよう、間隔の起点を更新する
     try:
