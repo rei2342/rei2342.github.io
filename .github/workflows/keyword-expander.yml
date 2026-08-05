@@ -1,0 +1,96 @@
+name: キーワードを補充する
+
+# keywords.csv の todo が枯れると記事生成が止まる。
+# 同じ軸ばかりだとネタも読者も飽きるので、毎回違う軸から仕入れる。
+# 公開情報のWeb検索だけを使い、ASP会員エリアには一切アクセスしない。
+
+on:
+  schedule:
+    - cron: '0 23 * * 1'    # 毎週火曜 08:00 JST
+  workflow_dispatch:
+    inputs:
+      axis:
+        description: '仕入れる軸（空ならその週の当番）'
+        required: false
+        default: ''
+      count:
+        description: '追加する件数'
+        required: false
+        default: '8'
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Expand keywords
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          AXIS: ${{ inputs.axis }}
+          COUNT: ${{ inputs.count }}
+        run: |
+          claude -p "affiliate-research-engine/playbook/workspace/keywords.csv に新しいキーワードを ${COUNT:-8} 件追加してください。
+
+          【手順】
+          1. keywords.csv を読み、既存キーワードを把握する（重複を絶対に作らない）
+          2. 今回の軸を決める。指定があればそれ: '${AXIS}'
+             空なら下の軸から、既存キーワードに最も少ない軸を選ぶ:
+             (a) 国・地域別の留学（フィリピン/カナダ/オーストラリア/マルタ/フィジー/アイルランド/シンガポール/ニュージーランド）
+             (b) 制度・年齢制限（ワーホリの年齢上限は国ごとに違う。ビザ要件・必要英語力）
+             (c) 費用と為替（円安の影響・実際に溶ける額・帰国後の空白期間）
+             (d) 職種と場面（営業事務/経理/接客で実際に詰まる英語の場面）
+             (e) 英語力の指標（TOEIC/IELTS/英検/CEFR の読み替え・目安）
+             (f) サービス比較（オンライン英会話/コーチング/アプリ/短期集中）
+             (g) 失敗と後悔（やめたこと・続かなかった理由・お金を無駄にした話）
+          3. その軸で Web検索し、**実際に検索されているロングテール**を探す。
+             想像で作らない。検索サジェストや上位記事の見出しから拾う。
+          4. 各キーワードについて、ペルソナ適合を必ず確認する。
+             ペルソナ: 田中さくら / 27歳 / 営業事務 / 東京 / 英語を5年後回し / 30歳タイムリミット。
+             **27歳が対象外の制度をそのまま推奨する記事にしない**
+             （例: シンガポールのワーホリは25歳まで。さくらは応募できない。
+               その場合は『応募できなかった』側から書けるキーワードにする）
+          5. affiliate-research-engine/CLAUDE.md の稼働中案件を読み、
+             各キーワードがどの案件に繋がるかを確認する。**繋がらないキーワードは採用しない**。
+          6. keywords.csv に追記する。列は keyword,target_url,asp,reward,status,last_rank,checked_at。
+             status=todo、checked_at=今日の日付、asp と reward には想定案件名を入れる。
+             既存の並びと同様、**案件方向がインターリーブ**されるように並べる（同じ方向を連続させない）。
+          7. affiliate-research-engine/playbook/workspace/reports/keyword_expansion_\$(date +%Y-%m-%d).md に
+             『今回の軸 / 追加したキーワードと根拠 / 想定案件 / 却下したものと理由』を記録する。
+
+          【禁止】
+          - 既存キーワードとの重複
+          - 検索需要の裏取りをしていない想像のキーワード
+          - 稼働中の案件に繋がらないキーワード
+          - ASP会員エリアへのログイン・スクレイピング" \
+            --allowedTools "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch" \
+            --dangerously-skip-permissions
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/keywords.csv \
+                  affiliate-research-engine/playbook/workspace/reports/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: keyword expansion $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
