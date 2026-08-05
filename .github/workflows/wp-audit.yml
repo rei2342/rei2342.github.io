@@ -1,0 +1,56 @@
+name: 公開記事を点検する
+
+# 公開時のゲートは投稿の瞬間しか見ない。
+# 本文を書き換えてCTAが消える、案件の判定が変わる、
+# 料金記事が日付なしのまま古くなる、といった劣化は
+# 定期的に全部を見ないと気づけない。
+
+on:
+  schedule:
+    - cron: '0 21 * * 5'    # 毎週土曜 06:00 JST
+  workflow_dispatch:
+    inputs:
+      min_chars:
+        description: '本文の下限文字数'
+        required: false
+        default: '3000'
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests -q
+
+      - name: Audit
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          MIN_CHARS: ${{ inputs.min_chars }}
+        run: python affiliate-research-engine/playbook/scripts/wp_audit.py
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/site/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: audit published posts $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
