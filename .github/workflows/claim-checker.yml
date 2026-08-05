@@ -1,0 +1,103 @@
+name: 定説を調べて記事にする
+
+# 「英語が話せる人はみんな現地に行けと言う」のような、世間でよく言われることを
+# さくらが実際に調べて確かめる記事を作る。
+# キーワード起点の記事とは別の型。読者から見ると「一緒に調べてくれた人」になる。
+#
+# 生成物は下書きとして保存するだけ。公開は人間が判断する。
+
+on:
+  workflow_dispatch:
+    inputs:
+      claim:
+        description: '調べる定説（空なら claims.csv の todo から1件）'
+        required: false
+        default: ''
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Research and draft
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          CLAIM: ${{ inputs.claim }}
+        run: |
+          claude -p "『定説を実際に調べて確かめる』型の記事を1本書いてください。
+
+          【今回の定説】
+          指定があればそれ: '${CLAIM}'
+          空なら affiliate-research-engine/playbook/workspace/claims.csv の status=todo から1件選ぶ。
+
+          【この型の狙い】
+          世間でよく言われることを、さくらが自分の状況に当てはめて調べ直す。
+          読者から見ると『代わりに調べてくれた人』になる。
+          結論を先に決めず、調べた結果そのものを書く。定説が正しければ正しいと書く。
+
+          【手順】
+          1. その定説が実際にどう言われているかをWeb検索で確かめる（誰が・どういう文脈で言うか）
+          2. 検証に必要な事実を集める。**必ず一次情報に近いものを探す**。
+             例: 国ごとのビザ年齢上限・必要書類は各国政府や大使館の情報、
+                 語学学校の授業時間や料金は学校の公式ページ、
+                 英語力の指標は CEFR 対応表など公的なもの
+          3. 集めた事実を**比較できる形**にする（表・数字の並び）。
+             読者がそのまま持ち帰って使えるかどうかが基準。
+          4. さくらの条件に当てはめる。
+             ペルソナ: 田中さくら / 27歳 / 営業事務 / 東京 / 英語を5年後回し / 30歳タイムリミット /
+             スクールで4.5万円を失った経験あり。
+             **27歳が対象外の制度は『応募できなかった』側から書く**（例: シンガポールのワーホリは25歳まで）。
+             おすすめとして書くと嘘になる。
+          5. 結論を書く。定説が当てはまる条件と、当てはまらない条件を分ける。
+          6. affiliate-research-engine/CLAUDE.md の稼働中案件を読み、
+             この記事から自然に繋がる案件を確認する。無理に繋げない。
+
+          【記事の条件】
+          - 5000字以上。タイトルは30〜45字の短い一人称＋数字型
+          - 書き出しは情景・数字・体験の一場面から。検索キーワードのかぎ括弧で始めない
+          - **調べて分かった数字を必ず表にする**。読者が比較して選べる形にする
+          - 出典を本文中に示す（『◯◯の公式ページによると』程度でよい。URL羅列はしない）
+          - **裏が取れなかったことは書かない**。『確かめられなかった』と正直に書くほうがよい
+          - AIっぽさ排除ルール（CLAUDE.md）を厳守。
+            対比構文は2回まで / 『設計』『構造』『物差し』『本質』は各1回まで /
+            H2の本数を固定しない / 漢数字禁止 / emダッシュ禁止
+
+          【保存】
+          - 記事: affiliate-research-engine/playbook/workspace/drafts/claim_\$(date +%Y-%m-%d).md
+            先頭に front matter（title: を必ず入れる）
+          - claims.csv の該当行の status を todo→done、checked_at を今日の日付に更新
+          - 調査メモ: affiliate-research-engine/playbook/workspace/reports/claim_\$(date +%Y-%m-%d).md
+            『定説 / 調べたこと / 出典 / 分かったこと / 分からなかったこと / 想定案件』" \
+            --allowedTools "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch" \
+            --dangerously-skip-permissions
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/drafts/ \
+                  affiliate-research-engine/playbook/workspace/claims.csv \
+                  affiliate-research-engine/playbook/workspace/reports/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: claim check $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
