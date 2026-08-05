@@ -1,0 +1,46 @@
+name: 下書きをWordPressに上げる
+
+# workspace/drafts/ のMarkdownを指定してWordPressに下書き投稿する。
+# 日次生成の投稿処理は日付ファイル名に依存していて、
+# 定説記事のような別名のドラフトを上げられなかった。
+# CTA挿入・スラッグ・カテゴリは日次と同じ経路を通す。
+
+on:
+  workflow_dispatch:
+    inputs:
+      draft_file:
+        description: '下書きのパス（例: affiliate-research-engine/playbook/workspace/drafts/claim_2026-08-05.md）'
+        required: true
+      dry_run:
+        description: 'ドライラン（内容を出すだけで投稿しない）'
+        type: boolean
+        default: true
+
+concurrency:
+  group: wp-write
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests markdown2 anthropic -q
+
+      - name: Upload
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          DRAFT_FILE: ${{ inputs.draft_file }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/draft_to_wp.py
