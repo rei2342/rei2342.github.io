@@ -1,0 +1,55 @@
+name: Threadsの数字を取る
+
+# 投稿直後の数字は当てにならない（11だった投稿が翌日34になった実例がある）。
+# 毎日取って履歴を積み、24時間・48時間・7日で見比べられるようにする。
+
+on:
+  schedule:
+    - cron: '0 3 * * *'      # 毎日 12:00 JST
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: '取得する投稿数'
+        required: false
+        default: '25'
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests -q
+
+      - name: Fetch
+        env:
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          LIMIT: ${{ inputs.limit }}
+        run: python affiliate-research-engine/playbook/scripts/threads_insights.py
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/threads_insights/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: threads insights $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
