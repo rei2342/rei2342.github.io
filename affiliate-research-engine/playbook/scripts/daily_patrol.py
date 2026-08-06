@@ -26,6 +26,7 @@ import ga4_fetch as g4
 
 DAYS = int(os.environ.get("DAYS", "14"))
 HISTORY = Path("affiliate-research-engine/playbook/workspace/threads_insights/history.jsonl")
+PINNED = Path("affiliate-research-engine/playbook/workspace/threads_insights/pinned.csv")
 OUT = Path("affiliate-research-engine/playbook/workspace/patrol")
 
 # 投稿に付けている印。どの経路から来たかを分ける
@@ -65,6 +66,27 @@ def latest_threads_posts(since=None):
         r["account"] = r.get("account_actual") or r.get("account")
         out.append(r)
     return out
+
+
+def pinned_ids():
+    """プロフィールに固定している投稿のIDを返す。
+
+    固定した投稿はプロフィール訪問者の分が加算され続けるので、
+    他の投稿と同じ土俵で比較できない。2026-08-06に、固定中の投稿を
+    「歴代1位」として扱い、型の仮説の根拠にしてしまった。
+    固定の有無はThreads APIで取れないので、CSVに手で書く。
+    """
+    if not PINNED.exists():
+        return set()
+    ids = set()
+    for line in PINNED.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or line.startswith("account,"):
+            continue
+        cols = line.split(",")
+        if len(cols) >= 4 and not cols[3].strip():   # until が空＝現在も固定中
+            ids.add(cols[1].strip())
+    return ids
 
 
 def table(header, rows, empty="（データなし）\n\n"):
@@ -125,14 +147,26 @@ def main():
 
     # ── 1段目: Threadsで何人に見られたか ──
     posts = latest_threads_posts()
+    pins = pinned_ids()
     L.append("## ① Threads（表示された数）\n\n")
     if not posts:
         L.append("履歴がまだ無い。`threads-insights` を先に回す。\n\n")
     else:
-        rows = [[p.get("views") or 0, p.get("likes") or "-", p.get("replies") or "-",
+        rows = [[("📌 " if p["id"] in pins else "") + str(p.get("views") or 0),
+                 p.get("likes") or "-", p.get("replies") or "-",
                  (p.get("posted_at") or "")[:10], p.get("account"), p.get("text", "")[:34]]
                 for p in sorted(posts, key=lambda x: -(x.get("views") or 0))]
         L.append(table(["表示", "いいね", "返信", "投稿日", "アカウント", "本文"], rows))
+        if any(p["id"] in pins for p in posts):
+            L.append("📌 はプロフィールに固定中。プロフィール訪問者の分が加算され続けるので、\n"
+                     "**他の投稿と同じ土俵で比べない**。下の中央値からも外している。\n\n")
+
+        # 固定を含めた中央値は実力より高く出る。型の比較には使わない
+        organic = sorted((p.get("views") or 0) for p in posts if p["id"] not in pins)
+        if organic:
+            n = len(organic)
+            med = organic[n // 2] if n % 2 else (organic[n // 2 - 1] + organic[n // 2]) / 2
+            L.append(f"固定を除いた {n}本の中央値 **{med:g}** / 最高 **{organic[-1]}**\n\n")
 
     if not tok:
         (OUT / "PATROL.md").write_text("".join(L), encoding="utf-8")
