@@ -70,10 +70,23 @@ jobs:
           echo "--- Jetpack統計が使えるか ---" >> $OUT
           curl -skS -o /dev/null -w "jetpack/v4: %{http_code}\n" --max-time 20 \
             https://sakura-eigo.com/wp-json/jetpack/v4/module/stats >> $OUT 2>&1 || true
-          echo "--- トップページに入っている解析タグ ---" >> $OUT
+          echo "--- 計測ID（どのGA4プロパティに送っているか）---" >> $OUT
+          # プロパティを取り違えていないか確かめるのに要る。
+          # 2026-08-06に、権限を渡したプロパティが別サイト(nizikake.jp)のもので、
+          # sakura-eigo.com の数字が1件も入っていなかった。
           curl -skS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ \
-            | grep -ioE "googletagmanager|gtag\(|google-analytics|G-[A-Z0-9]{8,}|UA-[0-9]+|jetpack|site-kit|matomo|clarity" \
-            | sort | uniq -c >> $OUT 2>&1 || echo "(解析タグは見つからず)" >> $OUT
+            | grep -oE "G-[A-Za-z0-9]{6,}|GTM-[A-Za-z0-9]{5,}|UA-[0-9]{4,}-[0-9]+" \
+            | sort | uniq -c >> $OUT 2>&1 || echo "(計測IDが見つからない)" >> $OUT
+          echo "" >> $OUT
+          echo "--- 解析タグの周辺（IDが取れないときの手がかり）---" >> $OUT
+          curl -skS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ \
+            | grep -ioE ".{60}(googletagmanager|google-analytics|gtag\().{60}" \
+            | head -6 >> $OUT 2>&1 || echo "(該当なし)" >> $OUT
+          echo "" >> $OUT
+          echo "--- その他の解析ツール ---" >> $OUT
+          curl -skS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ \
+            | grep -ioE "jetpack|site-kit|matomo|clarity" \
+            | sort | uniq -c >> $OUT 2>&1 || echo "(なし)" >> $OUT
           echo '```' >> $OUT
           echo "" >> $OUT
 
