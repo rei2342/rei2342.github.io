@@ -100,6 +100,9 @@ def check(pid, new_html, old_post):
     old_html = old_post["content"]["rendered"]
     old_text = _q.strip_tags(old_html)
     new_text = _q.strip_tags(new_html)
+    # CTAボックスは全記事共通の定型文で、中に「さくらが確かめた」が入っている。
+    # 外さずに文体を見ると、全記事が三人称視点として落ちる。
+    body_text = _q.strip_tags(_ai.strip_box(new_html))
     problems = []
 
     if len(new_text) < len(old_text) * 0.9:
@@ -120,10 +123,11 @@ def check(pid, new_html, old_post):
         problems.append(f"アフィリエイトリンクが{n_old}→{n_new}本に減っている")
 
     # 直しついでに文体が崩れていないか（既存ルールの一部だけ見る）
-    if "——" in new_text:
+    if "——" in body_text:
         problems.append("emダッシュが混入")
-    if re.search(r"(?:田中)?さくら(?:は|が|の|も|に|を)", new_text):
-        problems.append("三人称視点が混入")
+    third = re.findall(r"(?:田中)?さくら(?:は|が|の|も|に|を)", body_text)
+    if third:
+        problems.append(f"三人称視点が{len(third)}件混入")
 
     return problems
 
