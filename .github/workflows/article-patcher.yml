@@ -19,6 +19,10 @@ on:
         description: 'true なら検査だけしてWordPressには書かない'
         required: false
         default: 'true'
+      skip_generate:
+        description: 'true なら生成を飛ばし、out/ にある既存の修正版を反映するだけ'
+        required: false
+        default: 'false'
 
 concurrency:
   group: article-patcher
@@ -51,12 +55,15 @@ jobs:
           npm install -g @anthropic-ai/claude-code
 
       - name: 直す対象を洗い出す
+        if: inputs.skip_generate != 'true'
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           BATCH: ${{ inputs.batch || '8' }}
         run: python affiliate-research-engine/playbook/scripts/article_patcher.py --prepare
 
+      # 生成済みの出力があるなら作り直さない。同じものに二度課金しない
       - name: 修正版を作る
+        if: inputs.skip_generate != 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
         run: |
