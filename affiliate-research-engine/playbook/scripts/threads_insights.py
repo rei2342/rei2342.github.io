@@ -53,10 +53,25 @@ def get(token, path, **params):
     return r.json(), None
 
 
+def whoami(token):
+    """トークンが実際にどのアカウントのものかを確かめる。
+
+    生成ツールをブラウザで操作すると、ログイン中のアカウントに
+    引っ張られて別アカウントのトークンが出ることがある。
+    2026-08-06に、さくらとAKIRAの両方がAKIRAのトークンになっていた。
+    設定した名前を信用せず、APIに聞く。
+    """
+    me, err = get(token, "me", fields="id,username")
+    if err:
+        return None, None
+    return me.get("id"), me.get("username")
+
+
 def collect(acc):
     """1アカウントぶんの投稿と数字を集める。"""
     token = acc["token"]
     user = acc.get("user_id", "me")
+    acc["actual_id"], acc["actual_name"] = whoami(token)
     posts, err = get(token, f"{user}/threads",
                      fields="id,text,timestamp,permalink,media_type", limit=LIMIT)
     if err:
@@ -78,6 +93,8 @@ def collect(acc):
         text = re.sub(r"\s+", " ", (p.get("text") or ""))[:42]
         rows.append({
             "account": acc["name"],
+            # 履歴を後から見るとき、設定名が正しかったか確かめられるように残す
+            "account_actual": acc.get("actual_name"),
             "id": p["id"],
             "posted_at": p.get("timestamp", ""),
             "text": text,
@@ -123,15 +140,35 @@ def main():
             L.append(f"- **{name}**: {err}\n")
         L.append("\nトークンは60日程度で失効します。切れていれば取り直してください。\n\n")
 
+    # 同じトークンを2つ登録すると、数字が二重に並ぶだけで誰も気づかない。
+    # 実IDが重複していたら、集計より先に警告を出す。
+    seen = {}
+    for acc in accs:
+        aid = acc.get("actual_id")
+        if not aid:
+            continue
+        seen.setdefault(aid, []).append(acc)
+    dupes = [v for v in seen.values() if len(v) > 1]
+    if dupes:
+        L.append("## ⚠️ 同じアカウントのトークンが重複しています\n\n")
+        for group in dupes:
+            names = " / ".join(a["name"] for a in group)
+            L.append(f"- **{names}** はどれも `@{group[0].get('actual_name')}` のトークンです\n")
+        L.append("\n取り違えた側のトークンを生成し直してください。"
+                 "以下の数字は重複したまま並んでいます。\n\n")
+
     # アカウントごとの合計。横並びで比べられるようにする
     if len(accs) > 1:
-        L.append("## アカウント別の合計\n\n| アカウント | 投稿 | 表示 | いいね | 返信 |\n|---|---|---|---|---|\n")
+        L.append("## アカウント別の合計\n\n"
+                 "| 設定名 | 実際のアカウント | 投稿 | 表示 | いいね | 返信 |\n"
+                 "|---|---|---|---|---|---|\n")
         for acc in accs:
             rs = [r for r in all_rows if r["account"] == acc["name"]]
             if not rs:
                 continue
             tot = lambda k: sum(r.get(k) or 0 for r in rs)
-            L.append(f"| {acc['name']} | {len(rs)} | {tot('views')} | "
+            L.append(f"| {acc['name']} | @{acc.get('actual_name') or '不明'} | "
+                     f"{len(rs)} | {tot('views')} | "
                      f"{tot('likes')} | {tot('replies')} |\n")
         L.append("\n")
 
