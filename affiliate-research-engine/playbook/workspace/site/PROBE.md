@@ -1,4 +1,4 @@
-# サイト外形チェック 2026-08-06 03:09
+# サイト外形チェック 2026-08-06 03:22
 
 ## 接続診断
 ```
@@ -59,7 +59,17 @@ wp-abilities/v1
 jetpack/v4: 404
 --- 計測ID（どのGA4プロパティに送っているか）---
 
---- 解析タグの周辺（IDが取れないときの手がかり）---
+--- google が出てくる箇所（IDが取れないときの手がかり）---
+<meta name="google-site-verification" content="0pIyGHA4AeIZq9eodvR2t-pASqbzlL9kA4FzGZ_78GU" />
+<link rel="preconnect dns-prefetch" href="//www.googletagmanager.com">
+<link rel="preconnect dns-prefetch" href="//www.google-analytics.com">
+<link rel="preconnect dns-prefetch" href="//ajax.googleapis.com">
+<link rel="preconnect dns-prefetch" href="//pagead2.googlesyndication.com">
+<link rel="preconnect dns-prefetch" href="//googleads.g.doubleclick.net">
+<link rel="preconnect dns-prefetch" href="//tpc.googlesyndication.com">
+<link rel="preconnect dns-prefetch" href="//cse.google.com">
+<link rel="preconnect dns-prefetch" href="//fonts.googleapis.com">
+var cocoon_localize_script_options = {"is_lazy_load_enable":null,"is_fixed_mobile_buttons_enable":"","is_google_font_lazy_load_enable":""};
 
 --- その他の解析ツール ---
 ```
