@@ -22,6 +22,8 @@ import requests
 import urllib3
 
 urllib3.disable_warnings()
+sys.path.insert(0, str(Path(__file__).parent))
+import quality_rules as _q
 
 WP_BASE = "https://sakura-eigo.com/wp-json/wp/v2"
 WP_USER = "rei.00pt2342@gmail.com"
@@ -58,10 +60,7 @@ def audit(post):
     issues = []
     title = post["title"]["rendered"]
     body = post.get("content", {}).get("rendered", "")
-    # タグを詰めて消すと、表の別セルの数字が繋がって偽の金額になる
-    # （<td>5</td><td>980円</td> → 5980円）。空白で区切る。
-    # 価格語と額が別セルにあっても正規表現側が空白を許容するので検出は落ちない。
-    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", body)).strip()
+    text = _q.strip_tags(body)
 
     if any(m in title for m in SKIP_MARKS):
         issues.append("内部メモが公開されている")
@@ -83,22 +82,21 @@ def audit(post):
     if "アフィリエイトリンクが含まれます" not in text and "PR" not in text:
         issues.append("PR表記なし")
 
-    # 料金・制度は改定される。日付が無いと改定後は訂正ではなく虚偽になる。
-    # ただし「1円も残らなかった」「0円」のような修辞は料金ではない。
-    # サービスの価格として書かれているものだけを見る。
-    price = re.search(
-        # 「月額1,848円」「受講料は25万円」のように、価格を指す語のあとに来る額
-        r"(?:月額|年額|税込|税抜|料金|価格|受講料|授業料|総額|費用|月)"
-        r"[はがのも、\s]{0,3}[0-9０-９][0-9０-９,，\.]*\s*万?円"
-        # 「5,980円／月」のように単位が後ろに付く形
-        r"|[0-9０-９][0-9０-９,，\.]*\s*万?円\s*(?:／|/)\s*(?:月|年|回|人)"
-        # 桁区切りのある具体額（171,600円）。修辞では出てこない書き方
-        r"|[0-9０-９]{1,3}(?:[,，][0-9０-９]{3})+\s*円",
-        text)
-    has_date = re.search(r"20[0-9]{2}年\s*[0-9]{1,2}\s*月.{0,6}時点|"
-                         r"20[0-9]{2}[-/][0-9]{1,2}[-/][0-9]{1,2}\s*時点", text)
-    if price and not has_date:
-        issues.append(f"料金（{price.group(0).strip()}）があるのに基準日がない")
+    # 料金・制度・断定・導線の誠実さは quality_rules に集約している。
+    # 生成時（article_rewriter.audit）と同じ基準で見るため。
+    price = _q.price_without_basedate(text)
+    if price:
+        issues.append(f"料金（{price}）があるのに基準日がない")
+
+    hype = _q.hype_words(text)
+    if hype:
+        issues.append(f"根拠を超える断定: {'・'.join(hype)}")
+
+    if _q.institutional_without_source(text):
+        issues.append("制度・年齢条件の話があるのに確認日も出典もない")
+
+    if _q.missing_caveat(body, text):
+        issues.append("案件を紹介しているのに、合わない人も注意点も書いていない")
 
     return issues
 
