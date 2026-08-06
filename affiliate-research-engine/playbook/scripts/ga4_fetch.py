@@ -76,6 +76,44 @@ def find_property(tok, email):
     return props[0][0].split("/")[-1]
 
 
+def properties(tok):
+    """権限のあるプロパティと、そのデータストリームを列挙する。
+
+    プロパティ名だけでは、どのサイトを計測しているのか分からない。
+    実際に0件だったとき「タグが動いていない」のか
+    「別のプロパティを見ている」のかを切り分けるために要る。
+    """
+    r = requests.get(f"{ADMIN}/accountSummaries",
+                     headers={"Authorization": f"Bearer {tok}"}, timeout=40)
+    if r.status_code != 200:
+        return []
+    out = []
+    for a in r.json().get("accountSummaries", []):
+        for p in a.get("propertySummaries", []):
+            path = p.get("property", "")
+            s = requests.get(f"{ADMIN}/{path}/dataStreams",
+                             headers={"Authorization": f"Bearer {tok}"}, timeout=40)
+            streams = []
+            if s.status_code == 200:
+                for st in s.json().get("dataStreams", []):
+                    w = st.get("webStreamData", {})
+                    streams.append((w.get("defaultUri", "(URLなし)"),
+                                    w.get("measurementId", "-")))
+            out.append((path.split("/")[-1], p.get("displayName", ""), streams))
+    return out
+
+
+def realtime(tok, pid):
+    """いまサイトを見ている人数。タグが動いているかの一番速い確認方法。"""
+    r = requests.post(f"{DATA}/properties/{pid}:runRealtimeReport",
+                      headers={"Authorization": f"Bearer {tok}"},
+                      json={"metrics": [{"name": "activeUsers"}]}, timeout=40)
+    if r.status_code != 200:
+        return None
+    rows = r.json().get("rows", [])
+    return int(rows[0]["metricValues"][0]["value"]) if rows else 0
+
+
 def report(tok, pid, dims, mets, days=None, limit=50, order=None):
     body = {
         "dateRanges": [{"startDate": f"{days or DAYS}daysAgo", "endDate": "today"}],
@@ -121,13 +159,44 @@ def main():
 
     # 全体。まず母数が分からないと、個別の数字が多いのか少ないのか判断できない
     rows, err = report(tok, pid, [], ["sessions", "activeUsers", "screenPageViews"])
+    empty = False
     if err:
         L.append(f"取得できない: {err}\n\n")
-    elif rows:
+    elif rows and rows[0][0] != "0":
         s, u, v = rows[0]
         L.append(f"- セッション **{s}** / ユーザー **{u}** / ページビュー **{v}**\n\n")
     else:
-        L.append("- 計測データがまだ0件です（タグを入れた直後だとここが空になります）\n\n")
+        empty = True
+
+    # 0件は「誰も来なかった」ではなく「計測できていない」ことが多い。
+    # 見ているプロパティが正しいか、タグが動いているかをここで切り分ける。
+    if empty:
+        L.append("## ⚠️ 直近の計測が0件\n\n"
+                 "「誰も来なかった」ではなく「計測できていない」可能性が高い。以下で切り分ける。\n\n")
+
+        # もっと長い期間ならデータがあるか（タグ設置が最近なだけ、を除外する）
+        long_rows, _ = report(tok, pid, [], ["sessions"], days=365)
+        total = long_rows[0][0] if long_rows else "0"
+        L.append(f"- **過去365日の合計セッション: {total}**"
+                 + ("（このプロパティには一度もデータが入っていない）\n"
+                    if total == "0" else "（過去にはデータがある。直近だけ止まっている）\n"))
+
+        live = realtime(tok, pid)
+        if live is not None:
+            L.append(f"- **いまサイトを見ている人: {live}人**"
+                     + ("（サイトを開いた状態でこれが0なら、タグが動いていない）\n"
+                        if live == 0 else "（タグは動いている）\n"))
+
+        L.append("\n### 権限のあるプロパティとデータストリーム\n\n"
+                 "| プロパティID | 名前 | 計測しているURL | 測定ID |\n|---|---|---|---|\n")
+        for prop_id, name, streams in properties(tok):
+            mark = " ←取得中" if prop_id == str(pid) else ""
+            if not streams:
+                L.append(f"| {prop_id}{mark} | {name} | （ストリームなし） | - |\n")
+            for uri, mid in streams:
+                L.append(f"| {prop_id}{mark} | {name} | {uri} | {mid} |\n")
+        L.append("\nsakura-eigo.com を計測しているプロパティが別にあれば、"
+                 "そのIDを Secret `GA4_PROPERTY_ID` に入れてください。\n\n")
 
     # 流入元。Threadsから来ているかはここで分かる
     L.append("## 流入元\n\n")
