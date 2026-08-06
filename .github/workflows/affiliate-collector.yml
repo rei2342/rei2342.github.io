@@ -7,7 +7,7 @@ name: Affiliate Program Collector
 
 on:
   schedule:
-    - cron: '0 0 * * 1'   # 毎週月曜 09:00 JST
+    - cron: '0 21 * * 0'   # 毎週月曜 06:00 JST（週次レポート07:00の前に終わらせる）
   workflow_dispatch:
     inputs:
       focus:

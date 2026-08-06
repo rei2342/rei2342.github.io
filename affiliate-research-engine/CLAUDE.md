@@ -146,13 +146,31 @@ Clean kawaii flat illustration style. 16:9 aspect ratio.
 
 ### 数字を見る場所（役割が違うので混同しない）
 
-| 見たいこと | 見る場所 | 取り方 |
-|---|---|---|
-| Google検索から来た数・検索語・順位 | Search Console | `gsc-weekly.yml`（月07:00） |
-| インデックス済みか | Search Console | `gsc-index-check.yml` |
-| **SNSから記事に来たか**・記事別PV・滞在 | **GA4** | `ga4-fetch.yml`（毎日12:00） |
-| Threads投稿の表示・いいね | Threads API | `threads-insights.yml`（毎日12:00） |
-| 公開記事の劣化（CTA消失・基準日なし等） | WordPress API | `wp-audit.yml`（土06:00） |
+| 見たいこと | 見る場所 |
+|---|---|
+| Threads投稿の表示・いいね | Threads API |
+| **SNSから記事に来たか**・記事別PV・滞在 | **GA4** |
+| **記事からアフィリンクを踏んだか** | GA4のclickイベント＋カスタムディメンション `link_domain` / `link_url` |
+| Google検索から来た数・検索語・順位 | Search Console |
+| 公開記事の劣化（CTA消失・基準日なし等） | WordPress API |
+
+### 定期実行（2026-08-06に整理・9本→6本）
+
+| いつ（JST） | ワークフロー | 中身 | 通知 |
+|---|---|---|---|
+| 毎日 12:00 | `morning-check.yml` | Threads取得 → GA4取得 → パトロール1枚 | **Issue** |
+| 毎週月 06:00 | `affiliate-collector.yml` | 新規案件の候補を集める | — |
+| 毎週月 07:00 | `weekly-report.yml` | 記事点検 ＋ Search Console ＋ 案件候補 | **Issue** |
+| 毎週火 08:00 | `keyword-expander.yml` | キーワード補充 | — |
+| 3日ごと 05:30 | `daily-article-drafter.yml` | 記事生成 → WP下書き → Threads文面 | — |
+| 毎日3枠 | `x-poster.yml` | X投稿（各枠55%抽選・64時間間隔 ≒ 3日に1回） | — |
+
+**届くIssueは日次と週次の2種類だけ**。取得と集計を分けていた
+`threads-insights` / `ga4-fetch` / `daily-patrol` / `gsc-weekly` / `wp-audit` は統合して削除した。
+個別に回したいときは統合先を workflow_dispatch する。
+
+パトロールは3段で見る。**落ちている段が、次に直す場所**になる。
+① Threads表示 → ② 記事着地（GA4）→ ③ アフィリンクのクリック（GA4）
 
 **Search Console には Threads/X からの流入は1件も出ない**（検索経由しか集計しない）。
 「投稿から記事に来たか」を見られるのは GA4 だけ。

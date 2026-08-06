@@ -1,0 +1,105 @@
+name: 朝の点検（毎日）
+
+# threads-insights / ga4-fetch / daily-patrol の3本を1本にまとめたもの。
+# 同じ目的（昨日の投稿がどこまで届いたか）のために3回起動して
+# 3回コミットしていた。取得と集計は順番が決まっているので分ける意味がない。
+#
+# 取得が片方こけても集計まで進む。0件のまま出すほうが、
+# 何も出ないより状況が分かる。
+
+on:
+  schedule:
+    - cron: '0 3 * * *'      # 毎日 12:00 JST
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Threadsで取得する投稿数'
+        required: false
+        default: '50'
+      days:
+        description: '集計する日数'
+        required: false
+        default: '14'
+
+concurrency:
+  group: morning-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests google-auth -q
+
+      # トークン切れで止めない。GA4だけでも出るほうがよい
+      - name: Threadsの数字を取る
+        continue-on-error: true
+        env:
+          THREADS_ACCOUNTS: ${{ secrets.THREADS_ACCOUNTS }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          LIMIT: ${{ inputs.limit || '50' }}
+        run: python affiliate-research-engine/playbook/scripts/threads_insights.py
+
+      - name: GA4のアクセスを取る
+        continue-on-error: true
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          DAYS: ${{ inputs.days || '14' }}
+        run: python affiliate-research-engine/playbook/scripts/ga4_fetch.py
+
+      - name: 1枚にまとめる
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          DAYS: ${{ inputs.days || '14' }}
+        run: python affiliate-research-engine/playbook/scripts/daily_patrol.py
+
+      - name: Issueに投稿
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY=affiliate-research-engine/playbook/workspace/patrol/PATROL.md
+          [ -f "$BODY" ] || { echo "レポートが無い"; exit 0; }
+          head -c 60000 "$BODY" > /tmp/issue.md
+          printf '\n\n---\n自動生成。読んだら閉じてください。\n' >> /tmp/issue.md
+          jq -n --arg t "朝の点検 $(date +%Y-%m-%d)" \
+                --rawfile b /tmp/issue.md '{title:$t, body:$b}' > /tmp/payload.json
+          curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/issues" \
+            -d @/tmp/payload.json | head -c 200
+          echo ""
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/threads_insights/ \
+                  affiliate-research-engine/playbook/workspace/ga4/ \
+                  affiliate-research-engine/playbook/workspace/patrol/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: morning check $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
