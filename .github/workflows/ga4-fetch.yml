@@ -1,0 +1,58 @@
+name: GA4のアクセスを取る
+
+# Search Console は「Google検索から来た数」しか出さないので、
+# Threads や X から記事に来たかどうかは分からない。そこはGA4で見る。
+#
+# 使う前に、GA4の 管理 → プロパティのアクセス管理 で
+# サービスアカウント（GSCと同じもの）を「閲覧者」で追加しておくこと。
+
+on:
+  schedule:
+    - cron: '0 3 * * *'      # 毎日 12:00 JST（Threadsの数字と同じ時刻に揃える）
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '集計する日数'
+        required: false
+        default: '7'
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests google-auth -q
+
+      - name: Fetch
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          DAYS: ${{ inputs.days || '7' }}
+        run: python affiliate-research-engine/playbook/scripts/ga4_fetch.py
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/ga4/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: GA4 access $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
