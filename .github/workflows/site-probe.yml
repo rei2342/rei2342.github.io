@@ -60,6 +60,23 @@ jobs:
           done
           echo "" >> $OUT
 
+          echo "## アクセス解析で使えそうなもの" >> $OUT
+          echo '```' >> $OUT
+          echo "--- REST APIの名前空間（統計プラグインが居ればここに出る） ---" >> $OUT
+          curl -skS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/wp-json/ \
+            | python3 -c "import sys,json; d=json.load(sys.stdin); print('\n'.join(d.get('namespaces',[])))" \
+            >> $OUT 2>&1 || echo "(取得失敗)" >> $OUT
+          echo "" >> $OUT
+          echo "--- Jetpack統計が使えるか ---" >> $OUT
+          curl -skS -o /dev/null -w "jetpack/v4: %{http_code}\n" --max-time 20 \
+            https://sakura-eigo.com/wp-json/jetpack/v4/module/stats >> $OUT 2>&1 || true
+          echo "--- トップページに入っている解析タグ ---" >> $OUT
+          curl -skS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ \
+            | grep -ioE "googletagmanager|gtag\(|google-analytics|G-[A-Z0-9]{8,}|UA-[0-9]+|jetpack|site-kit|matomo|clarity" \
+            | sort | uniq -c >> $OUT 2>&1 || echo "(解析タグは見つからず)" >> $OUT
+          echo '```' >> $OUT
+          echo "" >> $OUT
+
           echo "## トップページの head 抜粋（SEOプラグイン判定）" >> $OUT
           echo '```' >> $OUT
           curl -skS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ \
