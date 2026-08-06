@@ -33,11 +33,16 @@ SOCIAL_SOURCES = ("threads", "x", "note")
 AFFILIATE_DOMAINS = ("af.moshimo.com", "px.a8.net")
 
 
-def latest_threads_posts():
+def latest_threads_posts(since=None):
     """history.jsonl から、投稿ごとの最新の測定値を取る。
 
     毎日追記しているので同じ投稿が何行も入っている。
     伸びを見るのは別の話で、ここでは今の値だけが要る。
+
+    キーは投稿IDだけにする。アカウント名と組にすると、2026-08-06に
+    さくら・AKIRAの両方へAKIRAのトークンを入れてしまった取得ぶんが
+    別レコードとして残り、同じ投稿が2アカウント分に見える。
+    投稿IDはThreads全体で一意なので、IDだけで足りる。
     """
     if not HISTORY.exists():
         return []
@@ -47,12 +52,19 @@ def latest_threads_posts():
             r = json.loads(line)
         except Exception:
             continue
-        key = (r.get("account"), r.get("id"))
-        prev = latest.get(key)
+        pid = r.get("id")
+        prev = latest.get(pid)
         if not prev or r.get("measured_at", "") > prev.get("measured_at", ""):
-            latest[key] = r
-    cutoff = (datetime.now(timezone.utc) - timedelta(days=DAYS)).isoformat()
-    return [r for r in latest.values() if (r.get("posted_at") or "") >= cutoff]
+            latest[pid] = r
+    cutoff = since or (datetime.now(timezone.utc) - timedelta(days=DAYS)).date().isoformat()
+    out = []
+    for r in latest.values():
+        if (r.get("posted_at") or "")[:10] < cutoff:
+            continue
+        # 設定名より、APIが返した実アカウント名を信じる
+        r["account"] = r.get("account_actual") or r.get("account")
+        out.append(r)
+    return out
 
 
 def table(header, rows, empty="（データなし）\n\n"):
@@ -64,10 +76,52 @@ def table(header, rows, empty="（データなし）\n\n"):
     return s + "\n"
 
 
+def ga4_start(tok, pid):
+    """GA4に最初にデータが入った日を返す。無ければ None。
+
+    タグを入れた日より前は、当然どの数字も0になる。
+    それを「記事に来ていない」と書くと嘘のレポートになるので、
+    比べる期間を実際に計測できている範囲へ揃える。
+    """
+    rows, err = g4.report(tok, pid, ["date"], ["sessions"], days=365, limit=400)
+    if err or not rows:
+        return None
+    days = sorted(r[0] for r in rows if int(r[1]) > 0)
+    if not days:
+        return None
+    d = days[0]
+    return f"{d[:4]}-{d[4:6]}-{d[6:]}"
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     stamp = date.today().isoformat()
-    L = [f"# 日次パトロール {stamp}\n\n直近{DAYS}日\n\n"]
+    L = [f"# 日次パトロール {stamp}\n\n"]
+
+    # ── サイト側の接続を先に確かめる。計測開始日で期間を決めるため ──
+    tok = pid = None
+    try:
+        c, email = g4.creds()
+        tok = c.token
+        pid = g4.find_property(tok, email)
+    except SystemExit:
+        pass
+
+    start = ga4_start(tok, pid) if tok else None
+    window_from = (date.today() - timedelta(days=DAYS)).isoformat()
+    compare_from = max(window_from, start) if start else None
+
+    if not tok:
+        L.append("GA4に接続できない。権限とSecretを確認する。\n\n")
+    elif not start:
+        L.append("> **GA4にはまだ1件もデータが入っていない。**\n"
+                 "> タグを入れた直後なら数時間かかる。サイト側の数字は"
+                 "まだ判断に使えないので、①だけを見る。\n\n")
+    elif start > window_from:
+        L.append(f"> **GA4の計測開始は {start}。それより前のサイト側の数字は存在しない。**\n"
+                 f"> 遷移率は {compare_from} 以降の投稿だけで計算する。\n\n")
+
+    L.append(f"直近{DAYS}日\n\n")
 
     # ── 1段目: Threadsで何人に見られたか ──
     posts = latest_threads_posts()
@@ -80,13 +134,7 @@ def main():
                 for p in sorted(posts, key=lambda x: -(x.get("views") or 0))]
         L.append(table(["表示", "いいね", "返信", "投稿日", "アカウント", "本文"], rows))
 
-    # ── 2段目・3段目: サイト側 ──
-    try:
-        c, email = g4.creds()
-        tok = c.token
-        pid = g4.find_property(tok, email)
-    except SystemExit:
-        L.append("## ②③ サイト側\n\nGA4に接続できない。権限とSecretを確認する。\n")
+    if not tok:
         (OUT / "PATROL.md").write_text("".join(L), encoding="utf-8")
         print("".join(L))
         return
@@ -104,16 +152,24 @@ def main():
 
     L.append(f"- 全流入 **{total_all}** セッション / うちSNS由来 **{total_social}**\n\n")
     L.append(table(["参照元", "セッション"], social,
-                   empty="**SNS由来の着地は0件**。投稿は見られていても記事までは来ていない。\n\n"))
+                   empty="SNS由来の着地は0件。\n\n"))
 
-    # 遷移率。表示に対して何%が記事まで来たか。ここが今いちばん見たい数字
-    views = sum(p.get("views") or 0 for p in posts)
-    if views:
-        rate = total_social / views * 100
-        L.append(f"**表示{views} → 着地{total_social}（{rate:.2f}%）**\n\n")
-        if rate < 1:
-            L.append("遷移率が1%未満。表示は出ているが記事に来ていない。\n"
-                     "リンクの置き場所と、2投稿目の終わり方を疑う。\n\n")
+    # 遷移率。表示に対して何%が記事まで来たか。ここが今いちばん見たい数字。
+    # 計測開始より前の投稿を分母に入れると、実態より低く出て判断を誤る。
+    if not compare_from:
+        L.append("計測開始前なので遷移率は出せない。\n\n")
+    else:
+        target = [p for p in posts if (p.get("posted_at") or "")[:10] >= compare_from]
+        views = sum(p.get("views") or 0 for p in target)
+        if not views:
+            L.append(f"{compare_from} 以降の投稿がまだ無いので、遷移率は次の投稿から出る。\n\n")
+        else:
+            rate = total_social / views * 100
+            L.append(f"**{compare_from}以降の投稿 {len(target)}本 / "
+                     f"表示{views} → 着地{total_social}（{rate:.2f}%）**\n\n")
+            if rate < 1:
+                L.append("遷移率が1%未満。表示は出ているが記事に来ていない。\n"
+                         "リンクの置き場所と、2投稿目の終わり方を疑う。\n\n")
 
     # どの記事に降りたか。次に書く軸を決める材料になる
     rows, err = g4.report(tok, pid, ["landingPagePlusQueryString"], ["sessions"],
@@ -137,9 +193,11 @@ def main():
                  f"（詳細: {err}）\n\n")
     else:
         af = [r for r in rows if any(d in r[0] for d in AFFILIATE_DOMAINS)]
-        L.append(table(["クリック先", "回数"], af,
-                       empty="**アフィリエイトリンクのクリックは0件。**\n"
-                             "記事には来ていてもリンクは踏まれていない。\n\n"))
+        empty = ("アフィリエイトリンクのクリックは0件。\n\n"
+                 if not compare_from or total_social == 0 else
+                 "**アフィリエイトリンクのクリックは0件。**\n"
+                 "記事には来ていてもリンクは踏まれていない。\n\n")
+        L.append(table(["クリック先", "回数"], af, empty=empty))
         if rows:
             L.append("<details><summary>外部リンク全体</summary>\n\n"
                      + table(["クリック先", "回数"], rows) + "</details>\n\n")
