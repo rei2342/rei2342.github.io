@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 threads_builder.py
-公開済みの記事から Threads のスレッド3連を作り直し、投稿用メモを更新する。
+公開済みの記事から Threads のスレッド2連を作り直し、投稿用メモを更新する。
 
-ARTICLE_ID … 元になる記事のID（この記事のURLを3投稿目に貼る）
+ARTICLE_ID … 元になる記事のID（この記事のURLを2投稿目の末尾に貼る）
 MEMO_ID    … 更新する【Threads用】メモのID（省略すると新規作成）
 
 数字は記事に書かれているものだけを使う。手順が書かれていない記事からは作らない。
@@ -26,11 +26,15 @@ ARTICLE_ID = os.environ.get("ARTICLE_ID", "")
 MEMO_ID = os.environ.get("MEMO_ID", "")
 DRY_RUN = os.environ.get("DRY_RUN", "true").lower() == "true"
 
-RULES = """【投稿はスレッド3連で作る】
+RULES = """【投稿はスレッド2連で作る】
 1投稿目=フック。最後を『これだけ↓』のように次へ送る形で止める。リンクは入れない
-2投稿目=中身。手順・結果・読者への翻訳。ここに価値を全部入れる
-3投稿目=記事のリンクだけ（本文では書かない。こちらで差し込む）
-1投稿目にリンクを入れると表示が伸びないので必ず分ける
+2投稿目=中身。手順・結果・読者への翻訳。ここに価値を全部入れる。
+  記事リンクはこの2投稿目の末尾に置く（本文では書かない。こちらで差し込む）
+
+リンクを3投稿目に分けるのは2026-08-05に試して失敗した。
+1投稿目780表示に対し、①いいね2 ②いいね1 ③反応0。3枚目まで開く人がほとんどおらず、
+記事への遷移がほぼ0だった。1投稿目にリンクを入れないのは維持する（表示が落ちるため）が、
+2投稿目まで来た人の目の前にリンクを置く。
 
 【お手本】人間が推敲して決めた理想形。この見た目と密度を再現する。
 --- 1投稿目 ---
@@ -144,8 +148,7 @@ def main():
         sys.exit(1)
 
     print("=== ① 1投稿目 ===\n" + t1)
-    print("\n=== ② 2投稿目 ===\n" + t2)
-    print("\n=== ③ 3投稿目 ===\n" + link_line)
+    print("\n=== ② 2投稿目（末尾にリンク） ===\n" + t2 + "\n\n" + link_line)
 
     # 句点が混ざっていないかだけ機械で見る（いちばん戻りやすい癖）
     kuten = t1.count("。") + t2.count("。")
@@ -157,10 +160,10 @@ def main():
     out_dir = Path("affiliate-research-engine/playbook/workspace/threads")
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / f"built_{ARTICLE_ID}.md").write_text(
-        f"# Threads 3連 — [{ARTICLE_ID}] {title}\n\n"
+        f"# Threads 2連 — [{ARTICLE_ID}] {title}\n\n"
         f"## ① 1投稿目（フック・リンクなし）\n\n```\n{t1}\n```\n\n"
-        f"## ② 2投稿目（スレッドに続けて）\n\n```\n{t2}\n```\n\n"
-        f"## ③ 3投稿目（このURLだけ貼る）\n\n{link_line}\n\n"
+        f"## ② 2投稿目（スレッドに続けて・末尾のURLまで貼る）\n\n"
+        f"```\n{t2}\n\n{link_line}\n```\n\n"
         f"句点の混入: {kuten}個\n", encoding="utf-8")
 
     if DRY_RUN:
@@ -178,8 +181,8 @@ def main():
         "<p style=\"color:#c0392b;font-weight:bold\">"
         "※これは投稿用メモです。公開せず、コピーして使ったら削除してください。</p>\n"
         + block("① 1投稿目（フック・リンクなし）", t1)
-        + block("② 2投稿目（スレッドに続けて）", t2)
-        + block("③ 3投稿目（このURLだけ貼る）", link_line)
+        + block("② 2投稿目（スレッドに続けて・末尾のURLまで貼る）",
+                t2 + "\n\n" + link_line)
         + f"<p style=\"font-size:0.85em;color:#999\">元記事: {htmlmod.escape(title)}</p>"
     )
 

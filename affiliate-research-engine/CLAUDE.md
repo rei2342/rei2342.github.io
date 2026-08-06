@@ -131,6 +131,13 @@ Clean kawaii flat illustration style. 16:9 aspect ratio.
 
 導線の設計:
 - **Threads → WordPress 直リンク**（`?utm_source=threads` を付けて計測する）
+  - **スレッドは2連。リンクは2投稿目の末尾**（2026-08-06の実測で確定）。
+    3投稿目に分けたら①780表示に対し③は反応0、記事への遷移もほぼ0だった。
+    1投稿目にリンクを入れないのは維持する（表示が落ちるため）が、
+    2投稿目まで来た人の目の前に置く
+  - **1投稿目で答えを言い切らない**。さくら全12投稿のうち伸びた2本
+    （1038・780）は冒頭で答えを出さず、伸びなかった2本（45・43）は
+    冒頭で結論まで言い切っていた（n=3なので仮説）
 - **X → note**（従来どおり）。noteの末尾からWPへ送る
 - 記事のCTAはWordPress側にしか無いので、最終的にWPへ着地させる
 
@@ -149,8 +156,20 @@ Clean kawaii flat illustration style. 16:9 aspect ratio.
 
 **Search Console には Threads/X からの流入は1件も出ない**（検索経由しか集計しない）。
 「投稿から記事に来たか」を見られるのは GA4 だけ。
-GA4のタグはサイトに入っている（2026-08-05・Cocoon経由 / Rank Math と併存）。
-GA4 APIはGSCと同じサービスアカウント `gsc-reader@pelagic-media-504503-i9.iam.gserviceaccount.com` を使う。
+
+GA4（2026-08-06に新規作成・**この日より前のデータは存在しない**）:
+- プロパティ `548880365`（名前 `sakura-eigo`）/ 測定ID `G-YRE7RGDSQV`
+- Secret `GA4_PROPERTY_ID` に固定済み。**固定しないと別サイト（nizikake.jp・
+  プロパティ501375720）を掴む**ので外さない
+- タグはCocoon設定 → アクセス解析・認証 の「GA4測定ID」から出力。
+  「サイト管理者も含めてアクセス解析する」は**OFF**（自分のアクセスで数字が埋まるため）
+- APIはGSCと同じサービスアカウント
+  `gsc-reader@pelagic-media-504503-i9.iam.gserviceaccount.com`（閲覧者）
+
+**ConoHaの「アクセス解析」はサーバーログ集計なので使わない**。ボットと管理画面の
+通信を全部数える（2026-08-05はPV927のうち1位が `/wp-admin/admin-ajax.php` 約430、
+デバイスはPC759に対しスマホ16だった）。参考になるのは「リンク元」の
+`l.threads.com` `t.co` のような外部リファラだけ。
 
 ## X投稿 絵文字ルール（Track B・さくらアカウント）
 - **数**: 1投稿につき2〜3個（短文は2個・長めは3個）
