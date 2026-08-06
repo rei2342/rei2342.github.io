@@ -1,0 +1,122 @@
+name: 公開記事の指摘を直す
+
+# wp_audit で出た指摘（料金の基準日なし・注意点なし・制度の出典なし・
+# 根拠を超える断定）を、全面リライトせずに直す。
+#
+# 生成に claude -p を使うのは WebSearch が要るため。
+# 料金と制度は**実際に公式サイトで確認してから**日付を入れる。
+# 確認していない数字に「2026年◯月◯日時点」と押すのは、
+# 訂正ではなく新しい虚偽を作る行為なので、機械では日付を入れない。
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch:
+        description: '1回に直す本数'
+        required: false
+        default: '8'
+      dry_run:
+        description: 'true なら検査だけしてWordPressには書かない'
+        required: false
+        default: 'true'
+
+concurrency:
+  group: article-patcher
+  cancel-in-progress: false
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          pip install requests -q
+          npm install -g @anthropic-ai/claude-code
+
+      - name: 直す対象を洗い出す
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          BATCH: ${{ inputs.batch || '8' }}
+        run: python affiliate-research-engine/playbook/scripts/article_patcher.py --prepare
+
+      - name: 修正版を作る
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+        run: |
+          claude -p "affiliate-research-engine/playbook/workspace/patches/tasks/ にある各タスクファイルを1つずつ処理してください。各ファイルには記事ID・指摘・現在の本文HTMLが入っています。指摘だけを直した本文HTMLを affiliate-research-engine/playbook/workspace/patches/out/<記事ID>.html に書いてください。
+
+          ★最重要: これは全面リライトではありません。指摘に関係のない文・見出し・段落は1文字も変えないでください。本文が短くなったら不合格になります。
+
+          指摘ごとの直し方:
+
+          (1)「料金があるのに基準日がない」
+          本文に出てくる金額を、WebSearchとWebFetchで**公式サイトの現在の表記と照合**してください。
+          - 一致した場合: その金額のすぐ後ろに『（2026年8月6日時点）』を付ける
+          - 金額が変わっていた場合: 現在の金額に直したうえで『（2026年8月6日時点）』を付ける
+          - **確認できなかった場合: 日付を付けてはいけません。** 具体的な金額を削り、『料金はプランと時期で変わるので公式サイトで確認してほしい』のような、事実として誤りにならない書き方へ置き換えてください。確認していない数字に日付を押すのは、訂正ではなく新しい虚偽を作る行為です
+          - さくら本人が実際に払った金額（4.5万円のスクール失敗談など）は他社の料金ではないので、照合不要でそのまま残してよい
+
+          (2)「制度・年齢条件の話があるのに確認日も出典もない」
+          ワーキングホリデーの年齢上限・ビザ条件・在学卒業要件などを、外務省または各国大使館の公式ページで確認してください。
+          - 確認できた場合: その記述の近くに『（外務省の公表内容・2026年8月6日時点）』のように、**どこで確認したかと日付**を書く
+          - 確認できなかった場合: 断定を外し『国と時期で変わるので、申請前に大使館の公式ページで確認してほしい』へ置き換える
+          - 事実が違っていた場合は正しい内容に直す（例: シンガポールのワーホリは25歳上限で四大在学・卒業が条件）
+
+          (3)「案件を紹介しているのに、合わない人も注意点も書いていない」
+          紹介しているサービスについて、**合わない人か注意点を最低1つ**、本文の自然な位置に1〜3文で足してください。
+          - 実在する制約だけ書く。想像で欠点を作らない
+          - 『向いていないのは〜』『ただし〜』のように、読者が自分で判断できる形にする
+          - 既存の段落を消して差し替えるのではなく、足す
+
+          (4)「根拠を超える断定」
+          『本当の原因』『唯一の方法』『間違いなく』『誰でも必ず』『絶対に伸びる』を、根拠の範囲に収まる表現へ書き換えてください。
+          例: 『本当の原因は〇〇だった』→『私の場合は〇〇だった』『〇〇の可能性が高いと考えている』
+
+          共通で守ること:
+          - さくら本人の一人称『私』で書く。『田中さくらは〜』のように外から書かない
+          - 『——』(emダッシュ)を使わない
+          - 漢数字を使わない（27歳・3ヶ月のようにアラビア数字）
+          - アフィリエイトリンクのHTMLは1つも消さない。属性も変えない
+          - 出力はHTMLのみ。前置きや説明、\`\`\`マーカーは入れない
+
+          全タスクを処理し終えたら、何本処理したか、うち何本で公式サイトの確認が取れなかったかを報告してください。" \
+            --allowedTools "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch" \
+            --dangerously-skip-permissions
+
+      - name: 検査して反映する
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run || 'true' }}
+        run: python affiliate-research-engine/playbook/scripts/article_patcher.py --apply
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/patches/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: article patch $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
