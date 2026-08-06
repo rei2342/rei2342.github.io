@@ -137,6 +137,21 @@ Clean kawaii flat illustration style. 16:9 aspect ratio.
 ハンドル名はスクリプトに埋め込んでいない（X APIはトークンで動く）。
 変更しても此処の記載を直すだけでよい。
 
+### 数字を見る場所（役割が違うので混同しない）
+
+| 見たいこと | 見る場所 | 取り方 |
+|---|---|---|
+| Google検索から来た数・検索語・順位 | Search Console | `gsc-weekly.yml`（月07:00） |
+| インデックス済みか | Search Console | `gsc-index-check.yml` |
+| **SNSから記事に来たか**・記事別PV・滞在 | **GA4** | `ga4-fetch.yml`（毎日12:00） |
+| Threads投稿の表示・いいね | Threads API | `threads-insights.yml`（毎日12:00） |
+| 公開記事の劣化（CTA消失・基準日なし等） | WordPress API | `wp-audit.yml`（土06:00） |
+
+**Search Console には Threads/X からの流入は1件も出ない**（検索経由しか集計しない）。
+「投稿から記事に来たか」を見られるのは GA4 だけ。
+GA4のタグはサイトに入っている（2026-08-05・Cocoon経由 / Rank Math と併存）。
+GA4 APIはGSCと同じサービスアカウント `gsc-reader@pelagic-media-504503-i9.iam.gserviceaccount.com` を使う。
+
 ## X投稿 絵文字ルール（Track B・さくらアカウント）
 - **数**: 1投稿につき2〜3個（短文は2個・長めは3個）
 - **配置**: 気持ちが動いた直後 or 前半1・後半1に分散。文末2連続は避ける
