@@ -14,6 +14,7 @@
 | プロパティID | 名前 | 計測しているURL | 測定ID |
 |---|---|---|---|
 | 501375720 ←取得中 | Yuy2342 | https://nizikake.jp/ | G-PS96LQJQ0Q |
+| 548880365 | sakura-eigo | https://sakura-eigo.com | G-YRE7RGDSQV |
 
 sakura-eigo.com を計測しているプロパティが別にあれば、そのIDを Secret `GA4_PROPERTY_ID` に入れてください。
 
