@@ -78,10 +78,12 @@ jobs:
             | grep -oE "G-[A-Za-z0-9]{6,}|GTM-[A-Za-z0-9]{5,}|UA-[0-9]{4,}-[0-9]+" \
             | sort | uniq -c >> $OUT 2>&1 || echo "(計測IDが見つからない)" >> $OUT
           echo "" >> $OUT
-          echo "--- 解析タグの周辺（IDが取れないときの手がかり）---" >> $OUT
+          echo "--- google が出てくる箇所（IDが取れないときの手がかり）---" >> $OUT
+          # 「googletagmanager」があってもIDが無い場合、それは dns-prefetch の
+          # ヒントだけで、実際のタグは出ていない。前後を見ないと判別できない。
           curl -skS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ \
-            | grep -ioE ".{60}(googletagmanager|google-analytics|gtag\().{60}" \
-            | head -6 >> $OUT 2>&1 || echo "(該当なし)" >> $OUT
+            | tr '>' '>\n' \
+            | grep -i "google" | head -12 >> $OUT 2>&1 || echo "(該当なし)" >> $OUT
           echo "" >> $OUT
           echo "--- その他の解析ツール ---" >> $OUT
           curl -skS -A "Mozilla/5.0" --max-time 20 https://sakura-eigo.com/ \
