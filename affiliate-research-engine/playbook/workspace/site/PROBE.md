@@ -1,4 +1,4 @@
-# サイト外形チェック 2026-08-06 03:22
+# サイト外形チェック 2026-08-06 03:40
 
 ## 接続診断
 ```
@@ -58,8 +58,11 @@ wp-abilities/v1
 --- Jetpack統計が使えるか ---
 jetpack/v4: 404
 --- 計測ID（どのGA4プロパティに送っているか）---
+      2 G-YRE7RGDSQV
 
 --- google が出てくる箇所（IDが取れないときの手がかり）---
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YRE7RGDSQV"></script>
 <meta name="google-site-verification" content="0pIyGHA4AeIZq9eodvR2t-pASqbzlL9kA4FzGZ_78GU" />
 <link rel="preconnect dns-prefetch" href="//www.googletagmanager.com">
 <link rel="preconnect dns-prefetch" href="//www.google-analytics.com">
