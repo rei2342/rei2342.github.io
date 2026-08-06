@@ -114,7 +114,7 @@ def realtime(tok, pid):
     return int(rows[0]["metricValues"][0]["value"]) if rows else 0
 
 
-def report(tok, pid, dims, mets, days=None, limit=50, order=None):
+def report(tok, pid, dims, mets, days=None, limit=50, order=None, filters=None):
     body = {
         "dateRanges": [{"startDate": f"{days or DAYS}daysAgo", "endDate": "today"}],
         "dimensions": [{"name": d} for d in dims],
@@ -123,6 +123,8 @@ def report(tok, pid, dims, mets, days=None, limit=50, order=None):
     }
     if order:
         body["orderBys"] = [{"metric": {"metricName": order}, "desc": True}]
+    if filters:
+        body["dimensionFilter"] = filters
     r = requests.post(f"{DATA}/properties/{pid}:runReport",
                       headers={"Authorization": f"Bearer {tok}"},
                       json=body, timeout=60)
