@@ -322,6 +322,15 @@ jobs:
               messages=[{'role': 'user', 'content': prompt}]
           )
           out = msg.content[0].text.strip().replace("——", "、").replace("—", "、")
+          # URLはこちらが差し込むものだけにする。モデルが書いたURLは
+          # 存在しない場所を指すことがある（2026-08-07に example.com を書いてきた）
+          out = re.sub(r"https?://\S+", "", out)
+          # 記事のCTAボックスから案件名を書き写すことがあるので行ごと落とす
+          out = "\n".join(
+              ln for ln in out.split("\n")
+              if not ln.lstrip().startswith("▶")
+              and not re.search(r"(無料体験|無料トライアル|無料相談|無料カウンセリング)\s*$", ln.strip())
+          )
           # 絵文字の直前の半角スペースを落とす（指示しても入ることがある）
           out = re.sub(
               r'(?<=[ぁ-んァ-ヴ一-龥ー、。！？…])[  ]+(?=[\U0001F000-\U0001FAFF☀-➿←-⇿⬀-⯿])',

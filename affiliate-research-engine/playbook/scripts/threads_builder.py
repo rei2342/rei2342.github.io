@@ -143,6 +143,9 @@ def main():
                    f"記事タイトル: {title}\n\n記事本文:\n{body[:6000]}\n\n" + RULES}],
     )
     out = msg.content[0].text.strip().replace("——", "、").replace("—", "、")
+    # URLはこちらが差し込むものだけにする。モデルが書いたURLは
+    # 存在しない場所を指すことがある（2026-08-07に example.com を書いてきた）
+    out = re.sub(r"https?://\S+", "", out)
     # 保険。箱を外しても案件名を書いてくることがあるので、行ごと落とす
     out = "\n".join(
         ln for ln in out.split("\n")
