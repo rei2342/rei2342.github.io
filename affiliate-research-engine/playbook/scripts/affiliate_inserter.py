@@ -110,6 +110,16 @@ LINKS = {
     # さくらは営業事務で英語の会議・電話に詰まる、という既存の軸がある。
     # 「聞き取れなかったところを後から文字起こしで確認する」用途でだけ出す。
     # 学習法・留学の記事に混ぜない（後付けの紹介になるため）。
+    # Notta Memo（A8）: EPC26.59。ハード製品でさくらは持っていないので、
+    # 「使った」とは絶対に書かない。「同僚に勧められて調べた」までにする。
+    # 録音して聞き直す話のときだけ出す（recording トピック）。
+    "notta_memo": (
+        "BWVTE",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9YLD+2HB1IQ+5988+BWVTE" rel="nofollow">'
+        '→ 会議を録って後から聞き直す（Notta Memo・AIボイスレコーダー）</a>'
+        '<img border="0" width="1" height="1" style="border:none" alt="" loading="lazy"'
+        ' src="https://www14.a8.net/0.gif?a8mat=4B9YLD+2HB1IQ+5988+BWVTE">'
+    ),
     "notta": (
         "5ZEMQ",
         '<a href="https://px.a8.net/svt/ejp?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ" rel="nofollow">'
@@ -135,6 +145,8 @@ TOPIC_MAP = {
     # 職場で英語に詰まる場面。Nottaは学習サービスではないので、
     # 学習法・留学のトピックには入れない（後付けの紹介になる）
     "work_english":   ["notta", "qq_english"],
+    # 録音して聞き直す話。ハードとソフトの2択を並べる
+    "recording":      ["notta_memo", "notta"],
     "default":        ["speek", "dmm"],              # 汎用は高単価speek＋DMMを露出
     # 控え（LINKSには登録済み。実績を見て入れ替える）:
     #   rarejob        … 確定率39%と低いため主力から外す。本人OK/セルフバック可なので原体験づくり用
@@ -161,6 +173,9 @@ def classify(title):
         return "eikaiwa"
     # 職場で実際に手が止まる場面。学習意図ではないので Notta を出す。
     # 「ビジネス英語」「仕事 英語」は学習したい意図なので eikaiwa に残す
+    # 録音・聞き直しの話は work_english より先に見る（会議と重なるため）
+    if any(k in t for k in ["録音", "聞き直", "ボイスレコーダー", "レコーダー", "録って"]):
+        return "recording"
     if any(k in t for k in ["会議", "議事録", "電話対応", "商談", "打ち合わせ",
                             "社内英語", "職場 英語", "営業事務"]):
         return "work_english"

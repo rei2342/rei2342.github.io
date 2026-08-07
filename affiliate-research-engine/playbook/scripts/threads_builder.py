@@ -119,7 +119,13 @@ def main():
         sys.exit(1)
 
     title = art["title"]["rendered"]
-    body = re.sub(r"<[^>]+>", "\n", art["content"]["rendered"])
+    # CTAボックスは案件名の羅列なので、渡すと投稿文に書き写される。
+    # 2026-08-07に「▶ QQ English 無料体験」がThreads文面へ漏れた。
+    import sys as _sys
+    from pathlib import Path as _P
+    _sys.path.insert(0, str(_P(__file__).parent))
+    import affiliate_inserter as _ai
+    body = re.sub(r"<[^>]+>", "\n", _ai.strip_box(art["content"]["rendered"]))
     body = re.sub(r"\n{3,}", "\n\n", body).strip()
     link = art.get("link", "")
     link_line = link + ("&" if "?" in link else "?") + "utm_source=threads" if link else "（記事URL）"
@@ -137,6 +143,12 @@ def main():
                    f"記事タイトル: {title}\n\n記事本文:\n{body[:6000]}\n\n" + RULES}],
     )
     out = msg.content[0].text.strip().replace("——", "、").replace("—", "、")
+    # 保険。箱を外しても案件名を書いてくることがあるので、行ごと落とす
+    out = "\n".join(
+        ln for ln in out.split("\n")
+        if not ln.lstrip().startswith("▶")
+        and not re.search(r"(無料体験|無料トライアル|無料相談|無料カウンセリング)\s*$", ln.strip())
+    )
     out = re.sub(r"(?<=[ぁ-んァ-ヴ一-龥ー、。！？…])[  ]+"
                  r"(?=[\U0001F000-\U0001FAFF☀-➿←-⇿⬀-⯿])", "", out)
 
