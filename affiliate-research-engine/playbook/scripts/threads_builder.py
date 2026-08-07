@@ -152,6 +152,78 @@ def section(tag, text):
     return m.group(1).strip() if m else ""
 
 
+
+def clean(out):
+    """モデルの出力から、外に出してはいけないものを落とす。
+
+    リトライでも同じ処理を通す必要があるので関数にしている。
+    2026-08-07に、この3つが素通りしてThreads文面に載りかけた。
+    """
+    out = out.replace("——", "、").replace("—", "、")
+    # URLはこちらが差し込むものだけにする（example.com を書いてきた）
+    out = re.sub(r"https?://\S+", "", out)
+    # 記事のCTAボックスから案件名を書き写すことがある
+    out = "\n".join(
+        ln for ln in out.split("\n")
+        if not ln.lstrip().startswith("▶")
+        and not re.search(r"(無料体験|無料トライアル|無料相談|無料カウンセリング)\s*$", ln.strip())
+    )
+    # 絵文字の直前の半角スペース（指示しても入ることがある）
+    return re.sub(r"(?<=[ぁ-んァ-ヴ一-龥ー、。！？…])[  ]+"
+                  r"(?=[\U0001F000-\U0001FAFF☀-➿←-⇿⬀-⯿])", "", out)
+
+
+# 2026-08-07に、生成した原稿を人間が7箇所直した。内訳は
+# 指示語で受ける／抽象語で説明する／箇条書きが消える／答えを1投稿目で言い切る、など。
+# 警告を出すだけでは直らないので、**合格しない原稿は外に出さない**。
+_ABSTRACT = ("手数", "設計", "構造", "物差し", "本質", "最適化", "仕組み化", "可視化")
+_VAGUE_HEAD = ("そこ", "それ", "これ", "その", "あの")
+# 時間のつなぎ言葉は指示語ではない（「それから90日続いてる」を誤検知していた）
+_VAGUE_OK = ("それから", "そのあと", "その後", "そして", "それでも", "それだけ")
+
+
+def review(t1, t2, title):
+    """投稿として出せる状態かを見る。出せない理由を文字列で返す。"""
+    bad = []
+    both = t1 + "\n" + t2
+
+    if "。" in both:
+        bad.append("句点（。）が入っている。改行で切る")
+
+    if "・" not in t2:
+        bad.append("2投稿目に箇条書きが無い。手順は箇条書きで独立させる")
+
+    longs = [ln for ln in both.split("\n") if len(ln) > 28]
+    if longs:
+        bad.append(f"28字を超える行がある（例:「{longs[0][:26]}」）。改行で割る")
+
+    abst = [w for w in _ABSTRACT if w in both]
+    if abst:
+        bad.append(f"抽象語で説明している（{'・'.join(abst)}）。実際の動作と場面で見せる")
+
+    # 指示語で行を始めると、前の行を覚えている前提になる
+    vague = [ln for ln in both.split("\n")
+             if ln.strip().startswith(_VAGUE_HEAD)
+             and not ln.strip().startswith(_VAGUE_OK)]
+    if vague:
+        bad.append(f"指示語で受けている（例:「{vague[0][:20]}」）。名指しで書く")
+
+    # 2投稿目だけが流れてくる人がいる。1〜2行目で何の話かを言う
+    head = "".join(t2.split("\n")[:2])
+    keys = [w for w in re.findall(r"[ぁ-んァ-ヴ一-龥]{3,}", title)][:6]
+    if keys and not any(k in head for k in keys):
+        bad.append("2投稿目の冒頭に記事の話題語が無い。1行目で何の話かを言う")
+
+    # 1投稿目で答えを言い切らない。最後は次へ送る形で止める
+    if not t1.rstrip().endswith(("↓", "→")):
+        bad.append("1投稿目が「↓」で終わっていない。答えを出さずに次へ送る")
+
+    if len(t2) < 120:
+        bad.append(f"2投稿目が{len(t2)}字と薄い。読者が今日できることを入れる")
+
+    return bad
+
+
 def main():
     if not ARTICLE_ID:
         print("ARTICLE_ID が未指定")
@@ -178,26 +250,12 @@ def main():
     print(f"リンク: {link_line}\n")
 
     ai = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-    msg = ai.messages.create(
-        model="claude-opus-4-8",
-        max_tokens=1500,
-        messages=[{"role": "user", "content":
-                   "あなたは田中さくら（27歳・営業事務・東京）。\n\n"
-                   f"下の記事から Threads の投稿を作って。\n\n"
-                   f"記事タイトル: {title}\n\n記事本文:\n{body[:6000]}\n\n" + RULES}],
-    )
-    out = msg.content[0].text.strip().replace("——", "、").replace("—", "、")
-    # URLはこちらが差し込むものだけにする。モデルが書いたURLは
-    # 存在しない場所を指すことがある（2026-08-07に example.com を書いてきた）
-    out = re.sub(r"https?://\S+", "", out)
-    # 保険。箱を外しても案件名を書いてくることがあるので、行ごと落とす
-    out = "\n".join(
-        ln for ln in out.split("\n")
-        if not ln.lstrip().startswith("▶")
-        and not re.search(r"(無料体験|無料トライアル|無料相談|無料カウンセリング)\s*$", ln.strip())
-    )
-    out = re.sub(r"(?<=[ぁ-んァ-ヴ一-龥ー、。！？…])[  ]+"
-                 r"(?=[\U0001F000-\U0001FAFF☀-➿←-⇿⬀-⯿])", "", out)
+    prompt = ("あなたは田中さくら（27歳・営業事務・東京）。\n\n"
+              f"下の記事から Threads の投稿を作って。\n\n"
+              f"記事タイトル: {title}\n\n記事本文:\n{body[:6000]}\n\n" + RULES)
+    msg = ai.messages.create(model="claude-opus-4-8", max_tokens=1500,
+                             messages=[{"role": "user", "content": prompt}])
+    out = clean(msg.content[0].text.strip())
 
     t1, t2 = section("THREADS_1", out), section("THREADS_2", out)
     ng = section("NG", out)
@@ -209,21 +267,25 @@ def main():
     print("=== ① 1投稿目 ===\n" + t1)
     print("\n=== ② 2投稿目（末尾にリンク） ===\n" + t2 + "\n\n" + link_line)
 
-    # 型から外れやすいところを機械で見る。人が直しているうちに
-    # 型が消えることがある（2026-08-07に箇条書きの手順が丸ごと落ちた）
-    warn = []
-    kuten = t1.count("。") + t2.count("。")
-    if kuten:
-        warn.append(f"句点が{kuten}個混ざっている")
-    if "・" not in t2:
-        warn.append("2投稿目に箇条書きが無い（手順は箇条書きで独立させる）")
-    longs = [ln for ln in (t1 + "\n" + t2).split("\n") if len(ln) > 28]
-    if longs:
-        warn.append(f"28字を超える行が{len(longs)}本（例: {longs[0][:30]}）")
-    if warn:
-        print("\n型から外れている点:")
-        for w in warn:
-            print(f"  - {w}")
+    # 合格しない原稿は外に出さない。理由を渡して書き直させる
+    for attempt in range(1, 4):
+        bad = review(t1, t2, title)
+        if not bad:
+            print(f"\n検査を通過（{attempt}回目）")
+            break
+        print(f"\n{attempt}回目は不合格:")
+        for b in bad:
+            print(f"  - {b}")
+        if attempt == 3:
+            print("\n3回書き直しても通らなかった。人が直す前提で出力する")
+            break
+        retry = (prompt + "\n\n## 直前の原稿は以下の理由で不合格だった。必ず直すこと\n"
+                 + "\n".join(f"- {b}" for b in bad)
+                 + "\n\n直した原稿を、同じ出力形式でもう一度出す。")
+        msg = ai.messages.create(model="claude-opus-4-8", max_tokens=1500,
+                                 messages=[{"role": "user", "content": retry}])
+        out = clean(msg.content[0].text.strip())
+        t1, t2 = section("THREADS_1", out), section("THREADS_2", out)
 
     # 結果をファイルにも残す（ログが取りにくいので確認用）
     from pathlib import Path
