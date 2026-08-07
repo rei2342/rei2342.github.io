@@ -63,11 +63,21 @@ def media(mid):
     return r.json() if r.status_code == 200 else None
 
 
-def new_name(slug, url):
-    """記事スラッグからファイル名を作る。拡張子は元のものを残す。"""
+def new_name(slug, url, post_id):
+    """記事スラッグからファイル名を作る。拡張子は元のものを残す。
+
+    スラッグ自体が日本語のことがある。その場合はURLエンコードされた
+    「%e3%80%8c…」が来るので、そのまま変換すると
+    「e3-80-8c-e3-83-af-…」という読めない名前になる。
+    英字が実質含まれないなら、記事IDで代用する。
+    """
+    from urllib.parse import unquote
     ext = os.path.splitext(url.split("?")[0])[1].lower() or ".png"
-    base = re.sub(r"[^a-z0-9\-]+", "-", (slug or "eyecatch").lower()).strip("-")[:60]
-    return f"{base or 'eyecatch'}{ext}"
+    base = re.sub(r"[^a-z0-9\-]+", "-", unquote(slug or "").lower()).strip("-")[:60]
+    # 英字が3文字未満なら、スラッグが日本語だったと判断する
+    if len(re.findall(r"[a-z]", base)) < 3:
+        base = f"eyecatch-{post_id}"
+    return f"{base}{ext}"
 
 
 def reupload(url, filename, mime, alt):
@@ -113,7 +123,7 @@ def main():
     ok = ng = 0
     for p, m in targets[:LIMIT]:
         old = m["source_url"].split("/")[-1]
-        name = new_name(p.get("slug"), m["source_url"])
+        name = new_name(p.get("slug"), m["source_url"], p["id"])
         if DRY_RUN:
             L.append(f"| {p['id']} | {p['status']} | {old[:34]} | {name} | 未実行 |\n")
             print(f"[{p['id']}] {old[:40]} → {name}")
