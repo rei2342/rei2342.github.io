@@ -106,6 +106,17 @@ LINKS = {
         "a8_s00000015388008",
         '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" rel="nofollow">→ スタディサプリENGLISH 新日常英会話セットプラン（アプリ＋英会話）を無料で体験する</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" alt="" loading="lazy">'
     ),
+    # Notta（A8）: EPC50以上・CTR5%以上。英語学習そのものではないが、
+    # さくらは営業事務で英語の会議・電話に詰まる、という既存の軸がある。
+    # 「聞き取れなかったところを後から文字起こしで確認する」用途でだけ出す。
+    # 学習法・留学の記事に混ぜない（後付けの紹介になるため）。
+    "notta": (
+        "5ZEMQ",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ" rel="nofollow">'
+        '→ 英語の会議を文字起こしして後から確認する（Notta・無料プランあり）</a>'
+        '<img border="0" width="1" height="1" style="border:none" alt="" loading="lazy"'
+        ' src="https://www19.a8.net/0.gif?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ">'
+    ),
 }
 
 # ── Topic → max 2 programs, priority order ────────────────────────────────────
@@ -121,6 +132,9 @@ TOPIC_MAP = {
     "training":       ["sptr", "sapuri_nichijo"],    # スパトレ(第二言語習得論)＋スタサプ(アプリ学習)
     "eikaiwa":        ["qq_english", "nativecamp"],  # QQ(確定率97.45%)＋NC(初成果ボーナス対象)
     "domestic":       ["ugaku"],
+    # 職場で英語に詰まる場面。Nottaは学習サービスではないので、
+    # 学習法・留学のトピックには入れない（後付けの紹介になる）
+    "work_english":   ["notta", "qq_english"],
     "default":        ["speek", "dmm"],              # 汎用は高単価speek＋DMMを露出
     # 控え（LINKSには登録済み。実績を見て入れ替える）:
     #   rarejob        … 確定率39%と低いため主力から外す。本人OK/セルフバック可なので原体験づくり用
@@ -145,7 +159,12 @@ def classify(title):
         return "pronunciation"
     if any(k in t for k in ["オンライン英会話", "英会話", "DMM", "ネイティブ", "毎日 英語"]):
         return "eikaiwa"
-    if any(k in t for k in ["ビジネス英語", "仕事 英語", "会議"]):
+    # 職場で実際に手が止まる場面。学習意図ではないので Notta を出す。
+    # 「ビジネス英語」「仕事 英語」は学習したい意図なので eikaiwa に残す
+    if any(k in t for k in ["会議", "議事録", "電話対応", "商談", "打ち合わせ",
+                            "社内英語", "職場 英語", "営業事務"]):
+        return "work_english"
+    if any(k in t for k in ["ビジネス英語", "仕事 英語"]):
         return "eikaiwa"
     if any(k in t for k in ["スパトレ", "トレーニング", "第二言語習得", "独学", "続かない", "アプリ",
                             "モチベ", "ゼロから", "勉強法", "やり直し"]):
