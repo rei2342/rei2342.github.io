@@ -187,9 +187,13 @@ jobs:
 
           if resp.status_code in (200, 201):
               print(f"Posted: {resp.json().get('id')} / {resp.json().get('link')}")
-              # Threads生成で使うので記事URLを渡す
+              # 下書きのlinkは ?p=ID で返る。公開後にリダイレクトはするが、
+              # Threadsに貼る文面なので slug から読めるURLを組み立てる
+              url = resp.json().get('link', '')
+              if slug:
+                  url = f"https://sakura-eigo.com/{slug}/"
               with open('/tmp/article_url.txt', 'w') as uf:
-                  uf.write(resp.json().get('link', ''))
+                  uf.write(url)
           else:
               print(f"Error {resp.status_code}: {resp.text[:300]}")
               sys.exit(1)
@@ -324,7 +328,9 @@ jobs:
               '', out)
 
           def section(tag, text):
-              m = re.search(rf'==={tag}===\s*(.*?)(?====[A-Z_]+===|$)', text, re.DOTALL)
+              # 区切りに数字が入る（THREADS_2）。[A-Z_]だけだと止まれず、
+              # 1投稿目に2投稿目が丸ごと混入する
+              m = re.search(rf'==={tag}===\s*(.*?)(?====[A-Z0-9_]+===|$)', text, re.DOTALL)
               return m.group(1).strip() if m else ""
 
           threads_1 = section('THREADS_1', out)
