@@ -1,4 +1,4 @@
-# サイト外形チェック 2026-08-06 03:40
+# サイト外形チェック 2026-08-07 03:22
 
 ## 接続診断
 ```
@@ -75,6 +75,24 @@ jetpack/v4: 404
 var cocoon_localize_script_options = {"is_lazy_load_enable":null,"is_fixed_mobile_buttons_enable":"","is_google_font_lazy_load_enable":""};
 
 --- その他の解析ツール ---
+```
+
+## 記事のOGP（SNSのプレビュー画像）
+```
+対象: https://sakura-eigo.com/online-english-lessons-90-days-success/
+<meta property="og:title" content="オンライン英会話が3日で終わっていた私が、予約をやめて続いた90日 - さくらの英語挑戦記" />
+<meta property="og:description" content="3日、4日、2日。オンライン英会話を3回登録して、続いた日数はこれで打ち止めだった。無料体験に申し込んで、初回はちゃんと話して、次の日に予約画面を開いて、講師を探しているうちに面倒になって閉じる。営業事務の残業で夜が崩れ [&hellip;]" />
+<meta property="og:image" content="https://sakura-eigo.com/wp-content/uploads/2026/08/ChatGPT-Image-2026年8月7日-11_04_03.png" />
+<meta property="og:image:secure_url" content="https://sakura-eigo.com/wp-content/uploads/2026/08/ChatGPT-Image-2026年8月7日-11_04_03.png" />
+<meta property="og:image:width" content="1672" />
+<meta property="og:image:height" content="941" />
+<meta property="og:image:alt" content="オンライン英会話が3日で終わっていた私が、予約をやめて続いた90日" />
+<meta property="og:image:type" content="image/png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://sakura-eigo.com/wp-content/uploads/2026/08/ChatGPT-Image-2026年8月7日-11_04_03.png" />
+--- og:image が実際に取れるか ---
+URL: https://sakura-eigo.com/wp-content/uploads/2026/08/ChatGPT-Image-2026年8月7日-11_04_03.png
+status=200 type=image/png size=2080342
 ```
 
 ## トップページの head 抜粋（SEOプラグイン判定）
