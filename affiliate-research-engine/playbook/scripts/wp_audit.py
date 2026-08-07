@@ -35,6 +35,33 @@ UNCATEGORIZED_ID = 1
 SKIP_MARKS = ("【Threads用】", "【メモ】", "【社内")
 
 
+def media_urls():
+    """メディアID → URL の対応を取る。
+
+    アイキャッチのファイル名が日本語だと、MetaのクローラーがURLを
+    取りに行けず、Threads/Facebookのプレビュー画像が出ない
+    （2026-08-07に「ChatGPT-Image-2026年8月7日-11_04_03.png」で発生）。
+    ファイル自体は200で返るので、外形からは気づけない。
+    """
+    urls, page = {}, 1
+    while True:
+        r = requests.get(f"{WP_BASE}/media", auth=(WP_USER, WP_PASS),
+                         params={"per_page": 100, "page": page,
+                                 "_fields": "id,source_url"},
+                         headers={"User-Agent": "Mozilla/5.0"},
+                         verify=False, timeout=40)
+        if r.status_code != 200:
+            break
+        b = r.json()
+        if not b:
+            break
+        urls.update({m["id"]: m.get("source_url", "") for m in b})
+        if len(b) < 100:
+            break
+        page += 1
+    return urls
+
+
 def published():
     posts, page = [], 1
     while True:
@@ -65,8 +92,14 @@ def audit(post):
     if any(m in title for m in SKIP_MARKS):
         issues.append("内部メモが公開されている")
 
-    if not post.get("featured_media"):
+    fm = post.get("featured_media")
+    if not fm:
         issues.append("アイキャッチ未設定")
+    else:
+        url = (MEDIA or {}).get(fm, "")
+        # 半角英数以外がURLに入っていると、SNSのプレビュー画像が出ない
+        if url and not url.isascii():
+            issues.append(f"アイキャッチのファイル名に日本語が入っている（{url.split('/')[-1][:40]}）")
 
     cats = post.get("categories") or []
     if not cats or cats == [UNCATEGORIZED_ID]:
@@ -101,8 +134,13 @@ def audit(post):
     return issues
 
 
+MEDIA = {}
+
+
 def main():
+    global MEDIA
     OUT.mkdir(parents=True, exist_ok=True)
+    MEDIA = media_urls()
     posts = published()
     print(f"公開中 {len(posts)}本を検査\n")
 
