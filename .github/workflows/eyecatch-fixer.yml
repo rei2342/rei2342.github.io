@@ -1,0 +1,64 @@
+name: アイキャッチのファイル名を直す
+
+# 日本語ファイル名だと Threads/Facebook のプレビュー画像が出ない。
+# WordPressのAPIではファイル名を変更できないので、
+# 取得 → 半角英数の名前で再アップロード → アイキャッチを差し替え、で直す。
+#
+# 古いメディアは消さない。本文に直接貼っている記事があると壊れるため。
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true なら対象を出すだけで書き換えない'
+        required: false
+        default: 'true'
+      limit:
+        description: '1回に直す本数'
+        required: false
+        default: '50'
+
+concurrency:
+  group: wp-write
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests -q
+
+      - name: Fix
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run || 'true' }}
+          LIMIT: ${{ inputs.limit || '50' }}
+        run: python affiliate-research-engine/playbook/scripts/eyecatch_fixer.py
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/site/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: eyecatch filenames $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
