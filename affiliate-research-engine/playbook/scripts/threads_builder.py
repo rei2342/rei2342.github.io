@@ -181,10 +181,21 @@ def main():
     print("=== ① 1投稿目 ===\n" + t1)
     print("\n=== ② 2投稿目（末尾にリンク） ===\n" + t2 + "\n\n" + link_line)
 
-    # 句点が混ざっていないかだけ機械で見る（いちばん戻りやすい癖）
+    # 型から外れやすいところを機械で見る。人が直しているうちに
+    # 型が消えることがある（2026-08-07に箇条書きの手順が丸ごと落ちた）
+    warn = []
     kuten = t1.count("。") + t2.count("。")
     if kuten:
-        print(f"\n注意: 句点が{kuten}個混ざっている")
+        warn.append(f"句点が{kuten}個混ざっている")
+    if "・" not in t2:
+        warn.append("2投稿目に箇条書きが無い（手順は箇条書きで独立させる）")
+    longs = [ln for ln in (t1 + "\n" + t2).split("\n") if len(ln) > 28]
+    if longs:
+        warn.append(f"28字を超える行が{len(longs)}本（例: {longs[0][:30]}）")
+    if warn:
+        print("\n型から外れている点:")
+        for w in warn:
+            print(f"  - {w}")
 
     # 結果をファイルにも残す（ログが取りにくいので確認用）
     from pathlib import Path
