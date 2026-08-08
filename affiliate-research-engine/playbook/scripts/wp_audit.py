@@ -131,6 +131,10 @@ def audit(post):
     if _q.missing_caveat(body, text):
         issues.append("案件を紹介しているのに、合わない人も注意点も書いていない")
 
+    plan = _q.personal_plan(text)
+    if plan:
+        issues.append(f"さくら個人の実現しない予定がある（{plan}）。読者の悩みとして書き直す")
+
     return issues
 
 

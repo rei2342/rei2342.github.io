@@ -388,6 +388,10 @@ def audit(html):
     if _q.lone_numbers(qtext) < 2:
         issues.append("判断材料になる数字が2つ未満")
 
+    plan = _q.personal_plan(qtext)
+    if plan:
+        issues.append(f"さくら個人の実現しない予定がある（{plan}）。読者の悩みとして書く")
+
     return issues
 
 
