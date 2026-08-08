@@ -392,6 +392,13 @@ def audit(html):
     if plan:
         issues.append(f"さくら個人の実現しない予定がある（{plan}）。読者の悩みとして書く")
 
+    tsf = _q.time_sensitive_fact(qtext)
+    if tsf:
+        issues.append(f"制度の断定に根拠が足りない: {tsf}")
+
+    for e in _q.experience_claims(qtext)[:3]:
+        issues.append(f"体験表現が台帳と合わない: {e}")
+
     return issues
 
 

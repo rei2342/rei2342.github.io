@@ -135,6 +135,22 @@ def audit(post):
     if plan:
         issues.append(f"さくら個人の実現しない予定がある（{plan}）。読者の悩みとして書き直す")
 
+    # 制度・年齢条件は、国・確認日・出典の3つが揃っていないと危ない。
+    # 「ワーホリの年齢上限は30歳」は国で違う（シンガポールは25歳＋四大在学）
+    tsf = _q.time_sensitive_fact(text)
+    if tsf:
+        issues.append(f"制度の断定に根拠が足りない: {tsf}")
+
+    # 台帳と食い違う体験表現。自動修正はせず、監査一覧に出す
+    for e in _q.experience_claims(text)[:3]:
+        issues.append(f"体験表現の確認が必要: {e}")
+
+    # 一人称の具体的な主張が、事実台帳に無い
+    fc = _q.fact_claims(text)
+    if fc:
+        issues.append(f"実体験台帳に無い主張: {'・'.join(fc[:3])}"
+                      + (f" ほか{len(fc)-3}件" if len(fc) > 3 else ""))
+
     return issues
 
 

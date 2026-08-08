@@ -1,0 +1,19 @@
+# サービス利用以外の実体験。さくらの一人称に使える事実のデータベース。
+# 記事の共感要素はここに多い。禁止リストではなく、書ける素材の一覧として使う。
+#
+# category   study_period / setback / toeic / spending / study_time / tool /
+#            abroad / travel / work_english など
+# claim      記事で書く形の主張（そのまま使える文にしておくと楽）
+# value      数値がある場合（点・円・時間・年 など単位つき）
+# period     いつのことか（2024-04〜2026-03 など）
+# verified   yes / no（no なら記事で使わない）
+# note       補足・注意点
+category,claim,value,period,verified,note
+study_period,,,,,
+setback,,,,,
+toeic,,,,,
+spending,,,,,
+study_time,,,,,
+tool,,,,,
+abroad,,,,,
+work_english,,,,,

@@ -1,24 +1,30 @@
-# 運営者が「実際に使った」サービス。ここに yes と書いたものだけ、
-# 記事で「使った」「試した」「続けた」「◯円かかった」と書ける。
+# サービス利用の実体験台帳。ここに書いた範囲だけ、記事で体験として書ける。
 #
-# 空欄・no のサービスに体験表現が付いていたら、機械が報告する。
-# **推測で yes にしない。** 使っていないものを使った体で書くと、
-# 他の記事の信用まで落ちる。
+# status        used / not_used / unknown（空欄は unknown 扱い。台帳に無いサービスも unknown）
+# usage_type    free_trial / paid / single / continuous など
+# start_date    利用開始（2026-01 の形式）
+# end_date      利用終了（継続中なら ongoing）
+# amount_paid   実際に払った総額（円・数字のみ。無料なら 0）
+# actual_experience  実際にしたこと（記事の素材になる）
+# allowed_claims     記事で書いてよい主張。ここに無い具体は書かない
+# note          補足
 #
-# used: yes / no / 空欄（未確認）
-# note: 使ったなら、いつ・いくら・どのプランかを書いておく（記事の素材になる）
-service,used,note
-speek,,
-スパトレ,,
-DMM英会話,,
-ネイティブキャンプ,,
-QQ English,,
-レアジョブ英会話,,
-スタディサプリ,,
-Notta,,
-Notta Memo,,
-U-GAKU,,
-留学情報館,,
-フィリピン留学ナビ,,
-CEBRIDGE,,
-ネイティブキャンプ留学,,
+# 判定:
+#   used       … 登録した期間・金額・内容の範囲だけ体験表現OK。超えたら警告
+#   not_used   … 「調べた」「比較した」「候補にした」のみ
+#   unknown/空 … 体験表現があれば警告（自動修正はしない。監査一覧に出す）
+service,status,usage_type,start_date,end_date,amount_paid,actual_experience,allowed_claims,note
+speek,,,,,,,,
+スパトレ,,,,,,,,
+DMM英会話,,,,,,,,
+ネイティブキャンプ,,,,,,,,
+QQ English,,,,,,,,
+レアジョブ英会話,,,,,,,,
+スタディサプリ,,,,,,,,
+Notta,,,,,,,,
+Notta Memo,,,,,,,,
+U-GAKU,,,,,,,,
+留学情報館,,,,,,,,
+フィリピン留学ナビ,,,,,,,,
+CEBRIDGE,,,,,,,,
+ネイティブキャンプ留学,,,,,,,,

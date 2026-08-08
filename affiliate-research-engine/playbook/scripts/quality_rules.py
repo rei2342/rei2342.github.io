@@ -83,53 +83,132 @@ def personal_plan(text):
 
 # ── 体験の主張 ──────────────────────────────────────────
 # 運営者が実際にやったことだけ「使った」「試した」と書ける。
-# 使っていないサービスに体験表現を付けたら、それは捏造。
-# どのサービスを実際に使ったかは機械には分からないので、
-# workspace/experience.csv に人が書く。書いていないサービスに
-# 体験表現が付いていたら報告する（自動で消さない。判断は人がする）。
+# ただし「使った」だけでは粗すぎる。無料体験を2回しただけのサービスに
+# 「3ヶ月使った」「4.5万円払った」と書けてしまう。
+# 台帳には期間・金額・実際にしたことまで登録し、**その範囲を超えたら警告**する。
+#
+# 空欄と、台帳に無いサービスは unknown として扱う（スキップしない）。
 EXPERIENCE_VERBS = (
     "使った", "使ってみた", "試した", "続けた", "受けた", "通った",
     "申し込んだ", "契約した", "解約した", "払った", "受講した",
-    "使って分かった", "体験した", "自腹",
+    "使って分かった", "体験した", "自腹", "始めた", "やってみた",
+    "試してみ", "使ってみ", "受けてみ", "続けてみ", "登録した", "無料体験",
 )
-EXPERIENCE_PATH = "affiliate-research-engine/playbook/workspace/experience.csv"
+EXPERIENCE_CSV = "affiliate-research-engine/playbook/workspace/experience.csv"
+FACTS_CSV = "affiliate-research-engine/playbook/workspace/experience_facts.csv"
+
+# 記事に出てくるサービス名。台帳のキーと揃える
+SERVICE_NAMES = (
+    "speek", "スパトレ", "DMM英会話", "ネイティブキャンプ留学", "ネイティブキャンプ",
+    "QQ English", "レアジョブ英会話", "スタディサプリ", "スタサプ",
+    "Notta Memo", "Notta", "U-GAKU", "留学情報館", "フィリピン留学ナビ", "CEBRIDGE",
+)
 
 
-def _used_services():
-    """実際に使ったサービス名の一覧。ファイルが無ければ空。"""
+def _read_csv(path):
     import csv
     import os
-    if not os.path.exists(EXPERIENCE_PATH):
-        return None          # 未整備。判定しない（誤検知で原稿を弾かない）
-    names = set()
-    with open(EXPERIENCE_PATH, encoding="utf-8") as f:
-        for row in csv.DictReader(l for l in f if not l.startswith("#")):
-            if (row.get("used") or "").strip().lower() in ("yes", "y", "true", "1"):
-                names.add((row.get("service") or "").strip())
-    return {n for n in names if n}
+    if not os.path.exists(path):
+        return []
+    with open(path, encoding="utf-8") as f:
+        return list(csv.DictReader(l for l in f if not l.lstrip().startswith("#")))
 
 
-def experience_claims(text, service_names):
-    """体験表現が付いているのに、実際には使っていないサービスを返す。
+def load_experience():
+    """サービス名 → 台帳の1行。台帳に無いものは呼び出し側で unknown 扱いにする。"""
+    return {(r.get("service") or "").strip(): r
+            for r in _read_csv(EXPERIENCE_CSV) if (r.get("service") or "").strip()}
 
-    service_names … その記事が触れている案件名のリスト（呼び出し側が渡す）。
-    実使用リストが未整備なら None を返し、判定しない。
-    """
-    used = _used_services()
-    if used is None:
+
+def _months(start, end):
+    """登録された利用期間を月数で返す。読めなければ None。"""
+    m1 = re.match(r"(20\d{2})-(\d{1,2})", (start or "").strip())
+    if not m1:
         return None
-    hits = []
-    for name in service_names:
-        if not name or name in used:
-            continue
-        # サービス名の前後60字に体験表現があるか
+    if (end or "").strip().lower() in ("ongoing", "継続中"):
+        return 999
+    m2 = re.match(r"(20\d{2})-(\d{1,2})", (end or "").strip())
+    if not m2:
+        return None
+    return (int(m2.group(1)) - int(m1.group(1))) * 12 + int(m2.group(2)) - int(m1.group(2)) + 1
+
+
+def experience_claims(text):
+    """体験表現の使い方が台帳と合っているかを見る。問題を文字列で返す。
+
+    自動修正はしない。監査一覧に出して、人が判断する。
+    """
+    ledger = load_experience()
+    issues = []
+    for name in SERVICE_NAMES:
         for m in re.finditer(re.escape(name), text):
-            around = text[max(0, m.start() - 60):m.end() + 60]
-            for v in EXPERIENCE_VERBS:
-                if v in around:
-                    hits.append((name, v, around.strip()[:80]))
-                    break
-    return hits
+            around = text[max(0, m.start() - 70):m.end() + 70]
+            verb = next((v for v in EXPERIENCE_VERBS if v in around), None)
+            if not verb:
+                continue
+
+            row = ledger.get(name)
+            status = ((row or {}).get("status") or "").strip().lower()
+
+            if not row:
+                issues.append(f"{name}に体験表現「{verb}」。台帳に無い（unknown）")
+                break
+            if status in ("", "unknown"):
+                issues.append(f"{name}に体験表現「{verb}」。台帳が未記入（unknown）")
+                break
+            if status == "not_used":
+                issues.append(f"{name}は未使用なのに体験表現「{verb}」。"
+                              "「調べた」「比較した」「候補にした」へ直す")
+                break
+
+            # used。登録した範囲を超えていないか
+            paid = re.sub(r"[^0-9]", "", (row.get("amount_paid") or ""))
+            if paid:
+                for am in re.finditer(r"([0-9][0-9,]*)\s*(万?)円", around):
+                    v = int(am.group(1).replace(",", "")) * (10000 if am.group(2) else 1)
+                    if v > int(paid):
+                        issues.append(f"{name}に「{am.group(0)}」。"
+                                      f"台帳の支払額は{paid}円。超えている")
+            mo = _months(row.get("start_date"), row.get("end_date"))
+            if mo:
+                for pm in re.finditer(r"([0-9]+)\s*(ヶ月|か月|カ月|年)", around):
+                    v = int(pm.group(1)) * (12 if pm.group(2) == "年" else 1)
+                    if v > mo:
+                        issues.append(f"{name}に「{pm.group(0)}」。"
+                                      f"台帳の利用期間は{mo}ヶ月。超えている")
+            break
+    return issues
+
+
+def load_facts():
+    """サービス利用以外の実体験。verified=yes のものだけ返す。"""
+    return [r for r in _read_csv(FACTS_CSV)
+            if (r.get("verified") or "").strip().lower() in ("yes", "y", "true", "1")]
+
+
+# 一人称の具体的な主張。台帳と突き合わせる対象
+FACT_CLAIM_RE = re.compile(
+    r"TOEIC[^。]{0,12}?([0-9]{3})\s*点"
+    r"|([0-9]+)\s*年(?:間)?[^。]{0,8}?(?:後回し|放置|やらなかった|止まって|停滞)"
+    r"|([0-9][0-9,]*)\s*万?円[^。]{0,10}?(?:溶かした|무駄|払った|使った)"
+    r"|([0-9]+)\s*時間[^。]{0,8}?(?:勉強|学習|やった)")
+
+
+def fact_claims(text):
+    """一人称の具体的な主張を拾い、台帳に根拠があるかを返す。
+
+    台帳が空なら「未登録」として全部返す。自動修正はしない。
+    """
+    facts = load_facts()
+    values = " ".join((f.get("value") or "") + (f.get("claim") or "") for f in facts)
+    out = []
+    for m in FACT_CLAIM_RE.finditer(text):
+        claim = m.group(0).strip()
+        num = next((g for g in m.groups() if g), "")
+        if num and num in values:
+            continue
+        out.append(claim[:40])
+    return out
 
 
 # ── 時限情報（制度・ビザ・年齢条件・料金）────────────────
