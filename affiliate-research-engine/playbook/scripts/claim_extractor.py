@@ -116,11 +116,15 @@ EXCLUDE_HTML = {
 
 
 def blocks(html):
-    """記事HTMLを (種別, 除外理由 or None, 文の並び) に分けて返す。
+    """記事HTMLを (種別, 除外理由 or None, 文の並び, 除外時の残り本文) で返す。
 
     CTAボックスは affiliate_inserter が付ける定型なので、まるごと外す。
-    アフィリンクを含むブロックも申込導線なので外す。
     引用（blockquote）は第三者の口コミなので外す。
+
+    **アフィリンクを含むブロックは注意が要る。** 体験を書いた段落の末尾に
+    公式リンクがあることがあり、丸ごと外すと体験主張まで消える。
+    リンク部分を取り除いた本文に体験表現が残るなら、
+    「要確認」として別一覧に出す（黙って捨てない）。
     """
     import affiliate_inserter as _ai2
     html = _ai2.strip_box(html)
@@ -129,16 +133,21 @@ def blocks(html):
         tag = m.group(1).lower()
         inner = m.group(2)
         reason = EXCLUDE_HTML.get(tag)
-        if _q.AFFILIATE_LINK_RE.search(inner):
-            reason = "アフィリエイト導線"
-        # ナビゲーション・関連記事は内部リンクだけの短い行になりやすい
+        rest = ""
+        if not reason and _q.AFFILIATE_LINK_RE.search(inner):
+            # リンクを取り除いた残りに体験表現があるか
+            rest = _q.strip_tags(re.sub(r"<a\b.*?</a>", "", inner, flags=re.DOTALL | re.I))
+            if any(v in rest for v in _q.EXPERIENCE_VERBS):
+                reason = "要確認: アフィリンク付きだが体験表現が残る"
+            else:
+                reason = "アフィリエイト導線"
         if not reason and re.search(r"<a\b", inner) and len(_q.strip_tags(inner)) < 40:
             reason = "リンクだけの行"
         text = _q.strip_tags(inner)
         if not text:
             continue
         ss = [x.strip() for x in re.split(r"(?<=[。？！])", text) if x.strip()]
-        out.append((tag, reason, ss))
+        out.append((tag, reason, ss, rest or text))
     return out
 
 
@@ -239,14 +248,16 @@ def main():
 
     props = defaultdict(lambda: {"rows": [], "posts": [], "variants": set()})
     excluded = defaultdict(int)
+    samples = defaultdict(list)
 
     for p in posts:
         title = re.sub(r"<[^>]+>", "", p["title"]["rendered"])
         html = p.get("content", {}).get("rendered", "")
         prev_subject = None
-        for tag, reason, ss in blocks(html):
+        for tag, reason, ss, rest in blocks(html):
             if reason:
                 excluded[reason] += 1
+                samples[reason].append((p["id"], p.get("link", ""), tag, rest[:160]))
                 prev_subject = None       # 除外ブロックで主語の引き継ぎを切る
                 continue
             for i, sent in enumerate(ss):
@@ -352,6 +363,33 @@ def main():
         L.append("\n**confirmation**: （未記入）\n\n---\n\n")
 
     (OUT / "CLAIMS.md").write_text("".join(L), encoding="utf-8")
+
+    # 除外しすぎていないかを確かめる一覧。偽陰性はここでしか見つからない
+    NEED = "要確認: アフィリンク付きだが体験表現が残る"
+    E = [f"# 抽出から外したブロック {date.today().isoformat()}\n\n",
+         "誤抽出（偽陽性）だけでなく、**除外しすぎ（偽陰性）**を確かめるための一覧。\n\n",
+         "## 理由別の件数\n\n| 理由 | ブロック数 |\n|---|---|\n"]
+    for k, n in sorted(excluded.items(), key=lambda kv: -kv[1]):
+        E.append(f"| {k} | {n} |\n")
+
+    E.append(f"\n## ⚠️ 要確認（{len(samples.get(NEED, []))}件）\n\n"
+             "アフィリンクを取り除いた本文に体験表現が残っているブロック。\n"
+             "**体験主張が監査から漏れている可能性がある。**\n\n")
+    for pid, url, tag, rest in samples.get(NEED, [])[:40]:
+        E.append(f"- **[{pid}]** `<{tag}>` {url}\n  - {rest}\n")
+    if not samples.get(NEED):
+        E.append("（該当なし）\n")
+
+    E.append("\n## 除外したブロックのサンプル（理由別・各5件）\n\n")
+    for k in sorted(excluded, key=lambda x: -excluded[x]):
+        if k == NEED:
+            continue
+        E.append(f"### {k}（{excluded[k]}件）\n\n")
+        for pid, url, tag, rest in samples[k][:5]:
+            E.append(f"- [{pid}] `<{tag}>` {rest[:120]}\n")
+        E.append("\n")
+
+    (OUT / "EXCLUDED.md").write_text("".join(E), encoding="utf-8")
     print(f"命題 {len(rows)}件（体験主張 {len(exp)}件）")
     print("除外したブロック:", dict(excluded))
     print(f"{'ID':6}{'記事':>3} {'体験':<4}{'主語':<8}{'分類':<6}{'元':<12} 命題")
