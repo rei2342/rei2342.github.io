@@ -73,6 +73,9 @@ AUX_VERB = {"いる", "ある", "みる", "しまう", "くる", "おく", "ほ�
             "する", "できる", "なる"}
 COND_SURF = {"ば", "たら", "なら", "れば"}
 
+# 可能の形。「受けられる」はできるという話で、受けた事実ではない
+POTENTIAL_V = {"られる", "れる", "得る", "うる"}
+
 # 複合動詞の後ろ側。前の動詞に付いて相を足すだけで、目的語は取らない
 COMPOUND_V2 = {"続ける", "始める", "終える", "直す", "切る", "出す", "込む",
                "きる", "つづける", "はじめる"}
@@ -136,7 +139,7 @@ def analyze(sent):
 
         action, atype = LEMMA_ACT[base]
         past = polite = prog = cond = vol = nonpast = False
-        negative = False
+        negative = potential = False
         end, te = be, False
         j = i + 1 + skip
         while j < len(spans):
@@ -161,6 +164,10 @@ def analyze(sent):
                     past = past or tk.surface == "だ"
             elif p1 == "助詞" and sf in ("ず", "ずに"):
                 negative = True
+            elif b in POTENTIAL_V:
+                # 「オンラインで受けられる」「すぐ始められる」は、
+                # できるという話であって、やった事実ではない
+                potential = True
             elif p1 == "動詞" and b in COMPOUND_V2:
                 # 「使い続けた」の「た」は続けるの後ろに付く。
                 # ここで切ると前側の動詞が現在形に見えてしまう
@@ -197,13 +204,16 @@ def analyze(sent):
         elif re.search(r"なくても|ないでも|ずとも", after):
             # 「TOEICを毎月受けなくても〜できる」は、受けなかった事実ではない
             modality = "concessive"
-        elif re.search(r"かもしれ|できる|得る|可能", after):
+        elif potential or re.search(r"かもしれ|できる|得る|可能", after):
             modality = "possibility"
         elif vol:
             modality = "intention"
         elif cond:
             modality = "conditional"
-        elif re.search(r"ほしい|ましょう|おすすめ|といい|してみて", after):
+        elif re.search(r"つもり", after):
+            modality = "intention"     # 「相談してみるつもりだ」＝まだやっていない
+        elif re.search(r"ほしい|ましょう|おすすめ|といい|してみて"
+                       r"|て(?:も)?いい|ていて?いい", after):
             modality = "advice"
         elif re.search(r"^[^。]{0,8}前に", after[len(sent[bs:end]):] or after):
             modality = "prospective"     # 「払う前に」＝まだやっていない
