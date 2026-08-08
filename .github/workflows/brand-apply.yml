@@ -10,6 +10,14 @@ on:
         description: 'true なら書かずにバックアップと差分だけ'
         required: false
         default: 'true'
+      frontpage:
+        description: 'true ならトップページの固定化も実行'
+        required: false
+        default: 'false'
+      skip_brand:
+        description: 'true ならサイト名・カテゴリの反映を飛ばす'
+        required: false
+        default: 'false'
 
 jobs:
   apply:
@@ -23,7 +31,15 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests janome -q
+      - name: トップページの固定化（記事一覧を先に作る）
+        if: inputs.frontpage == 'true'
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/frontpage_apply.py
+
       - name: 反映（バックアップを取ってから）
+        if: inputs.skip_brand != 'true'
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           DRY_RUN: ${{ inputs.dry_run }}
