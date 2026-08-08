@@ -1,0 +1,80 @@
+name: 安全性改修をWordPressへ反映
+
+# 改修した本文を反映する。**戻せる形でしか書かない。**
+# ゲートを通っていない記事は書かない。
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true なら書かずにバックアップと差分だけ'
+        required: false
+        default: 'true'
+      posts:
+        description: '対象記事ID（カンマ区切り。空なら rewrites/ にある全部）'
+        required: false
+        default: ''
+      hide_cta:
+        description: 'true なら CTA_ACTIONS.csv の一時非表示も実行'
+        required: false
+        default: 'false'
+
+concurrency:
+  group: rewrite-apply
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests janome -q
+
+      - name: ゲートの回帰テスト
+        run: python affiliate-research-engine/playbook/scripts/test_quality_rules.py
+
+      - name: 改修版をゲートに通す
+        run: |
+          python affiliate-research-engine/playbook/scripts/draft_gate.py \
+            affiliate-research-engine/playbook/workspace/claims/rewrites/*.html
+
+      - name: 反映（バックアップを取ってから）
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          POSTS: ${{ inputs.posts }}
+        run: python affiliate-research-engine/playbook/scripts/rewrite_apply.py
+
+      - name: 誤リンクのCTAを一時非表示
+        if: inputs.hide_cta == 'true'
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/cta_hide.py
+
+      - name: 反映後の検証
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          POSTS: ${{ inputs.posts }}
+        run: python affiliate-research-engine/playbook/scripts/rewrite_verify.py || true
+
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: rewrite apply $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
