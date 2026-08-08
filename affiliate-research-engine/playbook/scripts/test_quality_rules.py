@@ -188,6 +188,15 @@ def run_cta_gate():
             ng += 1
         elif want:
             print(f"      → {got[0]['reason'][:80]}")
+    # 一時非表示にしたCTAは、読者に出ないので対象外
+    hidden = ('<!-- cta-hidden:START x --><p>'
+              '<a href="//af.moshimo.com/af/c/click?a_id=1">'
+              '→ speekの無料トライアルを見る</a></p><!-- cta-hidden:END -->')
+    ok_hidden = not q.cta_claim_gate(hidden)
+    print(("OK  " if ok_hidden else "NG  ") + "非表示にしたCTAは検査しない")
+    if not ok_hidden:
+        ng += 1
+
     print(f"\nCTAゲートの失敗 {ng}件")
     return ng
 

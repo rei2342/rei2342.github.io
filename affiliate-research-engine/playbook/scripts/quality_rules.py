@@ -666,12 +666,22 @@ def load_cta_claims():
             ("yes", "y", "true", "1")]
 
 
+# 一時非表示にしたCTA。コメントで包んであるので読者には出ない
+HIDDEN_CTA_RE = re.compile(
+    r"<!--\s*cta-hidden:START.*?<!--\s*cta-hidden:END\s*-->",
+    re.DOTALL | re.IGNORECASE)
+
+
 def cta_claim_gate(html):
     """アフィリエイトCTAの訴求が、台帳と公式情報で裏付けられているかを見る。
 
     アンカー文言に訴求の語が入っているのに、案件台帳に
     verified な行が無い／数値が違う／確認日が無い場合はブロックする。
+
+    **一時非表示にしたCTAは対象外。** コメントで包んであって読者には
+    表示されないので、訴求として機能していない（2026-08-08に追加）。
     """
+    html = HIDDEN_CTA_RE.sub(" ", html)
     rows = load_cta_claims()
     out = []
     for m in _A_TAG_RE.finditer(html):
