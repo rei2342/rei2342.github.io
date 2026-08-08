@@ -18,6 +18,10 @@ on:
         description: 'true なら CTA_ACTIONS.csv の一時非表示も実行'
         required: false
         default: 'false'
+      restore_cta:
+        description: 'true なら旧リンクを新リンクへ差し替えて再表示'
+        required: false
+        default: 'false'
 
 concurrency:
   group: rewrite-apply
