@@ -32,6 +32,55 @@ IDS = [x.strip() for x in os.environ.get("IDS", "").split(",") if x.strip()]
 APPLY = os.environ.get("APPLY", "false").lower() == "true"
 
 # 旧ペルソナ設定。ゲートに掛からない疑問文・体言止めも拾う
+# どの記事でも同じ置き換えになるもの。記事ごとのJSONに書かない。
+# 生成側は 2026-08-09 に直したが、すでに出ている記事には旧文言が残っている。
+# **URLは触らない。アンカーの文言だけ。**
+GLOBAL = [
+    # フィリピン留学ナビは遷移先URLが特定できず裏取りできていないので中立のまま
+    ("→ フィリピン留学ナビの無料相談会に申し込む",
+     "→ フィリピン留学ナビ公式サイトで留学プランと相談の申し込み方法を見る"),
+    ("→ 国内英語留学U-GAKUで無料オンライン個別相談を予約する",
+     "→ 国内英語留学U-GAKUの無料カウンセリングを申し込む"),
+    ("→ 留学情報館で無料カウンセリングを申し込む",
+     "→ 留学情報館の無料カウンセリングを申し込む"),
+    ("→ CEBRIDGEでフィリピン留学の無料カウンセリングを予約する",
+     "→ CEBRIDGEでフィリピン留学の無料カウンセリングを申し込む"),
+    ("→ DMM英会話のオンライン無料体験レッスンを受けてみる",
+     "→ DMM英会話の無料体験レッスンを試す"),
+    ("→ レアジョブ英会話（マンツーマン・早朝6時から深夜1時まで）の無料体験レッスンを受ける",
+     "→ レアジョブ英会話の7日間無料体験を試す"),
+    ("→ スタディサプリENGLISH 新日常英会話コースを無料体験する",
+     "→ スタディサプリENGLISH 新日常英会話コースの初回無料体験を試す"),
+    ("→ 英語の会議を文字起こしして後から確認する（Notta・無料プランあり）",
+     "→ 英語の会議を文字起こしして後から確認する（Notta公式サイト）"),
+]
+
+def strip_baked_toc(html):
+    """本文に焼き付いた目次プラグインの出力を外す。
+
+    4本（241 281 287 297）は、プラグインが出したHTMLがそのまま
+    本文として保存されていた。見出しの文言を変えると目次だけ古くなるし、
+    プラグインは描画時に自分で目次を作るので、本文に持つ必要がない。
+    """
+    i = html.find('<div id="ez-toc-container"')
+    if i >= 0:
+        depth, j = 0, i
+        while j < len(html):
+            if html.startswith("<div", j):
+                depth += 1
+            elif html.startswith("</div>", j):
+                depth -= 1
+                if depth == 0:
+                    j += 6
+                    break
+            j += 1
+        html = (html[:i] + html[j:]).lstrip("\n")
+    # 見出しに残るアンカー用の span も外す（描画時に付け直される）
+    html = re.sub(r'<span class="ez-toc-section"[^>]*></span>', "", html)
+    html = re.sub(r'<span class="ez-toc-section-end"></span>', "", html)
+    return html
+
+
 LEGACY = re.compile(
     r"2[0-9]\s*歳|30歳まで|30歳になる前|あと\s*[0-9]+\s*年|残り\s*[0-9]+\s*年|"
     r"5年後回し|営業事務|さくらの英語挑戦記|さくらが確かめた|すべて無料")
@@ -63,10 +112,15 @@ def main():
         if not src.exists():
             print(f"[{pid}] 生の本文が無い（article_dump を先に回す）")
             continue
-        html = src.read_text(encoding="utf-8")
+        html = strip_baked_toc(src.read_text(encoding="utf-8"))
+
+        applied, missed = 0, []
+        for old, new in GLOBAL:          # 全記事共通の置き換えを先に当てる
+            if old in html:
+                html = html.replace(old, new)
+                applied += 1
 
         pf = PATCH / f"{pid}.json"
-        applied, missed = 0, []
         if pf.exists():
             for r in json.loads(pf.read_text(encoding="utf-8")):
                 if r["old"] not in html:
