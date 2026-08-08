@@ -22,6 +22,7 @@ urllib3.disable_warnings()
 
 sys.path.insert(0, str(Path(__file__).parent))
 import affiliate_inserter as _ai
+import quality_rules as _q
 import wp_categorizer as _wc
 
 WP_BASE = "https://sakura-eigo.com/wp-json/wp/v2"
@@ -31,6 +32,9 @@ DRAFT = os.environ.get("DRAFT_FILE", "")
 DRY_RUN = os.environ.get("DRY_RUN", "true").lower() == "true"
 # 指定すると新規作成ではなく既存記事の本文を差し替える
 POST_ID = os.environ.get("POST_ID", "").strip()
+# 本文の中にすでにCTAを書いてあるドラフト用。自動CTAを足すと導線が2本になる
+# （主案件は1つ、CTAは増やさない）。2026-08-09に追加
+SKIP_CTA = os.environ.get("SKIP_CTA", "false").lower() == "true"
 
 
 def make_slug(title):
@@ -82,12 +86,28 @@ def main():
                                                "break-on-newline"])
 
     topic = _ai.classify_full(title, html)
-    cta, progs = _ai.build_cta(topic)
-    html = _ai.strip_box(html) + cta
+    if SKIP_CTA:
+        progs = ["（本文のCTAをそのまま使う）"]
+        html = _ai.strip_box(html)
+    else:
+        cta, progs = _ai.build_cta(topic)
+        html = _ai.strip_box(html) + cta
 
     text_len = len(re.sub(r"<[^>]+>", "", _ai.strip_box(html)))
     print(f"タイトル: {title}")
     print(f"本文: {text_len}字 / トピック: {topic} / 案件: {progs}")
+
+    # ── 送る直前にゲートを通す ────────────────────────────
+    # ドラフト単体では通っても、**CTAを足したあとの本文**は別物になる。
+    # 2026-08-09に、箱の見出し「さくらが確かめた・次の一手（すべて無料）」と
+    # 未確認の「無料体験」訴求が、ここを素通りしてWordPressに入っていた。
+    blockers = _q.generation_blockers(html)
+    if blockers:
+        print(f"\n❌ 公開ブロッカー {len(blockers)}件。WordPressへは送らない。")
+        for b in blockers:
+            print(f"  - {b}")
+        sys.exit(1)
+    print("✅ ゲート通過（0件）")
 
     payload = {"title": title, "content": html, "status": "draft"}
 

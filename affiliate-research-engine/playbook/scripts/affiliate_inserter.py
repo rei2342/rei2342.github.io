@@ -38,7 +38,7 @@ LINKS = {
         "5640986",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992"'
         ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ フィリピン留学ナビの無料相談会に申し込む</a>'
+        '→ フィリピン留学ナビ公式サイトで留学プランと相談の申し込み方法を見る</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
@@ -46,7 +46,7 @@ LINKS = {
         "5640988",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640988&p_id=4449&pc_id=11553&pl_id=59973&url=https%3A%2F%2Fu-gaku.jp%2F%3Futm_source%3Dmoshimo%26utm_medium%3Daffiliate%26utm_campaign%3Dimg01"'
         ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ 国内英語留学U-GAKUで無料オンライン個別相談を予約する</a>'
+        '→ 国内英語留学U-GAKU公式サイトでコース内容と個別相談の申し込み方法を見る</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640988&p_id=4449&pc_id=11553&pl_id=59973"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
@@ -54,7 +54,7 @@ LINKS = {
         "5640990",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F%2Fwww.ryugaku-johokan.com%2Findex_mr.php%3Futm_source%3Dmoshimo%26utm_medium%3Daffiliate%26utm_campaign%3Dcounseling"'
         ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ 留学情報館で無料カウンセリングを申し込む</a>'
+        '→ 留学情報館公式サイトでサポート内容と申し込み方法を確認する</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
@@ -62,7 +62,7 @@ LINKS = {
         "5640987",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640987&p_id=4201&pc_id=10658&pl_id=57293&url=https%3A%2F%2Fcebridge.jp%2F"'
         ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ CEBRIDGEでフィリピン留学の無料カウンセリングを予約する</a>'
+        '→ CEBRIDGE公式サイトでフィリピン留学の内容と相談の申し込み方法を見る</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640987&p_id=4201&pc_id=10658&pl_id=57293"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
@@ -78,7 +78,7 @@ LINKS = {
         "5640982",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962"'
         ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ DMM英会話のオンライン無料体験レッスンを受けてみる</a>'
+        '→ DMM英会話公式サイトでレッスンの内容と料金を確認する</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
@@ -96,15 +96,15 @@ LINKS = {
     ),
     "rarejob": (
         "a8_s00000008409001",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" rel="nofollow">→ レアジョブ英会話（マンツーマン・早朝6時から深夜1時まで）の無料体験レッスンを受ける</a><img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" rel="nofollow">→ レアジョブ英会話公式サイトでレッスンの内容と料金を確認する</a><img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" alt="" loading="lazy">'
     ),
     "sapuri_nichijo": (
         "a8_s00000015388006",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" rel="nofollow">→ スタディサプリENGLISH 新日常英会話コースを無料体験する</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" rel="nofollow">→ スタディサプリENGLISH 新日常英会話コースの内容と料金を公式サイトで確認する</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" alt="" loading="lazy">'
     ),
     "sapuri_setplan": (
         "a8_s00000015388008",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" rel="nofollow">→ スタディサプリENGLISH 新日常英会話セットプラン（アプリ＋英会話）を無料で体験する</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" rel="nofollow">→ スタディサプリENGLISH 新日常英会話セットプラン（アプリ＋英会話）の内容と料金を公式サイトで確認する</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" alt="" loading="lazy">'
     ),
     # Notta（A8）: EPC50以上・CTR5%以上。英語学習そのものではないが、
     # さくらは営業事務で英語の会議・電話に詰まる、という既存の軸がある。
@@ -123,7 +123,7 @@ LINKS = {
     "notta": (
         "5ZEMQ",
         '<a href="https://px.a8.net/svt/ejp?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ" rel="nofollow">'
-        '→ 英語の会議を文字起こしして後から確認する（Notta・無料プランあり）</a>'
+        '→ 英語の会議を文字起こしして後から確認する（Notta公式サイト）</a>'
         '<img border="0" width="1" height="1" style="border:none" alt="" loading="lazy"'
         ' src="https://www19.a8.net/0.gif?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ">'
     ),
@@ -237,8 +237,19 @@ _BOX_RE = re.compile(
 )
 
 def strip_box(content):
-    """既存の『さくらが確かめた・次の一手』ボックスを除去（あれば）。"""
+    """既存のCTAボックスを除去（あれば）。"""
     return _BOX_RE.sub('', content).rstrip()
+
+# ⚠️ 2026-08-09に見出しを差し替えた。
+# 旧: 「▶ さくらが確かめた・次の一手（すべて無料）」
+#   - 「さくらが確かめた」は**台帳に無い一人称の行動**。QQ English・speek と同じ型のミスで、
+#     本文のゲートは通るのにCTAの箱だけ素通りしていた
+#   - 「すべて無料」は箱に入る案件すべてへの訴求になる。cta_claims.csv で
+#     案件ごとに確認しているのに、箱の見出しが一括で「無料」と言ってしまう
+# 新しい見出しは行動も訴求も主張しない。**リンク先が公式であることだけ**を言う。
+CTA_HEADING = "▶ 公式サイトで内容と料金を確認する"
+CTA_NOTE = ("料金・キャンペーンは改定されます。申し込む前に、"
+            "各公式サイトの最新表示を確認してください。")
 
 def build_cta(topic):
     """そのトピックの全案件（最大2件）を1つの箱にまとめて返す。"""
@@ -247,9 +258,10 @@ def build_cta(topic):
     block = (
         '\n<hr>\n'
         '<div style="background:#f9f9f9;border-left:4px solid #27ae60;padding:16px 20px;margin:32px 0">\n'
-        '<p style="margin-top:0;font-weight:bold">▶ さくらが確かめた・次の一手（すべて無料）</p>\n'
+        f'<p style="margin-top:0;font-weight:bold">{CTA_HEADING}</p>\n'
         + items +
-        '\n<p style="margin-bottom:0;font-size:0.8em;color:#999">※本記事にはアフィリエイトリンクが含まれます（PR）</p>\n'
+        f'\n<p style="margin-bottom:0;font-size:0.8em;color:#999">{CTA_NOTE}<br>'
+        '※本記事にはアフィリエイトリンクが含まれます（PR）</p>\n'
         '</div>'
     )
     return block, programs

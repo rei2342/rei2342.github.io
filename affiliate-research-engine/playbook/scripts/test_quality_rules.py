@@ -207,6 +207,64 @@ def run_cta_gate():
     return ng
 
 
+def run_cta_box():
+    """CTAボックスの、**リンク以外**の文言。
+
+    2026-08-09に見つけた穴。ゲートは `<a>` しか見ていなかったので、
+    箱の見出し「▶ さくらが確かめた・次の一手（すべて無料）」が素通りし、
+    生成される全記事に入り続けていた。主語が「私」ではなく「さくら」
+    だったので unverified_self_facts にも掛からなかった。
+    """
+    BOX = ('<div style="background:#f9f9f9;border-left:4px solid #27ae60;'
+           'padding:16px 20px;margin:32px 0">\n'
+           '<p style="margin-top:0;font-weight:bold">{}</p>\n'
+           '<p><a href="//af.moshimo.com/af/c/click?a_id=1&url=x">'
+           '→ 公式サイトで内容を確認する</a></p>\n</div>')
+
+    CASES = [
+        ("▶ さくらが確かめた・次の一手（すべて無料）", True,
+         "旧見出し。運営者の行動＋一括訴求 → ブロック"),
+        ("▶ さくらが確かめた・次の一手", True,
+         "運営者の行動だけでもブロック"),
+        ("▶ 次の一手（すべて無料）", True,
+         "案件を特定しない一括訴求だけでもブロック"),
+        ("▶ 私が試したサービス", True, "主語が「私」でもブロック"),
+        ("▶ 当サイトが比べたサービス", True, "主語が「当サイト」でもブロック"),
+        ("▶ 公式サイトで内容と料金を確認する", False,
+         "新しい見出し。行動も訴求も主張していない → 通過"),
+        ("▶ このテーマで見られる公式サイト", False, "案内だけ → 通過"),
+    ]
+    ng = 0
+    for heading, want, why in CASES:
+        got = q.cta_box_text_gate(BOX.format(heading))
+        ok = bool(got) == want
+        print(("OK  " if ok else "NG  ") + why)
+        if not ok:
+            print(f"      期待: {'ブロック' if want else '通過'} / 実際: {got}")
+            ng += 1
+        elif want:
+            print(f"      → {got[0]['reason'][:60]}")
+
+    # 箱の外の普通の本文は対象外。ここまで止めると記事が書けなくなる
+    outside = "<p>公式サイトで確認する方法は次のとおり。すべて無料で試せる場合もある。</p>"
+    ok_out = not q.cta_box_text_gate(outside)
+    print(("OK  " if ok_out else "NG  ") + "箱の外の本文は対象外")
+    if not ok_out:
+        ng += 1
+
+    # 一時非表示にした箱も対象外
+    hidden = "<!-- cta-hidden:START -->" + \
+        BOX.format("▶ さくらが確かめた・次の一手（すべて無料）") + \
+        "<!-- cta-hidden:END -->"
+    ok_hidden = not q.cta_box_text_gate(hidden)
+    print(("OK  " if ok_hidden else "NG  ") + "非表示にした箱は検査しない")
+    if not ok_hidden:
+        ng += 1
+
+    print(f"\nCTA見出しゲートの失敗 {ng}件")
+    return ng
+
+
 def run_claim_parse():
     """命題の解析を、構造化結果の**完全一致**で検証する。
 
@@ -416,6 +474,8 @@ if __name__ == "__main__":
     ng += run_blockers()
     print()
     ng += run_cta_gate()
+    print()
+    ng += run_cta_box()
     print()
     ng += run_claim_parse()
     print()

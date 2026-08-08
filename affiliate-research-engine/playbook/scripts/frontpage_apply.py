@@ -365,6 +365,47 @@ def main():
         L.append(f"| {u} | {r.status_code} | {canv} | {ni} | {note} |\n")
         print(f"{u} -> {r.status_code} canonical={canv} noindex={ni} {note}")
 
+    # ── 8. 記事一覧が実際に記事を並べているか ─────────────
+    # HTTP 200 だけでは「空の固定ページが表示されただけ」と区別が付かない。
+    # 記事へのリンクを数えて、2ページ目まで辿れるかを見る。
+    L.append("\n## 8. 記事一覧の中身とページ送り\n\n")
+    hr = requests.get(f"{WP}/posts", auth=AUTH, headers=UA, verify=False,
+                      timeout=40, params={"per_page": 1, "status": "publish"})
+    n_posts = int(hr.headers.get("X-WP-Total", 0))
+    per = int(settings.get("posts_per_page") or 10)
+    pages_needed = -(-n_posts // per) if per else 1
+    L.append(f"- 公開記事 **{n_posts}本** / 1ページ **{per}本** "
+             f"→ 全 **{pages_needed}ページ** になるはず\n\n")
+
+    L.append("| URL | HTTP | 記事リンク数 | 判定 |\n|---|---|---|---|\n")
+    for label, u in (("1ページ目", f"{SITE}/{ARTICLES_SLUG}/"),
+                     ("2ページ目", f"{SITE}/{ARTICLES_SLUG}/page/2/"),
+                     ("存在しないページ", f"{SITE}/{ARTICLES_SLUG}/page/999/")):
+        try:
+            r = requests.get(u, headers=UA, verify=False, timeout=45)
+        except Exception as e:
+            L.append(f"| {label} {u} | エラー | — | {e} |\n")
+            continue
+        # 記事URLらしいリンクだけ数える（カテゴリ・タグ・固定ページは除く）
+        links = set(re.findall(
+            r'href="https://sakura-eigo\.com/([a-z0-9][a-z0-9\-]{6,})/"', r.text))
+        links -= {ARTICLES_SLUG, FRONT_SLUG, "category", "tag", "author",
+                  "privacy-policy", "contact", "profile"}
+        n = len(links)
+        if label == "存在しないページ":
+            ok = "✅ 404を返す" if r.status_code == 404 else \
+                 f"⚠️ {r.status_code}。空ページがインデックスされうる"
+        elif label == "2ページ目":
+            ok = ("✅ ページ送りが効いている" if r.status_code == 200 and n > 0
+                  else ("— 2ページ目が不要（記事が1ページに収まる）"
+                        if pages_needed < 2
+                        else f"⚠️ 記事が並んでいない（HTTP {r.status_code}）"))
+        else:
+            ok = ("✅ 記事が並んでいる" if n >= min(per, n_posts)
+                  else f"⚠️ **{n}本しか出ていない**。空の固定ページの可能性")
+        L.append(f"| {label} {u} | {r.status_code} | {n} | {ok} |\n")
+        print(f"{label} {u} -> {r.status_code} links={n} {ok}")
+
     (BK / day / "FRONTPAGE.md").write_text("".join(L), encoding="utf-8")
     print(f"\n→ workspace/backups/{day}/FRONTPAGE.md")
 

@@ -30,7 +30,11 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 
 # ここに書いたドメインしか見ない。IIBC（日本の運営団体）と ETS（開発元）
 ALLOWED = ("iibc-global.org", "ets.org", "qqeng.com", "callan.co.uk",
-           "sptr.jp", "speek.jp", "nativecamp.net")
+           "sptr.jp", "speek.jp", "nativecamp.net",
+           # 2026-08-09に追加。CTAで「無料」を訴求しているのに
+           # cta_claims.csv に行が無い案件を裏取りするため
+           "eikaiwa.dmm.com", "rarejob.com", "eigosapuri.jp",
+           "u-gaku.jp", "ryugaku-johokan.com", "cebridge.jp", "notta.ai")
 
 # (主張ID, 記事, 主張, 見に行くURL, 根拠として探す語)
 CHECKS = [
@@ -63,6 +67,30 @@ CHECKS = [
      "カランメソッドは通常の4倍速で、ケンブリッジ検定に350時間が80時間になったという実績",
      ["https://www.callan.co.uk/", "https://www.qqeng.com/callan/"],
      ["4倍", "four times", "350", "80"]),
+    # ── CTAの「無料」訴求の裏取り（2026-08-09に追加）──────────────
+    # 生成側の全CTAをゲートに掛けたら、15本中8本が cta_claims.csv に
+    # 行が無いまま「無料」と書いていた。**アンカー文言は先に中立化した**うえで、
+    # 公式に書いてある範囲を確認して台帳に載せ直す。
+    #
+    # ⚠️ 見に行くURLの出どころを2種類に分ける。
+    #   [リンク由来] もしもリンクの url= パラメータから取れた。踏まずに確認できる
+    #   [推定]      A8リンクは遷移先がURLに入っていないので、こちらでドメインを推定した。
+    #               **ページタイトルが案件名と一致することを人が見て確かめる。**
+    ("A1", "cta", "[リンク由来] U-GAKUの無料オンライン個別相談",
+     ["https://u-gaku.jp/"], ["無料", "個別相談", "カウンセリング", "相談"]),
+    ("A2", "cta", "[リンク由来] CEBRIDGEの無料カウンセリング",
+     ["https://cebridge.jp/"], ["無料", "カウンセリング", "相談"]),
+    ("A3", "cta", "[推定] DMM英会話の無料体験レッスン",
+     ["https://eikaiwa.dmm.com/"], ["無料体験", "無料", "体験レッスン", "回"]),
+    ("A4", "cta", "[推定] レアジョブ英会話の無料体験レッスン",
+     ["https://www.rarejob.com/"], ["無料体験", "無料", "体験レッスン", "回"]),
+    ("A5", "cta", "[推定] スタディサプリENGLISHの無料体験",
+     ["https://eigosapuri.jp/"], ["無料体験", "無料", "日間", "体験"]),
+    ("A6", "cta", "[推定] Nottaの無料プラン",
+     ["https://www.notta.ai/"], ["無料", "無料プラン", "分"]),
+    ("A7", "cta", "[リンク由来] 留学情報館の無料カウンセリング",
+     ["https://www.ryugaku-johokan.com/index_mr.php"],
+     ["無料", "手数料", "カウンセリング", "0円"]),
     ("T4", "32",
      "成績票に項目別の正答率（Abilities Measured）が記載されている",
      ["https://www.iibc-global.org/toeic/test/lr/about/score.html",
@@ -113,8 +141,15 @@ def main():
         "部分一致なら、根拠が支持する範囲まで表現を弱める。\n\n"]
 
     for cid, pid, claim, urls, words in CHECKS:
-        if only and cid.lower() not in only.lower() and only != "toeic":
-            continue
+        # CHECKS には check_id（T1 / Q2 / A3）か、まとめ名（toeic / cta / callan）
+        # をカンマ区切りで書く。空なら全部見る
+        if only:
+            want = {w.strip().lower() for w in only.split(",") if w.strip()}
+            group = {"toeic": cid.startswith("T"), "cta": cid.startswith("A"),
+                     "callan": cid.startswith("Q")}
+            if not (cid.lower() in want or pid.lower() in want
+                    or any(group.get(w) for w in want)):
+                continue
         L.append(f"\n---\n\n## {cid}（記事{pid}）\n\n**主張**: {claim}\n\n")
         print(f"\n[{cid}] {claim}")
         found = False

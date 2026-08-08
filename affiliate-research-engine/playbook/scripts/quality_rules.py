@@ -666,6 +666,9 @@ def generation_blockers(html):
     # CTAの訴求は本文とは別に見る。リンク文言を素通りさせない
     for f in cta_claim_gate(html):
         issues.append(f"[CTAの訴求] {f['reason']}: 「{f['anchor'][:50]}」")
+    # リンクの外（箱の見出し・注記）も見る。2026-08-09に穴が見つかった
+    for f in cta_box_text_gate(html):
+        issues.append(f"[CTAの見出し] {f['reason']}: 「{f['anchor'][:50]}」")
     return issues
 
 
@@ -704,6 +707,51 @@ def load_cta_claims():
 HIDDEN_CTA_RE = re.compile(
     r"<!--\s*cta-hidden:START.*?<!--\s*cta-hidden:END\s*-->",
     re.DOTALL | re.IGNORECASE)
+
+# ── CTAボックスの、リンク以外の文言 ────────────────────────
+# 2026-08-09に見つけた穴。ゲートは `<a>` のアンカーしか見ていなかったので、
+# 箱の見出し「▶ さくらが確かめた・次の一手（すべて無料）」が素通りしていた。
+#
+#  - 「さくらが確かめた」… 台帳に無い一人称の行動。主語が「私」ではなく
+#    「さくら」だったので unverified_self_facts にも掛からなかった
+#  - 「すべて無料」… 箱に入る**全案件**への訴求。案件ごとに確認している
+#    cta_claims.csv の意味が消える
+#
+# 箱の中のリンク以外のテキストも見る。
+CTA_BOX_RE = re.compile(
+    r'<div style="background:#f9f9f9;border-left:4px solid #27ae60;[^"]*">'
+    r'(.*?)</div>', re.DOTALL)
+
+# 箱の見出しで使ってはいけない、運営者の行動表現。主語がどれでも止める
+CTA_PERSONA_RE = re.compile(
+    r"(?:さくら|私|自分|編集部|当サイト)(?:が|は|も)?"
+    r"[^。<]{0,12}?"
+    r"(?:確かめた|確認した|試した|使った|受けた|調べた|比べた|選んだ|体験した)")
+
+# 「すべて無料」のような、案件を特定しない一括訴求
+CTA_BLANKET_RE = re.compile(
+    r"(?:すべて|全部|どれも|いずれも|全て)\s*"
+    r"(?:無料|0円|割引|返金|保証|半額)")
+
+
+def cta_box_text_gate(html):
+    """CTAボックスの、アンカー以外の文言を見る。
+
+    見出し・注記に運営者の行動や一括訴求が入っていないかを確認する。
+    ここは読者が最後に見る場所なので、本文と同じ基準を当てる。
+    """
+    html = HIDDEN_CTA_RE.sub(" ", html)
+    out = []
+    for m in CTA_BOX_RE.finditer(html):
+        inner = _A_TAG_RE.sub(" ", m.group(1))     # リンクは cta_claim_gate の担当
+        text = strip_tags(inner)
+        for hit in CTA_PERSONA_RE.finditer(text):
+            out.append({"anchor": hit.group(0), "term": "運営者の行動",
+                        "reason": "CTAの見出しに、台帳に無い運営者の行動が入っている"})
+        for hit in CTA_BLANKET_RE.finditer(text):
+            out.append({"anchor": hit.group(0), "term": "一括訴求",
+                        "reason": "案件を特定しない訴求。案件ごとに書く"})
+    return out
 
 
 def cta_claim_gate(html):
