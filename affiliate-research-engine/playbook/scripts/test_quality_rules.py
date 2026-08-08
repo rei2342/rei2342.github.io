@@ -58,5 +58,36 @@ def run():
     return ng
 
 
+
+
+def run_claims():
+    """抽出ツールを、WPを叩かずに1本ぶんの記事で通す。
+
+    構文チェックだけでは実行時エラーを見つけられない
+    （2026-08-08にキー分解の不一致で本番が落ちた）。
+    """
+    import pathlib
+    import wp_audit
+    wp_audit.published = lambda: [{
+        "id": 1, "link": "https://example.test/a", "title": {"rendered": "テスト"},
+        "content": {"rendered": (
+            "<h2>見出しA</h2><p>私はスパトレを試した。</p>"
+            "<p>利用者は無料体験を受けている。</p>"
+            "<p>また英語学習を5年間後回しにしてきた。</p>"
+            "<h2>見出しB</h2><p>無料体験に登録するなら条件を見る。</p>"
+            "<blockquote>使ってみて良かったという口コミ。</blockquote>"
+            "<p>私は無料体験を2回受けました。"
+            "<a href='//af.moshimo.com/af/c/click?a_id=1'>公式</a></p>")}}]
+    import claim_extractor as ce
+    ce.OUT = pathlib.Path("/tmp/claims_selftest")
+    ce.OUT.mkdir(exist_ok=True)
+    ce.main()
+    print("claim_extractor: 実行できた")
+    return 0
+
+
 if __name__ == "__main__":
-    sys.exit(1 if run() else 0)
+    ng = run()
+    print()
+    ng += run_claims()
+    sys.exit(1 if ng else 0)

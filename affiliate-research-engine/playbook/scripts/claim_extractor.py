@@ -46,15 +46,15 @@ ACTS = [
     # (正規化した行動, 種別, 正規表現, 過去, 非過去, 進行)
     ("留学",   "体験", r"留学(?:し|に行っ|して)", "留学した", "留学する", "留学している"),
     ("渡航",   "体験", r"渡航し|現地に行っ", "渡航した", "渡航する", "渡航している"),
-    ("通学",   "体験", r"通っ|通う", "通った", "通う", "通っている"),
-    ("利用",   "体験", r"使っ(?:た|て|ている)|使う", "使った", "使う", "使っている"),
+    ("通学",   "体験", r"通っ|通う|通い(?:まし|ます)", "通った", "通う", "通っている"),
+    ("利用",   "体験", r"使っ(?:た|て|ている)|使う|使い(?:まし|ます)", "使った", "使う", "使っている"),
     ("試用",   "体験", r"試し|試す|試してみ", "試した", "試す", "試している"),
-    ("継続",   "体験", r"続け(?:た|られ|る|てい)", "続けた", "続ける", "続けている"),
-    ("中断",   "体験", r"やめ(?:た|て|る)|挫折し|中断し", "やめた", "やめる", "やめている"),
-    ("受講",   "体験", r"受け(?:た|て|る|てい)", "受けた", "受ける", "受けている"),
+    ("継続",   "体験", r"続け(?:た|られ|る|てい|まし|ます)", "続けた", "続ける", "続けている"),
+    ("中断",   "体験", r"やめ(?:た|て|る|まし|ます)|挫折し|中断し", "やめた", "やめる", "やめている"),
+    ("受講",   "体験", r"受け(?:た|て|る|てい|まし|ます)", "受けた", "受ける", "受けている"),
     ("受験",   "体験", r"受験し|受験する", "受験した", "受験する", "受験している"),
     ("登録",   "体験", r"登録し|登録する|申し込(?:んだ|む|み)", "登録した", "登録する", "登録している"),
-    ("支払",   "体験", r"払っ|支払っ|払う", "払った", "払う", "払っている"),
+    ("支払",   "体験", r"払っ|支払っ|払う|払い(?:まし|ます)", "払った", "払う", "払っている"),
     ("浪費",   "体験", r"溶かし|無駄にし", "溶かした", "溶かす", "溶かしている"),
     ("後回し", "体験", r"後回しに(?:し|してき|する)", "後回しにした", "後回しにする", "後回しにしている"),
     ("停滞",   "体験", r"止まっ|停滞し|動かなかっ", "止まっていた", "止まる", "止まっている"),
@@ -170,7 +170,9 @@ def blocks(html):
         if not reason and _q.AFFILIATE_LINK_RE.search(inner):
             # リンクを取り除いた残りに体験表現があるか
             rest = _q.strip_tags(re.sub(r"<a\b.*?</a>", "", inner, flags=re.DOTALL | re.I))
-            if any(v in rest for v in _q.EXPERIENCE_VERBS):
+            # 体験表現の判定は ACTS の正規表現を使う。単語リストだと
+            # 丁寧形（受けました）を取りこぼす（2026-08-08に実例）
+            if any(re.search(pat, rest) for _a, at, pat, *_ in ACTS if at == "体験"):
                 # 体験が書かれている段落。リンクだけ除いて本文は拾う
                 ss = [x.strip() for x in re.split(r"(?<=[。？！])", rest) if x.strip()]
                 out.append((tag, None, ss, rest))
@@ -335,15 +337,20 @@ def main():
                 excluded[reason] += 1
                 samples[reason].append((p["id"], p.get("link", ""), tag, rest[:160]))
                 continue
-            para_subj = None     # 同じ段落の中の引き継ぎ
+            para_subj = None     # 段落が変われば、第三者・読者の継承は切れる
             for i, sent in enumerate(ss):
                 # 主語だけ先に見る。命題にならない文からも拾う。
                 # 別の主語・情報源が出たら、そこで継承を上書きする
                 sh = scan_subject(sent)
                 if sh == "情報源":
                     para_subj = section_subj = None   # 一時停止
+                elif sh == "さくら":
+                    para_subj = section_subj = sh     # 筆者は節内で継続
                 elif sh:
-                    para_subj = section_subj = sh
+                    # 第三者・読者は段落内だけ。次の段落で筆者に戻ることが多く、
+                    # 節末まで残すと逆方向の誤判定になる（2026-08-08に実例）
+                    para_subj = sh
+                    section_subj = None
 
                 carried = (para_subj and (para_subj, "inherited_paragraph")) or \
                           (section_subj and (section_subj, "inherited_section"))
@@ -371,8 +378,8 @@ def main():
         if v:
             continue
         for other in props:
-            ot, oa, ov = other.split("|")
-            if ot == t and oa == a and ov:
+            ot, oa, ov, otn = other.split("|")
+            if ot == t and oa == a and otn == _tense and ov:
                 subsumes[key].append(other)
 
     ordered = sorted(props.items(), key=lambda kv: -len(kv[1]["posts"]))
