@@ -29,7 +29,8 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
 
 # ここに書いたドメインしか見ない。IIBC（日本の運営団体）と ETS（開発元）
-ALLOWED = ("iibc-global.org", "ets.org")
+ALLOWED = ("iibc-global.org", "ets.org", "qqeng.com", "callan.co.uk",
+           "sptr.jp", "speek.jp", "nativecamp.net")
 
 # (主張ID, 記事, 主張, 見に行くURL, 根拠として探す語)
 CHECKS = [
@@ -50,6 +51,18 @@ CHECKS = [
      ["https://www.iibc-global.org/toeic/test/sw.html",
       "https://www.iibc-global.org/toeic.html"],
      ["Speaking", "スピーキング", "話す"]),
+    ("Q1", "callan",
+     "QQ Englishの無料体験レッスンは2回まで",
+     ["https://www.qqeng.com/", "https://www.qqeng.com/price/"],
+     ["無料体験", "2回", "体験レッスン"]),
+    ("Q2", "callan",
+     "QQ Englishはカランメソッドの正式認定校",
+     ["https://www.qqeng.com/", "https://www.qqeng.com/callan/"],
+     ["正式認定校", "カランメソッド", "認定"]),
+    ("Q3", "callan",
+     "カランメソッドは通常の4倍速で、ケンブリッジ検定に350時間が80時間になったという実績",
+     ["https://www.callan.co.uk/", "https://www.qqeng.com/callan/"],
+     ["4倍", "four times", "350", "80"]),
     ("T4", "32",
      "成績票に項目別の正答率（Abilities Measured）が記載されている",
      ["https://www.iibc-global.org/toeic/test/lr/about/score.html",
