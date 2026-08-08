@@ -45,3 +45,35 @@ jobs:
             git rebase --abort || true
             sleep $((i * 5))
           done
+
+  context:
+    # 確認できなかった主張について、該当段落の原文をそのまま取り出す。
+    # 修正案を書くための材料集め。記事は書き換えない
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests janome -q
+      - name: 該当段落を集める
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python affiliate-research-engine/playbook/scripts/rewrite_planner.py
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/claims/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: rewrite context $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
