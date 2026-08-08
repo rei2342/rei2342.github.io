@@ -57,7 +57,7 @@ BASEDATE = r"20[0-9]{2}年[0-9]{1,2}月[0-9]{1,2}日時点|20[0-9]{2}年[0-9]{1,
 MONEY = ("万円", "円", "万")
 
 
-def classify(sent, unit, is_claim):
+def classify(sent, num, unit, is_claim):
     """1つの数値が誰の数字かを決める。
 
     **単位で門を作る。** 文にTOEICが出てくるからといって、
@@ -83,14 +83,22 @@ def classify(sent, unit, is_claim):
             return "個人_支出の可能性", svc
         if svc:
             return "公式_料金", svc
-        return "金額_判別不能", svc
+        # 留学費用の相場・見積もり。本人の明細ではなく出典で確かめる
+        if re.search(SELF, sent):
+            return "費用の見積もり_一人称", svc
+        return "費用の相場", svc
 
     if unit == "点":
+        # 「100点の選択肢」「1点」は点数ではない。
+        # TOEICの実在レンジ（200〜990）か、スコアの増減の話かで分ける
+        n = int(re.sub(r"[^0-9]", "", num) or 0)
         if re.search(HYPO, sent):
             return "仮定・試算", svc
-        if re.search(SELF, sent):
+        if 200 <= n <= 990:
             return "個人_スコア", svc
-        return "スコア_主語不明", svc
+        if re.search(r"TOEIC|スコア|リスニング|リーディング|点(?:上|下|動|伸|落)", sent):
+            return "スコアの増減", svc
+        return None, svc
 
     if re.search(GENERAL, sent):
         return "一般_データ", svc
@@ -101,21 +109,23 @@ def classify(sent, unit, is_claim):
     return None, svc
 
 
-ORDER = ["個人_支出", "個人_貯金", "個人_スコア", "個人_支出の可能性",
-         "スコア_主語不明", "個人_期間回数",
-         "公式_料金", "一般_データ", "仮定・試算", "金額_判別不能"]
+ORDER = ["個人_支出", "個人_貯金", "個人_スコア", "スコアの増減",
+         "個人_支出の可能性", "個人_期間回数",
+         "公式_料金", "費用の相場", "費用の見積もり_一人称",
+         "一般_データ", "仮定・試算"]
 
 NEEDS = {
     "個人_支出": "クレジットカード・銀行の明細",
     "個人_貯金": "本人の記録（記事に書く必要があるかも要検討）",
     "個人_スコア": "TOEIC公式マイページのスコアと受験日",
     "個人_支出の可能性": "主語を確かめたうえで明細",
-    "スコア_主語不明": "誰のスコアかを確かめる",
+    "スコアの増減": "TOEIC公式マイページの受験履歴",
+    "費用の相場": "出典（エージェント・公的機関の公表値）＋確認日",
+    "費用の見積もり_一人称": "本人の試算か、他所の数字かを確かめる",
     "個人_期間回数": "本人の記憶・記録",
     "公式_料金": "公式サイト＋基準日",
     "一般_データ": "出典（研究・統計の一次情報）",
     "仮定・試算": "確認不要（事実主張ではない）。ただし前提の数字は要確認",
-    "金額_判別不能": "原文を読んで、誰の金額かを決める",
 }
 
 
@@ -147,7 +157,7 @@ def main():
                 is_claim = sent[:50] in claims
                 for m in NUM_RE.finditer(sent):
                     val, unit = m.group(1), m.group(2)
-                    kind, svc = classify(sent, unit, is_claim)
+                    kind, svc = classify(sent, val, unit, is_claim)
                     if kind is None:
                         continue
                     key = (kind, f"{val}{unit}", sent[:60])
@@ -181,8 +191,8 @@ def main():
             L.append(f"| {k} | {cnt[k]} | {NEEDS[k]} |\n")
 
     L.append("\n---\n\n# 個人の数字（本人の記録でしか確かめられない）\n\n")
-    personal = ["個人_支出", "個人_貯金", "個人_スコア",
-                "個人_支出の可能性", "スコア_主語不明", "個人_期間回数"]
+    personal = ["個人_支出", "個人_貯金", "個人_スコア", "スコアの増減",
+                "個人_支出の可能性", "個人_期間回数"]
     for k in personal:
         sel = [r for r in rows if r["kind"] == k]
         if not sel:
@@ -194,7 +204,7 @@ def main():
             L.append(f"| **{r['value']}** | {r['post_id']} | {s} |\n")
 
     L.append("\n---\n\n# 公式・一般の数字（一次情報と基準日で確かめる）\n\n")
-    for k in ["公式_料金", "一般_データ"]:
+    for k in ["公式_料金", "費用の相場", "費用の見積もり_一人称", "一般_データ"]:
         sel = [r for r in rows if r["kind"] == k]
         if not sel:
             continue
@@ -210,9 +220,7 @@ def main():
     for r in [x for x in rows if x["kind"] == "仮定・試算"]:
         L.append(f"- **{r['value']}** [{r['post_id']}] {r['sentence'][:110]}\n")
 
-    L.append("\n---\n\n# 金額だが誰の数字か決められない（原文を読んで決める）\n\n")
-    for r in [x for x in rows if x["kind"] == "金額_判別不能"]:
-        L.append(f"- **{r['value']}** [{r['post_id']}] {r['sentence'][:110]}\n")
+
 
     (OUT / "NUMBERS.md").write_text("".join(L), encoding="utf-8")
     print(f"数値 {len(rows)}件")
