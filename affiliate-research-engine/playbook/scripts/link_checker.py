@@ -22,6 +22,9 @@ import sys
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
+from html import unescape as html_unescape
+from urllib.parse import unquote
+
 import requests
 import urllib3
 
@@ -81,18 +84,50 @@ def meta_of(html, prop):
     return m.group(1).strip() if m else ""
 
 
+def destination(url):
+    """アフィリンクの中に書いてある遷移先を、**踏まずに**取り出す。
+
+    もしもの click URL は `url=` に遷移先をそのまま持っている。
+    ここから読めば、ASPに本人クリックを1件も計上せずに確かめられる
+    （2026-08-08に判明。それまでは踏むしかないと思っていた）。
+    A8 のように遷移先を持たない形式のときは None を返す。
+    """
+    u = html_unescape(url)
+    m = re.search(r"[?&]url=([^&]+)", u)
+    if m:
+        return unquote(m.group(1)), "リンクのurlパラメータから取得（踏んでいない）"
+    return None, ""
+
+
+def normalize(url):
+    """`//host/...` のようなスキーム無しURLを直す。"""
+    u = html_unescape(url).strip()
+    if u.startswith("//"):
+        u = "https:" + u
+    return u
+
+
 def follow(url):
-    """リダイレクトを最後までたどる。**1本につき1回だけ**アクセスする。"""
+    """遷移先を確かめる。**アフィリンクは踏まない。**
+
+    遷移先がリンクの中に書いてあるなら、そこへ直接アクセスする。
+    書いていない形式のときだけ、アフィリンクをたどる（1回だけ）。
+    """
+    dest, how = destination(url)
+    target, note = (dest, how) if dest else (normalize(url), "遷移先が書かれていないのでアフィリンクをたどった")
     s = requests.Session()
     try:
-        r = s.get(url, headers={"User-Agent": UA}, allow_redirects=True,
+        r = s.get(target, headers={"User-Agent": UA}, allow_redirects=True,
                   timeout=45, verify=False)
     except Exception as e:
-        return {"error": f"{type(e).__name__}: {e}"}
+        return {"error": f"{type(e).__name__}: {e}", "declared_dest": dest or "",
+                "how": note}
     chain = [h.url for h in r.history] + [r.url]
     html = r.text if "text/html" in r.headers.get("Content-Type", "") else ""
     comp = COMPANY_RE.search(_q.strip_tags(html)) if html else None
     return {
+        "declared_dest": dest or "",
+        "how": note,
         "status": r.status_code,
         "final_url": r.url,
         "domain": re.sub(r"^www\.", "", (re.match(r"https?://([^/]+)", r.url)
@@ -127,12 +162,12 @@ def main():
             "anchor": " / ".join(sorted(d["anchors"])),
             "affiliate_url": d["url"],
             **{k: r.get(k, "") for k in
-               ("status", "final_url", "domain", "hops", "chain", "title",
-                "og_site_name", "og_title", "description", "company_line",
-                "error")},
+               ("declared_dest", "how", "status", "final_url", "domain",
+                "hops", "chain", "title", "og_site_name", "og_title",
+                "description", "company_line", "error")},
         })
-        for k in ("status", "final_url", "domain", "title", "og_site_name",
-                  "company_line", "error"):
+        for k in ("declared_dest", "how", "status", "final_url", "domain",
+                  "title", "og_site_name", "company_line", "error"):
             if r.get(k):
                 print(f"   {k}: {r[k]}")
 
@@ -143,13 +178,18 @@ def main():
 
     L = [f"# アフィリンクの遷移先 {stamp}\n\n",
          "記事の説明と、リンクが実際に飛ぶ先が一致しているかを見るための記録。\n"
-         "**ASPの管理画面には入っていない。** 公開リンクを1本につき1回たどっただけ。\n\n",
+         "**ASPの管理画面には入っていない。**\n"
+         "もしものリンクは `url=` に遷移先が書いてあるので、**踏まずに**そこへ直接見に行く。\n"
+         "本人クリックは1件も計上していない。\n\n",
          "判定は書いていない。**取得した事実だけ**を並べる。\n\n"]
     for r in rows:
         L.append(f"---\n\n## {r['anchor']}\n\n")
         L.append(f"- 記事: {r['posts']}\n")
         L.append(f"- 取得日時: {r['checked_at']}\n")
         L.append(f"- アフィリエイトURL: `{r['affiliate_url']}`\n")
+        if r.get("declared_dest"):
+            L.append(f"- **リンクに書かれた遷移先**: {r['declared_dest']}\n")
+        L.append(f"- 取得のしかた: {r.get('how','')}\n")
         if r.get("error"):
             L.append(f"- **たどれなかった**: {r['error']}\n\n")
             continue
