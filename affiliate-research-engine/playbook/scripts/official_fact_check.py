@@ -34,7 +34,11 @@ ALLOWED = ("iibc-global.org", "ets.org", "qqeng.com", "callan.co.uk",
            # 2026-08-09に追加。CTAで「無料」を訴求しているのに
            # cta_claims.csv に行が無い案件を裏取りするため
            "eikaiwa.dmm.com", "rarejob.com", "eigosapuri.jp",
-           "u-gaku.jp", "ryugaku-johokan.com", "cebridge.jp", "notta.ai")
+           "u-gaku.jp", "ryugaku-johokan.com", "cebridge.jp", "notta.ai",
+           # ワーホリの年齢条件の一次情報。**外務省と各国の公的機関だけ。**
+           # まとめサイト・エージェントの説明は根拠にしない
+           "mofa.go.jp", "immi.gov.au", "homeaffairs.gov.au",
+           "canada.ca", "cic.gc.ca", "immigration.govt.nz")
 
 # (主張ID, 記事, 主張, 見に行くURL, 根拠として探す語)
 CHECKS = [
@@ -91,6 +95,18 @@ CHECKS = [
     ("A7", "cta", "[リンク由来] 留学情報館の無料カウンセリング",
      ["https://www.ryugaku-johokan.com/index_mr.php"],
      ["無料", "手数料", "カウンセリング", "0円"]),
+    # ── ワーホリの年齢条件（2026-08-09に追加）────────────────
+    # 記事289・292・238が「申請時点で原則30歳まで」「31歳の誕生日の前日まで
+    # 申請すれば渡航は32歳でも大丈夫」と書いている。
+    # **国を特定せずに書いてある**ので、外務省の一次情報と照合する。
+    # 近い制度から推測して補わない。取れなければ削除する。
+    ("W1", "289,292", "ワーキング・ホリデー制度の対象年齢（外務省の一覧）",
+     ["https://www.mofa.go.jp/mofaj/toko/visa/working_h.html",
+      "https://www.mofa.go.jp/mofaj/toko/page22_000969.html"],
+     ["18歳", "25歳", "30歳", "年齢", "対象", "ワーキング・ホリデー"]),
+    ("W2", "238", "申請時と渡航時のどちらで年齢を判定するか",
+     ["https://www.mofa.go.jp/mofaj/toko/visa/working_h.html"],
+     ["申請時", "査証申請", "発給", "入国", "有効期間", "1年"]),
     ("T4", "32",
      "成績票に項目別の正答率（Abilities Measured）が記載されている",
      ["https://www.iibc-global.org/toeic/test/lr/about/score.html",
@@ -146,7 +162,8 @@ def main():
         if only:
             want = {w.strip().lower() for w in only.split(",") if w.strip()}
             group = {"toeic": cid.startswith("T"), "cta": cid.startswith("A"),
-                     "callan": cid.startswith("Q")}
+                     "callan": cid.startswith("Q"),
+                     "workingholiday": cid.startswith("W")}
             if not (cid.lower() in want or pid.lower() in want
                     or any(group.get(w) for w in want)):
                 continue

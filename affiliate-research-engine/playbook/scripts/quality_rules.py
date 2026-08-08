@@ -696,11 +696,37 @@ CTA_PROMO_NUM = (
 _A_TAG_RE = re.compile(r'<a\b[^>]*href="([^"]+)"[^>]*>(.*?)</a>', re.DOTALL | re.I)
 
 
+def _today():
+    from datetime import datetime, timedelta, timezone
+    return datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
+
+
 def load_cta_claims():
-    """CTAで訴求してよい条件。verified=yes の行だけ。"""
+    """CTAで訴求してよい条件。verified=yes で、**まだ失効していない**行だけ。
+
+    expires_on を過ぎた行は verified=yes でも落とす（2026-08-09に追加）。
+    「8月31日まで初月99円」を9月に出し続けると、確認済みの記録が
+    そのまま虚偽になる。人が消し忘れても機械が止まるようにする。
+    """
+    today = _today()
+    out = []
+    for r in _read_csv(CTA_CLAIMS_CSV):
+        if (r.get("verified") or "").strip().lower() not in \
+                ("yes", "y", "true", "1"):
+            continue
+        exp = (r.get("expires_on") or "").strip()
+        if exp and exp < today:
+            continue                       # 失効。台帳に無いのと同じ扱い
+        out.append(r)
+    return out
+
+
+def expired_cta_claims():
+    """失効した行を報告用に返す。黙って消すと気づけないため。"""
+    today = _today()
     return [r for r in _read_csv(CTA_CLAIMS_CSV)
-            if (r.get("verified") or "").strip().lower() in
-            ("yes", "y", "true", "1")]
+            if (r.get("expires_on") or "").strip()
+            and (r.get("expires_on") or "").strip() < today]
 
 
 # 一時非表示にしたCTA。コメントで包んであるので読者には出ない

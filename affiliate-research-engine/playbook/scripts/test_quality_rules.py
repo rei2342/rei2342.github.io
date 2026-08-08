@@ -13,6 +13,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 import quality_rules as q
 
+# 差し替える前の本物。テストの途中でモンキーパッチが残ると、
+# あとのテストが実装ではなくラムダを検査してしまう
+REAL_LOAD_CTA_CLAIMS = q.load_cta_claims
+
 # テスト専用の台帳。本番ファイルには一切書かない
 LEDGER = {
     "DMM英会話": {"service": "DMM英会話", "status": "used", "usage_type": "free_trial",
@@ -265,6 +269,86 @@ def run_cta_box():
     return ng
 
 
+def run_cta_expiry():
+    """期間限定の訴求が、失効日を過ぎたら自動で不合格になるか。
+
+    「8月31日まで初月99円」を9月に出し続けると、
+    確認済みの記録がそのまま虚偽になる。人の消し忘れを機械で止める。
+    """
+    import csv as _csv
+    import tempfile
+    ROWS = [
+        # 恒久的な内容。expires_on 空欄 → いつでも通る
+        {"service": "スパトレ", "promo_term": "無料", "claim": "7日間の無料期間",
+         "official_url": "https://sptr.jp/", "checked_on": "2026-08-08",
+         "expires_on": "", "landing_check": "", "verified": "yes", "note": ""},
+        {"service": "スパトレ", "promo_term": "期間", "claim": "7日間の無料期間",
+         "official_url": "https://sptr.jp/", "checked_on": "2026-08-08",
+         "expires_on": "", "landing_check": "", "verified": "yes", "note": ""},
+        # 失効済み
+        {"service": "QQ English", "promo_term": "初月", "claim": "初月99円",
+         "official_url": "https://www.qqeng.com/", "checked_on": "2026-08-09",
+         "expires_on": "2026-08-31", "landing_check": "", "verified": "yes",
+         "note": ""},
+        # まだ有効
+        {"service": "DMM英会話", "promo_term": "無料", "claim": "無料体験レッスン",
+         "official_url": "https://eikaiwa.dmm.com/", "checked_on": "2026-08-09",
+         "expires_on": "2099-12-31", "landing_check": "needs_japan_check",
+         "verified": "yes", "note": ""},
+    ]
+    fd = Path(tempfile.mkdtemp()) / "cta.csv"
+    with open(fd, "w", encoding="utf-8", newline="") as f:
+        w = _csv.DictWriter(f, fieldnames=list(ROWS[0].keys()))
+        w.writeheader()
+        w.writerows(ROWS)
+    old_path, old_today = q.CTA_CLAIMS_CSV, q._today
+    old_load = q.load_cta_claims
+    q.CTA_CLAIMS_CSV = str(fd)
+    # run_cta_gate が load_cta_claims をラムダに差し替えたままなので戻す。
+    # ここは**本物の読み込み処理**を通さないと失効判定を検査できない
+    q.load_cta_claims = REAL_LOAD_CTA_CLAIMS
+
+    A = '<a href="//af.moshimo.com/af/c/click?a_id=1&url=x">{}</a>'
+    CASES = [
+        ("2026-08-15", "→ QQ Englishの初月99円を見る", False,
+         "失効日前なら通る"),
+        ("2026-09-01", "→ QQ Englishの初月99円を見る", True,
+         "**失効日を過ぎたら verified=yes でもブロック**"),
+        ("2026-09-01", "→ スパトレの7日間無料体験を見る", False,
+         "expires_on が空欄なら失効しない"),
+        ("2026-09-01", "→ DMM英会話の無料体験レッスンを試す", False,
+         "失効日が先ならまだ通る"),
+    ]
+    ng = 0
+    for today, anchor, want, why in CASES:
+        q._today = lambda t=today: t
+        got = q.cta_claim_gate(A.format(anchor))
+        ok = bool(got) == want
+        print(("OK  " if ok else "NG  ") + f"[{today}] " + why)
+        if not ok:
+            print(f"      期待: {'ブロック' if want else '通過'} / 実際: {got}")
+            ng += 1
+
+    q._today = lambda: "2026-09-01"
+    exp = q.expired_cta_claims()
+    ok_rep = len(exp) == 1 and exp[0]["service"] == "QQ English"
+    print(("OK  " if ok_rep else "NG  ") + "失効した行は報告用に取り出せる")
+    if not ok_rep:
+        ng += 1
+
+    # landing_check は訴求の裏取りとは別。値が入っていてもブロックしない
+    q._today = lambda: "2026-08-15"
+    ok_land = not q.cta_claim_gate(A.format("→ DMM英会話の無料体験レッスンを試す"))
+    print(("OK  " if ok_land else "NG  ")
+          + "needs_japan_check は着地確認の話なので訴求は止めない")
+    if not ok_land:
+        ng += 1
+
+    q.CTA_CLAIMS_CSV, q._today, q.load_cta_claims = old_path, old_today, old_load
+    print(f"\n失効ゲートの失敗 {ng}件")
+    return ng
+
+
 def run_claim_parse():
     """命題の解析を、構造化結果の**完全一致**で検証する。
 
@@ -476,6 +560,8 @@ if __name__ == "__main__":
     ng += run_cta_gate()
     print()
     ng += run_cta_box()
+    print()
+    ng += run_cta_expiry()
     print()
     ng += run_claim_parse()
     print()

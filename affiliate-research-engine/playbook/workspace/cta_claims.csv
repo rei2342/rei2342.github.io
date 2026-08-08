@@ -12,30 +12,38 @@
 #               限定 / キャンペーン / 半額 / 初月 / 今だけ / 最安
 # claim         公式に書いてある内容（数値も含めてそのまま）
 # official_url  確認した公式ページ
-# checked_on    確認日（YYYY-MM-DD）
+# checked_on    確認日（YYYY-MM-DD）。**必須**
+# expires_on    失効日（YYYY-MM-DD）。**期間限定の訴求は必ず入れる。**
+#               この日を過ぎると、verified=yes でも自動的に不合格になる。
+#               「8月31日まで初月99円」のような訴求を、9月になっても
+#               出し続けないため。恒久的な内容は空欄でよい
+# landing_check 着地先の確認状態。空欄 / needs_japan_check / ok
+#               needs_japan_check は「無料体験の存在は確認できたが、
+#               日本からCTAを踏んだときの着地先が未確認」という意味。
+#               **訴求の裏取りとは別の話**なので列を分けてある
 # verified      yes / no（空欄は no 扱い）
 # note          補足
-service,promo_term,claim,official_url,checked_on,verified,note
-スパトレ,無料,7日間の無料期間,https://sptr.jp/,2026-08-08,yes,公式トップの説明文で確認。link_checker の取得記録は LINK_AUDIT.md
-スパトレ,期間,7日間の無料期間,https://sptr.jp/,2026-08-08,yes,同上
-ネイティブキャンプ,無料,7日間無料体験,https://nativecamp.net,2026-08-08,yes,公式トップの説明文で確認
-ネイティブキャンプ,回数,レッスン回数無制限,https://nativecamp.net,2026-08-08,yes,公式トップの説明文で確認
-留学情報館,無料,手数料0円・オンラインと対面どちらもカウンセリングは無料,https://www.ryugaku-johokan.com/index_mr.php,2026-08-09,yes,2026-08-09に再確認。公式トップの「＼オンライン、対面どちらも無料／ カウンセリング」でカウンセリング自体の無料も確認できた（前回は未確認だった）
-ネイティブキャンプ留学,無料,手数料0円・渡航前のオンライン英会話が完全無料,https://nativecamp.net/study_abroad/counseling-reserve,2026-08-08,yes,公式ページの説明文で確認
-QQ English,,公式サイトでレッスンの内容と料金を確認する（訴求語なし）,https://www.qqeng.com/,2026-08-08,yes,成人向け素材ID 010 / a8mat=4B9W9D+2IHWQA+4HHM+60H7M。旧 669JM は使わない。期間限定の初月価格はCTAに固定で書かない
-QQ English,無料,体験レッスン2回あり,https://www.qqeng.com/,2026-08-09,yes,公式トップで確認。回数は2回
-QQ English,回数,体験レッスン2回あり,https://www.qqeng.com/,2026-08-09,yes,同上
+service,promo_term,claim,official_url,checked_on,expires_on,landing_check,verified,note
+スパトレ,無料,7日間の無料期間,https://sptr.jp/,2026-08-08,,,yes,公式トップの説明文で確認。link_checker の取得記録は LINK_AUDIT.md
+スパトレ,期間,7日間の無料期間,https://sptr.jp/,2026-08-08,,,yes,同上
+ネイティブキャンプ,無料,7日間無料体験,https://nativecamp.net,2026-08-08,,,yes,公式トップの説明文で確認
+ネイティブキャンプ,回数,レッスン回数無制限,https://nativecamp.net,2026-08-08,,,yes,公式トップの説明文で確認
+留学情報館,無料,手数料0円・オンラインと対面どちらもカウンセリングは無料,https://www.ryugaku-johokan.com/index_mr.php,2026-08-09,,,yes,2026-08-09に再確認。公式トップの「＼オンライン、対面どちらも無料／ カウンセリング」でカウンセリング自体の無料も確認できた（前回は未確認だった）
+ネイティブキャンプ留学,無料,手数料0円・渡航前のオンライン英会話が完全無料,https://nativecamp.net/study_abroad/counseling-reserve,2026-08-08,,,yes,公式ページの説明文で確認
+QQ English,,公式サイトでレッスンの内容と料金を確認する（訴求語なし）,https://www.qqeng.com/,2026-08-08,,,yes,成人向け素材ID 010 / a8mat=4B9W9D+2IHWQA+4HHM+60H7M。旧 669JM は使わない。期間限定の初月価格はCTAに固定で書かない
+QQ English,無料,体験レッスン2回あり,https://www.qqeng.com/,2026-08-09,,,yes,公式トップで確認。回数は2回
+QQ English,回数,体験レッスン2回あり,https://www.qqeng.com/,2026-08-09,,,yes,同上
 # ── 2026-08-09追加 ────────────────────────────────
 # 生成側の全CTAをゲートに掛けたら、15本中8本が台帳の行を持たないまま
 # 「無料」と書いていた。official_fact_check.py の A1〜A7 で裏取りした結果。
 # **公式ページに実際に書いてある語だけを claim に写している。**
 # 回数は、公式の文からはっきり読めるものしか入れない
 # （DMMの「回」はサイト共通ナビの語だったので採用しない）。
-U-GAKU,無料,無料カウンセリング,https://u-gaku.jp/,2026-08-09,yes,公式FAQ「お申し込みの流れ ① 無料カウンセリングのお申し込み」で確認。個別相談という表記は公式に無いので使わない
-CEBRIDGE,無料,無料カウンセリング・LINEで無料相談,https://cebridge.jp/,2026-08-09,yes,公式トップのメニューで確認
-DMM英会話,無料,無料体験レッスン,https://eikaiwa.dmm.com/,2026-08-09,yes,公式トップ「無料体験レッスンまでの流れ」で確認。回数は公式トップからは読めないので書かない
-レアジョブ英会話,無料,7日間無料でレッスンを体験できます,https://www.rarejob.com/,2026-08-09,yes,公式トップの本文でそのまま確認
-レアジョブ英会話,期間,7日間無料でレッスンを体験できます,https://www.rarejob.com/,2026-08-09,yes,同上
-スタディサプリ,無料,初回無料体験（無料期間中キャンセルいつでもOK）,https://eigosapuri.jp/,2026-08-09,yes,公式トップ「初回無料体験までのかんたん3ステップ」で確認。日数は公式トップに出ていないので書かない
+U-GAKU,無料,無料カウンセリング,https://u-gaku.jp/,2026-08-09,,,yes,公式FAQ「お申し込みの流れ ① 無料カウンセリングのお申し込み」で確認。個別相談という表記は公式に無いので使わない
+CEBRIDGE,無料,無料カウンセリング・LINEで無料相談,https://cebridge.jp/,2026-08-09,,,yes,公式トップのメニューで確認
+DMM英会話,無料,無料体験レッスン,https://eikaiwa.dmm.com/,2026-08-09,,needs_japan_check,yes,公式トップ「無料体験レッスンまでの流れ」で確認。回数は公式トップからは読めないので書かない
+レアジョブ英会話,無料,7日間無料でレッスンを体験できます,https://www.rarejob.com/,2026-08-09,,,yes,公式トップの本文でそのまま確認
+レアジョブ英会話,期間,7日間無料でレッスンを体験できます,https://www.rarejob.com/,2026-08-09,,,yes,同上
+スタディサプリ,無料,初回無料体験（無料期間中キャンセルいつでもOK）,https://eigosapuri.jp/,2026-08-09,,,yes,公式トップ「初回無料体験までのかんたん3ステップ」で確認。日数は公式トップに出ていないので書かない
 # Notta は https://www.notta.ai/ が英語版へ転送され、「無料プラン」を確認できなかった。
 # **台帳に入れない。** CTAの文言は中立のままにする
