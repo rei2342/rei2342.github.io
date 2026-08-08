@@ -83,6 +83,23 @@ def actions():
     return out
 
 
+def headings():
+    """記事ID → 見出しの並び。修正後の構成を考えるのに要る。"""
+    import claim_extractor as _ce
+    out = {}
+    for p in _wa.published():
+        html = _ce.strip_containers(p.get("content", {}).get("rendered", ""))
+        hs = [(m.group(1).lower(), _q.strip_tags(m.group(2)))
+              for m in re.finditer(r"<(h2|h3)\b[^>]*>(.*?)</\1>", html,
+                                   re.DOTALL | re.I)]
+        out[str(p["id"])] = [(t, x) for t, x in hs if x.strip()]
+    return out
+
+
+# 未確認の一人称が見出しに入っている合図
+SELF_HEAD = re.compile(r"私|自分|僕|27歳|30歳まで")
+
+
 def main():
     nf = OUT / "NUMBERS.csv"
     if not nf.exists():
@@ -90,6 +107,7 @@ def main():
         return
     rows = list(csv.DictReader(nf.open(encoding="utf-8")))
     cta, act = ctas(), actions()
+    heads = headings()
 
     byp = defaultdict(lambda: defaultdict(list))
     meta = {}
@@ -177,6 +195,15 @@ def main():
                          f" … {r['sentence'][:100]}\n")
             if len(sel) > 8:
                 L.append(f"- （ほか {len(sel) - 8}件は NUMBERS.csv）\n")
+
+        hs = heads.get(p, [])
+        if hs:
+            bad = [x for t, x in hs if SELF_HEAD.search(x)]
+            L.append(f"\n### いまの見出し（H2 {sum(1 for t,_ in hs if t=='h2')}本"
+                     f" / 一人称が入っている見出し **{len(bad)}本**）\n\n")
+            for t, x in hs:
+                mark = " ⚠️一人称" if SELF_HEAD.search(x) else ""
+                L.append(f"{'  ' if t == 'h3' else ''}- `{t}` {x}{mark}\n")
 
         if judge:
             L.append("\n### 主語を確かめる数字\n\n")
