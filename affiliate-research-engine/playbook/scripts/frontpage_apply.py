@@ -37,6 +37,17 @@ BK = Path("affiliate-research-engine/playbook/workspace/backups")
 UA = {"User-Agent": "Mozilla/5.0"}
 AUTH = (WP_USER, WP_PASS)
 
+# 既存カテゴリのslug。**1つも変更しない**（変えると301が要る）
+CAT = {
+    "学習法": "%e8%8b%b1%e8%aa%9e%e5%ad%a6%e7%bf%92%e6%b3%95",
+    "比較": "%e8%8b%b1%e4%bc%9a%e8%a9%b1%e3%82%b5%e3%83%bc%e3%83%93%e3%82%b9%e6%af%94%e8%bc%83",
+    "コーチング": "%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e3%83%b3%e3%82%b0",
+    "留学": "%e6%b5%b7%e5%a4%96%e7%95%99%e5%ad%a6%e3%83%bb%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa",
+}
+
+# TOEIC・スコアへ移す記事。**主カテゴリを1つにする**
+TOEIC_POSTS = ["304", "521", "32"]
+
 ARTICLES_SLUG = "articles"
 FRONT_SLUG = "start"
 
@@ -70,12 +81,16 @@ def front_body(cats):
         return (f'<li><a href="{SITE}/category/{slug}/"><strong>{label}</strong></a>'
                 f'（{n}本）<br><span>{desc}</span></li>\n')
 
+    # slug は既存のものをそのまま使う。URLエンコードされた日本語slugも変えない
     cat_html = "".join([
-        cat_line("english-study", "勉強法・続け方", "続かない理由を、意志ではなく形から見直す"),
+        cat_line(CAT["学習法"], "英語学習法", "続かない理由を、意志ではなく形から見直す"),
         cat_line("toeic-score", "TOEIC・スコア", "止まったスコアの内訳を分解して、次に直す場所を決める"),
-        cat_line("eikaiwa-hikaku", "サービスの選び方", "アプリ・オンライン英会話・コーチングの比べ方"),
+        cat_line(CAT["比較"], "英会話サービス比較", "アプリ・オンライン英会話の比べ方"),
+        cat_line(CAT["コーチング"], "英語コーチング", "払う前に確認することと、卒業後に残るもの"),
         cat_line("ai-english", "AI英語学習", "AI翻訳・ChatGPT・AI英会話をどう使うか"),
-        cat_line("ryugaku-workingholiday", "留学・ワーホリ", "費用の出し方、エージェントの選び方、制度の確認"),
+        cat_line(CAT["留学"], "海外留学・ワーホリ", "費用の出し方、エージェントの選び方、制度の確認"),
+        cat_line("philippines-cebu", "フィリピン・セブ留学", "学校の選び方と、費用の内訳"),
+        cat_line("ryugaku-agent-cost", "留学エージェント・費用", "手数料の仕組みと、聞く質問"),
     ])
 
     return f"""<h2>働きながら英語をやり直したい人へ</h2>
@@ -200,11 +215,14 @@ def main():
     # 空カテゴリの扱いを記録
     L.append("### カテゴリ導線（記事が0本のものはリンクにしない）\n\n")
     L.append("| カテゴリ | slug | 記事数 | 扱い |\n|---|---|---|---|\n")
-    for slug, label in (("english-study", "勉強法・続け方"),
+    for slug, label in ((CAT["学習法"], "英語学習法"),
                         ("toeic-score", "TOEIC・スコア"),
-                        ("eikaiwa-hikaku", "サービスの選び方"),
+                        (CAT["比較"], "英会話サービス比較"),
+                        (CAT["コーチング"], "英語コーチング"),
                         ("ai-english", "AI英語学習"),
-                        ("ryugaku-workingholiday", "留学・ワーホリ")):
+                        (CAT["留学"], "海外留学・ワーホリ"),
+                        ("philippines-cebu", "フィリピン・セブ留学"),
+                        ("ryugaku-agent-cost", "留学エージェント・費用")):
         c = cats.get(slug)
         n = c.get("count", 0) if c else "（カテゴリ無し）"
         how = ("リンクにする" if isinstance(n, int) and n > 0
@@ -229,6 +247,39 @@ def main():
                  f"- `page_for_posts` → {aid}\n\n"
                  f"→ {'✅ 反映した' if ok else '❌ ' + str(up.status_code) + ' ' + up.text[:200]}\n")
         print(f"切り替え: {'OK' if ok else up.status_code}")
+
+    # ── 4. TOEIC記事を新カテゴリへ移す（主カテゴリ1つ）──
+    tc = cats.get("toeic-score")
+    L.append("\n## 4. TOEIC記事のカテゴリ割り当て\n\n")
+    if not tc:
+        L.append("⚠️ `toeic-score` が無いので割り当てない\n")
+    else:
+        L.append("**主カテゴリを1つにする。**過剰に付けない。\n\n")
+        L.append("| 記事 | 前 | 後 |\n|---|---|---|\n")
+        for pid in TOEIC_POSTS:
+            g = requests.get(f"{WP}/posts/{pid}", auth=AUTH, headers=UA,
+                             verify=False, timeout=40)
+            if g.status_code != 200:
+                L.append(f"| {pid} | 取得できず | — |\n")
+                continue
+            before = g.json().get("categories", [])
+            if DRY_RUN:
+                L.append(f"| {pid} | {before} | [{tc['id']}]（DRY RUN） |\n")
+                continue
+            up = requests.post(f"{WP}/posts/{pid}", auth=AUTH, headers=UA,
+                               verify=False, timeout=40,
+                               json={"categories": [tc["id"]]})
+            ok = up.status_code in (200, 201)
+            L.append(f"| {pid} | {before} | "
+                     f"{'✅ [' + str(tc['id']) + ']' if ok else '❌ ' + str(up.status_code)} |\n")
+            print(f"[{pid}] categories {before} -> [{tc['id']}] {'OK' if ok else up.status_code}")
+
+    # ── 5. Uncategorized に残る公開記事 ──────────────
+    uc = cats.get("uncategorized")
+    L.append("\n## 5. Uncategorized に残る公開記事\n\n")
+    if uc:
+        L.append(f"- 記事数: **{uc.get('count', 0)}本**"
+                 + ("（移す対象なし）" if uc.get("count", 0) == 0 else "") + "\n")
 
     (BK / day / "FRONTPAGE.md").write_text("".join(L), encoding="utf-8")
     print(f"\n→ workspace/backups/{day}/FRONTPAGE.md")
