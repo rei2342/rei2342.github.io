@@ -1,0 +1,48 @@
+name: CTAボックスの見出し差し替え
+
+# 「▶ さくらが確かめた・次の一手（すべて無料）」を公開記事から外す。
+# 生成側は 2026-08-09 に修正済み。すでに出ている記事を直す。
+# **リンクは触らない。** 見出しの1行だけ。
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true なら数えるだけで書かない'
+        required: false
+        default: 'true'
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    concurrency:
+      group: wp-write
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests janome -q
+      - name: 差し替え
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/cta_heading_fix.py
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: cta heading fix $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done

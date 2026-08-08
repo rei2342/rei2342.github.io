@@ -46,7 +46,7 @@ LINKS = {
         "5640988",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640988&p_id=4449&pc_id=11553&pl_id=59973&url=https%3A%2F%2Fu-gaku.jp%2F%3Futm_source%3Dmoshimo%26utm_medium%3Daffiliate%26utm_campaign%3Dimg01"'
         ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ 国内英語留学U-GAKU公式サイトでコース内容と個別相談の申し込み方法を見る</a>'
+        '→ 国内英語留学U-GAKUの無料カウンセリングを申し込む</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640988&p_id=4449&pc_id=11553&pl_id=59973"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
@@ -54,7 +54,7 @@ LINKS = {
         "5640990",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F%2Fwww.ryugaku-johokan.com%2Findex_mr.php%3Futm_source%3Dmoshimo%26utm_medium%3Daffiliate%26utm_campaign%3Dcounseling"'
         ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ 留学情報館公式サイトでサポート内容と申し込み方法を確認する</a>'
+        '→ 留学情報館の無料カウンセリングを申し込む</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
@@ -62,7 +62,7 @@ LINKS = {
         "5640987",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640987&p_id=4201&pc_id=10658&pl_id=57293&url=https%3A%2F%2Fcebridge.jp%2F"'
         ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ CEBRIDGE公式サイトでフィリピン留学の内容と相談の申し込み方法を見る</a>'
+        '→ CEBRIDGEでフィリピン留学の無料カウンセリングを申し込む</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640987&p_id=4201&pc_id=10658&pl_id=57293"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
@@ -78,7 +78,7 @@ LINKS = {
         "5640982",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962"'
         ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ DMM英会話公式サイトでレッスンの内容と料金を確認する</a>'
+        '→ DMM英会話の無料体験レッスンを試す</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
@@ -96,15 +96,15 @@ LINKS = {
     ),
     "rarejob": (
         "a8_s00000008409001",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" rel="nofollow">→ レアジョブ英会話公式サイトでレッスンの内容と料金を確認する</a><img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" rel="nofollow">→ レアジョブ英会話の7日間無料体験を試す</a><img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" alt="" loading="lazy">'
     ),
     "sapuri_nichijo": (
         "a8_s00000015388006",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" rel="nofollow">→ スタディサプリENGLISH 新日常英会話コースの内容と料金を公式サイトで確認する</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" rel="nofollow">→ スタディサプリENGLISH 新日常英会話コースの初回無料体験を試す</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" alt="" loading="lazy">'
     ),
     "sapuri_setplan": (
         "a8_s00000015388008",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" rel="nofollow">→ スタディサプリENGLISH 新日常英会話セットプラン（アプリ＋英会話）の内容と料金を公式サイトで確認する</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" rel="nofollow">→ スタディサプリENGLISH 新日常英会話セットプラン（アプリ＋英会話）の初回無料体験を試す</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" alt="" loading="lazy">'
     ),
     # Notta（A8）: EPC50以上・CTR5%以上。英語学習そのものではないが、
     # さくらは営業事務で英語の会議・電話に詰まる、という既存の軸がある。

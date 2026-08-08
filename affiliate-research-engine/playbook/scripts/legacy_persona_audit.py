@@ -92,17 +92,20 @@ def classify(sent, context):
     """1箇所の扱いを決める。**迷ったら「判定保留」にして触らない。**"""
     first = bool(FIRST_PERSON.search(sent))
     reader = bool(READER.search(sent))
-    system = bool(SYSTEM_REQ.search(sent)) or bool(SYSTEM_REQ.search(context))
+    # **その文自身が要件を書いているか**と、**近くに制度の話があるか**を分ける。
+    # 「私は27歳。」の前後にワーホリの年齢制限が書いてあっても、
+    # その文は制度の説明ではなく本人の設定（2026-08-09に直した）。
+    system_sent = bool(SYSTEM_REQ.search(sent))
+    system_ctx = bool(SYSTEM_REQ.search(context))
 
-    if first and not system:
+    if first and not system_sent:
         return ("個人の設定", "削除する",
                 "台帳に無いさくら固有の事実。読者の条件に置き換える")
-    # 「あと3年しかない」は主語が省略されていても本人のカウントダウン。
-    # 制度の要件が無い場合はここで拾う（一人称の判定より前に置かない）
-    if not system and DEADLINE_DECL.search(sent) and not reader:
+    # 「あと3年しかない」は主語が省略されていても本人のカウントダウン
+    if not system_sent and DEADLINE_DECL.search(sent) and not reader:
         return ("個人の設定", "削除する",
                 "本人の期限の宣言。読者自身の問題に置き換える")
-    if system:
+    if system_sent:
         need = []
         hay = sent + context
         if not COUNTRY.search(hay):
@@ -120,6 +123,9 @@ def classify(sent, context):
                 "国名・申請時期・一次情報・確認日が揃っている")
     if reader:
         return ("読者の条件", "残してよい", "読者自身の悩みとして書かれている")
+    if system_ctx:
+        return ("判定保留", "人が読む",
+                "近くに制度の話があるが、この文自体は要件を書いていない")
     return ("判定保留", "人が読む", "一人称でも読者向けでも制度でもない。文脈を見る")
 
 
