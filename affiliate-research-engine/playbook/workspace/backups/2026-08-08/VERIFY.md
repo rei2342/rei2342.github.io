@@ -1,81 +1,62 @@
-# 反映後の検証 2026-08-08 18:07:12 JST
+# 反映後の検証 2026-08-08 20:08:06 JST
 
 
 ---
 
-## ✅ 記事 310｜無料・低価格の英語アプリで足りる人と、足りない人の分かれ目
+## ⚠️ 記事 28｜「英会話 上達 しない 理由」で出る8個のリストを全部潰しても話せない、その全部を生んでいる1つの根
 
-https://sakura-eigo.com/cheap-english-learning-apps-free/
+https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e4%bc%9a%e8%a9%b1-%e4%b8%8a%e9%81%94-%e3%81%97%e3%81%aa%e3%81%84-%e7%90%86%e7%94%b1%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b8%e5%80%8b%e3%81%ae%e3%83%aa%e3%82%b9%e3%83%88%e3%82%92/
 
-- HTTP: 200 / 本文 3128字
-- H2 6本 / H3 10本
+- HTTP: 200 / 本文 4465字
+- H2 6本 / H3 9本
+- CTA 4本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e4%bc%9a%e8%a9%b1-%e4%b8%8a%e9%81%94-%e3%81%97%e3%81%aa%e3%81%84-%e7%90%86%e7%94%b1%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b8%e5%80%8b%e3%81%ae%e3%83%aa%e3%82%b9%e3%83%88%e3%82%92/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 不合格 / cta_claim_gate: 通過
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+28DJG2+35VG+64JTE`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+2IHWQA+4HHM+60H7M`
+
+**要対応**
+
+- draft_gate 不合格 3件
+
+---
+
+## ⚠️ 記事 42｜来週の会議で要る数10文だけを、1000時間の準備から取り出す
+
+https://sakura-eigo.com/%e3%80%8c%e4%bb%95%e4%ba%8b-%e8%8b%b1%e8%aa%9e-%e5%bf%85%e8%a6%81-%e3%81%aa%e3%81%ae%e3%81%ab-%e3%81%a7%e3%81%8d%e3%81%aa%e3%81%84%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e5%bf%83%e3%81%ae%e6%8c%81/
+
+- HTTP: 200 / 本文 5316字
+- H2 6本 / H3 8本
+- CTA 4本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/%e3%80%8c%e4%bb%95%e4%ba%8b-%e8%8b%b1%e8%aa%9e-%e5%bf%85%e8%a6%81-%e3%81%aa%e3%81%ae%e3%81%ab-%e3%81%a7%e3%81%8d%e3%81%aa%e3%81%84%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e5%bf%83%e3%81%ae%e6%8c%81/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 不合格 / cta_claim_gate: 通過
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+28DJG2+35VG+64JTE`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+2IHWQA+4HHM+60H7M`
+
+**要対応**
+
+- draft_gate 不合格 2件
+
+---
+
+## ⚠️ 記事 546｜オンライン英会話が3日で終わっていた私が、予約をやめて続いた90日
+
+https://sakura-eigo.com/online-english-lessons-90-days-success/
+
+- HTTP: 200 / 本文 4980字
+- H2 5本 / H3 14本
 - CTA 2本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/cheap-english-learning-apps-free/
+- canonical: https://sakura-eigo.com/online-english-lessons-90-days-success/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640981&#038;p_id=2409&#038;pc_id=5246&#038;pl_id=31559&#`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640991&#038;p_id=4940&#038;pc_id=13178&#038;pl_id=65056&`
+- draft_gate: 不合格 / cta_claim_gate: 通過
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+28DJG2+35VG+64JTE`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+2IHWQA+4HHM+60H7M`
 
----
+**要対応**
 
-## ✅ 記事 304｜TOEIC 600点で止まっているとき、勉強法を変える前に確認する4つのこと
-
-https://sakura-eigo.com/toeic-600-plateau-breakthrough-study/
-
-- HTTP: 200 / 本文 2161字
-- H2 5本 / H3 8本
-- CTA 2本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/toeic-600-plateau-breakthrough-study/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640981&#038;p_id=2409&#038;pc_id=5246&#038;pl_id=31559&#`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640991&#038;p_id=4940&#038;pc_id=13178&#038;pl_id=65056&`
-
----
-
-## ✅ 記事 282｜TOEIC400点台でワーホリに行く前に、点数の外側で確認する3つのこと
-
-https://sakura-eigo.com/working-holiday-english-anxiety/
-
-- HTTP: 200 / 本文 1735字
-- H2 4本 / H3 6本
-- CTA 1本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/working-holiday-english-anxiety/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640981&#038;p_id=2409&#038;pc_id=5246&#038;pl_id=31559&#`
-
----
-
-## ✅ 記事 521｜TOEICリスニングが止まっているとき、聞き流しを続ける前に確認する3つのこと
-
-https://sakura-eigo.com/toeic-listening-325-to-improvement/
-
-- HTTP: 200 / 本文 2015字
-- H2 5本 / H3 7本
-- CTA 2本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/toeic-listening-325-to-improvement/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640981&#038;p_id=2409&#038;pc_id=5246&#038;pl_id=31559&#`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640991&#038;p_id=4940&#038;pc_id=13178&#038;pl_id=65056&`
-
----
-
-## ✅ 記事 32｜TOEIC500点から上げる勉強法｜最初に確認したい4つのこと
-
-https://sakura-eigo.com/%e3%80%8ctoeic-500%e7%82%b9-%e3%81%8b%e3%82%89-%e4%b8%8a%e3%81%92%e3%82%8b-%e6%96%b9%e6%b3%95%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b%e5%8f%82%e8%80%83%e6%9b%b8%e3%81%a8200%e6%99%82%e9%96%93%e3%82%92/
-
-- HTTP: 200 / 本文 2102字
-- H2 5本 / H3 7本
-- CTA 2本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/%e3%80%8ctoeic-500%e7%82%b9-%e3%81%8b%e3%82%89-%e4%b8%8a%e3%81%92%e3%82%8b-%e6%96%b9%e6%b3%95%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b%e5%8f%82%e8%80%83%e6%9b%b8%e3%81%a8200%e6%99%82%e9%96%93%e3%82%92/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640981&#038;p_id=2409&#038;pc_id=5246&#038;pl_id=31559&#`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640991&#038;p_id=4940&#038;pc_id=13178&#038;pl_id=65056&`
+- draft_gate 不合格 3件
