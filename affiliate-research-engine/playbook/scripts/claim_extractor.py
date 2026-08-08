@@ -82,6 +82,14 @@ for _n in _q.SERVICE_NAMES:
 NUM_RE = re.compile(r"([0-9][0-9,\.]*)\s*(年間|年|ヶ月|か月|カ月|週間|日間|日|時間|分|"
                     r"回|点|万円|円|コマ|本|ページ)")
 
+# 「5年間」と「5年」、「3ヶ月」と「3か月」は同じ。表記を1つに寄せる
+UNIT_CANON = {"年間": "年", "か月": "ヶ月", "カ月": "ヶ月", "日間": "日"}
+
+
+def canon_value(num, unit):
+    n = num.replace(",", "").rstrip(".")
+    return f"{n}{UNIT_CANON.get(unit, unit)}"
+
 NEEDS = {
     "留学した": "パスポートの出入国記録", "渡航した": "パスポートの出入国記録",
     "受験した": "TOEIC公式マイページのスコアと受験日",
@@ -94,12 +102,56 @@ NEEDS = {
 }
 
 
+# 本文のブロック要素。ここから文を取り出す
+BLOCK_RE = re.compile(
+    r"<(p|li|h2|h3|h4|blockquote|td|figcaption)\b[^>]*>(.*?)</\1>",
+    re.DOTALL | re.IGNORECASE)
+
+# 抽出対象から外すブロック。**本文中の実体験は外さない**ので、
+# 文言ではなくHTML構造とアフィリンクの有無で判定する。
+EXCLUDE_HTML = {
+    "blockquote": "引用・口コミ",
+    "figcaption": "キャプション",
+}
+
+
+def blocks(html):
+    """記事HTMLを (種別, 除外理由 or None, 文の並び) に分けて返す。
+
+    CTAボックスは affiliate_inserter が付ける定型なので、まるごと外す。
+    アフィリンクを含むブロックも申込導線なので外す。
+    引用（blockquote）は第三者の口コミなので外す。
+    """
+    import affiliate_inserter as _ai2
+    html = _ai2.strip_box(html)
+    out = []
+    for m in BLOCK_RE.finditer(html):
+        tag = m.group(1).lower()
+        inner = m.group(2)
+        reason = EXCLUDE_HTML.get(tag)
+        if _q.AFFILIATE_LINK_RE.search(inner):
+            reason = "アフィリエイト導線"
+        # ナビゲーション・関連記事は内部リンクだけの短い行になりやすい
+        if not reason and re.search(r"<a\b", inner) and len(_q.strip_tags(inner)) < 40:
+            reason = "リンクだけの行"
+        text = _q.strip_tags(inner)
+        if not text:
+            continue
+        ss = [x.strip() for x in re.split(r"(?<=[。？！])", text) if x.strip()]
+        out.append((tag, reason, ss))
+    return out
+
+
 def sentences(text):
     return [s.strip() for s in re.split(r"(?<=[。？！\n])", text) if s.strip()]
 
 
-def parse(sent):
-    """1文から命題を取り出す。取れなければ None。"""
+def parse(sent, prev_subject=None):
+    """1文から命題を取り出す。取れなければ None。
+
+    prev_subject … 直前までの文で確定していた主語。日本語は主語を書かないので、
+    文脈から引き継ぐ。引き継げなければ unknown にする（本人と決めつけない）。
+    """
     if re.search(GENERAL_MARK, sent):
         kind = "一般論"
     else:
@@ -123,7 +175,7 @@ def parse(sent):
         return None
 
     m = NUM_RE.search(sent)
-    value = f"{m.group(1)}{m.group(2)}" if m else ""
+    value = canon_value(m.group(1), m.group(2)) if m else ""
 
     if re.search(SUBJ_READER, sent):
         subj = "読者"
@@ -131,10 +183,10 @@ def parse(sent):
         subj = "さくら"
     elif kind == "一般論":
         subj = "第三者"
+    elif prev_subject in ("さくら", "読者", "第三者"):
+        subj = prev_subject          # 直前の文の主語を引き継ぐ
     else:
-        # 主語が書かれていない日本語は多い。書き手の行為と読むのが自然。
-        # 一般論の印がある文だけ第三者にする（上で判定済み）
-        subj = "さくら"
+        subj = "unknown"             # 決めつけない
 
     if re.search(r"(?:する|します|したい|予定|つもり|だろう)$", sent.rstrip("。")):
         tense = "未来"
@@ -145,6 +197,9 @@ def parse(sent):
 
     is_exp = (subj == "さくら" and act_type == "体験" and tense != "未来"
               and kind != "一般論")
+    kind_label = ("一般論" if kind == "一般論" else
+                  "第三者口コミ" if subj == "第三者" else
+                  act_type)
 
     claim = f"{target}を{value}{act}" if value else f"{target}を{act}"
     if act in ("留学した", "渡航した", "働いている"):
@@ -153,7 +208,7 @@ def parse(sent):
             claim = f"{target}へ{value}{act}"
     return {
         "claim": claim, "subject": subj, "act": act, "act_type": act_type,
-        "target": target, "value": value, "tense": tense,
+        "target": target, "value": value, "tense": tense, "kind": kind_label,
         "is_experience": "yes" if is_exp else "no", "sentence": sent[:200],
     }
 
@@ -182,39 +237,80 @@ def main():
     posts = _wa.published()
     print(f"公開中 {len(posts)}本から命題を抜き出す\n")
 
-    props = defaultdict(lambda: {"rows": [], "posts": []})
+    props = defaultdict(lambda: {"rows": [], "posts": [], "variants": set()})
+    excluded = defaultdict(int)
+
     for p in posts:
         title = re.sub(r"<[^>]+>", "", p["title"]["rendered"])
-        text = _q.strip_tags(p.get("content", {}).get("rendered", ""))
-        ss = sentences(text)
-        for i, sent in enumerate(ss):
-            pr = parse(sent)
-            if not pr:
+        html = p.get("content", {}).get("rendered", "")
+        prev_subject = None
+        for tag, reason, ss in blocks(html):
+            if reason:
+                excluded[reason] += 1
+                prev_subject = None       # 除外ブロックで主語の引き継ぎを切る
                 continue
-            key = pr["claim"]
-            ctx = " ".join(ss[max(0, i - 1):i + 2])[:260]
-            props[key]["rows"].append({**pr, "context": ctx,
-                                       "post_id": p["id"], "url": p.get("link", ""),
-                                       "title": title})
-            if p["id"] not in props[key]["posts"]:
-                props[key]["posts"].append(p["id"])
+            for i, sent in enumerate(ss):
+                pr = parse(sent, prev_subject)
+                if not pr:
+                    continue
+                if pr["subject"] != "unknown":
+                    prev_subject = pr["subject"]
+                # 統合キーは 対象＋行動＋正規化した数値
+                key = f"{pr['target']}|{pr['act']}|{pr['value']}"
+                d = props[key]
+                ctx = " ".join(ss[max(0, i - 1):i + 2])[:260]
+                d["rows"].append({**pr, "context": ctx, "html_tag": tag,
+                                  "post_id": p["id"], "url": p.get("link", ""),
+                                  "title": title})
+                d["variants"].add(pr["sentence"][:60])
+                if p["id"] not in d["posts"]:
+                    d["posts"].append(p["id"])
+
+    # 数値なしの命題は、数値ありの命題を包含している可能性がある。
+    # 同じと断定せず、別命題として残したうえで関係だけ記録する。
+    subsumes = defaultdict(list)
+    for key in props:
+        t, a, v = key.split("|")
+        if v:
+            continue
+        for other in props:
+            ot, oa, ov = other.split("|")
+            if ot == t and oa == a and ov:
+                subsumes[key].append(other)
 
     ordered = sorted(props.items(), key=lambda kv: -len(kv[1]["posts"]))
     rows = []
-    for i, (claim, d) in enumerate(ordered, start=1):
+    for i, (key, d) in enumerate(ordered, start=1):
         r0 = d["rows"][0]
+        t, a, v = key.split("|")
+        claim = f"{t}を{v}{a}" if v else f"{t}を{a}"
+        if a in ("留学した", "渡航した"):
+            claim = f"{t}へ{v}{a}" if v else f"{t}へ{a}"
+        if a == "働いている":
+            claim = f"{t}として{a}"
         rows.append({
             "claim_id": f"C{i:03d}", "claim": claim,
-            "subject": r0["subject"], "act": r0["act"], "act_type": r0["act_type"],
-            "target": r0["target"], "value": r0["value"], "tense": r0["tense"],
+            "subject": r0["subject"], "act": a, "kind": r0["kind"],
+            "target": t, "value": v or "", "tense": r0["tense"],
             "is_experience": r0["is_experience"],
+            "html_tag": r0["html_tag"],
             "posts": len(d["posts"]),
             "post_ids": " ".join(str(x) for x in d["posts"][:12]),
-            "url": r0["url"], "sentence": r0["sentence"], "context": r0["context"],
+            "urls": " ".join(sorted({x["url"] for x in d["rows"]})[:4]),
+            "sentence": r0["sentence"], "context": r0["context"],
+            "variants": " ／ ".join(sorted(d["variants"])[:4]),
+            "subsumed_by": "",
             "setting_source": " ".join(setting_hit(r0)) or "（該当なし）",
-            "needs": NEEDS.get(r0["act"], "本人の確認"),
+            "needs": NEEDS.get(a, "本人の確認"),
             "confirmation": "",
+            "_key": key,
         })
+
+    idx = {r["_key"]: r["claim_id"] for r in rows}
+    for r in rows:
+        if r["_key"] in subsumes:
+            r["subsumed_by"] = "包含: " + " ".join(idx[k] for k in subsumes[r["_key"]])
+        r.pop("_key")
 
     with open(OUT / "CLAIMS.csv", "w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys()) if rows else ["claim_id"])
@@ -226,29 +322,42 @@ def main():
          f"公開中 {len(posts)}本 / 命題 **{len(rows)}件**"
          f"（うち一人称の体験主張 **{len(exp)}件**）\n\n",
          "**記事は一切修正していない。**\n\n",
-         "判定は文の形からの推測。**必ず原文を読んで確かめてから** "
-         "`confirmation` を入れてください（verified / partially_verified / "
-         "fictional / unknown）。\n\n---\n\n"]
+         "### 抽出から外したブロック\n\n| 理由 | ブロック数 |\n|---|---|\n"]
+    for k, n in sorted(excluded.items(), key=lambda kv: -kv[1]):
+        L.append(f"| {k} | {n} |\n")
+    L.append("\n判定は文の形からの推測。**必ず原文を読んで確かめてから** "
+             "`confirmation` を入れてください"
+             "（verified / partially_verified / fictional / unknown）。\n\n---\n\n")
 
     for r in rows[:TOP]:
         L.append(f"## {r['claim_id']} {r['claim']}\n\n")
-        L.append(f"| 項目 | 値 |\n|---|---|\n")
-        L.append(f"| 主語 | {r['subject']} |\n| 行動・状態 | {r['act']}（{r['act_type']}） |\n")
-        L.append(f"| 対象 | {r['target']} |\n| 数値と単位 | {r['value'] or '—'} |\n")
-        L.append(f"| 時制 | {r['tense']} |\n| 一人称の体験主張か | **{r['is_experience']}** |\n")
+        L.append("| 項目 | 値 |\n|---|---|\n")
+        L.append(f"| 正規化した命題 | **{r['claim']}** |\n")
+        L.append(f"| 主語 | {r['subject']} |\n")
+        L.append(f"| 分類 | **{r['kind']}** |\n")
+        L.append(f"| 行動・状態 | {r['act']} |\n| 対象 | {r['target']} |\n")
+        L.append(f"| 数値と単位 | {r['value'] or '—'} |\n| 時制 | {r['tense']} |\n")
+        L.append(f"| 一人称の体験主張か | **{r['is_experience']}** |\n")
+        L.append(f"| 抽出元のHTML種別 | `<{r['html_tag']}>` |\n")
         L.append(f"| 登場記事数 | {r['posts']}本（{r['post_ids']}） |\n")
+        L.append(f"| 同義統合した表現 | {r['variants']} |\n")
+        L.append(f"| 包含関係 | {r['subsumed_by'] or '—'} |\n")
         L.append(f"| 設定ファイルの一致 | {r['setting_source']} |\n")
         L.append(f"| 事実確認に必要なもの | {r['needs']} |\n\n")
-        L.append(f"**元の文章**\n\n> {r['sentence']}\n\n")
-        L.append(f"**前後の文脈**\n\n> {r['context']}\n\n")
-        L.append(f"**記事**: {r['url']}\n\n**confirmation**: （未記入）\n\n---\n\n")
+        L.append(f"**元文**\n\n> {r['sentence']}\n\n")
+        L.append(f"**前後3文**\n\n> {r['context']}\n\n")
+        L.append("**記事URL**\n\n")
+        for u in r["urls"].split():
+            L.append(f"- {u}\n")
+        L.append("\n**confirmation**: （未記入）\n\n---\n\n")
 
     (OUT / "CLAIMS.md").write_text("".join(L), encoding="utf-8")
     print(f"命題 {len(rows)}件（体験主張 {len(exp)}件）")
-    print(f"{'ID':6}{'記事':>4} {'体験':<5}{'主語':<5}{'時制':<5}{'命題'}")
-    for r in rows[:TOP + 10]:
-        print(f"{r['claim_id']:6}{r['posts']:>4} {r['is_experience']:<5}"
-              f"{r['subject']:<5}{r['tense']:<5}{r['claim']}")
+    print("除外したブロック:", dict(excluded))
+    print(f"{'ID':6}{'記事':>3} {'体験':<4}{'主語':<8}{'分類':<6}{'元':<12} 命題")
+    for r in rows[:TOP]:
+        print(f"{r['claim_id']:6}{r['posts']:>3} {r['is_experience']:<4}"
+              f"{r['subject']:<8}{r['kind']:<6}<{r['html_tag']}>{'':<6} {r['claim']}")
 
 
 if __name__ == "__main__":
