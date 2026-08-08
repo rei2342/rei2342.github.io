@@ -30,7 +30,7 @@ LINKS = {
         "speek",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056&url=https%3A%2F%2Fwww.speek.jp%2F"'
         ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ speek（英語発音矯正）の無料トライアルを見る</a>'
+        '→ speek公式サイトで発音矯正スクールの内容を確認する</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
