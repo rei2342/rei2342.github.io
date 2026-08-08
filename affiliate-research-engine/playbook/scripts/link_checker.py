@@ -130,8 +130,9 @@ def follow(url):
         "how": note,
         "status": r.status_code,
         "final_url": r.url,
-        "domain": re.sub(r"^www\.", "", (re.match(r"https?://([^/]+)", r.url)
-                                         or re.match("()", "")).group(1) or ""),
+        "domain": re.sub(r"^www\.", "",
+                         (re.match(r"https?://([^/?#]+)", r.url)
+                          or re.match("()", "")).group(1) or ""),
         "hops": len(chain) - 1,
         "chain": " → ".join(chain),
         "title": title_of(html),
