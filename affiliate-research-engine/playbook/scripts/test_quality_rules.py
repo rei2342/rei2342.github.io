@@ -61,33 +61,74 @@ def run():
 
 
 def run_claim_parse():
-    """命題の解析。**原文にない動詞を作らない**ことを含めて確かめる。"""
+    """命題の解析を、構造化結果の**完全一致**で検証する。
+
+    「解析に失敗しなかった」だけでは、報告と実際がずれても気づけない
+    （2026-08-08に、コードは正しいのに報告表だけ違う例があった）。
+    target / normalized_action / tense / experience / 数値属性 /
+    needs_review をすべて固定し、原文にない動詞を作っていないことも確かめる。
+    """
     import claim_extractor as ce
-    cases = [
-        # (原文, 期待する行動, 期待する属性, 要確認が要るか)
-        ("英語コーチングを25万円受けて、卒業した。", "受ける", {"amount": "25万円"}, True),
-        ("英語コーチングに25万円払った。", "支払", {"amount": "25万円"}, False),
-        ("3ヶ月57万円のコーチングを受けた。", "受ける",
-         {"duration": "3ヶ月", "amount": "57万円"}, True),
-        ("スクールに4万5000円を溶かした。", "浪費", {"amount": "4万5000円"}, False),
-        ("TOEICを600点で受けた。", "受験", {"score": "600点"}, False),
-        ("レッスンを25分受けた。", "受講", {"time_per_session": "25分"}, False),
-        ("週3回レッスンを受けている。", "受講", {"frequency": "3回"}, False),
-        ("留学情報館を受けた。", "受ける", {}, True),
-        ("オンライン英会話を3ヶ月続けた。", "継続", {"duration": "3ヶ月"}, False),
+
+    # 「受ける」から派生してよい行動。ここに無いものへ変えたら動詞の捏造
+    ALLOWED_REFINE = {"受講": {"受講", "受験", "相談", "診断", "受ける"}}
+
+    CASES = [
+        ("英語コーチングを25万円受けて、卒業した。",
+         dict(target="英語コーチング", normalized_action="受ける", tense="unknown",
+              experience="possible", attrs={"amount": "25万円"}, needs_review=True)),
+        ("私は英語コーチングに25万円払った。",
+         dict(target="英語コーチング", normalized_action="支払", tense="past",
+              experience="yes", attrs={"amount": "25万円"}, needs_review=False)),
+        ("3ヶ月57万円のコーチングを受けた。",
+         dict(target="英語コーチング", normalized_action="受ける", tense="past",
+              experience="possible",
+              attrs={"duration": "3ヶ月", "amount": "57万円"}, needs_review=True)),
+        ("私はスクールに4万5000円を溶かした。",
+         dict(target="英会話スクール", normalized_action="浪費", tense="past",
+              experience="yes", attrs={"amount": "4万5000円"}, needs_review=False)),
+        ("私はTOEICを600点で受けた。",
+         dict(target="TOEIC", normalized_action="受験", tense="past",
+              experience="yes", attrs={"score": "600点"}, needs_review=False)),
+        ("私はレッスンを25分受けた。",
+         dict(target="レッスン", normalized_action="受講", tense="past",
+              experience="yes", attrs={"time_per_session": "25分"}, needs_review=False)),
+        ("週3回レッスンを受けている。",
+         dict(target="レッスン", normalized_action="受講", tense="progressive",
+              experience="possible", attrs={"frequency": "3回"}, needs_review=False)),
+        ("留学情報館を受けた。",
+         dict(target="留学情報館", normalized_action="受ける", tense="past",
+              experience="possible", attrs={}, needs_review=True)),
+        ("私はオンライン英会話を3ヶ月続けた。",
+         dict(target="オンライン英会話", normalized_action="継続", tense="past",
+              experience="yes", attrs={"duration": "3ヶ月"}, needs_review=False)),
     ]
+
     ng = 0
-    for text, act, attrs, need in cases:
+    for text, want in CASES:
         r = ce.parse(text)
-        ok = (r and r["normalized_action"] == act and r["attrs"] == attrs
-              and bool(r["needs_review"]) == need)
-        print(("OK  " if ok else "NG  ") + text)
-        if not ok:
-            got = (f"{r['normalized_action']} / {r['attrs']} / "
-                   f"要確認={bool(r['needs_review'])}") if r else "(命題なし)"
-            print(f"      期待: {act} / {attrs} / 要確認={need}")
-            print(f"      実際: {got}")
-            ng += 1
+        diffs = []
+        if not r:
+            diffs.append("命題が取れない")
+        else:
+            for k in ("target", "normalized_action", "tense", "experience", "attrs"):
+                if r[k] != want[k]:
+                    diffs.append(f"{k}: 期待={want[k]!r} 実際={r[k]!r}")
+            if bool(r["needs_review"]) != want["needs_review"]:
+                diffs.append(f"needs_review: 期待={want['needs_review']} "
+                             f"実際={bool(r['needs_review'])}")
+            # 原文にない動詞を作っていないか
+            bases = {a for a, _t, _s, _p, _tn in ce.analyze(text)}
+            act = r["normalized_action"]
+            if act not in bases:
+                if not any(act in ALLOWED_REFINE.get(b, set()) for b in bases):
+                    diffs.append(f"原文にない動詞を生成: {act}（原文の行動: {bases}）")
+
+        print(("OK  " if not diffs else "NG  ") + text)
+        for d in diffs:
+            print("      " + d)
+        ng += 1 if diffs else 0
+
     print(f"\n命題解析の失敗 {ng}件")
     return ng
 
