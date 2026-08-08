@@ -51,6 +51,33 @@ TOEIC_POSTS = ["304", "521", "32"]
 ARTICLES_SLUG = "articles"
 FRONT_SLUG = "start"
 
+PROFILE_BODY = """<h2>さくら｜大人の英語学び直し案内人</h2>
+
+<p>英語を話せるようになりたいけれど、何から始めればいいか決まらない人に向けて、勉強法・サービス・留学の選び方を整理しています。</p>
+
+<p>先に正解へたどり着いた人ではありません。英語学習でつまずきやすいところを調べて、判断しやすい形に並べ直すのが役割です。</p>
+
+<h3>書き方の方針</h3>
+
+<ul>
+<li><strong>実際に試したものは、確認できる範囲を体験として書きます。</strong>記録で確かめられる範囲に限ります。</li>
+<li><strong>まだ使っていないサービスは、公式情報をもとに整理します。</strong>使ったふりはしません。体験と公式情報は、記事の中で分けて表示しています。</li>
+<li>料金・制度・キャンペーンなど変わる情報には、<strong>出典のURLと確認日</strong>を付けています。</li>
+<li>効果や必要な時間を保証しません。「これをやれば伸びる」ではなく、「自分の場合はどうかを確かめる方法」を書いています。</li>
+</ul>
+
+<h3>扱っていること</h3>
+
+<ul>
+<li>続けやすい勉強法と教材の選び方</li>
+<li>オンライン英会話・コーチング・アプリの比べ方</li>
+<li>AI時代の英語学習の使いどころ</li>
+<li>留学・ワーホリの費用の出し方と、エージェントの選び方</li>
+</ul>
+
+<p>当サイトにはアフィリエイトリンクが含まれます。紹介するサービスは、公式サイトで内容を確認したものだけにしています。報酬の有無で順番や評価を変えていません。</p>
+"""
+
 ARTICLES_BODY = """<p>新しい記事から順に並んでいます。テーマから探す場合は、
 <a href="https://sakura-eigo.com/">トップページ</a>の「テーマから読む」を使ってください。</p>
 """
@@ -198,23 +225,62 @@ def main():
     print("pages:", [(p["slug"], p["id"]) for p in pages])
     print("cats:", [(k, v.get("count")) for k, v in cats.items()])
 
-    # ── 1. 記事一覧ページを先に作る ──────────────────
-    L.append("## 1. 記事一覧ページ（先に作る）\n\n")
+    # ── 1. TOEIC記事のカテゴリ割り当て（**ページ生成より先**）──
+    # 先にページを作ると、移す前の件数（0本）でトップが生成されてしまう
+    # （2026-08-09に「準備中」と出た。処理順のミス）
+    tc = cats.get("toeic-score")
+    L.append("## 1. TOEIC記事のカテゴリ割り当て（ページ生成より先に実行）\n\n")
+    if not tc:
+        L.append("⚠️ `toeic-score` が無いので割り当てない\n\n")
+    else:
+        L.append("**主カテゴリを1つにする。**過剰に付けない。\n\n")
+        L.append("| 記事 | 前 | 後 | 公開状態 |\n|---|---|---|---|\n")
+        for pid in TOEIC_POSTS:
+            g = requests.get(f"{WP}/posts/{pid}", auth=AUTH, headers=UA,
+                             verify=False, timeout=40)
+            if g.status_code != 200:
+                L.append(f"| {pid} | 取得できず | — | — |\n")
+                continue
+            j = g.json()
+            before, st = j.get("categories", []), j.get("status")
+            if DRY_RUN:
+                L.append(f"| {pid} | {before} | [{tc['id']}]（DRY RUN） | {st} |\n")
+                continue
+            if before == [tc["id"]]:
+                L.append(f"| {pid} | {before} | 変更なし（すでに割当済み） | {st} |\n")
+                continue
+            up = requests.post(f"{WP}/posts/{pid}", auth=AUTH, headers=UA,
+                               verify=False, timeout=40,
+                               json={"categories": [tc["id"]]})
+            ok = up.status_code in (200, 201)
+            L.append(f"| {pid} | {before} | "
+                     f"{'✅ [' + str(tc['id']) + ']' if ok else '❌ ' + str(up.status_code)}"
+                     f" | {st} |\n")
+            print(f"[{pid}] {before} -> [{tc['id']}] {'OK' if ok else up.status_code}")
+
+    # ── 2. 件数を取り直す。**ここでトップの表示が決まる** ──
+    cats = get_cats()
+    tc2 = cats.get("toeic-score", {})
+    L.append(f"\n再取得したカテゴリ件数: `toeic-score` = **{tc2.get('count', 0)}本**"
+             f" / `ai-english` = **{cats.get('ai-english', {}).get('count', 0)}本**\n\n")
+    print("再取得 toeic-score:", tc2.get("count"))
+
+    # ── 3. 記事一覧ページ（トップより先に作る）──────────
+    L.append("## 3. 記事一覧ページ（トップより先に作る）\n\n")
     aid, amsg = ensure_page(pages, ARTICLES_SLUG, "記事一覧", ARTICLES_BODY)
     L.append(f"- slug `{ARTICLES_SLUG}` … {amsg}（ID {aid}）\n")
     L.append(f"- URL: {SITE}/{ARTICLES_SLUG}/\n\n")
     print(f"記事一覧: {amsg} id={aid}")
 
-    # ── 2. トップページ ────────────────────────────
-    L.append("## 2. トップページ\n\n")
+    # ── 4. トップページ（更新後の件数で作る）──────────
+    L.append("## 4. トップページ\n\n")
     fid, fmsg = ensure_page(pages, FRONT_SLUG, "さくらの大人英語学び直しガイド",
                             front_body(cats))
     L.append(f"- slug `{FRONT_SLUG}` … {fmsg}（ID {fid}）\n\n")
     print(f"トップ: {fmsg} id={fid}")
 
-    # 空カテゴリの扱いを記録
     L.append("### カテゴリ導線（記事が0本のものはリンクにしない）\n\n")
-    L.append("| カテゴリ | slug | 記事数 | 扱い |\n|---|---|---|---|\n")
+    L.append("| カテゴリ | 記事数 | 扱い |\n|---|---|---|\n")
     for slug, label in ((CAT["学習法"], "英語学習法"),
                         ("toeic-score", "TOEIC・スコア"),
                         (CAT["比較"], "英会話サービス比較"),
@@ -224,62 +290,80 @@ def main():
                         ("philippines-cebu", "フィリピン・セブ留学"),
                         ("ryugaku-agent-cost", "留学エージェント・費用")):
         c = cats.get(slug)
-        n = c.get("count", 0) if c else "（カテゴリ無し）"
-        how = ("リンクにする" if isinstance(n, int) and n > 0
-               else "**準備中と書くだけ。リンクにしない**")
-        L.append(f"| {label} | `{slug}` | {n} | {how} |\n")
+        n = c.get("count", 0) if c else "（無し）"
+        how = "リンクにする" if isinstance(n, int) and n > 0 else "**準備中（リンクなし）**"
+        L.append(f"| {label} | {n} | {how} |\n")
 
-    # ── 3. ホーム表示の切り替え ────────────────────
-    L.append("\n## 3. ホーム表示の切り替え\n\n")
+    # ── 5. ホーム表示の切り替え ────────────────────
+    L.append("\n## 5. ホーム表示の切り替え\n\n")
     if not (aid and fid):
         L.append("⚠️ ページIDが揃わないので**切り替えない**。\n")
-        print("ページIDが揃わないので切り替えない")
     elif DRY_RUN:
-        L.append(f"- `show_on_front` → `page`\n- `page_on_front` → {fid}\n"
-                 f"- `page_for_posts` → {aid}\n\n→ （DRY RUN）\n")
+        L.append(f"- `show_on_front` → `page` / `page_on_front` → {fid} / "
+                 f"`page_for_posts` → {aid}\n\n→ （DRY RUN）\n")
     else:
         up = requests.post(f"{WP}/settings", auth=AUTH, headers=UA, verify=False,
                            timeout=40, json={"show_on_front": "page",
                                              "page_on_front": fid,
                                              "page_for_posts": aid})
         ok = up.status_code in (200, 201)
-        L.append(f"- `show_on_front` → `page`\n- `page_on_front` → {fid}\n"
-                 f"- `page_for_posts` → {aid}\n\n"
-                 f"→ {'✅ 反映した' if ok else '❌ ' + str(up.status_code) + ' ' + up.text[:200]}\n")
-        print(f"切り替え: {'OK' if ok else up.status_code}")
+        L.append(f"- `show_on_front` → `page` / `page_on_front` → {fid} / "
+                 f"`page_for_posts` → {aid}\n\n"
+                 f"→ {'✅ 反映した' if ok else '❌ ' + str(up.status_code)}\n")
 
-    # ── 4. TOEIC記事を新カテゴリへ移す（主カテゴリ1つ）──
-    tc = cats.get("toeic-score")
-    L.append("\n## 4. TOEIC記事のカテゴリ割り当て\n\n")
-    if not tc:
-        L.append("⚠️ `toeic-score` が無いので割り当てない\n")
+    # ── 6. プロフィール固定ページの監査 ──────────────
+    L.append("\n## 6. プロフィール固定ページ\n\n")
+    pr = next((x for x in pages if "プロフィール" in x["title"]["rendered"]), None)
+    if not pr:
+        L.append("見つからない\n")
     else:
-        L.append("**主カテゴリを1つにする。**過剰に付けない。\n\n")
-        L.append("| 記事 | 前 | 後 |\n|---|---|---|\n")
-        for pid in TOEIC_POSTS:
-            g = requests.get(f"{WP}/posts/{pid}", auth=AUTH, headers=UA,
-                             verify=False, timeout=40)
-            if g.status_code != 200:
-                L.append(f"| {pid} | 取得できず | — |\n")
-                continue
-            before = g.json().get("categories", [])
-            if DRY_RUN:
-                L.append(f"| {pid} | {before} | [{tc['id']}]（DRY RUN） |\n")
-                continue
-            up = requests.post(f"{WP}/posts/{pid}", auth=AUTH, headers=UA,
-                               verify=False, timeout=40,
-                               json={"categories": [tc["id"]]})
-            ok = up.status_code in (200, 201)
-            L.append(f"| {pid} | {before} | "
-                     f"{'✅ [' + str(tc['id']) + ']' if ok else '❌ ' + str(up.status_code)} |\n")
-            print(f"[{pid}] categories {before} -> [{tc['id']}] {'OK' if ok else up.status_code}")
+        g = requests.get(f"{WP}/pages/{pr['id']}", auth=AUTH, headers=UA,
+                         params={"context": "edit"}, verify=False, timeout=40)
+        raw = g.json()["content"]["raw"] if g.status_code == 200 else ""
+        (BK / day / f"page{pr['id']}_profile.json").write_text(
+            json.dumps({"id": pr["id"], "content_raw": raw,
+                        "title": g.json().get("title", {}).get("raw", "")},
+                       ensure_ascii=False, indent=2), encoding="utf-8")
+        hits = [w for w in ("27歳", "営業事務", "5年後回し", "30歳まで",
+                            "あと3年", "来年こそ", "ワーホリに行く", "挑戦記")
+                if w in raw]
+        L.append(f"- ID {pr['id']} / 旧設定の残存: "
+                 f"**{'・'.join(hits) if hits else 'なし'}**\n")
+        L.append(f"- バックアップ: `workspace/backups/{day}/page{pr['id']}_profile.json`\n")
+        print(f"プロフィール ID {pr['id']} 旧設定: {hits}")
+        if hits and not DRY_RUN:
+            up = requests.post(f"{WP}/pages/{pr['id']}", auth=AUTH, headers=UA,
+                               verify=False, timeout=60,
+                               json={"content": PROFILE_BODY})
+            L.append(f"- → {'✅ 差し替えた' if up.status_code in (200, 201) else '❌ ' + str(up.status_code)}\n")
+        elif hits:
+            L.append("- → 差し替える（DRY RUN）\n")
 
-    # ── 5. Uncategorized に残る公開記事 ──────────────
-    uc = cats.get("uncategorized")
-    L.append("\n## 5. Uncategorized に残る公開記事\n\n")
-    if uc:
-        L.append(f"- 記事数: **{uc.get('count', 0)}本**"
-                 + ("（移す対象なし）" if uc.get("count", 0) == 0 else "") + "\n")
+    # ── 7. 公開URLの確認 ─────────────────────────
+    L.append("\n## 7. 公開URLの確認\n\n")
+    L.append("| URL | HTTP | canonical | noindex | 判定 |\n|---|---|---|---|---|\n")
+    for u in (f"{SITE}/", f"{SITE}/{FRONT_SLUG}/", f"{SITE}/{ARTICLES_SLUG}/",
+              f"{SITE}/feed/"):
+        try:
+            r = requests.get(u, headers=UA, verify=False, timeout=45,
+                             allow_redirects=True)
+        except Exception as e:
+            L.append(f"| {u} | エラー | — | — | {e} |\n")
+            continue
+        h = r.text if "html" in r.headers.get("Content-Type", "") else ""
+        can = re.search(r'rel="canonical"[^>]+href="([^"]+)"', h)
+        ni = "あり" if re.search(r'name="robots"[^>]+noindex', h, re.I) else "なし"
+        canv = can.group(1) if can else "（無し）"
+        note = ""
+        if u.endswith(f"/{FRONT_SLUG}/"):
+            if r.url.rstrip("/") == SITE:
+                note = "✅ ルートへ301"
+            elif canv.rstrip("/") == SITE:
+                note = "✅ canonicalが / を指す"
+            else:
+                note = "⚠️ **重複の恐れ**。canonicalが / を指していない"
+        L.append(f"| {u} | {r.status_code} | {canv} | {ni} | {note} |\n")
+        print(f"{u} -> {r.status_code} canonical={canv} noindex={ni} {note}")
 
     (BK / day / "FRONTPAGE.md").write_text("".join(L), encoding="utf-8")
     print(f"\n→ workspace/backups/{day}/FRONTPAGE.md")
