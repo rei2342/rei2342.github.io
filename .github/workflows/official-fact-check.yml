@@ -1,0 +1,43 @@
+name: 公式情報の裏取り
+
+# 記事に書く「公式情報」を、公式ページだけで確認する。
+# 第三者のまとめ記事は根拠にしない。許可したドメインしか見ない。
+
+on:
+  workflow_dispatch:
+    inputs:
+      checks:
+        description: '確認するID（toeic で全部）'
+        required: false
+        default: 'toeic'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - name: 公式ページを見る
+        env:
+          CHECKS: ${{ inputs.checks }}
+        run: python affiliate-research-engine/playbook/scripts/official_fact_check.py
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/claims/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: official facts $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
