@@ -108,6 +108,15 @@ def run_blockers():
         ("<p>月額5,980円で毎日レッスンが受けられる。</p>", True,
          "公式料金に出典も確認日も無い"),
 
+        # 誤検出の型。ゲートが強すぎて普通の文を止めた実例を固定する
+        ("<p>表の数字は自分で見に行ったほうが確実だ。</p>", False,
+         "「見に行った」は渡航ではない → 通過"),
+        ("<p>私はカナダに行った。</p>", True, "場所つきの移動 → ブロック"),
+        ("<p>無料プランや月1,000円前後のアプリが多い。</p>", False,
+         "「月1,000円前後」は幅の話 → 通過"),
+        ("<p>セブの語学学校はおよそ18万円かかる。</p>", False,
+         "「およそ18万円」は相場 → 通過"),
+
         # ── fact ID と主張内容の照合（2026-08-08 追加）──
         # **ID を付けるだけで別の事実を書けてはいけない**
         ("<p>私はTOEIC600点を取った。<!--fact:F001--></p>", False,
@@ -145,6 +154,41 @@ def run_blockers():
             print(f"      → {got[0][:88]}")
 
     print(f"\n公開ブロッカーの失敗 {ng}件")
+    return ng
+
+
+def run_cta_gate():
+    """CTAの訴求。**リンク文言を素通りさせない。**"""
+    LEDGER = [
+        {"service": "スパトレ", "promo_term": "無料", "claim": "7日間の無料期間",
+         "official_url": "https://sptr.jp/", "checked_on": "2026-08-08"},
+        {"service": "スパトレ", "promo_term": "期間", "claim": "7日間の無料期間",
+         "official_url": "https://sptr.jp/", "checked_on": "2026-08-08"},
+    ]
+    q.load_cta_claims = lambda: LEDGER
+    A = ('<a href="//af.moshimo.com/af/c/click?a_id=1&url=x">{}</a>')
+
+    CASES = [
+        ("→ スパトレの7日間無料体験を見る", False, "台帳どおりの無料期間 → 通過"),
+        ("→ スパトレの14日間無料体験を見る", True, "台帳は7日間なのに14日間 → ブロック"),
+        ("→ speekの無料トライアルを見る", True, "speek は台帳に無い → ブロック"),
+        ("→ speek公式サイトで発音矯正スクールの内容を確認する", False,
+         "訴求の語が無いCTA → 通過"),
+        ("→ 今だけ半額キャンペーンを見る", True, "案件名も台帳も無い → ブロック"),
+        ("→ スパトレの初月無料を見る", True, "「初月」は台帳に無い → ブロック"),
+        ("→ スパトレなら必ず上達、返金保証つき", True, "返金保証は台帳に無い → ブロック"),
+    ]
+    ng = 0
+    for anchor, want, why in CASES:
+        got = q.cta_claim_gate(A.format(anchor))
+        ok = bool(got) == want
+        print(("OK  " if ok else "NG  ") + why)
+        if not ok:
+            print(f"      期待: {'ブロック' if want else '通過'} / 実際: {got}")
+            ng += 1
+        elif want:
+            print(f"      → {got[0]['reason'][:80]}")
+    print(f"\nCTAゲートの失敗 {ng}件")
     return ng
 
 
@@ -355,6 +399,8 @@ if __name__ == "__main__":
     ng = run()
     print()
     ng += run_blockers()
+    print()
+    ng += run_cta_gate()
     print()
     ng += run_claim_parse()
     print()

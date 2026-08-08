@@ -363,9 +363,13 @@ SELF_FACT_RULES = [
         r"[^。]{0,12}?(?:続けた|続けていた|通った|通っていた|受けた|使った|"
         r"やった|やっていた|回した|積んだ)")),
 
+    # 「見に行った」「取りに行った」を渡航と読まないよう、場所を要求する。
+    # 動詞の連用形＋に行く は移動の話ではない（2026-08-08に誤検出）
     ("留学・渡航・居住", True, re.compile(
-        r"(?:留学|渡航|移住|滞在)(?:した|しました|していた|する前に私)"
-        r"|(?:に|へ)(?:行った|渡った|飛んだ|住んでいた|住んだ)")),
+        r"(?:留学|渡航|移住)(?:した|しました|していた)"
+        r"|(?:海外|現地|語学学校|"
+        + "|".join(COUNTRY) + r"|セブ島|セブ|ハワイ)"
+        r"(?:に|へ)[^。]{0,6}?(?:行った|渡った|飛んだ|住んでいた|住んだ|滞在した)")),
 
     ("職歴・仕事内容", True, re.compile(
         r"(?:営業事務|経理|総務|人事|販売|事務職)(?:として|で)[^。]{0,10}?"
@@ -561,6 +565,11 @@ OFFICIAL_SPEC_RE = re.compile(
     r"[^。]{0,20}?[0-9][0-9,]*\s*万?円"
     r"|[0-9]+\s*(?:日間|ヶ月)[^。]{0,6}?(?:無料|トライアル)")
 
+# 「月1,000円前後」「3万円ほど」は幅の話で、公式の提示額ではない。
+# 出典を求めると、相場の説明が全部書けなくなる（2026-08-08に誤検出）
+APPROX_RE = re.compile(r"[0-9][0-9,]*\s*万?円\s*(?:前後|程度|くらい|ぐらい|ほど|台|弱|強)"
+                       r"|(?:およそ|約|おおよそ|だいたい)\s*[0-9][0-9,]*\s*万?円")
+
 
 def _sentences_for_spec(html):
     """料金・仕様の検査に使う文。
@@ -598,6 +607,8 @@ def official_spec_without_source(html):
             continue
         if HYPOTHETICAL_RE.search(s):
             continue                      # 「例として月5,000円を試算」は対象外
+        if APPROX_RE.search(s):
+            continue                      # 「月1,000円前後」は幅の話
         # 出典は同じ段落にあればよい（リンクで示していることが多い）
         around = ctx.get(s, s)
         missing = []
@@ -618,4 +629,94 @@ def generation_blockers(html):
                       f"（{f['reason']}）: {f['matched']} … {f['sentence'][:70]}")
     for f in official_spec_without_source(html):
         issues.append(f"[公式の料金・仕様] {f['missing']}が無い: {f['sentence'][:70]}")
+    # CTAの訴求は本文とは別に見る。リンク文言を素通りさせない
+    for f in cta_claim_gate(html):
+        issues.append(f"[CTAの訴求] {f['reason']}: 「{f['anchor'][:50]}」")
     return issues
+
+
+# ══════════════════════════════════════════════════════════════
+# CTAの訴求を検査する（2026-08-08）
+#
+# 本文の fact gate とは別に持つ。
+# 料金・仕様の検査からリンク文言を外したので、そこを完全に素通りさせると
+# 「無料トライアル」「初月無料」「今だけ半額」が再び入ってしまう。
+# **CTAは読者が最後に見る約束**なので、未確認の訴求が一番害が大きい。
+# ══════════════════════════════════════════════════════════════
+
+CTA_CLAIMS_CSV = "affiliate-research-engine/playbook/workspace/cta_claims.csv"
+
+# CTAに入っていたら、台帳との一致を要求する語
+CTA_PROMO = ("無料", "割引", "返金", "成果保証", "保証", "限定",
+             "キャンペーン", "半額", "初月", "今だけ", "最安", "0円")
+
+# 期間・回数は数値とセットのときだけ訴求とみなす（「回数無制限」も拾う）
+CTA_PROMO_NUM = (
+    ("期間", re.compile(r"[0-9]+\s*(?:日間|日|週間|ヶ月|か月|カ月)")),
+    ("回数", re.compile(r"[0-9]+\s*回|回数無制限|無制限")),
+)
+
+_A_TAG_RE = re.compile(r'<a\b[^>]*href="([^"]+)"[^>]*>(.*?)</a>', re.DOTALL | re.I)
+
+
+def load_cta_claims():
+    """CTAで訴求してよい条件。verified=yes の行だけ。"""
+    return [r for r in _read_csv(CTA_CLAIMS_CSV)
+            if (r.get("verified") or "").strip().lower() in
+            ("yes", "y", "true", "1")]
+
+
+def cta_claim_gate(html):
+    """アフィリエイトCTAの訴求が、台帳と公式情報で裏付けられているかを見る。
+
+    アンカー文言に訴求の語が入っているのに、案件台帳に
+    verified な行が無い／数値が違う／確認日が無い場合はブロックする。
+    """
+    rows = load_cta_claims()
+    out = []
+    for m in _A_TAG_RE.finditer(html):
+        href, anchor = m.group(1), strip_tags(m.group(2)).strip()
+        if not AFFILIATE_LINK_RE.search(href) or not anchor:
+            continue
+
+        terms = [t for t in CTA_PROMO if t in anchor]
+        for name, pat in CTA_PROMO_NUM:
+            if pat.search(anchor):
+                terms.append(name)
+        if not terms:
+            continue                      # 訴求していないCTAは対象外
+
+        svc = next((s for s in SERVICE_NAMES if s in anchor), "")
+        if not svc:
+            out.append({"anchor": anchor, "term": "／".join(terms),
+                        "reason": "CTAに案件名が無いので、台帳と照合できない"})
+            continue
+
+        mine = [r for r in rows if (r.get("service") or "").strip() == svc]
+        if not mine:
+            out.append({"anchor": anchor, "term": "／".join(terms),
+                        "reason": f"{svc} が cta_claims.csv に無い"})
+            continue
+
+        for t in set(terms):
+            hit = [r for r in mine if (r.get("promo_term") or "").strip() == t]
+            if not hit:
+                out.append({"anchor": anchor, "term": t,
+                            "reason": f"{svc} の「{t}」が台帳で確認されていない"})
+                continue
+            r = hit[0]
+            if not (r.get("official_url") or "").strip():
+                out.append({"anchor": anchor, "term": t,
+                            "reason": f"{svc} の「{t}」に出典URLが無い"})
+            if not (r.get("checked_on") or "").strip():
+                out.append({"anchor": anchor, "term": t,
+                            "reason": f"{svc} の「{t}」に確認日が無い"})
+            # 数値まで一致させる。「7日間」の台帳で「14日間」を訴求させない
+            hay = _canon_num(str(r.get("claim") or ""))
+            for nm in _NUM_IN_SENT.finditer(anchor):
+                if _canon_num(nm.group(0)) not in hay:
+                    out.append({
+                        "anchor": anchor, "term": t,
+                        "reason": f"{svc} の台帳に「{nm.group(0)}」が無い"
+                                  f"（台帳: {r.get('claim')}）"})
+    return out

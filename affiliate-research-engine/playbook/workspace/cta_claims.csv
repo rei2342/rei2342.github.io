@@ -1,0 +1,24 @@
+# CTAで訴求してよい条件の台帳。
+#
+# CTAのアンカー文言に「無料」「割引」「返金」「期間」「回数」「保証」
+# 「限定」「キャンペーン」「半額」「初月」「今だけ」「最安」が入る場合、
+# **ここに verified=yes の行が無いと生成・公開が失敗する。**
+#
+# 本文の fact gate とは別。CTAは読者が最後に見る約束なので、
+# 未確認の訴求が入ると一番害が大きい。
+#
+# service       案件名（SERVICE_NAMES と一致させる）
+# promo_term    訴求の種類。無料 / 割引 / 返金 / 期間 / 回数 / 保証 /
+#               限定 / キャンペーン / 半額 / 初月 / 今だけ / 最安
+# claim         公式に書いてある内容（数値も含めてそのまま）
+# official_url  確認した公式ページ
+# checked_on    確認日（YYYY-MM-DD）
+# verified      yes / no（空欄は no 扱い）
+# note          補足
+service,promo_term,claim,official_url,checked_on,verified,note
+スパトレ,無料,7日間の無料期間,https://sptr.jp/,2026-08-08,yes,公式トップの説明文で確認。link_checker の取得記録は LINK_AUDIT.md
+スパトレ,期間,7日間の無料期間,https://sptr.jp/,2026-08-08,yes,同上
+ネイティブキャンプ,無料,7日間無料体験,https://nativecamp.net,2026-08-08,yes,公式トップの説明文で確認
+ネイティブキャンプ,回数,レッスン回数無制限,https://nativecamp.net,2026-08-08,yes,公式トップの説明文で確認
+留学情報館,無料,手数料0円,https://www.ryugaku-johokan.com/index_mr.php,2026-08-08,yes,公式トップのタイトルで確認。カウンセリング自体の無料は未確認
+ネイティブキャンプ留学,無料,手数料0円・渡航前のオンライン英会話が完全無料,https://nativecamp.net/study_abroad/counseling-reserve,2026-08-08,yes,公式ページの説明文で確認
