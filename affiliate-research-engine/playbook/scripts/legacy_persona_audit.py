@@ -204,6 +204,56 @@ def main():
     L.append(f"\n**手を入れる必要がある記事: {len(todo_posts)}本** "
              f"（{' '.join(str(x) for x in todo_posts)}）\n\n")
 
+    # ── サイト全体の再集計 ──────────────────────────────
+    # 「本人固有の未確認設定が0件」を完了条件にするための表。
+    # 語の残存だけでなく、ゲートが止める種類も同じ表で数える。
+    L.append("\n---\n\n## サイト全体の再集計\n\n")
+    WORDS = [("27歳", re.compile(r"27\s*歳")),
+             ("営業事務", re.compile(r"営業事務")),
+             ("5年後回し", re.compile(r"5年後回し|英語を[0-9]+年(?:後回し|放置|離れ)")),
+             ("30歳まで", re.compile(r"30歳まで|30歳になる前")),
+             ("あと3年", re.compile(r"あと\s*[0-9]+\s*年|残り\s*[0-9]+\s*年")),
+             ("来年こそ", re.compile(r"来年こそ|今度こそ必ず")),
+             ("旧サイト名", re.compile(r"さくらの英語挑戦記")),
+             ("旧CTA見出し", re.compile(r"さくらが確かめた|すべて無料|次の一手"))]
+    wc = {k: [] for k, _ in WORDS}
+    gate = {}
+    for p in posts:
+        html = p.get("content", {}).get("rendered", "")
+        txt = _q.strip_tags(html) + re.sub(r"<[^>]+>", "", p["title"]["rendered"])
+        for k, rx in WORDS:
+            n = len(rx.findall(txt))
+            if n:
+                wc[k].append((p["id"], n))
+        for b in _q.generation_blockers(html):
+            cat = b.split("]")[0].lstrip("[")
+            gate.setdefault(cat, []).append(p["id"])
+
+    L.append("### 語の残存\n\n| 語 | 残り | 記事 |\n|---|---|---|\n")
+    for k, _ in WORDS:
+        hits = wc[k]
+        L.append(f"| {k} | **{sum(n for _, n in hits)}箇所** "
+                 f"（{len(hits)}本） | "
+                 + (" ".join(f"{i}({n})" for i, n in hits[:20]) or "—") + " |\n")
+
+    L.append("\n### ゲートが止める種類（未確認の一人称心理・出典のない数値を含む）\n\n"
+             "| 種類 | 件数 | 記事 |\n|---|---|---|\n")
+    for cat in sorted(gate, key=lambda c: -len(gate[c])):
+        ids = gate[cat]
+        L.append(f"| {cat} | **{len(ids)}件** | "
+                 + " ".join(str(x) for x in sorted(set(ids))[:20]) + " |\n")
+    if not gate:
+        L.append("| （なし） | 0件 | — |\n")
+
+    selfish = sum(len(v) for k, v in gate.items()
+                  if k not in ("公式の料金・仕様",))
+    L.append(f"\n**本人固有の未確認設定: {selfish}件**"
+             + ("（**0件。完了条件を満たしている**）" if selfish == 0
+                else "（0件になるまで完了にしない）") + "\n")
+    print(f"\nサイト全体: 本人固有の未確認設定 {selfish}件")
+    for k, _ in WORDS:
+        print(f"  {k}: {sum(n for _, n in wc[k])}箇所")
+
     L.append("\n---\n\n## 記事ごとの内訳\n\n")
     order = sorted(by_post.items(),
                    key=lambda kv: -sum(1 for r in kv[1] if r["kind"] in need_work))
