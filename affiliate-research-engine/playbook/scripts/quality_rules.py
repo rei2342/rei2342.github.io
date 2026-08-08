@@ -150,15 +150,18 @@ def experience_claims(text):
             row = ledger.get(name)
             status = ((row or {}).get("status") or "").strip().lower()
 
+            # 3つの状態で、やるべきことが違う。区別して出す
             if not row:
-                issues.append(f"{name}に体験表現「{verb}」。台帳に無い（unknown）")
+                issues.append(f"{name}に体験表現「{verb}」。**台帳に未登録** "
+                              "→ 台帳へ追加して事実を確認する")
                 break
             if status in ("", "unknown"):
-                issues.append(f"{name}に体験表現「{verb}」。台帳が未記入（unknown）")
+                issues.append(f"{name}に体験表現「{verb}」。**unknown（使用したか未確認）** "
+                              "→ 運営者に確認する")
                 break
             if status == "not_used":
-                issues.append(f"{name}は未使用なのに体験表現「{verb}」。"
-                              "「調べた」「比較した」「候補にした」へ直す")
+                issues.append(f"{name}に体験表現「{verb}」。**未使用と確認済み** "
+                              "→「調べた」「比較した」「候補にした」へ直す")
                 break
 
             # used。登録した範囲を超えていないか
