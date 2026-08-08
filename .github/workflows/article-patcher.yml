@@ -107,6 +107,12 @@ jobs:
             --allowedTools "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch" \
             --dangerously-skip-permissions
 
+      # 反映する前に、変更前後を人が読める形で出す
+      - name: 修正案を一覧にする
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python affiliate-research-engine/playbook/scripts/article_patcher.py --report
+
       - name: 検査して反映する
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}

@@ -50,7 +50,8 @@ def targets():
     アイキャッチ未設定・カテゴリ未分類・文字数不足は、文章を直す話ではないので
     ここでは扱わない（別のツールの担当）。
     """
-    fixable = ("料金", "注意点", "確認日も出典", "断定")
+    fixable = ("料金", "注意点", "確認日も出典", "断定", "実現しない予定",
+               "制度", "体験表現")
     out = []
     for p in _wa.published():
         iss = [i for i in _wa.audit(p) if any(k in i for k in fixable)]
@@ -112,7 +113,8 @@ def check(pid, new_html, old_post):
     fake = dict(old_post)
     fake["content"] = {"rendered": new_html}
     left = [i for i in _wa.audit(fake)
-            if any(k in i for k in ("料金", "注意点", "確認日も出典", "断定"))]
+            if any(k in i for k in ("料金", "注意点", "確認日も出典", "断定",
+                                    "実現しない予定", "制度", "体験表現"))]
     if left:
         problems += [f"指摘が残っている: {i}" for i in left]
 
@@ -130,6 +132,86 @@ def check(pid, new_html, old_post):
         problems.append(f"三人称視点が{len(third)}件混入")
 
     return problems
+
+
+def sentences(text):
+    return [x.strip() for x in re.split(r"(?<=[。？！])", text) if x.strip()]
+
+
+def diff_report(old_html, new_html):
+    """変わった文だけを (変更前, 変更後) で返す。
+
+    全文diffだと読めないので、文単位で消えたもの・増えたものを並べる。
+    数字・アフィリンク・見出しを勝手に触っていないかを、ここで人が見る。
+    """
+    o = sentences(_q.strip_tags(old_html))
+    n = sentences(_q.strip_tags(new_html))
+    removed = [x for x in o if x not in n]
+    added = [x for x in n if x not in o]
+    return removed, added
+
+
+def report():
+    """out/ にある修正案を、適用せずに一覧で出す。"""
+    files = sorted(OUT.glob("*.html"))
+    if not files:
+        print("out/ にHTMLが無い。先に生成する")
+        return
+
+    L = [f"# 修正案の一覧 {date.today().isoformat()}\n\n",
+         "**まだ何も反映していない。** 内容を確認してから `--apply` を実行する。\n\n",
+         "保護するもの: 実体験・数値・タイトル・URL・内部リンク・アフィリンク・検索意図。\n"
+         "直すのは未来の宣言と、進行型の設定だけ。\n\n"]
+
+    for f in files:
+        pid = int(f.stem)
+        r = requests.get(f"{WP_BASE}/posts/{pid}", auth=(WP_USER, WP_PASS),
+                         headers={"User-Agent": "Mozilla/5.0"},
+                         verify=False, timeout=40)
+        if r.status_code != 200:
+            L.append(f"## [{pid}] 取得失敗 HTTP {r.status_code}\n\n")
+            continue
+        post = r.json()
+        old_html = post["content"]["rendered"]
+        new_html = f.read_text(encoding="utf-8").strip()
+        new_html = re.sub(r"^```html?\n?", "", new_html)
+        new_html = re.sub(r"\n?```$", "", new_html)
+
+        title = re.sub(r"<[^>]+>", "", post["title"]["rendered"])
+        L.append(f"## [{pid}] {title}\n\n{post.get('link','')}\n\n")
+
+        # 何を指摘されて直したのか
+        L.append("**検出理由**\n\n")
+        for i in _wa.audit(post):
+            L.append(f"- {i}\n")
+        L.append("\n")
+
+        removed, added = diff_report(old_html, new_html)
+        if not removed and not added:
+            L.append("（本文の変更なし）\n\n")
+            continue
+
+        L.append("**修正案**\n\n")
+        for x in removed[:12]:
+            L.append(f"- 変更前: {x[:120]}\n")
+        for x in added[:12]:
+            L.append(f"- 変更後: {x[:120]}\n")
+        if len(removed) > 12 or len(added) > 12:
+            L.append(f"- （ほか 変更前{max(0,len(removed)-12)}文 / 変更後{max(0,len(added)-12)}文）\n")
+
+        # 保護対象が壊れていないか、その場で見せる
+        no = len(_q.AFFILIATE_LINK_RE.findall(old_html))
+        nn = len(_q.AFFILIATE_LINK_RE.findall(new_html))
+        ho = len(re.findall(r"<h2", old_html))
+        hn = len(re.findall(r"<h2", new_html))
+        lo = len(_q.strip_tags(old_html))
+        ln = len(_q.strip_tags(new_html))
+        L.append(f"\n**保護対象の確認**: アフィリンク {no}→{nn} / "
+                 f"H2 {ho}→{hn} / 本文 {lo}→{ln}字\n\n---\n\n")
+
+    (ROOT / "REVIEW.md").write_text("".join(L), encoding="utf-8")
+    print("".join(L)[:4000])
+    print(f"\n→ {ROOT / 'REVIEW.md'} に全文")
 
 
 def apply():
@@ -196,8 +278,10 @@ if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else "--prepare"
     if mode == "--prepare":
         prepare()
+    elif mode == "--report":
+        report()
     elif mode == "--apply":
         apply()
     else:
-        print("使い方: article_patcher.py [--prepare|--apply]")
+        print("使い方: article_patcher.py [--prepare|--report|--apply]")
         sys.exit(1)

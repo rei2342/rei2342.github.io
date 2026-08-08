@@ -72,9 +72,103 @@ PERSONAL_PLAN = re.compile(
 
 
 def personal_plan(text):
-    """さくら本人の、実現しない予定の宣言を返す。"""
+    """さくら本人の、実現しない予定の宣言を返す。**未来の宣言だけ**を見る。
+
+    体験（experience_claim）とも、制度情報（time_sensitive_fact）とも別物。
+    混ぜると「3日でやめた」まで消してしまう。
+    """
     m = PERSONAL_PLAN.search(text)
     return m.group(0).strip() if m else None
+
+
+# ── 体験の主張 ──────────────────────────────────────────
+# 運営者が実際にやったことだけ「使った」「試した」と書ける。
+# 使っていないサービスに体験表現を付けたら、それは捏造。
+# どのサービスを実際に使ったかは機械には分からないので、
+# workspace/experience.csv に人が書く。書いていないサービスに
+# 体験表現が付いていたら報告する（自動で消さない。判断は人がする）。
+EXPERIENCE_VERBS = (
+    "使った", "使ってみた", "試した", "続けた", "受けた", "通った",
+    "申し込んだ", "契約した", "解約した", "払った", "受講した",
+    "使って分かった", "体験した", "自腹",
+)
+EXPERIENCE_PATH = "affiliate-research-engine/playbook/workspace/experience.csv"
+
+
+def _used_services():
+    """実際に使ったサービス名の一覧。ファイルが無ければ空。"""
+    import csv
+    import os
+    if not os.path.exists(EXPERIENCE_PATH):
+        return None          # 未整備。判定しない（誤検知で原稿を弾かない）
+    names = set()
+    with open(EXPERIENCE_PATH, encoding="utf-8") as f:
+        for row in csv.DictReader(l for l in f if not l.startswith("#")):
+            if (row.get("used") or "").strip().lower() in ("yes", "y", "true", "1"):
+                names.add((row.get("service") or "").strip())
+    return {n for n in names if n}
+
+
+def experience_claims(text, service_names):
+    """体験表現が付いているのに、実際には使っていないサービスを返す。
+
+    service_names … その記事が触れている案件名のリスト（呼び出し側が渡す）。
+    実使用リストが未整備なら None を返し、判定しない。
+    """
+    used = _used_services()
+    if used is None:
+        return None
+    hits = []
+    for name in service_names:
+        if not name or name in used:
+            continue
+        # サービス名の前後60字に体験表現があるか
+        for m in re.finditer(re.escape(name), text):
+            around = text[max(0, m.start() - 60):m.end() + 60]
+            for v in EXPERIENCE_VERBS:
+                if v in around:
+                    hits.append((name, v, around.strip()[:80]))
+                    break
+    return hits
+
+
+# ── 時限情報（制度・ビザ・年齢条件・料金）────────────────
+# 「ワーホリの年齢上限は30歳」は、国・国籍・いつ時点かで変わる。
+# 一般化して書くと、personal_plan は通っても事実として危ない。
+# **対象国／確認日／出典**が揃っている場合だけ通す。
+COUNTRY = ("オーストラリア", "豪州", "カナダ", "ニュージーランド", "イギリス", "英国",
+           "アイルランド", "フランス", "ドイツ", "韓国", "台湾", "シンガポール",
+           "フィリピン", "アメリカ", "米国", "スペイン", "イタリア", "ポーランド",
+           "デンマーク", "ノルウェー", "オランダ", "オーストリア", "チェコ",
+           "ハンガリー", "ポルトガル", "スロバキア", "アイスランド", "リトアニア",
+           "スウェーデン", "エストニア", "ウルグアイ", "アルゼンチン", "チリ")
+SOURCE = ("外務省", "大使館", "領事館", "移民局", "公式サイト", "公式ページ",
+          "公表", "https://", "http://")
+# 制度の数値を断定している形。ここに引っかかったものだけ厳しく見る
+INSTITUTIONAL_CLAIM = re.compile(
+    r"(?:年齢(?:制限|上限)|上限年齢|申請条件|ビザ|査証|滞在期間|就労|在学|卒業要件)"
+    r"[^。]{0,40}?(?:[0-9０-９]{1,2}\s*歳|[0-9０-９]{1,2}\s*(?:年|ヶ月|か月|週間))")
+
+
+def time_sensitive_fact(text):
+    """制度・条件を断定しているのに、国・確認日・出典が揃っていない箇所を返す。
+
+    3つのうち1つでも欠けたら報告する。読者が実際に申請するときに
+    条件が違っていたら実害が出るため、料金より厳しく見る。
+    """
+    m = INSTITUTIONAL_CLAIM.search(text)
+    if not m:
+        return None
+    missing = []
+    if not any(c in text for c in COUNTRY):
+        missing.append("対象国")
+    if not BASEDATE_RE.search(text):
+        missing.append("確認日")
+    if not any(sform in text for sform in SOURCE):
+        missing.append("出典")
+    if not missing:
+        return None
+    return f"{m.group(0).strip()[:40]}（{'・'.join(missing)}がない）"
 
 
 def strip_tags(html):
