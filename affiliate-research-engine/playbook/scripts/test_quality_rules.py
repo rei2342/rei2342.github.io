@@ -66,7 +66,23 @@ def run_blockers():
     自動で一般論へ書き換えず、該当文を報告して失敗させることを確かめる。
     """
     # テスト専用の台帳。本番には1行も書かない
-    q.verified_fact_ids = lambda: {"F001"}
+    LEDGER = {
+        "F001": {"fact_id": "F001", "category": "toeic",
+                 "claim": "TOEICで600点を取った", "value": "600点",
+                 "period": "2025-11", "allowed_claims": "", "note": ""},
+        "F010": {"fact_id": "F010", "category": "service",
+                 "claim": "DMM英会話の無料体験を2回受けた", "value": "2回",
+                 "period": "2026-01", "allowed_claims": "", "note": ""},
+        "F020": {"fact_id": "F020", "category": "utterance",
+                 "claim": "講師から発音の指摘を受けた", "value": "",
+                 "period": "2026-02",
+                 "allowed_claims": "アクセントの位置が違う", "note": ""},
+        "F030": {"fact_id": "F030", "category": "result",
+                 "claim": "2週間続いた", "value": "", "period": "2026-02",
+                 "allowed_claims": "", "note": "具体的な結果は登録していない"},
+    }
+    q.verified_facts = lambda: LEDGER
+    q.verified_fact_ids = lambda: set(LEDGER)
 
     CASES = [
         # (本文, ブロックされるべきか, 説明)
@@ -91,6 +107,30 @@ def run_blockers():
          "台帳に無い fact ID は通さない"),
         ("<p>月額5,980円で毎日レッスンが受けられる。</p>", True,
          "公式料金に出典も確認日も無い"),
+
+        # ── fact ID と主張内容の照合（2026-08-08 追加）──
+        # **ID を付けるだけで別の事実を書けてはいけない**
+        ("<p>私はTOEIC600点を取った。<!--fact:F001--></p>", False,
+         "F001=600点 に 600点 → 通過"),
+        ("<p>私はTOEIC800点を取った。<!--fact:F001--></p>", True,
+         "F001=600点 に 800点 → ブロック"),
+        ("<p>私はDMM英会話の無料体験を2回受けた。<!--fact:F010--></p>", False,
+         "F010 の登録どおりの利用 → 通過"),
+        ("<p>私はDMM英会話の無料体験を2回受けて、3ヶ月続けた。"
+         "<!--fact:F010--></p>", True,
+         "F010 に無い利用期間を足す → ブロック"),
+        ("<p>私はDMM英会話に4万5000円払った。<!--fact:F010--></p>", True,
+         "F010 に無い金額を足す → ブロック"),
+        ("<p>私はスパトレの無料体験を2回受けた。<!--fact:F010--></p>", True,
+         "別サービスに F010 を流用 → ブロック"),
+        ("<p>私はTOEIC600点を取った。<!--fact:F010--></p>", True,
+         "category違いの fact ID → ブロック"),
+        ("<p>講師に「アクセントの位置が違う」と言われた。<!--fact:F020--></p>",
+         False, "allowed_claims にある台詞 → 通過"),
+        ("<p>講師に「発音は完璧だ」と言われた。<!--fact:F020--></p>", True,
+         "allowed_claims に無い台詞 → ブロック"),
+        ("<p>私は話せるようになった。<!--fact:F030--></p>", True,
+         "allowed_claims の無い fact で結果を書く → ブロック"),
     ]
     ng = 0
     for html, want, why in CASES:

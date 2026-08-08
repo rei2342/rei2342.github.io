@@ -401,15 +401,97 @@ SELF_FACT_RULES = [
 ]
 
 
-def verified_fact_ids():
-    """experience_facts.csv の verified=yes な fact ID。"""
-    out = set()
+def verified_facts():
+    """experience_facts.csv の verified=yes な行を fact_id 引きで返す。"""
+    out = {}
     for r in _read_csv(FACTS_CSV):
         fid = (r.get("fact_id") or "").strip()
         ok = (r.get("verified") or "").strip().lower() in ("yes", "y", "true", "1")
         if fid and ok:
-            out.add(fid)
+            out[fid] = r
     return out
+
+
+def verified_fact_ids():
+    """verified=yes な fact ID の集合。"""
+    return set(verified_facts())
+
+
+# 検出した種類 → 台帳の category として認めるもの。
+# **ID が存在するだけでは通さない。**種類が違えば別の事実なので落とす。
+CATEGORY_MAP = {
+    "TOEICスコア・受験日・増減": {"toeic", "score"},
+    "貯金・収入・支出": {"spending", "saving", "income"},
+    "サービスの登録・契約・無料体験・利用": {"service"},
+    "利用期間・回数": {"duration", "service"},
+    "留学・渡航・居住": {"abroad", "travel"},
+    "職歴・仕事内容": {"work", "work_english"},
+    "年齢・期限・将来計画": {"age_plan", "profile"},
+    "実際の発言・会話": {"utterance"},
+    "第三者から言われた言葉": {"utterance"},
+    "成功・失敗・改善結果": {"result", "setback"},
+    "固有の日付・場所・人物": {"datetime_place"},
+}
+
+# 文中の数値。台帳と突き合わせる
+_NUM_IN_SENT = re.compile(
+    r"[0-9][0-9,]*(?:万[0-9,]*)?\s*"
+    r"(?:万円|円|万|点|年間|年|ヶ月|か月|カ月|週間|日間|日|時間|分|回|コマ|冊|校|社|歳)")
+
+
+def _canon_num(x):
+    """「4万5000円」「4,500円」を比べられる形にそろえる。"""
+    x = re.sub(r"[,，\s]", "", x)
+    return x.replace("か月", "ヶ月").replace("カ月", "ヶ月").replace("年間", "年")
+
+
+def fact_mismatch(sent, matched, category, fact):
+    """付いている fact ID が、この文の主張と合っているかを見る。
+
+    **ID の存在確認だけでは足りない。** F001 が「TOEIC600点」なのに
+    「TOEIC800点を取った」に F001 を付ければ通る、では意味がない。
+    台帳の category / claim / value / period / allowed_claims と突き合わせる。
+
+    合っていれば None、合っていなければ理由を返す。
+    """
+    fid = (fact.get("fact_id") or "").strip()
+    cat = (fact.get("category") or "").strip().lower()
+    ok_cats = CATEGORY_MAP.get(category, set())
+    if ok_cats and cat not in ok_cats:
+        return (f"{fid} は category={cat or '（空）'} で、"
+                f"この主張の種類（{category}）と違う")
+
+    # 台帳に書いてある文字列を全部つないで、照合の材料にする
+    hay = " ".join(str(fact.get(k) or "") for k in
+                   ("claim", "value", "period", "allowed_claims", "note"))
+    hay_c = _canon_num(hay)
+
+    # 数値。文に出てくる数値が台帳に無ければ、別の事実になっている
+    for m in _NUM_IN_SENT.finditer(sent):
+        v = _canon_num(m.group(0))
+        if v in hay_c:
+            continue
+        digits = re.sub(r"[^0-9]", "", v)
+        if digits and digits in re.sub(r"[^0-9]", "", hay_c):
+            continue
+        return f"{fid} の台帳に「{m.group(0)}」が無い"
+
+    # サービス名。別サービスの ID を流用させない
+    for name in SERVICE_NAMES:
+        if name in sent and name not in hay:
+            return f"{fid} は別のサービスの事実（台帳に「{name}」が無い）"
+
+    # 発言・第三者の台詞・結果は、allowed_claims に書いてあるものだけ
+    if category in ("実際の発言・会話", "第三者から言われた言葉",
+                    "成功・失敗・改善結果"):
+        allowed = str(fact.get("allowed_claims") or "")
+        q = re.search(r"[「『]([^」』]{2,60})[」』]", sent)
+        target = q.group(1) if q else matched
+        if not allowed:
+            return f"{fid} に allowed_claims が無い（具体的な発言・結果は書けない）"
+        if target not in allowed:
+            return f"{fid} の allowed_claims に「{target[:30]}」が無い"
+    return None
 
 
 def _blocks_with_marks(html):
@@ -435,7 +517,8 @@ def unverified_self_facts(html):
     **自動で一般論へ書き換えない。** 該当文をそのまま返して、
     生成・公開を失敗させる。何が消えたか分からなくなるほうが危ない。
     """
-    ok_ids = verified_fact_ids()
+    facts = verified_facts()
+    ok_ids = set(facts)
     out = []
     for sent, ids in _blocks_with_marks(html):
         if HYPOTHETICAL_RE.search(sent):
@@ -449,15 +532,24 @@ def unverified_self_facts(html):
                 continue
             good = ids & ok_ids
             if good:
-                break                     # 裏付けあり。この文は通す
+                # **存在確認だけでは通さない。**中身が合っているかまで見る。
+                # どれか1つでも合っていれば、その文は裏付けありとする
+                misses = [fact_mismatch(sent, m.group(0), name, facts[i])
+                          for i in sorted(good)]
+                if any(x is None for x in misses):
+                    break
+                reason = "／".join(x for x in misses if x)
+            elif ids:
+                reason = "付いている fact ID が台帳で verified ではない"
+            else:
+                reason = "fact ID が無い"
             out.append({
                 "category": name,
                 "matched": m.group(0)[:50],
                 "sentence": sent[:180],
                 "fact_ids": " ".join(sorted(ids)) if ids
                             else "（fact ID が付いていない）",
-                "reason": ("付いている fact ID が台帳で verified ではない"
-                           if ids else "fact ID が無い"),
+                "reason": reason,
             })
             break
     return out

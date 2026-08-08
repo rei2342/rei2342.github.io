@@ -7,6 +7,12 @@
 # fact_id が無い、または verified でない場合、生成と公開が失敗する。
 # **機械は勝手に一般論へ書き換えない。** 該当文を報告して止める。
 #
+# ⚠️ **ID を付けるだけでは通らない。** 記事の主張と台帳の中身を突き合わせる。
+#   F001 が「TOEIC600点」なら「TOEIC800点を取った <!--fact:F001-->」は落ちる。
+#   照合するもの: category が主張の種類と合うか / 文中の数値が value・claim に
+#   あるか / サービス名が claim にあるか / 具体的な発言・結果が allowed_claims
+#   にあるか。1つでも合わなければブロックする。
+#
 # fact_id    F001 のような一意のID。記事から参照する
 # category   toeic / spending / saving / service / duration / abroad /
 #            work / age_plan / utterance / result / datetime_place
@@ -15,5 +21,7 @@
 # period     いつのことか（2024-04〜2026-03 など）
 # verified   yes / no（**空欄は no 扱い**。推測で yes にしない）
 # evidence   何で確認したか（TOEIC公式マイページ / カード明細 / 領収書 など）
+# allowed_claims  具体的な発言・第三者の台詞・結果を書くなら、**ここに書いた文言だけ**
+#                 使える。空なら、その fact で発言や結果は書けない。「｜」区切り
 # note       補足・注意点
-fact_id,category,claim,value,period,verified,evidence,note
+fact_id,category,claim,value,period,verified,evidence,allowed_claims,note
