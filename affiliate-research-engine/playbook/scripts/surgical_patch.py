@@ -81,6 +81,39 @@ def strip_baked_toc(html):
     return html
 
 
+# CTAの箱の見出し。ここより前にある単独リンクの段落は本文中のCTA
+BOX_MARK = "▶ 公式サイトで内容と料金を確認する"
+# 段落まるごとがアフィリンク1本だけ、という形
+LONE_CTA_P = re.compile(
+    r'\s*<p>\s*<a\b[^>]*href="[^"]*(?:af\.moshimo\.com/af/c/click|'
+    r'px\.a8\.net/svt/ejp)[^"]*"[^>]*>.*?</a>\s*(?:<img[^>]*>)?\s*</p>',
+    re.DOTALL)
+
+# 文中に埋め込まれたアフィリンク（前後に地の文がある）。リンクだけ外す
+INLINE_CTA_A = re.compile(
+    r'<a\b[^>]*href="[^"]*(?:af\.moshimo\.com/af/c/click|'
+    r'px\.a8\.net/svt/ejp)[^"]*"[^>]*>.*?</a>\s*(?:<img[^>]*>)?',
+    re.DOTALL)
+
+
+def drop_inline_cta(html):
+    """本文中に散らしたCTAを外して、末尾の箱だけ残す。
+
+    改修前の記事は、本文の途中に2本＋箱に2本で計4本あった。
+    主案件を1つに絞る方針なので、読者が最後に見る箱だけにする。
+    **箱の中のリンクは触らない。**
+    """
+    i = html.find(BOX_MARK)
+    if i < 0:
+        return html, 0
+    head, tail = html[:i], html[i:]
+    head, n = LONE_CTA_P.subn("", head)
+    # 段落の文中に埋め込まれているCTAは、リンクだけ外して文章は残す。
+    # 3本（297 138 286）がこの形で、箱と同じ案件を二重に置いていた
+    head, m = INLINE_CTA_A.subn("", head)
+    return head + tail, n + m
+
+
 LEGACY = re.compile(
     r"2[0-9]\s*歳|30歳まで|30歳になる前|あと\s*[0-9]+\s*年|残り\s*[0-9]+\s*年|"
     r"5年後回し|営業事務|さくらの英語挑戦記|さくらが確かめた|すべて無料")
@@ -129,9 +162,10 @@ def main():
                 html = html.replace(r["old"], r["new"])
                 applied += 1
 
+        html, dropped = drop_inline_cta(html)
         left = problems(html)
         L.append(f"\n## 記事{pid}\n\n"
-                 f"- 当てたパッチ: {applied}件"
+                 f"- 当てたパッチ: {applied}件 / 本文中のCTAを外した: {dropped}本"
                  + (f" / **見つからなかった: {len(missed)}件**" if missed else "")
                  + f" / 残る問題: **{len(left)}件**\n\n")
         for m in missed:
@@ -139,7 +173,7 @@ def main():
         for kind, s in left:
             L.append(f"  - [{kind}] {s}\n")
 
-        print(f"[{pid}] パッチ{applied} 未一致{len(missed)} 残り{len(left)}")
+        print(f"[{pid}] パッチ{applied} CTA削除{dropped} 未一致{len(missed)} 残り{len(left)}")
         for kind, s in left:
             print(f"    [{kind}] {s[:120]}")
 
