@@ -256,6 +256,26 @@ def run_cta_box():
     if not ok_out:
         ng += 1
 
+    # 箱を使わず見出しの段落だけ置いている形（改修済み18本がこれだった）
+    BARE = ('<p>▶ 次の一手（すべて無料）</p>'
+            '<p><a href="//af.moshimo.com/af/c/click?a_id=1&url=x">'
+            '→ スパトレの7日間無料体験を見る</a></p>')
+    ok_bare = bool(q.cta_box_text_gate(BARE))
+    print(("OK  " if ok_bare else "NG  ")
+          + "**styled div を使わない見出し段落も検査する**")
+    if not ok_bare:
+        ng += 1
+
+    # 「→」で始まるアンカーそのものは、この関数の担当ではない
+    # （訴求は cta_claim_gate が台帳と照合する）
+    anchor_only = ('<p><a href="//af.moshimo.com/af/c/click?a_id=1&url=x">'
+                   '→ スパトレの7日間無料体験を見る</a></p>')
+    ok_anchor = not q.cta_box_text_gate(anchor_only)
+    print(("OK  " if ok_anchor else "NG  ")
+          + "アンカー文言は cta_claim_gate の担当なので二重に止めない")
+    if not ok_anchor:
+        ng += 1
+
     # 一時非表示にした箱も対象外
     hidden = "<!-- cta-hidden:START -->" + \
         BOX.format("▶ さくらが確かめた・次の一手（すべて無料）") + \

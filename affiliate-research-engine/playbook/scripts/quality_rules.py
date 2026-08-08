@@ -748,6 +748,12 @@ CTA_BOX_RE = re.compile(
     r'<div style="background:#f9f9f9;border-left:4px solid #27ae60;[^"]*">'
     r'(.*?)</div>', re.DOTALL)
 
+# 箱を使わずに、見出しの段落だけ置いている形もある。
+# 改修済み18本が `<p>▶ 次の一手（すべて無料）</p>` を持っていた
+# （styled div ではないので CTA_BOX_RE では拾えなかった。2026-08-09に追加）。
+CTA_HEADING_P_RE = re.compile(
+    r'<p[^>]*>\s*([▶▼■●➡→]\s*[^<]{0,80})</p>')
+
 # 箱の見出しで使ってはいけない、運営者の行動表現。主語がどれでも止める
 CTA_PERSONA_RE = re.compile(
     r"(?:さくら|私|自分|編集部|当サイト)(?:が|は|も)?"
@@ -767,17 +773,31 @@ def cta_box_text_gate(html):
     ここは読者が最後に見る場所なので、本文と同じ基準を当てる。
     """
     html = HIDDEN_CTA_RE.sub(" ", html)
+    chunks = [_A_TAG_RE.sub(" ", m.group(1))       # リンクは cta_claim_gate の担当
+              for m in CTA_BOX_RE.finditer(html)]
+    # 矢印で始まる短い見出し段落。箱を使っていない形を拾う。
+    # **リンクそのもの（→ で始まるアンカー）は除く。** あれは訴求の担当
+    linkless = _A_TAG_RE.sub(" ", html)
+    chunks += [m.group(1) for m in CTA_HEADING_P_RE.finditer(linkless)]
+
     out = []
-    for m in CTA_BOX_RE.finditer(html):
-        inner = _A_TAG_RE.sub(" ", m.group(1))     # リンクは cta_claim_gate の担当
-        text = strip_tags(inner)
+    for chunk in chunks:
+        text = strip_tags(chunk)
         for hit in CTA_PERSONA_RE.finditer(text):
             out.append({"anchor": hit.group(0), "term": "運営者の行動",
                         "reason": "CTAの見出しに、台帳に無い運営者の行動が入っている"})
         for hit in CTA_BLANKET_RE.finditer(text):
             out.append({"anchor": hit.group(0), "term": "一括訴求",
                         "reason": "案件を特定しない訴求。案件ごとに書く"})
-    return out
+    # 同じ箇所を箱と見出しの両方で拾うことがあるので重複を落とす
+    seen, uniq = set(), []
+    for o in out:
+        k = (o["anchor"], o["term"])
+        if k in seen:
+            continue
+        seen.add(k)
+        uniq.append(o)
+    return uniq
 
 
 def cta_claim_gate(html):

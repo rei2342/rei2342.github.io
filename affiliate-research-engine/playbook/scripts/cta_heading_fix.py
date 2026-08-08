@@ -41,10 +41,13 @@ BK = Path("affiliate-research-engine/playbook/workspace/backups")
 UA = {"User-Agent": "Mozilla/5.0"}
 AUTH = (WP_USER, WP_PASS)
 
-# 差し替える見出し。表記ゆれを許すが、**箱の見出しの行だけ**に限る
+# 差し替える見出し。表記ゆれを許すが、**箱の見出しの行だけ**に限る。
+# 2026-08-09の2回目: 改修済み18本は箱を使わず `<p>▶ 次の一手（すべて無料）</p>`
+# だけを置いていた。矢印で始まる短い見出し段落も対象にする。
 OLD_HEADING = re.compile(
-    r"(<p[^>]*>)\s*▶?\s*さくらが確かめた[^<]*?(?:</p>)",
-    re.IGNORECASE)
+    r"(<p[^>]*>)\s*[▶▼■●]?\s*"
+    r"(?:さくらが確かめた[^<]*?|次の一手[^<]*?)"
+    r"</p>", re.IGNORECASE)
 
 # 見出しの外に「すべて無料」だけが残っている場合
 BLANKET = re.compile(r"（\s*すべて無料\s*）|\(\s*すべて無料\s*\)")
