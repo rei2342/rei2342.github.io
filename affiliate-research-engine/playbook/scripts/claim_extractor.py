@@ -126,6 +126,14 @@ def analyze(sent):
                     and "連用" in getattr(pv, "infl_form", ""):
                 continue
 
+        # 連用形＋名詞は複合名詞。「払い損になる」は払った事実ではないし、
+        # 「使い方」「言い訳」も同じ形をしている
+        if "連用" in getattr(t, "infl_form", "") and i + 1 < len(spans):
+            nv = spans[i + 1][2]
+            if nv.part_of_speech.split(",")[0] == "名詞" \
+                    and nv.part_of_speech.split(",")[1] != "非自立":
+                continue
+
         action, atype = LEMMA_ACT[base]
         past = polite = prog = cond = vol = nonpast = False
         negative = False
