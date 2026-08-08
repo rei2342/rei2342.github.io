@@ -46,6 +46,13 @@ SWAPS = [
      "QQ English"),
 ]
 
+# URLは変えず、**文言だけ**を中立にするもの。
+# 未確認の訴求（speekの「無料トライアル」など）を全記事から外す
+ANCHOR_ONLY = [
+    ("a_id=5640991", "speek",
+     "→ speek公式サイトで発音矯正スクールの内容を確認する"),
+]
+
 HIDDEN = re.compile(r"<!--\s*cta-hidden:START[^>]*?-->(.*?)<!--\s*cta-hidden:END\s*-->",
                     re.DOTALL | re.IGNORECASE)
 
@@ -121,6 +128,40 @@ def main():
                 L.append(f" … {'✅ 反映' if up.status_code in (200, 201) else '❌ ' + str(up.status_code)}\n")
             else:
                 L.append(" … （DRY RUN）\n")
+
+    # ── 文言だけの中立化（URLは触らない）──
+    for needle, svc, anchor in ANCHOR_ONLY:
+        hits = [p for p in posts
+                if needle in p.get("content", {}).get("rendered", "")]
+        L.append(f"\n---\n\n## {svc}（文言だけ中立化）\n\n")
+        L.append(f"- **新しい文言**: {anchor}\n")
+        L.append(f"- **対象記事**: {len(hits)}本\n\n")
+        print(f"\n{svc} 文言中立化: {len(hits)}本")
+        for p in hits:
+            pid = p["id"]
+            res = requests.get(f"{WP_BASE}/posts/{pid}", auth=(WP_USER, WP_PASS),
+                               params={"context": "edit"}, headers=UA,
+                               verify=False, timeout=40)
+            if res.status_code != 200:
+                continue
+            raw = res.json()["content"]["raw"]
+            (BK / day / f"{pid}_anchor.json").write_text(json.dumps(
+                {"id": pid, "content_raw": raw}, ensure_ascii=False, indent=2),
+                encoding="utf-8")
+            body = re.sub(
+                r'(<a[^>]+' + re.escape(needle) + r'[^>]*>)(.*?)(</a>)',
+                lambda m: m.group(1) + anchor + m.group(3),
+                raw, flags=re.DOTALL)
+            n = len(re.findall(re.escape(anchor), body))
+            print(f"[{pid}] {n}箇所" + ("（DRY RUN）" if DRY_RUN else ""))
+            L.append(f"- 記事 {pid}: {n}箇所")
+            if DRY_RUN or body == raw:
+                L.append(" …（変更なし）\n")
+                continue
+            up = requests.post(f"{WP_BASE}/posts/{pid}", auth=(WP_USER, WP_PASS),
+                               headers=UA, verify=False, timeout=60,
+                               json={"content": body})
+            L.append(f" … {'✅' if up.status_code in (200, 201) else '❌ ' + str(up.status_code)}\n")
 
     (BK / day / "CTA_RESTORE.md").write_text("".join(L), encoding="utf-8")
     print(f"\n→ workspace/backups/{day}/CTA_RESTORE.md")
