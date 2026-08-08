@@ -23,6 +23,9 @@ import urllib3
 
 urllib3.disable_warnings()
 
+sys.path.insert(0, str(Path(__file__).parent))
+import quality_rules as _q
+
 WP_BASE = "https://sakura-eigo.com/wp-json/wp/v2"
 WP_USER = "rei.00pt2342@gmail.com"
 WP_PASS = os.environ.get("WP_APP_PASSWORD", "")
@@ -84,6 +87,10 @@ def preflight(post):
 
     if "af.moshimo.com" not in body and "px.a8.net" not in body:
         issues.append("CTAボックスが入っていない")
+
+    # 台帳の裏付けが無い、さくら固有の事実。**自動で薄めずに公開を止める**
+    for b in _q.generation_blockers(body)[:8]:
+        issues.append(b)
 
     return issues
 

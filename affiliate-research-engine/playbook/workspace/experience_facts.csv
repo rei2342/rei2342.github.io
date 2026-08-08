@@ -1,19 +1,19 @@
 # サービス利用以外の実体験。さくらの一人称に使える事実のデータベース。
-# 記事の共感要素はここに多い。禁止リストではなく、書ける素材の一覧として使う。
 #
-# category   study_period / setback / toeic / spending / study_time / tool /
-#            abroad / travel / work_english など
+# **記事に一人称の具体的な事実を書くには、ここの fact_id が要る。**
+# verified=yes の fact_id を、その文に付ける:
+#     私はTOEIC600点を取った。<!--fact:F001-->
+#     <span data-fact="F001">私はTOEIC600点を取った。</span>
+# fact_id が無い、または verified でない場合、生成と公開が失敗する。
+# **機械は勝手に一般論へ書き換えない。** 該当文を報告して止める。
+#
+# fact_id    F001 のような一意のID。記事から参照する
+# category   toeic / spending / saving / service / duration / abroad /
+#            work / age_plan / utterance / result / datetime_place
 # claim      記事で書く形の主張（そのまま使える文にしておくと楽）
 # value      数値がある場合（点・円・時間・年 など単位つき）
 # period     いつのことか（2024-04〜2026-03 など）
-# verified   yes / no（no なら記事で使わない）
+# verified   yes / no（**空欄は no 扱い**。推測で yes にしない）
+# evidence   何で確認したか（TOEIC公式マイページ / カード明細 / 領収書 など）
 # note       補足・注意点
-category,claim,value,period,verified,note
-study_period,,,,,
-setback,,,,,
-toeic,,,,,
-spending,,,,,
-study_time,,,,,
-tool,,,,,
-abroad,,,,,
-work_english,,,,,
+fact_id,category,claim,value,period,verified,evidence,note

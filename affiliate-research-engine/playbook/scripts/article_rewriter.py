@@ -371,6 +371,13 @@ def audit(html):
     # 公開してから直すより、作った時点で弾くほうが安い。
     qtext = _q.strip_tags(_ai.strip_box(html))
 
+    # ── 最上位ルール（2026-08-08）──
+    # **事実台帳で verified になっていない、さくら固有の過去・現在の事実を
+    #   生成しない。** 該当したら一般論へ書き換えず、生成を失敗させる。
+    # 機械が黙って薄めると、何が消えたのか誰も分からなくなる。
+    for b in _q.generation_blockers(html):
+        issues.append(b)
+
     price = _q.price_without_basedate(qtext)
     if price:
         issues.append(f"料金（{price}）があるのに基準日がない")

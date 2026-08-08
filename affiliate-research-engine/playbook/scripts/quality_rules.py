@@ -298,3 +298,203 @@ def lone_numbers(text):
     厳密な判定は無理なので、記事全体で数字が2つ未満なら薄いと見なす程度にする。
     """
     return len(set(re.findall(r"[0-9]+(?:,[0-9]{3})*(?:\.[0-9]+)?", text)))
+
+
+# ══════════════════════════════════════════════════════════════
+# さくら固有の事実の封鎖（2026-08-08）
+#
+# **事実台帳で verified になっていない、さくら固有の過去・現在の事実を
+#   生成しない。**
+#
+# これまでは「スコアを書くな」「金額を書くな」と個別に禁じてきたが、
+# 記事ごとに別の履歴が生成される問題は止まらなかった。
+# 実際、TOEICのスコアは5本の記事で互いに矛盾していた
+# （385点・515点・545点・595点・600点が同時に「私のスコア」だった）。
+#
+# 禁止リストを足すのではなく、**根拠が無いものを全部止める**。
+# 一人称の具体的な事実を書くには、verified な fact ID を付ける。
+# 付いていなければ、一般論へ書き換えずに**生成・公開を失敗させる**。
+# 機械が勝手に薄めると、何が消えたのか誰も分からなくなるため。
+# ══════════════════════════════════════════════════════════════
+
+# 一人称の合図。これが無い文は、第三者の話として扱う
+SELF_RE = re.compile(r"私|自分|僕|うち(?:の|は)")
+
+# 仮定・試算・引用は、さくら固有の事実の主張ではない
+HYPOTHETICAL_RE = re.compile(
+    r"例(?:として|えば|示)|試算|仮に|としたら|とすると|だとすれば|"
+    r"と仮定|概算|シミュレーション|目安として")
+
+# 出典。公式情報として書くなら、これと確認日が要る
+SOURCE_URL_RE = re.compile(r"https?://|公式サイト|公式ページ|外務省|大使館|移民局")
+
+# fact ID の付け方。HTMLコメントと data 属性の両方を受ける。
+#   <!--fact:F001-->  /  <span data-fact="F001">…</span>
+FACT_MARK_RE = re.compile(
+    r"<!--\s*fact\s*:\s*([A-Za-z0-9_\-]+)\s*-->"
+    r"|data-fact=\"([A-Za-z0-9_\-]+)\"")
+
+# 封鎖する事実の種類。**一人称の合図が要るもの**は need_self=True。
+# 第三者の台詞のように、一人称が無くても危ないものは False。
+SELF_FACT_RULES = [
+    ("TOEICスコア・受験日・増減", True, re.compile(
+        r"TOEIC[^。]{0,15}?[0-9]{3}\s*点"
+        r"|[0-9]{3}\s*点(?:から|まで|で|に|を|が)[^。]{0,10}?"
+        r"(?:止ま|伸び|上が|下が|動|取っ|出|超え)"
+        r"|[0-9]{1,3}\s*点(?:上が|下が|伸び|戻|動い|落ち)"
+        r"|(?:受験|受け)(?:た|ました)[^。]{0,8}?TOEIC"
+        r"|TOEIC[^。]{0,10}?(?:受験した|受けた|受けました)")),
+
+    ("貯金・収入・支出", True, re.compile(
+        r"(?:貯金|貯め|預金|手取り|年収|月収|給料)[^。]{0,12}?[0-9][0-9,]*\s*万?円"
+        r"|[0-9][0-9,]*\s*万?円[^。]{0,12}?(?:貯め|貯金)"
+        r"|[0-9][0-9,]*\s*万?円[^。]{0,12}?"
+        r"(?:払った|払っていた|支払った|溶かした|課金し|使っていた|失った)")),
+
+    ("サービスの登録・契約・無料体験・利用", True, re.compile(
+        r"(?:登録|契約|申し込|申込|入会|課金|解約|退会)"
+        r"(?:した|しました|んだ|んでいた|していた)"
+        r"|(?:無料体験|無料トライアル|体験レッスン|カウンセリング)"
+        r"[^。]{0,10}?(?:受けた|受けました|試した|申し込んだ|使った)"
+        r"|(?:受講|利用)(?:した|しました|していた)")),
+
+    ("利用期間・回数", True, re.compile(
+        r"[0-9]+\s*(?:年|年間|ヶ月|か月|カ月|週間|日|日間|回|コマ)"
+        r"[^。]{0,12}?(?:続けた|続けていた|通った|通っていた|受けた|使った|"
+        r"やった|やっていた|回した|積んだ)")),
+
+    ("留学・渡航・居住", True, re.compile(
+        r"(?:留学|渡航|移住|滞在)(?:した|しました|していた|する前に私)"
+        r"|(?:に|へ)(?:行った|渡った|飛んだ|住んでいた|住んだ)")),
+
+    ("職歴・仕事内容", True, re.compile(
+        r"(?:営業事務|経理|総務|人事|販売|事務職)(?:として|で)[^。]{0,10}?"
+        r"(?:働いて|勤めて|やって)"
+        r"|(?:転職|異動|昇進|昇給)(?:した|しました)"
+        r"|(?:同期|上司|先輩|後輩|取引先|部署)[^。]{0,12}?"
+        r"(?:だった|がいた|に言われ|から聞い)")),
+
+    ("年齢・期限・将来計画", True, re.compile(
+        r"[0-9]{2}\s*歳(?:の私|になる|だった|です|になった)"
+        r"|(?:30歳|三十歳)(?:まで|になる前)に[^。]{0,14}?(?:行く|出発|渡航|申請)"
+        r"|(?:来年|再来年|年内)[^。]{0,10}?(?:出発|渡航|申請|行く)")),
+
+    ("実際の発言・会話", True, re.compile(
+        r"[「『][^」』]{2,60}[」』][^。]{0,8}?"
+        r"(?:と言った|と答えた|と返した|と伝えた|と口に出した|と聞いた)")),
+
+    ("第三者から言われた言葉", False, re.compile(
+        r"[「『][^」』]{2,60}[」』][^。]{0,10}?"
+        r"(?:と言われ|と指摘され|と教えて|と返ってき|と褒められ|とすすめられ)")),
+
+    ("成功・失敗・改善結果", True, re.compile(
+        r"(?:話せるように|聞き取れるように|できるように|出るように)"
+        r"(?:なった|なりました)"
+        r"|(?:伸びた|上がった|動いた|改善した|減った|増えた)[^。]{0,6}$"
+        r"|(?:やめた|閉じた|挫折した|続かなかった)[^。]{0,10}?"
+        r"[0-9]+\s*(?:日|回|ページ|ヶ月)")),
+
+    ("固有の日付・場所・人物", True, re.compile(
+        r"20[0-9]{2}\s*年\s*[0-9]{1,2}\s*月[^。]{0,10}?(?:私|受け|行っ|払っ)"
+        r"|[0-9]{1,2}\s*月[0-9]{1,2}\s*日[^。]{0,10}?(?:私|受け|行っ|払っ)"
+        r"|(?:月|火|水|木|金|土|日)曜(?:日)?の(?:夜|朝|昼)[^。]{0,10}?私")),
+]
+
+
+def verified_fact_ids():
+    """experience_facts.csv の verified=yes な fact ID。"""
+    out = set()
+    for r in _read_csv(FACTS_CSV):
+        fid = (r.get("fact_id") or "").strip()
+        ok = (r.get("verified") or "").strip().lower() in ("yes", "y", "true", "1")
+        if fid and ok:
+            out.add(fid)
+    return out
+
+
+def _blocks_with_marks(html):
+    """(プレーン文, その文に効いている fact ID) の並びを返す。
+
+    fact ID はブロック単位で効かせる。文の直後に書くのが基本だが、
+    段落の先頭にまとめて置く書き方も通す。
+    """
+    out = []
+    parts = re.split(r"(?i)(?=<(?:p|li|h[1-6]|td|blockquote)\b)", html) or [html]
+    for part in parts:
+        ids = {m.group(1) or m.group(2) for m in FACT_MARK_RE.finditer(part)}
+        text = strip_tags(part)
+        for s in re.split(r"(?<=[。？！])", text):
+            if s.strip():
+                out.append((s.strip(), ids))
+    return out
+
+
+def unverified_self_facts(html):
+    """verified な fact ID の裏付けが無い、さくら固有の事実を返す。
+
+    **自動で一般論へ書き換えない。** 該当文をそのまま返して、
+    生成・公開を失敗させる。何が消えたか分からなくなるほうが危ない。
+    """
+    ok_ids = verified_fact_ids()
+    out = []
+    for sent, ids in _blocks_with_marks(html):
+        if HYPOTHETICAL_RE.search(sent):
+            continue                      # 例・試算は事実の主張ではない
+        has_self = bool(SELF_RE.search(sent))
+        for name, need_self, pat in SELF_FACT_RULES:
+            if need_self and not has_self:
+                continue
+            m = pat.search(sent)
+            if not m:
+                continue
+            good = ids & ok_ids
+            if good:
+                break                     # 裏付けあり。この文は通す
+            out.append({
+                "category": name,
+                "matched": m.group(0)[:50],
+                "sentence": sent[:180],
+                "fact_ids": " ".join(sorted(ids)) if ids
+                            else "（fact ID が付いていない）",
+                "reason": ("付いている fact ID が台帳で verified ではない"
+                           if ids else "fact ID が無い"),
+            })
+            break
+    return out
+
+
+# 公式料金・制度・サービス仕様は、出典URLと確認日が両方要る
+OFFICIAL_SPEC_RE = re.compile(
+    r"(?:月額|年額|料金|受講料|授業料|プラン|無料トライアル|無料体験)"
+    r"[^。]{0,20}?[0-9][0-9,]*\s*万?円"
+    r"|[0-9]+\s*(?:日間|ヶ月)[^。]{0,6}?(?:無料|トライアル)")
+
+
+def official_spec_without_source(text):
+    """公式の料金・仕様なのに、出典URLか確認日が欠けている文を返す。"""
+    out = []
+    for s in re.split(r"(?<=[。？！])", text):
+        s = s.strip()
+        if not s or not OFFICIAL_SPEC_RE.search(s):
+            continue
+        if HYPOTHETICAL_RE.search(s):
+            continue                      # 「例として月5,000円を試算」は対象外
+        missing = []
+        if not SOURCE_URL_RE.search(s):
+            missing.append("出典")
+        if not BASEDATE_RE.search(s):
+            missing.append("確認日")
+        if missing:
+            out.append({"missing": "と".join(missing), "sentence": s[:180]})
+    return out
+
+
+def generation_blockers(html):
+    """公開ブロッカーをまとめて返す。空なら公開してよい。"""
+    issues = []
+    for f in unverified_self_facts(html):
+        issues.append(f"[{f['category']}] 台帳の裏付けが無い"
+                      f"（{f['reason']}）: {f['matched']} … {f['sentence'][:70]}")
+    for f in official_spec_without_source(strip_tags(html)):
+        issues.append(f"[公式の料金・仕様] {f['missing']}が無い: {f['sentence'][:70]}")
+    return issues

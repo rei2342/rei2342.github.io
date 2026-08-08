@@ -60,6 +60,54 @@ def run():
 
 
 
+def run_blockers():
+    """生成側の封鎖。**verified な fact ID が無い一人称の事実を止める。**
+
+    自動で一般論へ書き換えず、該当文を報告して失敗させることを確かめる。
+    """
+    # テスト専用の台帳。本番には1行も書かない
+    q.verified_fact_ids = lambda: {"F001"}
+
+    CASES = [
+        # (本文, ブロックされるべきか, 説明)
+        ("<p>私はTOEIC600点を取った。</p>", True, "台帳にないTOEICスコア"),
+        ("<p>私の貯金は50万円だった。</p>", True, "台帳にない貯金"),
+        ("<p>私はDMM英会話の無料体験を受けた。</p>", True, "台帳にないサービス利用"),
+        ("<p>私はセブ島へ留学した。</p>", True, "台帳にない留学"),
+        ("<p>講師に「アクセントの位置が違う」と言われた。</p>", True,
+         "台帳にない第三者の台詞"),
+        ("<p>私はオンライン英会話を3ヶ月続けた。</p>", True, "台帳にない利用期間"),
+        ("<p>私は営業事務として働いていた。</p>", True, "台帳にない職歴"),
+        ("<p>私は27歳の私で、30歳までに必ず渡航する。</p>", True, "年齢・将来計画"),
+        ("<p>スパトレの料金は月5,980円（公式サイト https://sptr.jp/ ・"
+         "2026年8月8日時点）。</p>", False, "出典と確認日つきの公式料金"),
+        ("<p>例として月5,000円を試算すると、年間6万円になる。</p>", False,
+         "例・試算と明記した数字"),
+        ("<p>私はTOEIC600点を取った。<!--fact:F001--></p>", False,
+         "verified な fact ID つきの体験"),
+        ("<p><span data-fact=\"F001\">私はTOEIC600点を取った。</span></p>", False,
+         "data-fact でも通る"),
+        ("<p>私はTOEIC600点を取った。<!--fact:F999--></p>", True,
+         "台帳に無い fact ID は通さない"),
+        ("<p>月額5,980円で毎日レッスンが受けられる。</p>", True,
+         "公式料金に出典も確認日も無い"),
+    ]
+    ng = 0
+    for html, want, why in CASES:
+        got = q.generation_blockers(html)
+        ok = bool(got) == want
+        print(("OK  " if ok else "NG  ") + f"{why}")
+        if not ok:
+            print(f"      期待: {'ブロック' if want else '通過'} / "
+                  f"実際: {got if got else '通過'}")
+            ng += 1
+        elif want:
+            print(f"      → {got[0][:88]}")
+
+    print(f"\n公開ブロッカーの失敗 {ng}件")
+    return ng
+
+
 def run_claim_parse():
     """命題の解析を、構造化結果の**完全一致**で検証する。
 
@@ -265,6 +313,8 @@ def run_claims():
 
 if __name__ == "__main__":
     ng = run()
+    print()
+    ng += run_blockers()
     print()
     ng += run_claim_parse()
     print()
