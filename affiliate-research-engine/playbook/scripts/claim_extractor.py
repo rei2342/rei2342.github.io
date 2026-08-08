@@ -166,6 +166,9 @@ ACTION_FORM = {
     "継続": ("続けた", "続ける", "続けている"),
     "中断": ("やめた", "やめる", "やめている"),
     "受講": ("受けた", "受ける", "受けている"),
+    "相談": ("相談した", "相談する", "相談している"),
+    "診断": ("診断を受けた", "診断を受ける", "診断を受けている"),
+    "受ける": ("受けた", "受ける", "受けている"),
     "受験": ("受験した", "受験する", "受験している"),
     "登録": ("登録した", "登録する", "登録している"),
     "契約": ("契約した", "契約する", "契約している"),
@@ -238,6 +241,25 @@ NUM_RE = re.compile(r"([0-9][0-9,\.]*)\s*(年間|年|ヶ月|か月|カ月|週間
 
 # 「5年間」と「5年」、「3ヶ月」と「3か月」は同じ。表記を1つに寄せる
 UNIT_CANON = {"年間": "年", "か月": "ヶ月", "カ月": "ヶ月", "日間": "日"}
+
+# 数値は命題本文に混ぜず、属性として分ける。
+# 「TOEICを600点受ける」のような、意味の壊れた命題を作らないため。
+UNIT_KIND = {
+    "回": "count", "社": "count", "校": "count", "件": "count",
+    "本": "count", "コマ": "count", "ページ": "count", "人": "count",
+    "年": "duration", "ヶ月": "duration", "日": "duration",
+    "週間": "duration", "時間": "duration",
+    "点": "score", "円": "amount", "万円": "amount",
+    "分": "time_per_session", "歳": "age",
+}
+
+
+def classify_number(num, unit, before):
+    """数値を属性の種類に分ける。頻度は直前の語で判断する。"""
+    kind = UNIT_KIND.get(unit, "unknown_numeric")
+    if unit == "回" and re.search(r"(?:週|月|日|毎週|毎月|毎日)\s*$", before):
+        kind = "frequency"
+    return kind
 
 
 def canon_value(num, unit):
@@ -370,8 +392,37 @@ def parse(sent, carried=None, from_aff=False):
         return None
     (action, atype, vstart, pred, tense), target, quoted = picked
 
-    nm = NUM_RE.search(sent[:vstart]) or NUM_RE.search(sent)
-    value = canon_value(nm.group(1), nm.group(2)) if nm else ""
+    # 「受ける」は受験・受講・相談・診断のどれか分からない。
+    # 対象だけで決めず、周辺語も見る。分からなければ要確認にする
+    needs_review = ""
+    if action == "受講":
+        near = sent[max(0, vstart - 60):vstart + 20]
+        if target in ("TOEIC",) or re.search(r"試験|テスト|受験", near):
+            action = "受験"
+        elif target in ("レッスン", "無料体験") or re.search(r"レッスン|授業|講座", near):
+            action = "受講"
+        elif re.search(r"カウンセリング|無料相談|相談", near):
+            action = "相談"
+        elif re.search(r"診断|チェック", near):
+            action = "診断"
+        else:
+            action = "受ける"
+            needs_review = "「受ける」の意味を特定できない"
+
+    # 数値は「対象と述語の間」にあるものだけを結びつける。
+    # 近くにあるだけの数値を結合しない（600点を「受ける」の目的語にしない）
+    tpos = sent.rfind(target, 0, vstart)
+    zone = sent[tpos + len(target):vstart] if tpos >= 0 else ""
+    attrs = {}
+    for nm in NUM_RE.finditer(zone):
+        kind = classify_number(nm.group(1), nm.group(2), zone[:nm.start()])
+        attrs.setdefault(kind, canon_value(nm.group(1), nm.group(2)))
+    # 対象の直前にある数値も見る（「3ヶ月のレッスンを受けた」）
+    head = sent[max(0, tpos - 10):tpos] if tpos >= 0 else ""
+    for nm in NUM_RE.finditer(head):
+        kind = classify_number(nm.group(1), nm.group(2), head[:nm.start()])
+        attrs.setdefault(kind, canon_value(nm.group(1), nm.group(2)))
+    value = ""      # 命題本文には数値を入れない
 
     subj_here = scan_subject(sent)
     if subj_here == "情報源":
@@ -422,6 +473,7 @@ def parse(sent, carried=None, from_aff=False):
         "normalized_action": action, "original_predicate": pred,
         "act_type": atype, "target": target, "value": value,
         "tense": tense, "kind": kind, "experience": experience,
+        "attrs": attrs, "needs_review": needs_review,
         "quoted": "yes" if quoted else "",
         "from_affiliate_block": "yes" if from_aff else "",
         "sentence": sent[:200],
@@ -452,7 +504,8 @@ def main():
     posts = _wa.published()
     print(f"公開中 {len(posts)}本から命題を抜き出す\n")
 
-    props = defaultdict(lambda: {"rows": [], "posts": [], "variants": set()})
+    props = defaultdict(lambda: {"rows": [], "posts": [], "variants": set(),
+                                 "attrs": {}, "needs_review": ""})
     excluded = defaultdict(int)
     samples = defaultdict(list)
 
@@ -490,8 +543,7 @@ def main():
                 if not pr:
                     continue
                 # 統合キーは 対象＋行動＋正規化した数値
-                key = (f"{pr['target']}|{pr['normalized_action']}|"
-                       f"{pr['value']}|{pr['tense']}")
+                key = f"{pr['target']}|{pr['normalized_action']}|{pr['tense']}"
                 d = props[key]
                 ctx = " ".join(ss[max(0, i - 1):i + 2])[:260]
                 d["rows"].append({**pr, "context": ctx, "html_tag": tag,
@@ -499,6 +551,10 @@ def main():
                                   "post_id": p["id"], "url": p.get("link", ""),
                                   "title": title})
                 d["variants"].add(pr["sentence"][:60])
+                for k, v in pr["attrs"].items():
+                    d.setdefault("attrs", {}).setdefault(k, set()).add(v)
+                if pr["needs_review"]:
+                    d["needs_review"] = pr["needs_review"]
                 if p["id"] not in d["posts"]:
                     d["posts"].append(p["id"])
 
@@ -506,19 +562,18 @@ def main():
     # 同じと断定せず、別命題として残したうえで関係だけ記録する。
     subsumes = defaultdict(list)
     for key in props:
-        t, a, v, _tense = key.split("|")
-        if v:
-            continue
+        # 数値は属性になったので、包含関係は「時制ちがい」だけを見る
+        t, a, tn = key.split("|")
         for other in props:
-            ot, oa, ov, otn = other.split("|")
-            if ot == t and oa == a and otn == _tense and ov:
+            ot, oa, otn = other.split("|")
+            if ot == t and oa == a and otn != tn:
                 subsumes[key].append(other)
 
     ordered = sorted(props.items(), key=lambda kv: -len(kv[1]["posts"]))
     rows = []
     for i, (key, d) in enumerate(ordered, start=1):
         r0 = d["rows"][0]
-        t, a, v, _tense = key.split("|")
+        t, a, tn = key.split("|")
         claim = r0["claim"]      # 表示は行動と時制から作った文字列を使う
         rows.append({
             "claim_id": f"C{i:03d}", "claim": claim,
@@ -529,6 +584,9 @@ def main():
             "target": t, "value": v or "", "tense": r0["tense"],
             "experience": r0["experience"],
             "quoted": r0["quoted"], "from_affiliate_block": r0["from_affiliate_block"],
+            "attributes": " / ".join(f"{k}={'・'.join(sorted(vs))}"
+                                     for k, vs in sorted(d.get("attrs", {}).items())),
+            "needs_review": d.get("needs_review", ""),
             "html_tag": r0["html_tag"],
             "posts": len(d["posts"]),
             "post_ids": " ".join(str(x) for x in d["posts"][:12]),
@@ -594,6 +652,8 @@ def main():
                    f"分類: **{r['kind']}** / 体験: **{r['experience']}**\n")
         out.append(f"- 行動: {r['normalized_action']} / 時制: **{r['tense']}** / "
                    f"述語: `{r['original_predicate']}`\n")
+        out.append(f"- 数値属性: {r['attributes'] or '—'}"
+                   + (f" / ⚠️ {r['needs_review']}" if r['needs_review'] else "") + "\n")
         out.append(f"- 引用: {r['quoted'] or '—'} / "
                    f"アフィ段落由来: {r['from_affiliate_block'] or '—'} / "
                    f"`<{r['html_tag']}>` / {r['posts']}本\n")
