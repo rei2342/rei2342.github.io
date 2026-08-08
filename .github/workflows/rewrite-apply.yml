@@ -51,6 +51,13 @@ jobs:
           POSTS: ${{ inputs.posts }}
         run: python affiliate-research-engine/playbook/scripts/rewrite_apply.py
 
+      - name: 誤リンクのCTAを正しいリンクへ差し替えて再表示
+        if: inputs.restore_cta == 'true'
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/cta_restore.py
+
       - name: 誤リンクのCTAを一時非表示
         if: inputs.hide_cta == 'true'
         env:
