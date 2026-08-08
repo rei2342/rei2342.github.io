@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-08-09 00:40:20 JST",
+  "checked_at": "2026-08-09 00:47:14 JST",
   "settings": {
     "wordpress_api_key": "",
     "title": "さくらの大人英語学び直しガイド",
@@ -15,15 +15,25 @@
     "default_category": 1,
     "default_post_format": "0",
     "posts_per_page": 10,
-    "show_on_front": "posts",
-    "page_on_front": 0,
-    "page_for_posts": 0,
+    "show_on_front": "page",
+    "page_on_front": 643,
+    "page_for_posts": 642,
     "default_ping_status": "open",
     "default_comment_status": "open",
     "site_logo": null,
     "site_icon": 0
   },
   "pages": [
+    {
+      "id": 643,
+      "slug": "start",
+      "title": "さくらの大人英語学び直しガイド"
+    },
+    {
+      "id": 642,
+      "slug": "articles",
+      "title": "記事一覧"
+    },
     {
       "id": 69,
       "slug": "%e3%81%8a%e5%95%8f%e3%81%84%e5%90%88%e3%82%8f%e3%81%9b",
