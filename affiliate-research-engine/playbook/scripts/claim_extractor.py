@@ -223,6 +223,12 @@ def analyze(sent):
         else:
             modality = "factual"
 
+        # 「申し込んで、…相談してみるつもりだ」のように、て形の節は文末に
+        # 支配される。述語から40字の窓では文末の「つもり」に届かない
+        if modality == "factual" and te and tense == "unknown" and \
+                re.search(r"(?:つもり|予定)(?:だ|です)?[。！]?$", sent.rstrip()):
+            modality = "intention"
+
         # 「英語しか使わない」は英語を使わなかった話ではない。
         # 「しか」は否定の形で肯定を言う構文なので、極性を反転させない
         if re.search(r"しか", sent[max(0, bs - 30):bs]):
