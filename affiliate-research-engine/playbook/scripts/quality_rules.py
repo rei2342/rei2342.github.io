@@ -562,19 +562,48 @@ OFFICIAL_SPEC_RE = re.compile(
     r"|[0-9]+\s*(?:日間|ヶ月)[^。]{0,6}?(?:無料|トライアル)")
 
 
-def official_spec_without_source(text):
-    """公式の料金・仕様なのに、出典URLか確認日が欠けている文を返す。"""
+def _sentences_for_spec(html):
+    """料金・仕様の検査に使う文。
+
+    **ブロック単位で切ってから文に分ける。** 段落をつないでから切ると、
+    句点で終わらないCTA行と次の見出しが1文になって誤爆する
+    （2026-08-08に「7日間無料体験を見る」＋見出しで発生）。
+    **リンクの文言は検査しない。** CTAは定型で、出典を書く場所ではない。
+    """
     out = []
-    for s in re.split(r"(?<=[。？！])", text):
+    parts = re.split(r"(?i)(?=<(?:p|li|h[1-6]|td|blockquote)\b)", html) or [html]
+    for part in parts:
+        body = re.sub(r"<a\b[^>]*>.*?</a>", " ", part, flags=re.DOTALL | re.I)
+        for x in re.split(r"(?<=[。？！])", strip_tags(body)):
+            if x.strip():
+                out.append(x.strip())
+    return out
+
+
+def official_spec_without_source(html):
+    """公式の料金・仕様なのに、出典URLか確認日が欠けている文を返す。
+
+    出典は同じ段落にあれば足りる。リンクで示している場合もあるので、
+    段落全体（リンクのhrefを含む）を見て判定する。
+    """
+    out = []
+    parts = re.split(r"(?i)(?=<(?:p|li|h[1-6]|td|blockquote)\b)", html) or [html]
+    ctx = {}
+    for part in parts:
+        for x in _sentences_for_spec(part):
+            ctx[x] = part
+    for s in _sentences_for_spec(html):
         s = s.strip()
         if not s or not OFFICIAL_SPEC_RE.search(s):
             continue
         if HYPOTHETICAL_RE.search(s):
             continue                      # 「例として月5,000円を試算」は対象外
+        # 出典は同じ段落にあればよい（リンクで示していることが多い）
+        around = ctx.get(s, s)
         missing = []
-        if not SOURCE_URL_RE.search(s):
+        if not SOURCE_URL_RE.search(around):
             missing.append("出典")
-        if not BASEDATE_RE.search(s):
+        if not BASEDATE_RE.search(around):
             missing.append("確認日")
         if missing:
             out.append({"missing": "と".join(missing), "sentence": s[:180]})
@@ -587,6 +616,6 @@ def generation_blockers(html):
     for f in unverified_self_facts(html):
         issues.append(f"[{f['category']}] 台帳の裏付けが無い"
                       f"（{f['reason']}）: {f['matched']} … {f['sentence'][:70]}")
-    for f in official_spec_without_source(strip_tags(html)):
+    for f in official_spec_without_source(html):
         issues.append(f"[公式の料金・仕様] {f['missing']}が無い: {f['sentence'][:70]}")
     return issues
