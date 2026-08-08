@@ -56,7 +56,13 @@ def targets():
 
 
 def paragraphs(html):
-    """(見出し, 種別, 内側HTML, プレーン文) の並び。見出しは直近のものを持ち回る。"""
+    """(見出し, 種別, 内側HTML, プレーン文) の並び。見出しは直近のものを持ち回る。
+
+    目次・ナビは本文ではないので、抽出器と同じ規則で先に落とす。
+    落とさないと目次の塊が1段落として出てくる（2026-08-08に発生）。
+    """
+    import claim_extractor as _ce
+    html = _ce.strip_containers(html)
     out, head = [], ""
     for m in BLOCK_RE.finditer(html):
         tag, inner = m.group(1).lower(), m.group(2)
