@@ -1,157 +1,5 @@
-# 反映後の検証 2026-08-09 01:47:07 JST
+# 反映後の検証 2026-08-09 01:49:29 JST
 
-
----
-
-## ✅ 記事 136｜IELTS6.5に一度触れて、中学レベルに縮める記事を5年読んできた私
-
-https://sakura-eigo.com/%e3%80%8c%e6%b5%b7%e5%a4%96%e7%a7%bb%e4%bd%8f-%e6%ba%96%e5%82%99-%e8%8b%b1%e8%aa%9e%e3%81%a7%e3%81%8d%e3%81%aa%e3%81%84%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b6%e8%8b%b1%e8%aa%9e%e3%81%a7%e3%81%8d/
-
-- HTTP: 200 / 本文 5188字
-- H2 7本 / H3 0本
-- CTA 4本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/%e3%80%8c%e6%b5%b7%e5%a4%96%e7%a7%bb%e4%bd%8f-%e6%ba%96%e5%82%99-%e8%8b%b1%e8%aa%9e%e3%81%a7%e3%81%8d%e3%81%aa%e3%81%84%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b6%e8%8b%b1%e8%aa%9e%e3%81%a7%e3%81%8d/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
-
----
-
-## ✅ 記事 281｜帰国後の半年で消える英語を、「効果なし」と呼ぶ前に確認したい3つの数字
-
-https://sakura-eigo.com/philippines-english-study-after-return/
-
-- HTTP: 200 / 本文 4651字
-- H2 6本 / H3 5本
-- CTA 4本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/philippines-english-study-after-return/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640982&#038;p_id=6652&#038;pc_id=18969&#038;pl_id=84962`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640991&#038;p_id=4940&#038;pc_id=13178&#038;pl_id=65056&`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
-
----
-
-## ✅ 記事 305｜TOEIC600点より先に、初日の薬局で症状を伝えられるか確かめる
-
-https://sakura-eigo.com/working-holiday-english-level-needed/
-
-- HTTP: 200 / 本文 5207字
-- H2 6本 / H3 6本
-- CTA 4本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/working-holiday-english-level-needed/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
-
----
-
-## ✅ 記事 287｜67.4%が伸びた週3と、25分黙ったままの毎日。何が違うのか
-
-https://sakura-eigo.com/english-conversation-daily-effectiveness/
-
-- HTTP: 200 / 本文 5808字
-- H2 6本 / H3 5本
-- CTA 4本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/english-conversation-daily-effectiveness/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&#038;p_id=4347&#038;pc_id=11168&#038;pl_id=58884&`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
-
----
-
-## ✅ 記事 286｜単語帳を数ページで閉じてきた27歳が、口に出して初めて気づく「何から」の答え
-
-https://sakura-eigo.com/english-restart-at-30-speaking/
-
-- HTTP: 200 / 本文 5600字
-- H2 5本 / H3 10本
-- CTA 4本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/english-restart-at-30-speaking/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056&url=https%3A%2F`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
-
----
-
-## ✅ 記事 235｜帰国後も動き続ける仕組みを、セブ1ヶ月で作れるか、27歳の私が記事に見つけられない答え
-
-https://sakura-eigo.com/%e3%80%8c%e3%82%bb%e3%83%96%e5%b3%b6%e7%95%99%e5%ad%a6-1%e3%83%b6%e6%9c%88-%e4%bd%93%e9%a8%93%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e8%b2%bb%e7%94%a8%e3%83%bb%e3%82%b9%e3%82%b1%e3%82%b8%e3%83%a5/
-
-- HTTP: 200 / 本文 5386字
-- H2 6本 / H3 6本
-- CTA 4本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/%e3%80%8c%e3%82%bb%e3%83%96%e5%b3%b6%e7%95%99%e5%ad%a6-1%e3%83%b6%e6%9c%88-%e4%bd%93%e9%a8%93%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e8%b2%bb%e7%94%a8%e3%83%bb%e3%82%b9%e3%82%b1%e3%82%b8%e3%83%a5/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
-
----
-
-## ✅ 記事 67｜帰国後の床がないまま、5校を比べた2ヶ月を捨てた
-
-https://sakura-eigo.com/%e3%80%8c%e3%83%95%e3%82%a3%e3%83%aa%e3%83%94%e3%83%b3%e7%95%99%e5%ad%a6-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e3%81%8a%e3%81%99%e3%81%99%e3%82%81%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e5%ae%89%e3%81%84/
-
-- HTTP: 200 / 本文 5567字
-- H2 6本 / H3 13本
-- CTA 4本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/%e3%80%8c%e3%83%95%e3%82%a3%e3%83%aa%e3%83%94%e3%83%b3%e7%95%99%e5%ad%a6-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e3%81%8a%e3%81%99%e3%81%99%e3%82%81%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e5%ae%89%e3%81%84/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
-
----
-
-## ✅ 記事 19｜「英語 独学 社会人 方法」を10個集めても話せない人が、本当に欠いている1つの土台
-
-https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e7%8b%ac%e5%ad%a6-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e6%96%b9%e6%b3%95%e3%80%8d%e3%82%9210%e5%80%8b%e9%9b%86%e3%82%81%e3%81%a6%e3%82%82%e8%a9%b1%e3%81%9b%e3%81%aa%e3%81%84/
-
-- HTTP: 200 / 本文 5614字
-- H2 7本 / H3 14本
-- CTA 4本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e7%8b%ac%e5%ad%a6-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e6%96%b9%e6%b3%95%e3%80%8d%e3%82%9210%e5%80%8b%e9%9b%86%e3%82%81%e3%81%a6%e3%82%82%e8%a9%b1%e3%81%9b%e3%81%aa%e3%81%84/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559&url=https%3A%2F%`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI`
-
----
-
-## ✅ 記事 18｜留学エージェントのおすすめを18社比較し続ける限り、あなたは一生出発しない
-
-https://sakura-eigo.com/%e7%95%99%e5%ad%a6%e3%82%a8%e3%83%bc%e3%82%b8%e3%82%a7%e3%83%b3%e3%83%88%e3%81%ae%e3%81%8a%e3%81%99%e3%81%99%e3%82%81%e3%82%9218%e7%a4%be%e6%af%94%e8%bc%83%e3%81%97%e7%b6%9a%e3%81%91%e3%82%8b%e9%99%90/
-
-- HTTP: 200 / 本文 4872字
-- H2 6本 / H3 12本
-- CTA 4本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/%e7%95%99%e5%ad%a6%e3%82%a8%e3%83%bc%e3%82%b8%e3%82%a7%e3%83%b3%e3%83%88%e3%81%ae%e3%81%8a%e3%81%99%e3%81%99%e3%82%81%e3%82%9218%e7%a4%be%e6%af%94%e8%bc%83%e3%81%97%e7%b6%9a%e3%81%91%e3%82%8b%e9%99%90/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
 
 ---
 
@@ -159,34 +7,15 @@ https://sakura-eigo.com/%e7%95%99%e5%ad%a6%e3%82%a8%e3%83%bc%e3%82%b8%e3%82%a7%e
 
 https://sakura-eigo.com/second-language-acquisition-theory-gap/
 
-- HTTP: 200 / 本文 5068字
+- HTTP: 200 / 本文 5016字
 - H2 5本 / H3 3本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/second-language-acquisition-theory-gap/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
 - draft_gate: 通過 / cta_claim_gate: 通過
   - CTA: `//af.moshimo.com/af/c/click?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559&url=https%3A%2F%`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&#038;p_id=4347&#038;pc_id=11168&#038;pl_id=58884&`
   - CTA: `//af.moshimo.com/af/c/click?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056&url=https%3A%2F`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
-
----
-
-## ✅ 記事 297｜3ヶ月続けた8割に入る前に、最初の7日間で「話す恐怖」が薄れるかを試す
-
-https://sakura-eigo.com/dmm-eikaiwa-beginner-consistency-check/
-
-- HTTP: 200 / 本文 5346字
-- H2 6本 / H3 11本
-- CTA 4本 / 非表示にしたCTA 0箇所
-- canonical: https://sakura-eigo.com/dmm-eikaiwa-beginner-consistency-check/
-- noindex: なし / X-Robots-Tag: なし
-- 目次: あり
-- draft_gate: 通過 / cta_claim_gate: 通過
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&#038;p_id=4347&#038;pc_id=11168&#038;pl_id=58884&`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
 
 ---
 
@@ -194,9 +23,9 @@ https://sakura-eigo.com/dmm-eikaiwa-beginner-consistency-check/
 
 https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e5%8b%89%e5%bc%b7%e6%b3%95-30%e4%bb%a3-%e3%81%8b%e3%82%89%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e4%b8%ad%e5%ad%a6%e6%96%87%e6%b3%95%e3%82%84%e3%82%8a%e7%9b%b4/
 
-- HTTP: 200 / 本文 4451字
+- HTTP: 200 / 本文 4382字
 - H2 6本 / H3 0本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e5%8b%89%e5%bc%b7%e6%b3%95-30%e4%bb%a3-%e3%81%8b%e3%82%89%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e4%b8%ad%e5%ad%a6%e6%96%87%e6%b3%95%e3%82%84%e3%82%8a%e7%9b%b4/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
@@ -210,9 +39,9 @@ https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e5%8b%89%e5%bc%b7%e6%b3%95-
 
 https://sakura-eigo.com/online-english-conversation-speaking-time/
 
-- HTTP: 200 / 本文 4760字
+- HTTP: 200 / 本文 4684字
 - H2 6本 / H3 6本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/online-english-conversation-speaking-time/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
@@ -226,9 +55,9 @@ https://sakura-eigo.com/online-english-conversation-speaking-time/
 
 https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e3%83%b3%e3%82%b0-%e6%84%8f%e5%91%b3%e3%81%aa%e3%81%84%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e9%ab%98%e3%81%84%e3%83%bb%e7%b5%90%e5%b1%80/
 
-- HTTP: 200 / 本文 4496字
+- HTTP: 200 / 本文 4427字
 - H2 5本 / H3 0本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e3%83%b3%e3%82%b0-%e6%84%8f%e5%91%b3%e3%81%aa%e3%81%84%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e9%ab%98%e3%81%84%e3%83%bb%e7%b5%90%e5%b1%80/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
@@ -242,9 +71,9 @@ https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e
 
 https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e4%bc%9a%e8%a9%b1-%e7%b6%9a%e3%81%8b%e3%81%aa%e3%81%84-%e8%a7%a3%e6%b1%ba%e7%ad%96%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e7%bf%92%e6%85%a3%e5%8c%96%e3%81%ae%e3%82%b3%e3%83%84/
 
-- HTTP: 200 / 本文 4641字
+- HTTP: 200 / 本文 4565字
 - H2 6本 / H3 7本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e4%bc%9a%e8%a9%b1-%e7%b6%9a%e3%81%8b%e3%81%aa%e3%81%84-%e8%a7%a3%e6%b1%ba%e7%ad%96%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e7%bf%92%e6%85%a3%e5%8c%96%e3%81%ae%e3%82%b3%e3%83%84/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
@@ -258,10 +87,26 @@ https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e4%bc%9a%e8%a9%b1-%e7%b6%9a%e3%81%8b%
 
 https://sakura-eigo.com/free-study-abroad-agent-bias/
 
-- HTTP: 200 / 本文 4850字
+- HTTP: 200 / 本文 4798字
 - H2 6本 / H3 0本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/free-study-abroad-agent-bias/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 通過 / cta_claim_gate: 通過
+  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
+
+---
+
+## ✅ 記事 297｜3ヶ月続けた8割に入る前に、最初の7日間で「話す恐怖」が薄れるかを試す
+
+https://sakura-eigo.com/dmm-eikaiwa-beginner-consistency-check/
+
+- HTTP: 200 / 本文 5294字
+- H2 6本 / H3 11本
+- CTA 2本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/dmm-eikaiwa-beginner-consistency-check/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
 - draft_gate: 通過 / cta_claim_gate: 通過
@@ -274,9 +119,9 @@ https://sakura-eigo.com/free-study-abroad-agent-bias/
 
 https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e3%83%b3%e3%82%b0-3%e3%83%b6%e6%9c%88-%e5%8a%b9%e6%9e%9c-%e4%bd%93%e9%a8%93%e8%ab%87%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b6toeic155%e7%82%b9/
 
-- HTTP: 200 / 本文 4572字
+- HTTP: 200 / 本文 4520字
 - H2 5本 / H3 0本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e3%83%b3%e3%82%b0-3%e3%83%b6%e6%9c%88-%e5%8a%b9%e6%9e%9c-%e4%bd%93%e9%a8%93%e8%ab%87%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b6toeic155%e7%82%b9/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
@@ -290,17 +135,15 @@ https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e
 
 https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e3%82%bc%e3%83%ad%e3%81%8b%e3%82%89-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e3%81%a9%e3%81%ae%e3%81%8f%e3%82%89%e3%81%84%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b61000%e6%99%82%e9%96%93/
 
-- HTTP: 200 / 本文 5637字
+- HTTP: 200 / 本文 5585字
 - H2 7本 / H3 11本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e3%82%bc%e3%83%ad%e3%81%8b%e3%82%89-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e3%81%a9%e3%81%ae%e3%81%8f%e3%82%89%e3%81%84%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b61000%e6%99%82%e9%96%93/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
 - draft_gate: 通過 / cta_claim_gate: 通過
   - CTA: `//af.moshimo.com/af/c/click?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559&url=https%3A%2F%`
-  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F`
   - CTA: `//af.moshimo.com/af/c/click?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056&url=https%3A%2F`
-  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
 
 ---
 
@@ -308,9 +151,9 @@ https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e3%82%bc%e3%83%ad%e3%81%8b%
 
 https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e3%83%9a%e3%83%a9%e3%83%9a%e3%83%a9-%e3%81%ab%e3%81%aa%e3%82%8b-%e6%9c%9f%e9%96%93%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b2000%e6%99%82%e9%96%93%e3%83%bb2%e5%b9%b4/
 
-- HTTP: 200 / 本文 4323字
+- HTTP: 200 / 本文 4271字
 - H2 6本 / H3 8本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e3%83%9a%e3%83%a9%e3%83%9a%e3%83%a9-%e3%81%ab%e3%81%aa%e3%82%8b-%e6%9c%9f%e9%96%93%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b2000%e6%99%82%e9%96%93%e3%83%bb2%e5%b9%b4/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
@@ -324,9 +167,9 @@ https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e3%83%9a%e3%83%a9%e3%83%9a%
 
 https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e3%83%b3%e3%82%b0-%e6%8c%ab%e6%8a%98-%e3%81%97%e3%81%aa%e3%81%84-%e6%96%b9%e6%b3%95%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e7%9b%ae%e6%a8%99/
 
-- HTTP: 200 / 本文 4466字
+- HTTP: 200 / 本文 4414字
 - H2 6本 / H3 3本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e3%83%b3%e3%82%b0-%e6%8c%ab%e6%8a%98-%e3%81%97%e3%81%aa%e3%81%84-%e6%96%b9%e6%b3%95%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e7%9b%ae%e6%a8%99/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
@@ -340,9 +183,9 @@ https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e
 
 https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e5%8b%89%e5%bc%b7-%e3%83%a2%e3%83%81%e3%83%99-%e4%b8%8a%e3%81%92%e3%82%8b-%e6%96%b9%e6%b3%95%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e7%9b%ae%e6%a8%99%e8%a8%ad%e5%ae%9a/
 
-- HTTP: 200 / 本文 5088字
+- HTTP: 200 / 本文 5012字
 - H2 6本 / H3 11本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e5%8b%89%e5%bc%b7-%e3%83%a2%e3%83%81%e3%83%99-%e4%b8%8a%e3%81%92%e3%82%8b-%e6%96%b9%e6%b3%95%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e7%9b%ae%e6%a8%99%e8%a8%ad%e5%ae%9a/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
@@ -356,9 +199,9 @@ https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e5%8b%89%e5%bc%b7-%e3%83%a2
 
 https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e4%bc%9a%e8%a9%b1-%e4%b8%8a%e9%81%94-%e3%81%97%e3%81%aa%e3%81%84-%e7%90%86%e7%94%b1%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b8%e5%80%8b%e3%81%ae%e3%83%aa%e3%82%b9%e3%83%88%e3%82%92/
 
-- HTTP: 200 / 本文 4458字
+- HTTP: 200 / 本文 4385字
 - H2 6本 / H3 9本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e4%bc%9a%e8%a9%b1-%e4%b8%8a%e9%81%94-%e3%81%97%e3%81%aa%e3%81%84-%e7%90%86%e7%94%b1%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b8%e5%80%8b%e3%81%ae%e3%83%aa%e3%82%b9%e3%83%88%e3%82%92/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
@@ -372,9 +215,9 @@ https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e4%bc%9a%e8%a9%b1-%e4%b8%8a%e9%81%94-
 
 https://sakura-eigo.com/%e3%80%8c%e7%a4%be%e4%bc%9a%e4%ba%ba-%e7%95%99%e5%ad%a6-%e4%bb%95%e4%ba%8b%e8%be%9e%e3%82%81%e3%82%8b-%e4%b8%8d%e5%ae%89%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e5%86%8d%e5%b0%b1%e8%81%b7%e3%83%bb/
 
-- HTTP: 200 / 本文 4827字
+- HTTP: 200 / 本文 4775字
 - H2 6本 / H3 3本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e7%a4%be%e4%bc%9a%e4%ba%ba-%e7%95%99%e5%ad%a6-%e4%bb%95%e4%ba%8b%e8%be%9e%e3%82%81%e3%82%8b-%e4%b8%8d%e5%ae%89%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e5%86%8d%e5%b0%b1%e8%81%b7%e3%83%bb/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
@@ -388,9 +231,9 @@ https://sakura-eigo.com/%e3%80%8c%e7%a4%be%e4%bc%9a%e4%ba%ba-%e7%95%99%e5%ad%a6-
 
 https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e3%83%b3%e3%82%b0-%e6%96%99%e9%87%91-%e6%af%94%e8%bc%83-2024%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b63%e3%83%b6%e6%9c%8857%e4%b8%87%e3%83%bb%e6%9c%881/
 
-- HTTP: 200 / 本文 4447字
+- HTTP: 200 / 本文 4378字
 - H2 5本 / H3 15本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e3%83%b3%e3%82%b0-%e6%96%99%e9%87%91-%e6%af%94%e8%bc%83-2024%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b63%e3%83%b6%e6%9c%8857%e4%b8%87%e3%83%bb%e6%9c%881/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
@@ -404,10 +247,154 @@ https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e
 
 https://sakura-eigo.com/%e3%80%8c%e3%83%93%e3%82%b8%e3%83%8d%e3%82%b9%e8%8b%b1%e8%aa%9e-%e5%8b%89%e5%bc%b7%e6%b3%95-%e7%a4%be%e4%bc%9a%e4%ba%ba%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b%e5%ae%9a%e5%9e%8b%e8%a1%a8%e7%8f%be%e3%82%92/
 
-- HTTP: 200 / 本文 5359字
+- HTTP: 200 / 本文 5307字
 - H2 7本 / H3 10本
-- CTA 4本 / 非表示にしたCTA 0箇所
+- CTA 2本 / 非表示にしたCTA 0箇所
 - canonical: https://sakura-eigo.com/%e3%80%8c%e3%83%93%e3%82%b8%e3%83%8d%e3%82%b9%e8%8b%b1%e8%aa%9e-%e5%8b%89%e5%bc%b7%e6%b3%95-%e7%a4%be%e4%bc%9a%e4%ba%ba%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b%e5%ae%9a%e5%9e%8b%e8%a1%a8%e7%8f%be%e3%82%92/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 通過 / cta_claim_gate: 通過
+  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
+
+---
+
+## ✅ 記事 136｜IELTS6.5に一度触れて、中学レベルに縮める記事を5年読んできた私
+
+https://sakura-eigo.com/%e3%80%8c%e6%b5%b7%e5%a4%96%e7%a7%bb%e4%bd%8f-%e6%ba%96%e5%82%99-%e8%8b%b1%e8%aa%9e%e3%81%a7%e3%81%8d%e3%81%aa%e3%81%84%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b6%e8%8b%b1%e8%aa%9e%e3%81%a7%e3%81%8d/
+
+- HTTP: 200 / 本文 5136字
+- H2 7本 / H3 0本
+- CTA 2本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/%e3%80%8c%e6%b5%b7%e5%a4%96%e7%a7%bb%e4%bd%8f-%e6%ba%96%e5%82%99-%e8%8b%b1%e8%aa%9e%e3%81%a7%e3%81%8d%e3%81%aa%e3%81%84%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b6%e8%8b%b1%e8%aa%9e%e3%81%a7%e3%81%8d/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 通過 / cta_claim_gate: 通過
+  - CTA: `//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
+
+---
+
+## ✅ 記事 281｜帰国後の半年で消える英語を、「効果なし」と呼ぶ前に確認したい3つの数字
+
+https://sakura-eigo.com/philippines-english-study-after-return/
+
+- HTTP: 200 / 本文 4600字
+- H2 6本 / H3 5本
+- CTA 2本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/philippines-english-study-after-return/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 通過 / cta_claim_gate: 通過
+  - CTA: `//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
+
+---
+
+## ✅ 記事 305｜TOEIC600点より先に、初日の薬局で症状を伝えられるか確かめる
+
+https://sakura-eigo.com/working-holiday-english-level-needed/
+
+- HTTP: 200 / 本文 5142字
+- H2 6本 / H3 6本
+- CTA 2本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/working-holiday-english-level-needed/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 通過 / cta_claim_gate: 通過
+  - CTA: `//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
+
+---
+
+## ✅ 記事 287｜67.4%が伸びた週3と、25分黙ったままの毎日。何が違うのか
+
+https://sakura-eigo.com/english-conversation-daily-effectiveness/
+
+- HTTP: 200 / 本文 5756字
+- H2 6本 / H3 5本
+- CTA 2本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/english-conversation-daily-effectiveness/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 通過 / cta_claim_gate: 通過
+  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
+
+---
+
+## ✅ 記事 286｜単語帳を数ページで閉じてきた27歳が、口に出して初めて気づく「何から」の答え
+
+https://sakura-eigo.com/english-restart-at-30-speaking/
+
+- HTTP: 200 / 本文 5549字
+- H2 5本 / H3 10本
+- CTA 2本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/english-restart-at-30-speaking/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 通過 / cta_claim_gate: 通過
+  - CTA: `//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
+
+---
+
+## ✅ 記事 235｜帰国後も動き続ける仕組みを、セブ1ヶ月で作れるか、27歳の私が記事に見つけられない答え
+
+https://sakura-eigo.com/%e3%80%8c%e3%82%bb%e3%83%96%e5%b3%b6%e7%95%99%e5%ad%a6-1%e3%83%b6%e6%9c%88-%e4%bd%93%e9%a8%93%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e8%b2%bb%e7%94%a8%e3%83%bb%e3%82%b9%e3%82%b1%e3%82%b8%e3%83%a5/
+
+- HTTP: 200 / 本文 5321字
+- H2 6本 / H3 6本
+- CTA 2本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/%e3%80%8c%e3%82%bb%e3%83%96%e5%b3%b6%e7%95%99%e5%ad%a6-1%e3%83%b6%e6%9c%88-%e4%bd%93%e9%a8%93%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e8%b2%bb%e7%94%a8%e3%83%bb%e3%82%b9%e3%82%b1%e3%82%b8%e3%83%a5/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 通過 / cta_claim_gate: 通過
+  - CTA: `//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
+
+---
+
+## ✅ 記事 67｜帰国後の床がないまま、5校を比べた2ヶ月を捨てた
+
+https://sakura-eigo.com/%e3%80%8c%e3%83%95%e3%82%a3%e3%83%aa%e3%83%94%e3%83%b3%e7%95%99%e5%ad%a6-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e3%81%8a%e3%81%99%e3%81%99%e3%82%81%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e5%ae%89%e3%81%84/
+
+- HTTP: 200 / 本文 5502字
+- H2 6本 / H3 13本
+- CTA 2本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/%e3%80%8c%e3%83%95%e3%82%a3%e3%83%aa%e3%83%94%e3%83%b3%e7%95%99%e5%ad%a6-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e3%81%8a%e3%81%99%e3%81%99%e3%82%81%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e5%ae%89%e3%81%84/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 通過 / cta_claim_gate: 通過
+  - CTA: `//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE`
+
+---
+
+## ✅ 記事 19｜「英語 独学 社会人 方法」を10個集めても話せない人が、本当に欠いている1つの土台
+
+https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e7%8b%ac%e5%ad%a6-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e6%96%b9%e6%b3%95%e3%80%8d%e3%82%9210%e5%80%8b%e9%9b%86%e3%82%81%e3%81%a6%e3%82%82%e8%a9%b1%e3%81%9b%e3%81%aa%e3%81%84/
+
+- HTTP: 200 / 本文 5562字
+- H2 7本 / H3 14本
+- CTA 2本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e7%8b%ac%e5%ad%a6-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e6%96%b9%e6%b3%95%e3%80%8d%e3%82%9210%e5%80%8b%e9%9b%86%e3%82%81%e3%81%a6%e3%82%82%e8%a9%b1%e3%81%9b%e3%81%aa%e3%81%84/
+- noindex: なし / X-Robots-Tag: なし
+- 目次: あり
+- draft_gate: 通過 / cta_claim_gate: 通過
+  - CTA: `//af.moshimo.com/af/c/click?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559&url=https%3A%2F%`
+  - CTA: `https://px.a8.net/svt/ejp?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI`
+
+---
+
+## ✅ 記事 18｜留学エージェントのおすすめを18社比較し続ける限り、あなたは一生出発しない
+
+https://sakura-eigo.com/%e7%95%99%e5%ad%a6%e3%82%a8%e3%83%bc%e3%82%b8%e3%82%a7%e3%83%b3%e3%83%88%e3%81%ae%e3%81%8a%e3%81%99%e3%81%99%e3%82%81%e3%82%9218%e7%a4%be%e6%af%94%e8%bc%83%e3%81%97%e7%b6%9a%e3%81%91%e3%82%8b%e9%99%90/
+
+- HTTP: 200 / 本文 4820字
+- H2 6本 / H3 12本
+- CTA 2本 / 非表示にしたCTA 0箇所
+- canonical: https://sakura-eigo.com/%e7%95%99%e5%ad%a6%e3%82%a8%e3%83%bc%e3%82%b8%e3%82%a7%e3%83%b3%e3%83%88%e3%81%ae%e3%81%8a%e3%81%99%e3%81%99%e3%82%81%e3%82%9218%e7%a4%be%e6%af%94%e8%bc%83%e3%81%97%e7%b6%9a%e3%81%91%e3%82%8b%e9%99%90/
 - noindex: なし / X-Robots-Tag: なし
 - 目次: あり
 - draft_gate: 通過 / cta_claim_gate: 通過
