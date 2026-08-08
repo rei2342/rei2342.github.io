@@ -71,18 +71,19 @@ def run_claim_parse():
     import claim_extractor as ce
 
     # 「受ける」から派生してよい行動。ここに無いものへ変えたら動詞の捏造
-    ALLOWED_REFINE = {"受ける_未分類": {"受講", "受験", "相談", "診断", "受ける"}}
+    ALLOWED_REFINE = {"受ける_未分類": {"受講", "受験", "相談", "診断", "受ける"},
+                      "受ける": {"受講", "受験", "相談", "診断", "受ける"}}
 
     CASES = [
         ("英語コーチングを25万円受けて、卒業した。",
          dict(target_surface="英語コーチング", target_normalized="英語コーチング",
-              normalization_type="none", action_lemma="受ける_未分類",
+              normalization_type="none", action_lemma="受ける",
               action_normalized="受ける", tense="unknown",
               experience="possible", attrs={"amount": "25万円"}, needs_review=True)),
         # 原文の語を保持しているか（授業→レッスンに置き換えない）
         ("私は授業を25分受けた。",
          dict(target_surface="授業", target_normalized="レッスン",
-              normalization_type="exact_alias", action_lemma="受ける_未分類",
+              normalization_type="exact_alias", action_lemma="受ける",
               action_normalized="受講", tense="past", experience="yes",
               attrs={"time_per_session": "25分"}, needs_review=False)),
         ("私はスクールに4万5000円を払った。",
@@ -94,30 +95,50 @@ def run_claim_parse():
          dict(target_surface="英語コーチング", target_normalized="英語コーチング", normalization_type="none", action_lemma="支払", action_normalized="支払", tense="past",
               experience="yes", attrs={"amount": "25万円"}, needs_review=False)),
         ("3ヶ月57万円のコーチングを受けた。",
-         dict(target_surface="コーチング", target_normalized="英語コーチング", normalization_type="context_enrichment", action_lemma="受ける_未分類", action_normalized="受ける", tense="past",
+         dict(target_surface="コーチング", target_normalized="英語コーチング", normalization_type="context_enrichment", action_lemma="受ける", action_normalized="受ける", tense="past",
               experience="possible",
               attrs={"duration": "3ヶ月", "amount": "57万円"}, needs_review=True)),
         ("私はスクールに4万5000円を溶かした。",
          dict(target_surface="スクール", target_normalized="英会話スクール", normalization_type="context_enrichment", action_lemma="浪費", action_normalized="浪費", tense="past",
               experience="yes", attrs={"amount": "4万5000円"}, needs_review=False)),
         ("私はTOEICを600点で受けた。",
-         dict(target_surface="TOEIC", target_normalized="TOEIC", normalization_type="none", action_lemma="受ける_未分類", action_normalized="受験", tense="past",
+         dict(target_surface="TOEIC", target_normalized="TOEIC", normalization_type="none", action_lemma="受ける", action_normalized="受験", tense="past",
               experience="yes", attrs={"score": "600点"}, needs_review=False)),
         ("私はレッスンを25分受けた。",
-         dict(target_surface="レッスン", target_normalized="レッスン", normalization_type="none", action_lemma="受ける_未分類", action_normalized="受講", tense="past",
+         dict(target_surface="レッスン", target_normalized="レッスン", normalization_type="none", action_lemma="受ける", action_normalized="受講", tense="past",
               experience="yes", attrs={"time_per_session": "25分"}, needs_review=False)),
         ("週3回レッスンを受けている。",
-         dict(target_surface="レッスン", target_normalized="レッスン", normalization_type="none", action_lemma="受ける_未分類", action_normalized="受講", tense="progressive",
+         dict(target_surface="レッスン", target_normalized="レッスン", normalization_type="none", action_lemma="受ける", action_normalized="受講", tense="progressive",
               experience="possible", attrs={"frequency": "3回"}, needs_review=False)),
         ("留学情報館を受けた。",
-         dict(target_surface="留学情報館", target_normalized="留学情報館", normalization_type="none", action_lemma="受ける_未分類", action_normalized="受ける", tense="past",
+         dict(target_surface="留学情報館", target_normalized="留学情報館", normalization_type="none", action_lemma="受ける", action_normalized="受ける", tense="past",
               experience="possible", attrs={}, needs_review=True)),
         ("私はオンライン英会話を3ヶ月続けた。",
          dict(target_surface="オンライン英会話", target_normalized="オンライン英会話", normalization_type="none", action_lemma="継続", action_normalized="継続", tense="past",
               experience="yes", attrs={"duration": "3ヶ月"}, needs_review=False)),
     ]
 
+    # 否定・法性の検証。否定でも本人の体験事実はある
+    POLARITY_CASES = [
+        ("私は英語コーチングを契約しなかった。", "negative", "factual", "yes"),
+        ("その場で契約する必要もない。", None, None, None),          # 命題を作らない
+        ("セブに大金を払う前に自分の部屋で味わえた。", "affirmative", "prospective", "no"),
+        ("私はスパトレを試した。", "affirmative", "factual", "yes"),
+    ]
     ng = 0
+    for text, pol, mod, exp in POLARITY_CASES:
+        got, _ = ce.parse_all(text)
+        r = got[0] if got else None
+        if pol is None:
+            ok = not got
+        else:
+            ok = bool(r) and (r["polarity"], r["modality"], r["experience"]) == (pol, mod, exp)
+        print(("OK  " if ok else "NG  ") + text)
+        if not ok:
+            print(f"      期待: {pol}/{mod}/{exp}  実際: "
+                  + (f"{r['polarity']}/{r['modality']}/{r['experience']}" if r else "(命題なし)"))
+            ng += 1
+
     for text, want in CASES:
         r = ce.parse(text)
         diffs = []
@@ -133,7 +154,7 @@ def run_claim_parse():
                 diffs.append(f"needs_review: 期待={want['needs_review']} "
                              f"実際={bool(r['needs_review'])}")
             # 原文にない動詞を作っていないか
-            bases = {a for a, _t, _s, _p, _tn in ce.analyze(text)}
+            bases = {c[0] for c in ce.analyze(text)}
             act = r["action_normalized"]
             if act not in bases:
                 if not any(act in ALLOWED_REFINE.get(b, set()) for b in bases):

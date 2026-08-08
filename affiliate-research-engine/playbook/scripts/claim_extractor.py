@@ -98,7 +98,7 @@ def analyze(sent):
             for k in (1, 2):
                 nxt = spans[i + k][2] if i + k < len(spans) else None
                 if nxt and (nxt.base_form in ("する", "できる")
-                            or nxt.surface in ("し", "する", "さ")):
+                            or nxt.surface in ("し", "する", "さ", "せ")):
                     skip = k
                     break
             if not skip:
@@ -108,6 +108,7 @@ def analyze(sent):
 
         action, atype = LEMMA_ACT[base]
         past = polite = prog = cond = vol = nonpast = False
+        negative = False
         end, te = be, False
         j = i + 1 + skip
         while j < len(spans):
@@ -126,8 +127,12 @@ def analyze(sent):
                     polite = True
                 elif b in ("う", "よう", "たい"):
                     vol = True
+                elif b in ("ない", "ぬ"):
+                    negative = True
                 elif b == "だ" and tk.surface in ("だ", "な"):
                     past = past or tk.surface == "だ"
+            elif p1 == "助詞" and sf in ("ず", "ずに"):
+                negative = True
             elif p1 == "動詞" and b in AUX_VERB:
                 if b == "いる" and te:
                     prog = True
@@ -153,7 +158,25 @@ def analyze(sent):
         else:
             tense = "present" if j == i + 1 else "unknown"
 
-        out.append((action, atype, bs, sent[bs:end], tense))
+        # 法性。助言・必要・可能・意志は、本人がやった事実ではない
+        after = sent[bs:bs + 40]
+        if re.search(r"必要(?:は|が)?ない|必要が?ある|べき|なければ|なくてもい", after):
+            modality = "necessity"
+        elif re.search(r"かもしれ|できる|得る|可能", after):
+            modality = "possibility"
+        elif vol:
+            modality = "intention"
+        elif cond:
+            modality = "conditional"
+        elif re.search(r"ほしい|ましょう|おすすめ|といい|してみて", after):
+            modality = "advice"
+        elif re.search(r"^[^。]{0,8}前に", after[len(sent[bs:end]):] or after):
+            modality = "prospective"     # 「払う前に」＝まだやっていない
+        else:
+            modality = "factual"
+
+        polarity = "negative" if negative else "affirmative"
+        out.append((action, atype, bs, sent[bs:end], tense, polarity, modality))
     return out
 
 
@@ -321,6 +344,31 @@ EXCLUDE_HTML = {
 }
 
 
+# 目次・ナビ・関連記事は本文ではない。文字列（Toggle等）ではなく構造で外す
+CONTAINER_RE = re.compile(
+    r'<(div|nav|aside|section)\b[^>]*(?:id|class)="[^"]*'
+    r'(toc|ez-toc|widget|sidebar|related|breadcrumb|nav|footer|share)[^"]*"[^>]*>',
+    re.IGNORECASE)
+
+
+def strip_containers(html):
+    """目次などのコンテナを、入れ子を数えて丸ごと落とす。"""
+    while True:
+        m = CONTAINER_RE.search(html)
+        if not m:
+            return html
+        tag, i, depth = m.group(1), m.end(), 1
+        pat = re.compile(rf"</?{tag}\b", re.IGNORECASE)
+        while depth and i < len(html):
+            n = pat.search(html, i)
+            if not n:
+                i = len(html)
+                break
+            depth += -1 if n.group(0).startswith("</") else 1
+            i = n.end()
+        html = html[:m.start()] + html[i:]
+
+
 def blocks(html):
     """記事HTMLを (種別, 除外理由 or None, 文の並び, 除外時の残り本文) で返す。
 
@@ -333,7 +381,7 @@ def blocks(html):
     「要確認」として別一覧に出す（黙って捨てない）。
     """
     import affiliate_inserter as _ai2
-    html = _ai2.strip_box(html)
+    html = strip_containers(_ai2.strip_box(html))
     out = []
     for m in BLOCK_RE.finditer(html):
         tag = m.group(1).lower()
@@ -386,85 +434,66 @@ def detect_tense(sent):
     return "unknown"
 
 
-def parse(sent, carried=None, from_aff=False):
-    """1文から命題を取り出す。取れなければ None。"""
-    general = bool(re.search(GENERAL_MARK, sent))
-    quotes = quote_spans(sent)
+def _one(sent, cand, quotes, carried, from_aff, general):
+    """1つの述語から命題を作る。作れなければ None。"""
+    action, atype, vstart, pred, tense, polarity, modality = cand
+    in_quote = any(a <= vstart < b for a, b in quotes)
 
-    cands = analyze(sent)
-    if not cands:
+    best = None
+    for n, variants in TARGETS:
+        for tpat, ntype in variants:
+            for tm in re.finditer(tpat, sent):
+                if tm.end() > vstart:
+                    continue
+                if any(a <= tm.start() < b for a, b in quotes) and not in_quote:
+                    continue
+                tail = sent[tm.end():tm.end() + 2]
+                score = (vstart - tm.end()) - (30 if re.match(r"[をにへで]", tail) else 0)
+                if best is None or score < best[0]:
+                    best = (score, n, tm.group(0), ntype, tm.start(), tm.end())
+    if not best:
         return None
-    # 引用の外にある述語を優先する。無ければ引用内のものを使い、印を付ける
-    outside = [c for c in cands if not any(a <= c[2] < b for a, b in quotes)]
-    ordered_cands = outside + [c for c in cands if c not in outside]
+    _sc, target_norm, target_surface, ntype, tstart, tend = best
 
-    # 述語ごとに目的語を探し、取れたものを採用する。
-    # 最初の候補に目的語が無いだけで諦めない
-    picked = None
-    for cand in ordered_cands:
-        _a, _t, vstart, _p, _tn = cand
-        in_quote = any(a <= vstart < b for a, b in quotes)
-        best = None
-        for n, variants in TARGETS:
-            for tpat, ntype in variants:
-                for tm in re.finditer(tpat, sent):
-                    if tm.end() > vstart:
-                        continue
-                    if any(a <= tm.start() < b for a, b in quotes) and not in_quote:
-                        continue  # 引用内の語を、引用外の述語の目的語にしない
-                    tail = sent[tm.end():tm.end() + 2]
-                    score = ((vstart - tm.end())
-                             - (30 if re.match(r"[をにへで]", tail) else 0))
-                    if best is None or score < best[0]:
-                        # 原文の表記も残す。正規化名で原文を探し直すと
-                        # 見つからない（英語コーチング vs コーチング）
-                        best = (score, n, tm.group(0), ntype, tm.start(), tm.end())
-        if best:
-            picked = (cand, best, in_quote)
-            break
-    if not picked:
-        return None
-    (action, atype, vstart, pred, tense) = picked[0]
-    _sc, target_norm, target_surface, ntype, tstart, tend = picked[1]
-    quoted = picked[2]
-    target = target_surface       # 表示は必ず原文の表記を使う
-
-    # 「受ける」は受験・受講・相談・診断のどれか分からない。
-    # 対象だけで決めず、周辺語も見る。分からなければ要確認にする
+    # **不変条件**: 原文の該当位置に、その語が実在すること。
+    # 位置と文字列がずれていたら、別ブロックとの誤結合か状態の持ち越し
     needs_review = ""
-    action_lemma = action
+    if sent[tstart:tend] != target_surface:
+        return {"_invalid": f"target_surface が原文の位置と一致しない "
+                            f"（{target_surface!r} vs {sent[tstart:tend]!r}）"}
+
+    action_lemma = "受ける" if action == "受ける_未分類" else action
+    normalization_status = "classified"
     action_reason = ""
     if action == "受ける_未分類":
+        normalization_status = "unclassified"
         near = sent[max(0, vstart - 60):vstart + 20]
         if target_norm == "TOEIC" or re.search(r"試験|テスト|受験", near):
             action, action_reason = "受験", "対象がTOEIC／周辺に試験・受験がある"
+            normalization_status = "classified"
         elif target_norm in ("レッスン", "無料体験") or re.search(r"レッスン|授業|講座", near):
             action, action_reason = "受講", "対象がレッスン／周辺に授業・講座がある"
+            normalization_status = "classified"
         elif re.search(r"カウンセリング|無料相談|相談", near):
             action, action_reason = "相談", "周辺にカウンセリング・相談がある"
+            normalization_status = "classified"
         elif re.search(r"診断|チェック", near):
             action, action_reason = "診断", "周辺に診断・チェックがある"
+            normalization_status = "classified"
         else:
             action, action_reason = "受ける", "対象・周辺語から意味を特定できない"
             needs_review = "「受ける」の意味を特定できない"
 
-
-    # 数値は「対象と述語の間」にあるものだけを結びつける。
-    # 近くにあるだけの数値を結合しない（600点を「受ける」の目的語にしない）
     zone = sent[tend:vstart]
     attrs = {}
     for nm in NUM_RE.finditer(zone):
-        kind = classify_number(nm.group(1), nm.group(2), zone[:nm.start()])
-        attrs.setdefault(kind, canon_value(nm.group(1), nm.group(2)))
-    # 対象を修飾する数値も見る（「3ヶ月57万円のコーチングを受けた」）。
-    # 直前20字までを見て、間に句読点があればそこで切る
+        attrs.setdefault(classify_number(nm.group(1), nm.group(2), zone[:nm.start()]),
+                         canon_value(nm.group(1), nm.group(2)))
     head = re.split(r"[、。]", sent[max(0, tstart - 20):tstart])[-1]
     for nm in NUM_RE.finditer(head):
-        kind = classify_number(nm.group(1), nm.group(2), head[:nm.start()])
-        attrs.setdefault(kind, canon_value(nm.group(1), nm.group(2)))
-    value = ""      # 命題本文には数値を入れない
-    # 数値属性は行動を補足するだけ。**原文にない動詞を作らない。**
-    # 金額があるからといって「払った」にしてはいけない
+        attrs.setdefault(classify_number(nm.group(1), nm.group(2), head[:nm.start()]),
+                         canon_value(nm.group(1), nm.group(2)))
+
     if attrs.get("amount") and action not in ("支払", "浪費"):
         needs_review = (needs_review + " / " if needs_review else "") + \
             "金額があるが支払いの動詞ではない（対象と金額の関係を確認）"
@@ -481,13 +510,17 @@ def parse(sent, carried=None, from_aff=False):
     else:
         subj, conf = "unknown", "unknown"
 
-    # 分類と体験判定は必ず整合させる
-    if quoted:
+    # 否定でも本人の体験事実はある（私は契約しなかった）。
+    # 体験でなくなるのは、必要・可能・意志・助言・条件のとき
+    if in_quote:
         kind, experience = "引用", "no"
     elif general or subj == "第三者":
         kind, experience = "一般論", "no"
-    elif tense in ("future", "conditional"):
-        kind, experience = ("予定" if tense == "future" else "条件"), "no"
+    elif modality in ("necessity", "possibility", "intention", "advice",
+                      "prospective"):
+        kind, experience = modality, "no"
+    elif modality == "conditional" or tense in ("future", "conditional"):
+        kind, experience = ("条件" if modality == "conditional" else "予定"), "no"
     elif atype == "調査":
         kind, experience = "調査", "no"
     elif subj == "さくら":
@@ -497,7 +530,7 @@ def parse(sent, carried=None, from_aff=False):
     else:
         kind, experience = "体験", "possible"
 
-    forms = ACTION_FORM.get(action)
+    forms = ACTION_FORM.get(action, ("した", "する", "している"))
     if tense == "past":
         verb = forms[0]
     elif tense in ("future", "conditional", "present"):
@@ -505,28 +538,63 @@ def parse(sent, carried=None, from_aff=False):
     elif tense == "progressive":
         verb = forms[2]
     else:
-        verb = pred          # unknown は原文の述語をそのまま出す
+        verb = pred
+    if polarity == "negative":
+        verb += "（否定）"
 
-    claim = f"{target}を{value}{verb}" if value else f"{target}を{verb}"
+    claim = f"{target_surface}を{verb}"
     if action in ("留学", "渡航"):
-        claim = f"{target}へ{value}{verb}" if value else f"{target}へ{verb}"
+        claim = f"{target_surface}へ{verb}"
     if action == "就業":
-        claim = f"{target}として{verb}"
+        claim = f"{target_surface}として{verb}"
 
     return {
         "claim": claim, "subject": subj, "subject_confidence": conf,
         "target_surface": target_surface, "target_normalized": target_norm,
         "normalization_type": ntype,
+        "target_start": tstart, "target_end": tend,
         "action_surface": pred, "action_lemma": action_lemma,
         "action_normalized": action, "action_normalization_reason": action_reason,
+        "normalization_status": normalization_status,
+        "polarity": polarity, "modality": modality,
         "normalized_action": action, "original_predicate": pred,
-        "act_type": atype, "target": target, "value": value,
+        "act_type": atype, "target": target_surface, "value": "",
         "tense": tense, "kind": kind, "experience": experience,
         "attrs": attrs, "needs_review": needs_review,
-        "quoted": "yes" if quoted else "",
+        "quoted": "yes" if in_quote else "",
         "from_affiliate_block": "yes" if from_aff else "",
-        "sentence": sent[:200],
+        "sentence": sent[:200], "source_text": sent,
     }
+
+
+def parse_all(sent, carried=None, from_aff=False):
+    """1文から命題を全部取り出す。「契約せずに比較した」は2件になる。"""
+    general = bool(re.search(GENERAL_MARK, sent))
+    quotes = quote_spans(sent)
+    out, bad = [], []
+    for cand in analyze(sent):
+        r = _one(sent, cand, quotes, carried, from_aff, general)
+        if not r:
+            continue
+        if r.get("_invalid"):
+            bad.append(r["_invalid"])
+            continue
+        out.append(r)
+    # 同じ対象×同じ行動が重複したら1つにする
+    seen, uniq = set(), []
+    for r in out:
+        k = (r["target_surface"], r["action_normalized"], r["polarity"])
+        if k in seen:
+            continue
+        seen.add(k)
+        uniq.append(r)
+    return uniq, bad
+
+
+def parse(sent, carried=None, from_aff=False):
+    """先頭の命題だけ返す（テスト用）。"""
+    got, _ = parse_all(sent, carried, from_aff)
+    return got[0] if got else None
 
 
 def setting_hit(prop):
@@ -555,6 +623,7 @@ def main():
 
     props = defaultdict(lambda: {"rows": [], "posts": [], "variants": set(),
                                  "attrs": {}, "needs_review": ""})
+    broken = []   # 不変条件に違反した抽出
     excluded = defaultdict(int)
     samples = defaultdict(list)
 
@@ -588,36 +657,37 @@ def main():
 
                 carried = (para_subj and (para_subj, "inherited_paragraph")) or \
                           (section_subj and (section_subj, "inherited_section"))
-                pr = parse(sent, carried, from_aff)
-                if not pr:
-                    continue
-                # 統合キーは 対象＋行動＋正規化した数値
-                # 重複整理には正規化語を使い、表示には原文の語を使う
-                key = (f"{pr['target_normalized']}|{pr['action_normalized']}|"
-                       f"{pr['tense']}")
-                d = props[key]
-                ctx = " ".join(ss[max(0, i - 1):i + 2])[:260]
-                d["rows"].append({**pr, "context": ctx, "html_tag": tag,
-
-                                  "post_id": p["id"], "url": p.get("link", ""),
-                                  "title": title})
-                d["variants"].add(pr["sentence"][:60])
-                for k, v in pr["attrs"].items():
-                    d.setdefault("attrs", {}).setdefault(k, set()).add(v)
-                if pr["needs_review"]:
-                    d["needs_review"] = pr["needs_review"]
-                if p["id"] not in d["posts"]:
-                    d["posts"].append(p["id"])
+                prs, invalids = parse_all(sent, carried, from_aff)
+                for msg in invalids:
+                    broken.append((p["id"], msg, sent[:80]))
+                for pr in prs:
+                    tkey = (pr["target_normalized"]
+                            if pr["normalization_type"] in ("none", "exact_alias")
+                            else pr["target_surface"])
+                    key = (f"{tkey}|{pr['action_normalized']}|{pr['tense']}"
+                           f"|{pr['polarity']}")
+                    d = props[key]
+                    ctx = " ".join(ss[max(0, i - 1):i + 2])[:260]
+                    d["rows"].append({**pr, "context": ctx, "html_tag": tag,
+                                      "post_id": p["id"], "url": p.get("link", ""),
+                                      "title": title})
+                    d["variants"].add(pr["sentence"][:60])
+                    for k, v in pr["attrs"].items():
+                        d.setdefault("attrs", {}).setdefault(k, set()).add(v)
+                    if pr["needs_review"]:
+                        d["needs_review"] = pr["needs_review"]
+                    if p["id"] not in d["posts"]:
+                        d["posts"].append(p["id"])
 
     # 数値なしの命題は、数値ありの命題を包含している可能性がある。
     # 同じと断定せず、別命題として残したうえで関係だけ記録する。
     subsumes = defaultdict(list)
     for key in props:
         # 数値は属性になったので、包含関係は「時制ちがい」だけを見る
-        t, a, tn = key.split("|")
+        t, a, tn, pol = key.split("|")
         for other in props:
-            ot, oa, otn = other.split("|")
-            if ot == t and oa == a and otn != tn:
+            ot, oa, otn, opol = other.split("|")
+            if ot == t and oa == a and (otn, opol) != (tn, pol):
                 subsumes[key].append(other)
 
     ordered = sorted(props.items(), key=lambda kv: -len(kv[1]["posts"]))
@@ -638,6 +708,9 @@ def main():
             "action_lemma": r0["action_lemma"],
             "action_normalized": r0["action_normalized"],
             "action_normalization_reason": r0["action_normalization_reason"],
+            "normalization_status": r0["normalization_status"],
+            "polarity": r0["polarity"], "modality": r0["modality"],
+            "target_start": r0["target_start"], "target_end": r0["target_end"],
             "value": "", "tense": r0["tense"],
             "experience": r0["experience"],
             "quoted": r0["quoted"], "from_affiliate_block": r0["from_affiliate_block"],
@@ -653,9 +726,18 @@ def main():
             "subsumed_by": "",
             "setting_source": " ".join(setting_hit(r0)) or "（該当なし）",
             "needs": NEEDS.get(a, "本人の確認"),
-            "confirmation": "",
+            "confirmation": "", "related_claims": "",
             "_key": key,
         })
+
+    # 上位概念化・文脈補完は統合しないが、関連としては紐づける
+    bynorm = defaultdict(list)
+    for r in rows:
+        bynorm[(r["target_normalized"], r["action_normalized"])].append(r["claim_id"])
+    for r in rows:
+        r["related_claims"] = " ".join(
+            [c for c in bynorm[(r["target_normalized"], r["action_normalized"])]
+             if c != r["claim_id"]][:6])
 
     idx = {r["_key"]: r["claim_id"] for r in rows}
     for r in rows:
@@ -664,6 +746,16 @@ def main():
         r.pop("_key")
 
     # 分類が「体験」なのに experience=no は矛盾。出したら気づけるようにする
+    # 以前「要確認」で見つかった記事の体験主張が、いまも取れているか
+    have = {q for r in rows for q in r["post_ids"].split()}
+    missing = {"282", "283", "286", "138"} - have
+    if missing:
+        print(f"⚠️ 回帰: 記事 {sorted(missing)} から命題が1件も取れていない")
+    if broken:
+        print(f"⚠️ 不変条件違反 {len(broken)}件:")
+        for pid, msg, ex in broken[:5]:
+            print(f"   [{pid}] {msg} / {ex}")
+
     bad = [r for r in rows
            if (r["kind"] == "体験") != (r["experience"] in ("yes", "possible"))]
     if bad:
