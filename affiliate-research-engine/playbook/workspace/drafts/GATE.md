@@ -7,19 +7,3 @@
 ## ✅ 通過 310.html
 
 問題なし。WordPressへ送ってよい。
-
-## ✅ 通過 304.html
-
-問題なし。WordPressへ送ってよい。
-
-## ✅ 通過 282.html
-
-問題なし。WordPressへ送ってよい。
-
-## ✅ 通過 521.html
-
-問題なし。WordPressへ送ってよい。
-
-## ✅ 通過 32.html
-
-問題なし。WordPressへ送ってよい。
