@@ -1,0 +1,3 @@
+severity,title,detail,urls,suggested_fix,auto_fixed
+low,descriptionが重複している,1組,3,記事ごとに書く,
+high,記事の大半が内部リンクで繋がっていない,孤立 49/49本。クロールの導線が弱い,49,監査済みの記事から順に相互リンクを足す,
