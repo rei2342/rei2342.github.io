@@ -88,7 +88,7 @@ LINKS = {
     ),
     "qq_english": (
         "a8_s00000020929001",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2IHWQA+4HHM+669JM" rel="nofollow">→ QQ English（セブ島発・教師は全員正社員）の無料体験レッスンを予約する</a><img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=4B9W9D+2IHWQA+4HHM+669JM" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2IHWQA+4HHM+60H7M" rel="nofollow">→ QQ English公式サイトでレッスンの内容と料金を確認する</a><img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=4B9W9D+2IHWQA+4HHM+60H7M" alt="" loading="lazy">'
     ),
     "nativecamp": (
         "a8_s00000014758001",
