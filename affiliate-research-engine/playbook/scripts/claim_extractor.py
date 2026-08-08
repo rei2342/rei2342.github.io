@@ -73,6 +73,16 @@ AUX_VERB = {"いる", "ある", "みる", "しまう", "くる", "おく", "ほ�
             "する", "できる", "なる"}
 COND_SURF = {"ば", "たら", "なら", "れば"}
 
+# 複合動詞の後ろ側。前の動詞に付いて相を足すだけで、目的語は取らない
+COMPOUND_V2 = {"続ける", "始める", "終える", "直す", "切る", "出す", "込む",
+               "きる", "つづける", "はじめる"}
+
+# 問いの文。「〜たどり着けるのか。」はやった事実の記述ではない
+QUESTION_RE = re.compile(r"(?:のか|だろうか|でしょうか|ますか|ですか)[。？]?\s*$")
+
+# 連体修飾の主名詞。「本契約しなかった人は」の主語はさくらではない
+RELATIVE_HEAD_RE = re.compile(r"^[^。、]{0,6}?(人|方|者|層|タイプ)(?:は|が|も|の|に|、)")
+
 
 def analyze(sent):
     """文から (行動, 種別, 開始位置, 述語の表層, 時制) を取り出す。
@@ -106,6 +116,16 @@ def analyze(sent):
         elif pos1 != "動詞":
             continue
 
+        # 複合動詞の後ろ側（言い**続ける**・調べ**始める**）は、
+        # 目的語を自分では取らない。「ワーホリで海外に行きたいと言い続けて」を
+        # 「ワーホリを続けた」にしてしまうため、後ろ側からは命題を作らない。
+        # 前側（言う）が LEMMA_ACT にあるなら、そちらが同じ対象を拾う
+        if base in COMPOUND_V2 and i > 0:
+            pv = spans[i - 1][2]
+            if pv.part_of_speech.split(",")[0] == "動詞" \
+                    and "連用" in getattr(pv, "infl_form", ""):
+                continue
+
         action, atype = LEMMA_ACT[base]
         past = polite = prog = cond = vol = nonpast = False
         negative = False
@@ -133,6 +153,10 @@ def analyze(sent):
                     past = past or tk.surface == "だ"
             elif p1 == "助詞" and sf in ("ず", "ずに"):
                 negative = True
+            elif p1 == "動詞" and b in COMPOUND_V2:
+                # 「使い続けた」の「た」は続けるの後ろに付く。
+                # ここで切ると前側の動詞が現在形に見えてしまう
+                pass
             elif p1 == "動詞" and b in AUX_VERB:
                 if b == "いる" and te:
                     prog = True
@@ -160,8 +184,11 @@ def analyze(sent):
 
         # 法性。助言・必要・可能・意志は、本人がやった事実ではない
         after = sent[bs:bs + 40]
-        if re.search(r"必要(?:は|が)?ない|必要が?ある|べき|なければ|なくてもい", after):
+        if re.search(r"必要(?:は|が|も)?ない|必要が?ある|べき|なければ|なくてもい", after):
             modality = "necessity"
+        elif re.search(r"なくても|ないでも|ずとも", after):
+            # 「TOEICを毎月受けなくても〜できる」は、受けなかった事実ではない
+            modality = "concessive"
         elif re.search(r"かもしれ|できる|得る|可能", after):
             modality = "possibility"
         elif vol:
@@ -172,9 +199,16 @@ def analyze(sent):
             modality = "advice"
         elif re.search(r"^[^。]{0,8}前に", after[len(sent[bs:end]):] or after):
             modality = "prospective"     # 「払う前に」＝まだやっていない
+        elif QUESTION_RE.search(sent):
+            # 「たどり着けるのか。」は問いであって、やった事実の記述ではない
+            modality = "question"
         else:
             modality = "factual"
 
+        # 「英語しか使わない」は英語を使わなかった話ではない。
+        # 「しか」は否定の形で肯定を言う構文なので、極性を反転させない
+        if re.search(r"しか", sent[max(0, bs - 30):bs]):
+            negative = False
         polarity = "negative" if negative else "affirmative"
         out.append((action, atype, bs, sent[bs:end], tense, polarity, modality))
     return out
@@ -319,15 +353,24 @@ def canon_value(num, unit):
     n = num.replace(",", "").rstrip(".")
     return f"{n}{UNIT_CANON.get(unit, unit)}"
 
+# 事実確認に何を見ればよいか。キーは action_normalized（LEMMA_ACT の値）。
+# 表示用の活用形をキーにしていた頃は1件も一致していなかった（2026-08-08に修正）
 NEEDS = {
-    "留学した": "パスポートの出入国記録", "渡航した": "パスポートの出入国記録",
-    "受験した": "TOEIC公式マイページのスコアと受験日",
-    "払った": "クレジットカード・銀行の明細", "溶かした": "クレジットカード・銀行の明細",
-    "使った": "サービスのアカウント履歴", "続けた": "サービスのアカウント履歴",
-    "通った": "受講記録・領収書", "受けた": "サービスのアカウント履歴",
-    "登録した": "サービスのアカウント履歴", "やめた": "サービスのアカウント履歴",
-    "働いている": "職務経歴（本人の申告で足りる）",
-    "後回しにした": "本人の記憶で足りる", "止まっていた": "TOEIC公式マイページ",
+    "留学": "パスポートの出入国記録", "渡航": "パスポートの出入国記録",
+    "受験": "TOEIC公式マイページのスコアと受験日",
+    "支払": "クレジットカード・銀行の明細", "浪費": "クレジットカード・銀行の明細",
+    "契約": "契約書・申込確認メール", "解約": "解約完了メール",
+    "利用": "サービスのアカウント履歴", "継続": "サービスのアカウント履歴",
+    "試用": "サービスのアカウント履歴", "開始": "サービスのアカウント履歴",
+    "登録": "サービスのアカウント履歴", "中断": "サービスのアカウント履歴",
+    "通学": "受講記録・領収書", "受講": "受講記録・領収書",
+    "受ける": "何を受けたのかを先に確定する", "相談": "予約確認メール",
+    "診断": "診断結果の画面",
+    "就業": "職務経歴（本人の申告で足りる）",
+    "後回し": "本人の記憶で足りる", "停滞": "TOEIC公式マイページ",
+    "調査": "本人の記憶で足りる", "比較": "本人の記憶で足りる",
+    "探索": "本人の記憶で足りる", "検討": "本人の記憶で足りる",
+    "検索": "本人の記憶で足りる", "問合せ": "問い合わせメール",
 }
 
 
@@ -498,8 +541,14 @@ def _one(sent, cand, quotes, carried, from_aff, general):
         needs_review = (needs_review + " / " if needs_review else "") + \
             "金額があるが支払いの動詞ではない（対象と金額の関係を確認）"
 
+    # 連体修飾なら、その述語の主語は直後の名詞。
+    # 「無料体験だけで本契約しなかった人は」を、さくらの体験にしない
+    rel = RELATIVE_HEAD_RE.match(sent[vstart + len(pred):])
+
     subj_here = scan_subject(sent)
-    if subj_here == "情報源":
+    if rel:
+        subj, conf = "第三者", "explicit"
+    elif subj_here == "情報源":
         subj, conf = "第三者", "explicit"
     elif subj_here:
         subj, conf = subj_here, "explicit"
@@ -517,7 +566,7 @@ def _one(sent, cand, quotes, carried, from_aff, general):
     elif general or subj == "第三者":
         kind, experience = "一般論", "no"
     elif modality in ("necessity", "possibility", "intention", "advice",
-                      "prospective"):
+                      "prospective", "concessive", "question"):
         kind, experience = modality, "no"
     elif modality == "conditional" or tense in ("future", "conditional"):
         kind, experience = ("条件" if modality == "conditional" else "予定"), "no"
@@ -694,13 +743,16 @@ def main():
     rows = []
     for i, (key, d) in enumerate(ordered, start=1):
         r0 = d["rows"][0]
+        # この命題の行動。包含関係のループで使った a を読むと、
+        # 全行が最後の1件の値になる（2026-08-08まで全181行が「開始」だった）
+        akey = key.split("|")[1]
         claim = r0["claim"]      # 表示は行動と時制から作った文字列を使う
         rows.append({
             "claim_id": f"C{i:03d}", "claim": claim,
             "subject": r0["subject"], "subject_confidence": r0["subject_confidence"],
             "normalized_action": r0["normalized_action"],
             "original_predicate": r0["original_predicate"],
-            "act": a, "kind": r0["kind"],
+            "act": akey, "kind": r0["kind"],
             "target": r0["target_surface"],
             "target_normalized": r0["target_normalized"],
             "normalization_type": r0["normalization_type"],
@@ -725,7 +777,7 @@ def main():
             "variants": " ／ ".join(sorted(d["variants"])[:4]),
             "subsumed_by": "",
             "setting_source": " ".join(setting_hit(r0)) or "（該当なし）",
-            "needs": NEEDS.get(a, "本人の確認"),
+            "needs": NEEDS.get(akey, "本人の確認"),
             "confirmation": "", "related_claims": "",
             "_key": key,
         })
@@ -749,7 +801,8 @@ def main():
     # 以前「要確認」で見つかった記事の体験主張が、いまも取れているか
     have = {q for r in rows for q in r["post_ids"].split()}
     missing = {"282", "283", "286", "138"} - have
-    if missing:
+    # 自己テストは1本しか流さないので、そこでは回帰を見ない
+    if missing and len(posts) > 10:
         print(f"⚠️ 回帰: 記事 {sorted(missing)} から命題が1件も取れていない")
     if broken:
         print(f"⚠️ 不変条件違反 {len(broken)}件:")

@@ -124,6 +124,35 @@ def run_claim_parse():
         ("その場で契約する必要もない。", None, None, None),          # 命題を作らない
         ("セブに大金を払う前に自分の部屋で味わえた。", "affirmative", "prospective", "no"),
         ("私はスパトレを試した。", "affirmative", "factual", "yes"),
+        # 2026-08-08 の9周目で本番に出た誤りを、そのまま型として固定する
+        # 「必要もない」を必要ないと読めず、体験にしてしまっていた
+        ("英語ゼロに近い状態でも相談していいし、その場で契約する必要もない。",
+         "affirmative", "necessity", "no"),
+        # 「〜しなくても」は、しなかった事実の記述ではない
+        ("TOEICを毎月受けなくても、自分で判定できる。",
+         "negative", "concessive", "no"),
+        # 「英語しか使わない」は、英語を使わなかった話ではない
+        ("私は日中の1時間だけは英語しか使わないとルールを引く。",
+         "affirmative", "factual", "yes"),
+        # 問いは、やった事実の記述ではない
+        ("私は渡航する日までに、英語を溶かさずに済む状態へたどり着けるのか。",
+         "negative", "question", "no"),
+    ]
+
+    # 複合動詞の後ろ側から命題を作らない。
+    # 「ワーホリで海外に行きたいと言い続けて」を「ワーホリを続けた」にしていた
+    COMPOUND_CASES = [
+        # (原文, その対象×行動の命題が出てよいか)
+        ("27歳の私が、いつかワーホリで海外に行きたいと言い続けて、5年が過ぎた。",
+         ("ワーホリ", "継続"), False),
+        # 前側が行動語なら、そちらから正しく取れる
+        ("私は3年間、英語を使い続けた。", ("英語", "利用"), True),
+    ]
+
+    # 連体修飾の主語。「〜しなかった人は」はさくらの体験ではない
+    RELATIVE_CASES = [
+        ("無料体験だけで本契約しなかった人は、そもそも分母に入っていない。",
+         "第三者", "no"),
     ]
     ng = 0
     for text, pol, mod, exp in POLARITY_CASES:
@@ -137,6 +166,28 @@ def run_claim_parse():
         if not ok:
             print(f"      期待: {pol}/{mod}/{exp}  実際: "
                   + (f"{r['polarity']}/{r['modality']}/{r['experience']}" if r else "(命題なし)"))
+            ng += 1
+
+    for text, (tgt, act), want in COMPOUND_CASES:
+        got, _ = ce.parse_all(text)
+        hit = any(r["target_surface"] == tgt and r["action_normalized"] == act
+                  for r in got)
+        ok = hit == want
+        print(("OK  " if ok else "NG  ") + text)
+        if not ok:
+            print(f"      「{tgt}を{act}」は {'出るはず' if want else '出てはいけない'}"
+                  f"  実際: {[(r['target_surface'], r['action_normalized']) for r in got]}")
+            ng += 1
+
+    for text, subj, exp in RELATIVE_CASES:
+        # 直前の段落でさくらが主語だった状況を再現する
+        got, _ = ce.parse_all(text, ("さくら", "inherited_paragraph"))
+        r = got[0] if got else None
+        ok = bool(r) and (r["subject"], r["experience"]) == (subj, exp)
+        print(("OK  " if ok else "NG  ") + text)
+        if not ok:
+            print(f"      期待: {subj}/{exp}  実際: "
+                  + (f"{r['subject']}/{r['experience']}" if r else "(命題なし)"))
             ng += 1
 
     for text, want in CASES:
