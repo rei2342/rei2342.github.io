@@ -24,7 +24,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests -q
+        run: pip install requests janome -q
 
       - name: Extract
         env:

@@ -40,47 +40,167 @@ SETTING_FILES = [
 TOP = int(__import__("os").environ.get("TOP", "10"))
 
 # ── 行動・状態 ──────────────────────────────────────────
-# 表示は「正規化した行動 × 時制」から作る。原文の述語も別に持つので、
-# 「登録する」が「登録した」と表示されるズレが起きない。
-ACTS = [
-    # (正規化した行動, 種別, 正規表現, 過去, 非過去, 進行)
-    ("留学",   "体験", r"留学(?:し|に行っ|して)", "留学した", "留学する", "留学している"),
-    ("渡航",   "体験", r"渡航し|現地に行っ", "渡航した", "渡航する", "渡航している"),
-    ("通学",   "体験", r"通っ|通う|通い(?:まし|ます)", "通った", "通う", "通っている"),
-    ("利用",   "体験", r"使っ(?:た|て|ている)|使う|使い(?:まし|ます)", "使った", "使う", "使っている"),
-    ("試用",   "体験", r"試し|試す|試してみ", "試した", "試す", "試している"),
-    ("継続",   "体験", r"続け(?:た|られ|る|てい|まし|ます)", "続けた", "続ける", "続けている"),
-    ("中断",   "体験", r"やめ(?:た|て|る|まし|ます)|挫折し|中断し", "やめた", "やめる", "やめている"),
-    ("受講",   "体験", r"受け(?:た|て|る|てい|まし|ます)", "受けた", "受ける", "受けている"),
-    ("受験",   "体験", r"受験し|受験する", "受験した", "受験する", "受験している"),
-    ("登録",   "体験", r"登録し|登録する|申し込(?:んだ|む|み)", "登録した", "登録する", "登録している"),
-    ("支払",   "体験", r"払っ|支払っ|払う|払い(?:まし|ます)", "払った", "払う", "払っている"),
-    ("浪費",   "体験", r"溶かし|無駄にし", "溶かした", "溶かす", "溶かしている"),
-    ("後回し", "体験", r"後回しに(?:し|してき|する)", "後回しにした", "後回しにする", "後回しにしている"),
-    ("停滞",   "体験", r"止まっ|停滞し|動かなかっ", "止まっていた", "止まる", "止まっている"),
-    ("就業",   "体験", r"(?:として|で)働(?:い|く)|の仕事をし", "働いていた", "働く", "働いている"),
-    ("調査",   "調査", r"調べ", "調べた", "調べる", "調べている"),
-    ("比較",   "調査", r"比較し|比べ", "比較した", "比較する", "比較している"),
-    ("候補化", "調査", r"候補に(?:し|入れ)", "候補にした", "候補にする", "候補にしている"),
-    ("探索",   "調査", r"探し(?:た|始め|回っ)|探す", "探した", "探す", "探している"),
-    ("検討",   "調査", r"検討し|検討する", "検討した", "検討する", "検討している"),
-    ("問合せ", "調査", r"問い合わせ", "問い合わせた", "問い合わせる", "問い合わせている"),
-    ("検索",   "調査", r"検索し", "検索した", "検索する", "検索している"),
-]
+# 動詞は形態素解析で**辞書形**に戻して判定する。
+# 「受けました」「契約しました」を個別に列挙すると必ず漏れる
+# （2026-08-08に「受けました」を取りこぼした）。
+from janome.tokenizer import Tokenizer  # noqa: E402
+
+_T = Tokenizer()
+
+# 辞書形 → (正規化した行動, 種別)
+LEMMA_ACT = {
+    "留学": ("留学", "体験"), "渡航": ("渡航", "体験"),
+    "通う": ("通学", "体験"), "使う": ("利用", "体験"), "利用": ("利用", "体験"),
+    "試す": ("試用", "体験"), "続ける": ("継続", "体験"), "継続": ("継続", "体験"),
+    "やめる": ("中断", "体験"), "止める": ("中断", "体験"), "挫折": ("中断", "体験"),
+    "受ける": ("受講", "体験"), "受講": ("受講", "体験"), "受験": ("受験", "体験"),
+    "登録": ("登録", "体験"), "申し込む": ("登録", "体験"), "契約": ("契約", "体験"),
+    "解約": ("解約", "体験"), "退会": ("解約", "体験"),
+    "払う": ("支払", "体験"), "支払う": ("支払", "体験"), "支払": ("支払", "体験"),
+    "始める": ("開始", "体験"), "開始": ("開始", "体験"),
+    "溶かす": ("浪費", "体験"), "働く": ("就業", "体験"),
+    "後回し": ("後回し", "体験"), "停滞": ("停滞", "体験"),
+    "調べる": ("調査", "調査"), "調査": ("調査", "調査"),
+    "比べる": ("比較", "調査"), "比較": ("比較", "調査"),
+    "探す": ("探索", "調査"), "検討": ("検討", "調査"), "検索": ("検索", "調査"),
+    "問い合わせる": ("問合せ", "調査"),
+}
+
+# 述語の後ろに付いて時制を決めるもの
+AUX_BASE = {"ます", "た", "だ", "です", "ない", "ぬ", "う", "よう", "たい", "らしい"}
+AUX_VERB = {"いる", "ある", "みる", "しまう", "くる", "おく", "ほしい",
+            "する", "できる", "なる"}
+COND_SURF = {"ば", "たら", "なら", "れば"}
+
+
+def analyze(sent):
+    """文から (行動, 種別, 開始位置, 述語の表層, 時制) を取り出す。
+
+    時制は**その述語に付いた助動詞**から決める。文中のどこかに
+    「なら」があるだけで条件扱いしない。
+    """
+    toks, pos, spans = list(_T.tokenize(sent)), 0, []
+    for t in toks:
+        spans.append((pos, pos + len(t.surface), t))
+        pos += len(t.surface)
+
+    out = []
+    for i, (bs, be, t) in enumerate(spans):
+        base = t.base_form if t.base_form != "*" else t.surface
+        if base not in LEMMA_ACT:
+            continue
+        pos1 = t.part_of_speech.split(",")[0]
+        skip = 0
+        if pos1 == "名詞":
+            # サ変名詞は「する」が続くときだけ動詞として扱う。
+            # 「後回しにする」のように助詞を挟む形もある
+            for k in (1, 2):
+                nxt = spans[i + k][2] if i + k < len(spans) else None
+                if nxt and (nxt.base_form in ("する", "できる")
+                            or nxt.surface in ("し", "する", "さ")):
+                    skip = k
+                    break
+            if not skip:
+                continue
+        elif pos1 != "動詞":
+            continue
+
+        action, atype = LEMMA_ACT[base]
+        past = polite = prog = cond = vol = nonpast = False
+        end, te = be, False
+        j = i + 1 + skip
+        while j < len(spans):
+            tk = spans[j][2]
+            b, sf = (tk.base_form if tk.base_form != "*" else tk.surface), tk.surface
+            p1 = tk.part_of_speech.split(",")[0]
+            # 条件は品詞に頼らない。「なら」は助動詞と解析されることがある
+            if sf in COND_SURF or sf in ("なら", "たら", "れば", "ば"):
+                cond = True
+            elif p1 == "助詞" and sf in ("て", "で"):
+                te = True
+            elif p1 == "助動詞" and b in AUX_BASE:
+                if b == "た":
+                    past = True
+                elif b == "ます":
+                    polite = True
+                elif b in ("う", "よう", "たい"):
+                    vol = True
+                elif b == "だ" and tk.surface in ("だ", "な"):
+                    past = past or tk.surface == "だ"
+            elif p1 == "動詞" and b in AUX_VERB:
+                if b == "いる" and te:
+                    prog = True
+                if b == "する":
+                    pass
+            else:
+                break
+            end = spans[j][1]
+            j += 1
+
+        if cond:
+            tense = "conditional"
+        elif past:
+            tense = "past"
+        elif prog:
+            tense = "progressive"
+        elif vol:
+            tense = "future"
+        elif polite:
+            tense = "future"
+        elif spans[j - 1][2].part_of_speech.split(",")[1:2] == ["自立"] or nonpast:
+            tense = "present"
+        else:
+            tense = "present" if j == i + 1 else "unknown"
+
+        out.append((action, atype, bs, sent[bs:end], tense))
+    return out
+
+
+# 表示に使う語尾。時制が unknown のときは原文の述語をそのまま出す
+ACTION_FORM = {
+    "留学": ("留学した", "留学する", "留学している"),
+    "渡航": ("渡航した", "渡航する", "渡航している"),
+    "通学": ("通った", "通う", "通っている"),
+    "利用": ("使った", "使う", "使っている"),
+    "試用": ("試した", "試す", "試している"),
+    "継続": ("続けた", "続ける", "続けている"),
+    "中断": ("やめた", "やめる", "やめている"),
+    "受講": ("受けた", "受ける", "受けている"),
+    "受験": ("受験した", "受験する", "受験している"),
+    "登録": ("登録した", "登録する", "登録している"),
+    "契約": ("契約した", "契約する", "契約している"),
+    "解約": ("解約した", "解約する", "解約している"),
+    "支払": ("払った", "払う", "払っている"),
+    "開始": ("始めた", "始める", "始めている"),
+    "浪費": ("溶かした", "溶かす", "溶かしている"),
+    "就業": ("働いていた", "働く", "働いている"),
+    "後回し": ("後回しにした", "後回しにする", "後回しにしている"),
+    "停滞": ("止まっていた", "止まる", "止まっている"),
+    "調査": ("調べた", "調べる", "調べている"),
+    "比較": ("比較した", "比較する", "比較している"),
+    "探索": ("探した", "探す", "探している"),
+    "検討": ("検討した", "検討する", "検討している"),
+    "検索": ("検索した", "検索する", "検索している"),
+    "問合せ": ("問い合わせた", "問い合わせる", "問い合わせている"),
+}
 GENERAL_MARK = r"と言われ|一般的に|多くの人|人によって|とされ|らしい|そうだ|だろう|かもしれない"
 
-# ── 時制。述語の形から決める ────────────────────────────
-# 条件は文中に出るので、末尾だけでなく全体を見る。
-# 判定の順番が意味を持つ（条件 → 未来 → 進行 → 過去）
-TENSE_RE = [
-    ("conditional", r"(?:なら|ならば|たら|れば|場合|とき、|時、|としたら)"),
-    ("future",      r"(?:する|します|しよう|しましょう|してみる|したい|てほしい"
-                    r"|つもり|予定|べき|ください)[。！？]?$"),
-    ("progressive", r"(?:ている|ています|ていた|でいる)[。！？]?$"),
-    ("past",        r"(?:た|だ|ました|でした|たことがある)[。！？]?$"),
-]
 
-# ── 主語。命題にならない文からも拾う ────────────────────
+def quote_spans(sent):
+    """「」で囲まれた範囲。中の述語だけで本人の体験を確定しない。"""
+    spans, depth, start = [], 0, None
+    for i, ch in enumerate(sent):
+        if ch in "「『":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch in "」』" and depth:
+            depth -= 1
+            if depth == 0 and start is not None:
+                spans.append((start, i + 1))
+    return spans
+
+
 # 同じ節でも、別の主語・情報源が出たら継承を上書き／停止する
 SUBJ_OTHER = [
     ("読者",   r"あなた(?:は|が|も)|読者(?:は|が)|みなさん"),
@@ -88,6 +208,7 @@ SUBJ_OTHER = [
                r"|という人(?:は|が)|経験者(?:は|が)"),
     ("情報源", r"口コミでは|レビューでは|公式(?:サイト|ページ)では|公式には|調査では"),
 ]
+
 SUBJ_SELF = r"私|自分|僕"
 SUBJ_READER = r"あなた|読者|みなさん"
 
@@ -170,12 +291,12 @@ def blocks(html):
         if not reason and _q.AFFILIATE_LINK_RE.search(inner):
             # リンクを取り除いた残りに体験表現があるか
             rest = _q.strip_tags(re.sub(r"<a\b.*?</a>", "", inner, flags=re.DOTALL | re.I))
-            # 体験表現の判定は ACTS の正規表現を使う。単語リストだと
+            # 体験表現の判定は形態素解析に任せる。単語リストだと
             # 丁寧形（受けました）を取りこぼす（2026-08-08に実例）
-            if any(re.search(pat, rest) for _a, at, pat, *_ in ACTS if at == "体験"):
+            if any(at == "体験" for _a, at, *_ in analyze(rest)):
                 # 体験が書かれている段落。リンクだけ除いて本文は拾う
                 ss = [x.strip() for x in re.split(r"(?<=[。？！])", rest) if x.strip()]
-                out.append((tag, None, ss, rest))
+                out.append((tag, None, ss, rest, True))
                 continue
             reason = "アフィリエイト導線"
         if not reason and re.search(r"<a\b", inner) and len(_q.strip_tags(inner)) < 40:
@@ -184,7 +305,7 @@ def blocks(html):
         if not text:
             continue
         ss = [x.strip() for x in re.split(r"(?<=[。？！])", text) if x.strip()]
-        out.append((tag, reason, ss, rest or text))
+        out.append((tag, reason, ss, rest or text, False))
     return out
 
 
@@ -213,39 +334,43 @@ def detect_tense(sent):
     return "unknown"
 
 
-def parse(sent, carried=None):
-    """1文から命題を取り出す。取れなければ None。
-
-    行動・時制・主語・体験判定を別々に持ち、表示はそこから作る。
-    """
+def parse(sent, carried=None, from_aff=False):
+    """1文から命題を取り出す。取れなければ None。"""
     general = bool(re.search(GENERAL_MARK, sent))
+    quotes = quote_spans(sent)
 
-    hit = None
-    for action, atype, pat, past, nonpast, prog in ACTS:
-        m = re.search(pat, sent)
-        if m:
-            hit = (action, atype, m, past, nonpast, prog)
+    cands = analyze(sent)
+    if not cands:
+        return None
+    # 引用の外にある述語を優先する。無ければ引用内のものを使い、印を付ける
+    outside = [c for c in cands if not any(a <= c[2] < b for a, b in quotes)]
+    ordered_cands = outside + [c for c in cands if c not in outside]
+
+    # 述語ごとに目的語を探し、取れたものを採用する。
+    # 最初の候補に目的語が無いだけで諦めない
+    picked = None
+    for cand in ordered_cands:
+        _a, _t, vstart, _p, _tn = cand
+        in_quote = any(a <= vstart < b for a, b in quotes)
+        best = None
+        for n, tpat in TARGETS:
+            for tm in re.finditer(tpat, sent):
+                if tm.end() > vstart:
+                    continue
+                if any(a <= tm.start() < b for a, b in quotes) and not in_quote:
+                    continue      # 引用内の語を、引用外の述語の目的語にしない
+                tail = sent[tm.end():tm.end() + 2]
+                score = (vstart - tm.end()) - (30 if re.match(r"[をにへで]", tail) else 0)
+                if best is None or score < best[0]:
+                    best = (score, n)
+        if best:
+            picked = (cand, best[1], in_quote)
             break
-    if not hit:
+    if not picked:
         return None
-    action, atype, vm, past, nonpast, prog = hit
+    (action, atype, vstart, pred, tense), target, quoted = picked
 
-    # 動詞の目的語を維持する。動詞より後ろの語は対象にしない
-    vstart = vm.start()
-    best = None
-    for n, tpat in TARGETS:
-        for tm in re.finditer(tpat, sent):
-            if tm.end() > vstart:
-                continue
-            tail = sent[tm.end():tm.end() + 2]
-            score = (vstart - tm.end()) - (30 if re.match(r"[をにへで]", tail) else 0)
-            if best is None or score < best[0]:
-                best = (score, n)
-    if not best:
-        return None
-    target = best[1]
-
-    nm = NUM_RE.search(sent)
+    nm = NUM_RE.search(sent[:vstart]) or NUM_RE.search(sent)
     value = canon_value(nm.group(1), nm.group(2)) if nm else ""
 
     subj_here = scan_subject(sent)
@@ -260,15 +385,13 @@ def parse(sent, carried=None):
     else:
         subj, conf = "unknown", "unknown"
 
-    tense = detect_tense(sent)
-
     # 分類と体験判定は必ず整合させる
-    if general or subj == "第三者":
+    if quoted:
+        kind, experience = "引用", "no"
+    elif general or subj == "第三者":
         kind, experience = "一般論", "no"
-    elif tense == "future":
-        kind, experience = "予定", "no"
-    elif tense == "conditional":
-        kind, experience = "条件", "no"
+    elif tense in ("future", "conditional"):
+        kind, experience = ("予定" if tense == "future" else "条件"), "no"
     elif atype == "調査":
         kind, experience = "調査", "no"
     elif subj == "さくら":
@@ -278,20 +401,29 @@ def parse(sent, carried=None):
     else:
         kind, experience = "体験", "possible"
 
-    verb = {"past": past, "future": nonpast, "conditional": nonpast,
-            "progressive": prog, "unknown": past}[tense]
+    forms = ACTION_FORM.get(action)
+    if tense == "past":
+        verb = forms[0]
+    elif tense in ("future", "conditional", "present"):
+        verb = forms[1]
+    elif tense == "progressive":
+        verb = forms[2]
+    else:
+        verb = pred          # unknown は原文の述語をそのまま出す
+
     claim = f"{target}を{value}{verb}" if value else f"{target}を{verb}"
     if action in ("留学", "渡航"):
         claim = f"{target}へ{value}{verb}" if value else f"{target}へ{verb}"
     if action == "就業":
         claim = f"{target}として{verb}"
 
-    pred = re.sub(r"\s+", "", sent[vm.start():][:24])
     return {
         "claim": claim, "subject": subj, "subject_confidence": conf,
         "normalized_action": action, "original_predicate": pred,
         "act_type": atype, "target": target, "value": value,
         "tense": tense, "kind": kind, "experience": experience,
+        "quoted": "yes" if quoted else "",
+        "from_affiliate_block": "yes" if from_aff else "",
         "sentence": sent[:200],
     }
 
@@ -328,7 +460,7 @@ def main():
         title = re.sub(r"<[^>]+>", "", p["title"]["rendered"])
         html = p.get("content", {}).get("rendered", "")
         section_subj = None      # 同じ見出しの中で引き継ぐ主語
-        for tag, reason, ss, rest in blocks(html):
+        for tag, reason, ss, rest, from_aff in blocks(html):
             # 見出しが変われば話者が変わりうる。ここでだけリセットする。
             # CTAやリンクでは切らない（同じ節なら書き手は同じ）
             if tag in ("h2", "h3", "h4"):
@@ -354,7 +486,7 @@ def main():
 
                 carried = (para_subj and (para_subj, "inherited_paragraph")) or \
                           (section_subj and (section_subj, "inherited_section"))
-                pr = parse(sent, carried)
+                pr = parse(sent, carried, from_aff)
                 if not pr:
                     continue
                 # 統合キーは 対象＋行動＋正規化した数値
@@ -363,7 +495,7 @@ def main():
                 d = props[key]
                 ctx = " ".join(ss[max(0, i - 1):i + 2])[:260]
                 d["rows"].append({**pr, "context": ctx, "html_tag": tag,
-                                  "link_stripped": "yes" if rest != " ".join(ss) else "",
+
                                   "post_id": p["id"], "url": p.get("link", ""),
                                   "title": title})
                 d["variants"].add(pr["sentence"][:60])
@@ -396,6 +528,7 @@ def main():
             "act": a, "kind": r0["kind"],
             "target": t, "value": v or "", "tense": r0["tense"],
             "experience": r0["experience"],
+            "quoted": r0["quoted"], "from_affiliate_block": r0["from_affiliate_block"],
             "html_tag": r0["html_tag"],
             "posts": len(d["posts"]),
             "post_ids": " ".join(str(x) for x in d["posts"][:12]),
@@ -442,6 +575,42 @@ def main():
     L.append("\n判定は文の形からの推測。**必ず原文を読んで確かめてから** "
              "`confirmation` を入れてください"
              "（verified / partially_verified / fictional / unknown）。\n\n---\n\n")
+
+    # 出現数の多い命題は似たものに偏る。弱点は層別サンプルのほうが見つかる
+    STRATA = [
+        ("explicit かつ experience=yes",
+         lambda r: r["subject_confidence"] == "explicit" and r["experience"] == "yes"),
+        ("inherited_section", lambda r: r["subject_confidence"] == "inherited_section"),
+        ("subject=unknown かつ possible",
+         lambda r: r["subject"] == "unknown" and r["experience"] == "possible"),
+        ("conditional", lambda r: r["tense"] == "conditional"),
+        ("from_affiliate_block=yes", lambda r: r["from_affiliate_block"] == "yes"),
+        ("quoted=yes", lambda r: r["quoted"] == "yes"),
+    ]
+
+    def detail(r):
+        out = [f"### {r['claim_id']} {r['claim']}\n\n"]
+        out.append(f"- 主語: **{r['subject']}**（{r['subject_confidence']}） / "
+                   f"分類: **{r['kind']}** / 体験: **{r['experience']}**\n")
+        out.append(f"- 行動: {r['normalized_action']} / 時制: **{r['tense']}** / "
+                   f"述語: `{r['original_predicate']}`\n")
+        out.append(f"- 引用: {r['quoted'] or '—'} / "
+                   f"アフィ段落由来: {r['from_affiliate_block'] or '—'} / "
+                   f"`<{r['html_tag']}>` / {r['posts']}本\n")
+        out.append(f"- **元文**: {r['sentence']}\n")
+        out.append(f"- **前後3文**: {r['context']}\n")
+        out.append(f"- 記事: {r['urls'].split()[0] if r['urls'] else '—'}\n\n")
+        return "".join(out)
+
+    L.append("# 層別サンプル（各5件）\n\n")
+    for name, cond in STRATA:
+        sel = [r for r in rows if cond(r)]
+        L.append(f"## {name}（該当 {len(sel)}件）\n\n")
+        if not sel:
+            L.append("（該当なし）\n\n")
+        for r in sel[:5]:
+            L.append(detail(r))
+    L.append("\n---\n\n# 出現数の多い順（上位10件）\n\n")
 
     for r in rows[:TOP]:
         L.append(f"## {r['claim_id']} {r['claim']}\n\n")
