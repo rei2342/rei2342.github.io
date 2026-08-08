@@ -14,7 +14,7 @@ post_id,section,claim,class,source,note
 310,単価,月900円×6ヶ月÷20回で1回270円という試算,editorial_inference,,「例として」「仮に」と明記した試算
 310,単価,分母が0回なら月額がいくらでも割り算は成立しない,editorial_inference,,算術上の帰結
 304,リード,600点前後から動かなくなることがある,editorial_inference,,「ことがある」
-304,確認1,TOEIC L&R の結果はリスニングとリーディングの内訳が返ってくる,official_fact,TOEIC公式の成績表仕様,⚠️要確認。公式ページで裏を取ってから公開する
+304,確認1,TOEIC L&R はリスニング約45分100問・リーディング75分100問の2セクション。結果ではスコアに加えて Abilities Measured（項目別正答率）も確認できる,official_fact,https://www.iibc-global.org/toeic/test/lr/about/format.html ＋ /lr/guide04.html 2026-08-08,IIBC公式で確認済み
 304,確認1,結果を3回分並べてリスニングとリーディングを別々に折れ線にする,recommendation,,確認手順
 304,確認1,沈んでいる側と時間を使ってきた側を見比べる,recommendation,,確認手順
 304,確認2,詰まる箇所が単語の繋がりや語尾に集中していることがある,editorial_inference,,「ことがある」。原因とは書いていない
@@ -28,8 +28,8 @@ post_id,section,claim,class,source,note
 304,確認4,知識を増やす練習とそれを使う練習は分けて考えたほうがいい,recommendation,,提案
 304,確認4,スパトレの公式情報,official_fact,https://sptr.jp/ 2026-08-08,
 282,リード,「TOEIC400あれば十分」は何について十分なのかが抜けたまま広がっていることがある,editorial_inference,,「ことがある」
-282,試験,TOEIC L&R で問われるのは聞いて選ぶことと読んで選ぶこと。口から音を出す項目は入っていない,official_fact,TOEIC公式の試験形式,⚠️要確認。公式ページで裏を取ってから公開する
-282,試験,話す力を測る試験は別にある（TOEIC Speaking など）,official_fact,TOEIC公式のテスト一覧,⚠️要確認
+282,試験,TOEIC L&R は合計200問のマークシート方式の一斉客観テストで、解答はすべて解答用紙に記入する,official_fact,https://www.iibc-global.org/toeic/test/lr/about/format.html 2026-08-08,公式の記載に合わせて表現を弱めた。「発話が含まれない」は提案として分離
+282,試験,話す力と書く力を測るテストは TOEIC Speaking & Writing Tests として別に提供されている,official_fact,https://www.iibc-global.org/toeic/test/sw.html 2026-08-08,IIBC公式で確認済み
 282,試験,「400で十分」が指しているのは選んで答える力のこと,editorial_inference,,試験項目から導いた推論
 282,練習量,今日英語を声に出した分数を記録する,recommendation,,確認手順
 282,練習量,直近1週間の練習を「選ぶ」と「組み立てる」に分けて数える,recommendation,,確認手順
@@ -51,7 +51,7 @@ post_id,section,claim,class,source,note
 521,2週間,必要な時間は人によって違うので決まった分数は示さない,recommendation,,「平日90分」は削除
 521,2週間,夜が崩れても残る時間帯を1つ選び、その枠が続いているかだけを見る,recommendation,,確認手順
 32,リード,方法を選ぶ前に確認したい4つ,recommendation,,
-32,確認1,TOEICの成績票には項目別の正答率が印刷されている,official_fact,TOEIC公式の成績表仕様,⚠️要確認。公式ページで裏を取ってから公開する
+32,確認1,結果ではスコアに加えて Score Descriptors と Abilities Measured（項目別正答率）も確認できる,official_fact,https://www.iibc-global.org/toeic/test/lr/guide04.html 2026-08-08,公式の記載は「確認いただけます」。「印刷されている」は支持されないので表現を弱めた
 32,確認1,1か所に固まっているなら絞った対策から始められる。散っているなら基礎の量が足りていない段階かもしれない,recommendation,,「かもしれない」
 32,確認2,つまずきを1文で言えるなら市販の教材で組める段階にいる,recommendation,,提案
 32,確認2,分解はできたが次の手順が組めない状態のときに独学以外の選択肢を検討する意味が出てくる,recommendation,,提案。数値条件は書いていない
