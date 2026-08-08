@@ -53,7 +53,8 @@ LEMMA_ACT = {
     "通う": ("通学", "体験"), "使う": ("利用", "体験"), "利用": ("利用", "体験"),
     "試す": ("試用", "体験"), "続ける": ("継続", "体験"), "継続": ("継続", "体験"),
     "やめる": ("中断", "体験"), "止める": ("中断", "体験"), "挫折": ("中断", "体験"),
-    "受ける": ("受講", "体験"), "受講": ("受講", "体験"), "受験": ("受験", "体験"),
+    "受ける": ("受ける_未分類", "体験"),
+    "受講": ("受講", "体験"), "受験": ("受験", "体験"),
     "登録": ("登録", "体験"), "申し込む": ("登録", "体験"), "契約": ("契約", "体験"),
     "解約": ("解約", "体験"), "退会": ("解約", "体験"),
     "払う": ("支払", "体験"), "支払う": ("支払", "体験"), "支払": ("支払", "体験"),
@@ -169,6 +170,7 @@ ACTION_FORM = {
     "相談": ("相談した", "相談する", "相談している"),
     "診断": ("診断を受けた", "診断を受ける", "診断を受けている"),
     "受ける": ("受けた", "受ける", "受けている"),
+    "受ける_未分類": ("受けた", "受ける", "受けている"),
     "受験": ("受験した", "受験する", "受験している"),
     "登録": ("登録した", "登録する", "登録している"),
     "契約": ("契約した", "契約する", "契約している"),
@@ -216,25 +218,52 @@ SUBJ_SELF = r"私|自分|僕"
 SUBJ_READER = r"あなた|読者|みなさん"
 
 # 対象（何について言っているか）
+# (正規化した名前, [(原文の表記, 変換の種類), ...])
+#
+# 変換の種類:
+#   none                … 変換なし
+#   exact_alias         … 表記違い・ほぼ同義（授業→レッスン）
+#   generalization      … 上位概念化（単語帳→教材）。事実認定に使わない
+#   context_enrichment  … 文脈補完（スクール→英会話スクール）。事実認定に使わない
+#
+# **人が見る命題には必ず原文の表記（target_surface）を出す。**
+# 正規化名は重複整理・検索・カテゴリ分類にだけ使う。
 TARGETS = [
-    ("フィリピン", r"フィリピン"), ("セブ島", r"セブ島?"),
-    ("オーストラリア", r"オーストラリア|豪州"), ("カナダ", r"カナダ"),
-    ("ニュージーランド", r"ニュージーランド"), ("シンガポール", r"シンガポール"),
-    ("イギリス", r"イギリス|英国"), ("台湾", r"台湾"), ("韓国", r"韓国"),
-    ("ハワイ", r"ハワイ"), ("国内留学", r"国内留学"),
-    ("英語学習", r"英語(?:学習|の勉強|を勉強)"), ("英語", r"英語"),
-    ("TOEIC", r"TOEIC"), ("ワーホリ", r"ワーホリ|ワーキングホリデー"),
-    ("オンライン英会話", r"オンライン英会話"), ("英会話スクール", r"(?:英会話)?スクール"),
-    ("英語コーチング", r"英語コーチング|コーチング"),
-    ("営業事務", r"営業事務"), ("仕事の英語", r"仕事で英語|会議|議事録|電話対応"),
-    ("発音矯正アプリ", r"発音矯正(?:の)?(?:アプリ|サービス|ツール)?"),
-    ("英語アプリ", r"英語(?:学習)?アプリ|アプリ"),
-    ("教材", r"教材|参考書|単語帳|問題集"),
-    ("無料体験", r"無料体験|体験レッスン"),
-    ("レッスン", r"レッスン|授業"),
+    ("フィリピン", [(r"フィリピン", "none")]),
+    ("セブ島", [(r"セブ島", "none"), (r"セブ", "exact_alias")]),
+    ("オーストラリア", [(r"オーストラリア", "none"), (r"豪州", "exact_alias")]),
+    ("カナダ", [(r"カナダ", "none")]),
+    ("ニュージーランド", [(r"ニュージーランド", "none")]),
+    ("シンガポール", [(r"シンガポール", "none")]),
+    ("イギリス", [(r"イギリス", "none"), (r"英国", "exact_alias")]),
+    ("台湾", [(r"台湾", "none")]), ("韓国", [(r"韓国", "none")]),
+    ("ハワイ", [(r"ハワイ", "none")]),
+    ("国内留学", [(r"国内留学", "none")]),
+    ("英語学習", [(r"英語学習", "none"),
+                (r"英語の勉強", "exact_alias"), (r"英語を勉強", "exact_alias")]),
+    ("TOEIC", [(r"TOEIC", "none")]),
+    ("ワーホリ", [(r"ワーホリ", "none"), (r"ワーキングホリデー", "exact_alias")]),
+    ("オンライン英会話", [(r"オンライン英会話", "none")]),
+    ("英会話スクール", [(r"英会話スクール", "none"), (r"スクール", "context_enrichment")]),
+    ("英語コーチング", [(r"英語コーチング", "none"), (r"コーチング", "context_enrichment")]),
+    ("営業事務", [(r"営業事務", "none")]),
+    ("仕事の英語", [(r"仕事で英語", "exact_alias"), (r"会議", "generalization"),
+                (r"議事録", "generalization"), (r"電話対応", "generalization")]),
+    ("発音矯正アプリ", [(r"発音矯正アプリ", "none"),
+                  (r"発音矯正(?:の)?(?:サービス|ツール)", "exact_alias"),
+                  (r"発音矯正", "context_enrichment")]),
+    ("英語アプリ", [(r"英語(?:学習)?アプリ", "exact_alias"),
+                (r"アプリ", "context_enrichment")]),
+    ("教材", [(r"教材", "none"), (r"参考書", "generalization"),
+            (r"単語帳", "generalization"), (r"問題集", "generalization")]),
+    ("無料体験", [(r"無料体験", "none"), (r"体験レッスン", "exact_alias")]),
+    ("レッスン", [(r"レッスン", "none"), (r"授業", "exact_alias"),
+              (r"講座", "exact_alias")]),
+    ("英語", [(r"英語", "none")]),
 ]
+# サービス名は表記そのまま。変換しない
 for _n in _q.SERVICE_NAMES:
-    TARGETS.insert(0, (_n, re.escape(_n)))
+    TARGETS.insert(0, (_n, [(re.escape(_n), "none")]))
 
 NUM_RE = re.compile(r"([0-9][0-9,\.]*(?:万[0-9,]*)?(?:千[0-9,]*)?)\s*"
                     r"(年間|年|ヶ月|か月|カ月|週間|日間|日|時間|分|"
@@ -376,40 +405,47 @@ def parse(sent, carried=None, from_aff=False):
         _a, _t, vstart, _p, _tn = cand
         in_quote = any(a <= vstart < b for a, b in quotes)
         best = None
-        for n, tpat in TARGETS:
-            for tm in re.finditer(tpat, sent):
-                if tm.end() > vstart:
-                    continue
-                if any(a <= tm.start() < b for a, b in quotes) and not in_quote:
-                    continue      # 引用内の語を、引用外の述語の目的語にしない
-                tail = sent[tm.end():tm.end() + 2]
-                score = (vstart - tm.end()) - (30 if re.match(r"[をにへで]", tail) else 0)
-                if best is None or score < best[0]:
-                    # 正規化した名前と、原文での位置の両方を持つ。
-                    # 名前で原文を探し直すと見つからない（英語コーチング vs コーチング）
-                    best = (score, n, tm.start(), tm.end())
+        for n, variants in TARGETS:
+            for tpat, ntype in variants:
+                for tm in re.finditer(tpat, sent):
+                    if tm.end() > vstart:
+                        continue
+                    if any(a <= tm.start() < b for a, b in quotes) and not in_quote:
+                        continue  # 引用内の語を、引用外の述語の目的語にしない
+                    tail = sent[tm.end():tm.end() + 2]
+                    score = ((vstart - tm.end())
+                             - (30 if re.match(r"[をにへで]", tail) else 0))
+                    if best is None or score < best[0]:
+                        # 原文の表記も残す。正規化名で原文を探し直すと
+                        # 見つからない（英語コーチング vs コーチング）
+                        best = (score, n, tm.group(0), ntype, tm.start(), tm.end())
         if best:
             picked = (cand, best, in_quote)
             break
     if not picked:
         return None
-    (action, atype, vstart, pred, tense), (_sc, target, tstart, tend), quoted = picked
+    (action, atype, vstart, pred, tense) = picked[0]
+    _sc, target_norm, target_surface, ntype, tstart, tend = picked[1]
+    quoted = picked[2]
+    target = target_surface       # 表示は必ず原文の表記を使う
 
     # 「受ける」は受験・受講・相談・診断のどれか分からない。
     # 対象だけで決めず、周辺語も見る。分からなければ要確認にする
     needs_review = ""
-    if action == "受講":
+    action_lemma = action
+    action_reason = ""
+    if action == "受ける_未分類":
         near = sent[max(0, vstart - 60):vstart + 20]
-        if target in ("TOEIC",) or re.search(r"試験|テスト|受験", near):
-            action = "受験"
-        elif target in ("レッスン", "無料体験") or re.search(r"レッスン|授業|講座", near):
-            action = "受講"
+        if target_norm == "TOEIC" or re.search(r"試験|テスト|受験", near):
+            action, action_reason = "受験", "対象がTOEIC／周辺に試験・受験がある"
+        elif target_norm in ("レッスン", "無料体験") or re.search(r"レッスン|授業|講座", near):
+            action, action_reason = "受講", "対象がレッスン／周辺に授業・講座がある"
         elif re.search(r"カウンセリング|無料相談|相談", near):
-            action = "相談"
+            action, action_reason = "相談", "周辺にカウンセリング・相談がある"
         elif re.search(r"診断|チェック", near):
-            action = "診断"
+            action, action_reason = "診断", "周辺に診断・チェックがある"
         else:
-            action = "受ける"
+            action, action_reason = "受ける", "対象・周辺語から意味を特定できない"
             needs_review = "「受ける」の意味を特定できない"
 
 
@@ -479,6 +515,10 @@ def parse(sent, carried=None, from_aff=False):
 
     return {
         "claim": claim, "subject": subj, "subject_confidence": conf,
+        "target_surface": target_surface, "target_normalized": target_norm,
+        "normalization_type": ntype,
+        "action_surface": pred, "action_lemma": action_lemma,
+        "action_normalized": action, "action_normalization_reason": action_reason,
         "normalized_action": action, "original_predicate": pred,
         "act_type": atype, "target": target, "value": value,
         "tense": tense, "kind": kind, "experience": experience,
@@ -552,7 +592,9 @@ def main():
                 if not pr:
                     continue
                 # 統合キーは 対象＋行動＋正規化した数値
-                key = f"{pr['target']}|{pr['normalized_action']}|{pr['tense']}"
+                # 重複整理には正規化語を使い、表示には原文の語を使う
+                key = (f"{pr['target_normalized']}|{pr['action_normalized']}|"
+                       f"{pr['tense']}")
                 d = props[key]
                 ctx = " ".join(ss[max(0, i - 1):i + 2])[:260]
                 d["rows"].append({**pr, "context": ctx, "html_tag": tag,
@@ -582,7 +624,6 @@ def main():
     rows = []
     for i, (key, d) in enumerate(ordered, start=1):
         r0 = d["rows"][0]
-        t, a, tn = key.split("|")
         claim = r0["claim"]      # 表示は行動と時制から作った文字列を使う
         rows.append({
             "claim_id": f"C{i:03d}", "claim": claim,
@@ -590,7 +631,14 @@ def main():
             "normalized_action": r0["normalized_action"],
             "original_predicate": r0["original_predicate"],
             "act": a, "kind": r0["kind"],
-            "target": t, "value": v or "", "tense": r0["tense"],
+            "target": r0["target_surface"],
+            "target_normalized": r0["target_normalized"],
+            "normalization_type": r0["normalization_type"],
+            "action_surface": r0["action_surface"],
+            "action_lemma": r0["action_lemma"],
+            "action_normalized": r0["action_normalized"],
+            "action_normalization_reason": r0["action_normalization_reason"],
+            "value": "", "tense": r0["tense"],
             "experience": r0["experience"],
             "quoted": r0["quoted"], "from_affiliate_block": r0["from_affiliate_block"],
             "attributes": " / ".join(f"{k}={'・'.join(sorted(vs))}"
@@ -653,14 +701,23 @@ def main():
         ("conditional", lambda r: r["tense"] == "conditional"),
         ("from_affiliate_block=yes", lambda r: r["from_affiliate_block"] == "yes"),
         ("quoted=yes", lambda r: r["quoted"] == "yes"),
+        ("normalization_type=generalization",
+         lambda r: r["normalization_type"] == "generalization"),
+        ("normalization_type=context_enrichment",
+         lambda r: r["normalization_type"] == "context_enrichment"),
     ]
 
     def detail(r):
         out = [f"### {r['claim_id']} {r['claim']}\n\n"]
         out.append(f"- 主語: **{r['subject']}**（{r['subject_confidence']}） / "
                    f"分類: **{r['kind']}** / 体験: **{r['experience']}**\n")
-        out.append(f"- 行動: {r['normalized_action']} / 時制: **{r['tense']}** / "
-                   f"述語: `{r['original_predicate']}`\n")
+        out.append(f"- 対象: **{r['target']}**（原文） / 正規化: {r['target_normalized']}"
+                   f" / 変換: **{r['normalization_type']}**\n")
+        out.append(f"- 行動: 原文`{r['action_surface']}` / 辞書形 {r['action_lemma']}"
+                   f" / 正規化 **{r['action_normalized']}**"
+                   + (f"（{r['action_normalization_reason']}）"
+                      if r['action_normalization_reason'] else "") + "\n")
+        out.append(f"- 時制: **{r['tense']}**\n")
         out.append(f"- 数値属性: {r['attributes'] or '—'}"
                    + (f" / ⚠️ {r['needs_review']}" if r['needs_review'] else "") + "\n")
         out.append(f"- 引用: {r['quoted'] or '—'} / "
