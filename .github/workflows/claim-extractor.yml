@@ -62,7 +62,7 @@ jobs:
       - name: 該当段落を集める
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
-          POSTS: ${{ vars.DUMP_POSTS || '272,149,131,37,23,278,315,288,526,277,40,232,283' }}
+          POSTS: ${{ vars.DUMP_POSTS || '151,150,28,273,117,292,546,289,241,238,301,136,294,42,287,281,286,138,137,305,67,19,61,64,27,235' }}
         run: |
           python affiliate-research-engine/playbook/scripts/rewrite_planner.py
           python affiliate-research-engine/playbook/scripts/article_dump.py
@@ -71,7 +71,7 @@ jobs:
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
-          PAGES: ${{ vars.DUMP_POSTS || '272,149,131,37,23,278,315,288,526,277,40,232,283' }}
+          PAGES: ${{ vars.DUMP_POSTS || '151,150,28,273,117,292,546,289,241,238,301,136,294,42,287,281,286,138,137,305,67,19,61,64,27,235' }}
           DAYS: '90'
         run: |
           pip install google-auth -q
