@@ -5,6 +5,6 @@
 
 | 記事 | トピック | 案件 | 字数 | ゲート |
 |---|---|---|---|---|
-| 289 | workingholiday | nativecamp_ryugaku・johokan | 3461 | ✅ 0件 |
+| 42 | eikaiwa | qq_english・nativecamp | 2952 | ✅ 0件 |
 
 **ゲートで止まった記事 0本**
