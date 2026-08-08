@@ -1,6 +1,6 @@
-# トップページの固定化 2026-08-09 00:47:14 JST
+# トップページの固定化 2026-08-09 01:07:54 JST
 
-モード: **LIVE（書いた）**
+モード: **DRY RUN（書いていない）**
 
 ## 反映前のホーム表示設定（バックアップ済み）
 
@@ -17,20 +17,20 @@
 
 | 記事 | 前 | 後 | 公開状態 |
 |---|---|---|---|
-| 304 | [10] | 変更なし（すでに割当済み） | publish |
-| 521 | [10] | 変更なし（すでに割当済み） | publish |
-| 32 | [10] | 変更なし（すでに割当済み） | publish |
+| 304 | [10] | [10]（DRY RUN） | publish |
+| 521 | [10] | [10]（DRY RUN） | publish |
+| 32 | [10] | [10]（DRY RUN） | publish |
 
 再取得したカテゴリ件数: `toeic-score` = **3本** / `ai-english` = **0本**
 
 ## 3. 記事一覧ページ（トップより先に作る）
 
-- slug `articles` … ✅ 更新（ID 642）
+- slug `articles` … すでにある（更新する）（ID 642）
 - URL: https://sakura-eigo.com/articles/
 
 ## 4. トップページ
 
-- slug `start` … ✅ 更新（ID 643）
+- slug `start` … すでにある（更新する）（ID 643）
 
 ### カテゴリ導線（記事が0本のものはリンクにしない）
 
@@ -49,13 +49,12 @@
 
 - `show_on_front` → `page` / `page_on_front` → 643 / `page_for_posts` → 642
 
-→ ✅ 反映した
+→ （DRY RUN）
 
 ## 6. プロフィール固定ページ
 
-- ID 8 / 旧設定の残存: **27歳・営業事務・5年後回し・30歳まで・来年こそ**
+- ID 8 / 旧設定の残存: **なし**
 - バックアップ: `workspace/backups/2026-08-09/page8_profile.json`
-- → ✅ 差し替えた
 
 ## 7. 公開URLの確認
 
@@ -65,3 +64,13 @@
 | https://sakura-eigo.com/start/ | 200 | https://sakura-eigo.com/ | なし | ✅ ルートへ301 |
 | https://sakura-eigo.com/articles/ | 200 | https://sakura-eigo.com/articles/ | なし |  |
 | https://sakura-eigo.com/feed/ | 200 | （無し） | なし |  |
+
+## 8. 記事一覧の中身とページ送り
+
+- 公開記事 **49本** / 1ページ **10本** → 全 **5ページ** になるはず
+
+| URL | HTTP | 記事リンク数 | 判定 |
+|---|---|---|---|
+| 1ページ目 https://sakura-eigo.com/articles/ | 200 | 10 | ✅ 記事が並んでいる |
+| 2ページ目 https://sakura-eigo.com/articles/page/2/ | 200 | 15 | ✅ ページ送りが効いている |
+| 存在しないページ https://sakura-eigo.com/articles/page/999/ | 404 | 5 | ✅ 404を返す |
