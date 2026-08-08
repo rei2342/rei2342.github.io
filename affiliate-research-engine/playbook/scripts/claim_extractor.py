@@ -236,8 +236,9 @@ TARGETS = [
 for _n in _q.SERVICE_NAMES:
     TARGETS.insert(0, (_n, re.escape(_n)))
 
-NUM_RE = re.compile(r"([0-9][0-9,\.]*)\s*(年間|年|ヶ月|か月|カ月|週間|日間|日|時間|分|"
-                    r"回|点|万円|円|コマ|本|ページ)")
+NUM_RE = re.compile(r"([0-9][0-9,\.]*(?:万[0-9,]*)?(?:千[0-9,]*)?)\s*"
+                    r"(年間|年|ヶ月|か月|カ月|週間|日間|日|時間|分|"
+                    r"回|点|万円|円|コマ|本|ページ|社|校|件|人|歳)")
 
 # 「5年間」と「5年」、「3ヶ月」と「3か月」は同じ。表記を1つに寄せる
 UNIT_CANON = {"年間": "年", "か月": "ヶ月", "カ月": "ヶ月", "日間": "日"}
@@ -384,13 +385,15 @@ def parse(sent, carried=None, from_aff=False):
                 tail = sent[tm.end():tm.end() + 2]
                 score = (vstart - tm.end()) - (30 if re.match(r"[をにへで]", tail) else 0)
                 if best is None or score < best[0]:
-                    best = (score, n)
+                    # 正規化した名前と、原文での位置の両方を持つ。
+                    # 名前で原文を探し直すと見つからない（英語コーチング vs コーチング）
+                    best = (score, n, tm.start(), tm.end())
         if best:
-            picked = (cand, best[1], in_quote)
+            picked = (cand, best, in_quote)
             break
     if not picked:
         return None
-    (action, atype, vstart, pred, tense), target, quoted = picked
+    (action, atype, vstart, pred, tense), (_sc, target, tstart, tend), quoted = picked
 
     # 「受ける」は受験・受講・相談・診断のどれか分からない。
     # 対象だけで決めず、周辺語も見る。分からなければ要確認にする
@@ -409,20 +412,26 @@ def parse(sent, carried=None, from_aff=False):
             action = "受ける"
             needs_review = "「受ける」の意味を特定できない"
 
+
     # 数値は「対象と述語の間」にあるものだけを結びつける。
     # 近くにあるだけの数値を結合しない（600点を「受ける」の目的語にしない）
-    tpos = sent.rfind(target, 0, vstart)
-    zone = sent[tpos + len(target):vstart] if tpos >= 0 else ""
+    zone = sent[tend:vstart]
     attrs = {}
     for nm in NUM_RE.finditer(zone):
         kind = classify_number(nm.group(1), nm.group(2), zone[:nm.start()])
         attrs.setdefault(kind, canon_value(nm.group(1), nm.group(2)))
-    # 対象の直前にある数値も見る（「3ヶ月のレッスンを受けた」）
-    head = sent[max(0, tpos - 10):tpos] if tpos >= 0 else ""
+    # 対象を修飾する数値も見る（「3ヶ月57万円のコーチングを受けた」）。
+    # 直前20字までを見て、間に句読点があればそこで切る
+    head = re.split(r"[、。]", sent[max(0, tstart - 20):tstart])[-1]
     for nm in NUM_RE.finditer(head):
         kind = classify_number(nm.group(1), nm.group(2), head[:nm.start()])
         attrs.setdefault(kind, canon_value(nm.group(1), nm.group(2)))
     value = ""      # 命題本文には数値を入れない
+    # 数値属性は行動を補足するだけ。**原文にない動詞を作らない。**
+    # 金額があるからといって「払った」にしてはいけない
+    if attrs.get("amount") and action not in ("支払", "浪費"):
+        needs_review = (needs_review + " / " if needs_review else "") + \
+            "金額があるが支払いの動詞ではない（対象と金額の関係を確認）"
 
     subj_here = scan_subject(sent)
     if subj_here == "情報源":

@@ -60,6 +60,38 @@ def run():
 
 
 
+def run_claim_parse():
+    """命題の解析。**原文にない動詞を作らない**ことを含めて確かめる。"""
+    import claim_extractor as ce
+    cases = [
+        # (原文, 期待する行動, 期待する属性, 要確認が要るか)
+        ("英語コーチングを25万円受けて、卒業した。", "受ける", {"amount": "25万円"}, True),
+        ("英語コーチングに25万円払った。", "支払", {"amount": "25万円"}, False),
+        ("3ヶ月57万円のコーチングを受けた。", "受ける",
+         {"duration": "3ヶ月", "amount": "57万円"}, True),
+        ("スクールに4万5000円を溶かした。", "浪費", {"amount": "4万5000円"}, False),
+        ("TOEICを600点で受けた。", "受験", {"score": "600点"}, False),
+        ("レッスンを25分受けた。", "受講", {"time_per_session": "25分"}, False),
+        ("週3回レッスンを受けている。", "受講", {"frequency": "3回"}, False),
+        ("留学情報館を受けた。", "受ける", {}, True),
+        ("オンライン英会話を3ヶ月続けた。", "継続", {"duration": "3ヶ月"}, False),
+    ]
+    ng = 0
+    for text, act, attrs, need in cases:
+        r = ce.parse(text)
+        ok = (r and r["normalized_action"] == act and r["attrs"] == attrs
+              and bool(r["needs_review"]) == need)
+        print(("OK  " if ok else "NG  ") + text)
+        if not ok:
+            got = (f"{r['normalized_action']} / {r['attrs']} / "
+                   f"要確認={bool(r['needs_review'])}") if r else "(命題なし)"
+            print(f"      期待: {act} / {attrs} / 要確認={need}")
+            print(f"      実際: {got}")
+            ng += 1
+    print(f"\n命題解析の失敗 {ng}件")
+    return ng
+
+
 def run_claims():
     """抽出ツールを、WPを叩かずに1本ぶんの記事で通す。
 
@@ -88,6 +120,8 @@ def run_claims():
 
 if __name__ == "__main__":
     ng = run()
+    print()
+    ng += run_claim_parse()
     print()
     ng += run_claims()
     sys.exit(1 if ng else 0)
