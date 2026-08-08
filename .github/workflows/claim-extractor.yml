@@ -94,7 +94,9 @@ jobs:
       - name: 数値を仕分ける
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
-        run: python affiliate-research-engine/playbook/scripts/number_audit.py
+        run: |
+          python affiliate-research-engine/playbook/scripts/number_audit.py
+          python affiliate-research-engine/playbook/scripts/number_plan.py
       - name: Commit
         if: always()
         run: |
