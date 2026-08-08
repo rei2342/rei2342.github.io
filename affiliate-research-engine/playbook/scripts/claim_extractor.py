@@ -596,6 +596,10 @@ def _one(sent, cand, quotes, carried, from_aff, general):
         claim = f"{target_surface}へ{verb}"
     if action == "就業":
         claim = f"{target_surface}として{verb}"
+    # 「英語しか使わない」を「英語を使わない」と表示すると意味が逆に読める。
+    # 極性を反転させない構文なので、助詞も原文のまま出す
+    if re.search(r"しか", sent[max(0, vstart - 30):vstart]):
+        claim = f"{target_surface}しか{pred}"
 
     return {
         "claim": claim, "subject": subj, "subject_confidence": conf,
