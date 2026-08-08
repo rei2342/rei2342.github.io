@@ -54,35 +54,56 @@ SERVICES = tuple(_q.SERVICE_NAMES)
 BASEDATE = r"20[0-9]{2}年[0-9]{1,2}月[0-9]{1,2}日時点|20[0-9]{2}年[0-9]{1,2}月時点"
 
 
-def classify(sent, unit):
-    """1つの数値が誰の数字かを決める。**迷ったら判別不能に落とす。**"""
-    money = unit in ("万円", "円", "万")
+MONEY = ("万円", "円", "万")
+
+
+def classify(sent, unit, is_claim):
+    """1つの数値が誰の数字かを決める。
+
+    **単位で門を作る。** 文にTOEICが出てくるからといって、
+    その文の「2冊」をスコアにしない（2026-08-08に3312件まで膨らんだ原因）。
+    金額の話は金額の単位でだけ、スコアの話は点でだけ判定する。
+
+    期間・回数は数が多すぎるので、**体験主張として抽出済みのものだけ**出す。
+    「3ヶ月」「1回」を全部並べても確認できない。
+    """
+    money = unit in MONEY
     svc = [s for s in SERVICES if s in sent]
 
-    if re.search(HYPO, sent):
-        return "仮定・試算", svc
-    if money and re.search(SAVE, sent):
-        return "個人_貯金", svc
-    if money and re.search(OFFICIAL, sent) and svc:
-        return "公式_料金", svc
-    if money and re.search(SELF, sent) and re.search(SPEND, sent):
-        return "個人_支出", svc
-    if money and re.search(SPEND, sent):
-        return "個人_支出の可能性", svc
-    if money and svc:
-        return "公式_料金", svc
-    if unit == "点" or re.search(SCORE, sent):
-        return ("個人_スコア" if re.search(SELF, sent) else "スコア_主語不明"), svc
+    if money:
+        if re.search(HYPO, sent):
+            return "仮定・試算", svc
+        if re.search(SAVE, sent):
+            return "個人_貯金", svc
+        if re.search(SELF, sent) and re.search(SPEND, sent):
+            return "個人_支出", svc
+        if svc and re.search(OFFICIAL, sent):
+            return "公式_料金", svc
+        if re.search(SPEND, sent):
+            return "個人_支出の可能性", svc
+        if svc:
+            return "公式_料金", svc
+        return "金額_判別不能", svc
+
+    if unit == "点":
+        if re.search(HYPO, sent):
+            return "仮定・試算", svc
+        if re.search(SELF, sent):
+            return "個人_スコア", svc
+        return "スコア_主語不明", svc
+
     if re.search(GENERAL, sent):
         return "一般_データ", svc
-    if re.search(SELF, sent):
+
+    # 期間・回数・時間は、体験主張として抽出できているものだけ
+    if is_claim and re.search(SELF, sent):
         return "個人_期間回数", svc
-    return "判別不能", svc
+    return None, svc
 
 
 ORDER = ["個人_支出", "個人_貯金", "個人_スコア", "個人_支出の可能性",
          "スコア_主語不明", "個人_期間回数",
-         "公式_料金", "一般_データ", "仮定・試算", "判別不能"]
+         "公式_料金", "一般_データ", "仮定・試算", "金額_判別不能"]
 
 NEEDS = {
     "個人_支出": "クレジットカード・銀行の明細",
@@ -94,8 +115,17 @@ NEEDS = {
     "公式_料金": "公式サイト＋基準日",
     "一般_データ": "出典（研究・統計の一次情報）",
     "仮定・試算": "確認不要（事実主張ではない）。ただし前提の数字は要確認",
-    "判別不能": "原文を読んで判断",
+    "金額_判別不能": "原文を読んで、誰の金額かを決める",
 }
+
+
+def claim_sentences():
+    """CLAIMS.csv で体験主張と判定された文。期間・回数の絞り込みに使う。"""
+    f = OUT / "CLAIMS.csv"
+    if not f.exists():
+        return set()
+    return {r["sentence"][:50] for r in csv.DictReader(f.open(encoding="utf-8"))
+            if r["experience"] in ("yes", "possible")}
 
 
 def main():
@@ -103,6 +133,8 @@ def main():
     posts = _wa.published()
     print(f"公開中 {len(posts)}本から数値を拾う\n")
 
+    claims = claim_sentences()
+    print(f"体験主張の文 {len(claims)}件を、期間・回数の絞り込みに使う")
     rows, seen = [], set()
     for p in posts:
         pid, link = p["id"], p.get("link", "")
@@ -112,9 +144,12 @@ def main():
             if reason:
                 continue
             for sent in ss:
+                is_claim = sent[:50] in claims
                 for m in NUM_RE.finditer(sent):
                     val, unit = m.group(1), m.group(2)
-                    kind, svc = classify(sent, unit)
+                    kind, svc = classify(sent, unit, is_claim)
+                    if kind is None:
+                        continue
                     key = (kind, f"{val}{unit}", sent[:60])
                     if key in seen:
                         continue
@@ -175,8 +210,8 @@ def main():
     for r in [x for x in rows if x["kind"] == "仮定・試算"]:
         L.append(f"- **{r['value']}** [{r['post_id']}] {r['sentence'][:110]}\n")
 
-    L.append("\n---\n\n# 判別不能（原文を読んで決める）\n\n")
-    for r in [x for x in rows if x["kind"] == "判別不能"][:60]:
+    L.append("\n---\n\n# 金額だが誰の数字か決められない（原文を読んで決める）\n\n")
+    for r in [x for x in rows if x["kind"] == "金額_判別不能"]:
         L.append(f"- **{r['value']}** [{r['post_id']}] {r['sentence'][:110]}\n")
 
     (OUT / "NUMBERS.md").write_text("".join(L), encoding="utf-8")
