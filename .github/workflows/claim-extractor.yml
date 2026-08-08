@@ -62,7 +62,10 @@ jobs:
       - name: 該当段落を集める
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
-        run: python affiliate-research-engine/playbook/scripts/rewrite_planner.py
+          POSTS: ${{ vars.DUMP_POSTS || '310,304,282,521,32' }}
+        run: |
+          python affiliate-research-engine/playbook/scripts/rewrite_planner.py
+          python affiliate-research-engine/playbook/scripts/article_dump.py
       - name: Commit
         if: always()
         run: |
