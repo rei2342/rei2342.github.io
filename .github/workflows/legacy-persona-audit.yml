@@ -1,0 +1,39 @@
+name: 旧ペルソナ設定の残存監査
+
+# 27歳・30歳まで・あと3年・5年後回し・営業事務 が
+# 公開記事のどこに残っているかを1箇所ずつ出す。
+# **一括置換はしない。** 同じ「30歳」でも個人の設定・読者の条件・制度の条件で扱いが違う。
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests janome -q
+      - name: 監査
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python affiliate-research-engine/playbook/scripts/legacy_persona_audit.py
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/claims/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: legacy persona audit $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
