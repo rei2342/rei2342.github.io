@@ -35,6 +35,19 @@ def terms(t):
     return {w for w in TERM.findall(t) if w not in STOP and len(w) >= 2}
 
 
+def shared(a_terms, b_terms):
+    """語の重なりを数える。**部分一致も1つと数える。**
+
+    形態素解析を入れていないので「解約期限」と「解約」が別語になる。
+    完全一致だけで見ると、同じことを言っていても0件になってしまう。
+    """
+    n = 0
+    for x in a_terms:
+        if any(x == y or x in y or y in x for y in b_terms):
+            n += 1
+    return n
+
+
 # 記事へ送るための一言。**主張ではない**ので照合の対象から外す
 META = re.compile(r"記事(の(ほう|中))?(に|へ|で)(置いて|書いて|まとめて|あります)"
                   r"|続きは|詳しくは")
@@ -110,25 +123,43 @@ def negated(s):
 
 
 def best_match(spec, s, article_sents):
-    """記事側で、いちばん語が重なる文を探す。"""
+    """記事側で、いちばん語が重なるところを探す。
+
+    記事は1つの主張を2文に分けて書くことがある
+    （「〜を確かめる時間にもできる。確認するのは次の5つ」）。
+    1文だけで見ると拾えないので、**隣り合う2文の窓でも見る。**
+    """
     st = terms(s)
     if not st:
         return None, 0.0
     best, score = None, 0.0
-    for a in article_sents:
+    windows = list(article_sents) + [
+        article_sents[i] + article_sents[i + 1]
+        for i in range(len(article_sents) - 1)]
+    for a in windows:
         at = terms(a)
         if not at:
             continue
-        ov = len(st & at) / len(st)
+        ov = shared(st, at) / len(st)
         if ov > score:
             best, score = a, ov
     return best, score
 
 
 def article_hedged(a):
-    # 「例」1文字は「例として」以外にも当たるので使わない
+    """記事側が**認識の弱さ**を示しているか。
+
+    「確認項目」「提案」は段落の役割を示すラベルであって、
+    その文の断定の強さではない。ここに入れると
+    「総額÷時間で1時間あたりを出す」まで弱い主張として扱ってしまう。
+    """
     return bool(re.search(r"可能性|かもしれ|ことがあ|場合があ|とは限|とはかぎ|"
-                          r"確認項目|提案|目安|例えば|試算|こともあ", a or ""))
+                          r"目安|例えば|試算|こともあ", a or ""))
+
+
+def article_labelled(a):
+    """記事側が「確認項目」「提案」と札を付けているか。"""
+    return bool(re.search(r"確認項目|提案", a or ""))
 
 
 def check(spec, parts, article, inferences=()):
@@ -142,7 +173,7 @@ def check(spec, parts, article, inferences=()):
       unjudged           内容語が少なく、**判定していない**
       needs_human_review 判定できないのに、言い切りかつ危うい話題
       unsupported        記事に対応する記述が無い
-      contradiction      記事と肯定・否定が逆
+      contradiction      記事と肯定・否定が逆（今は needs_human_review へ回す）
       overclaim          記事が可能性としているのに言い切っている
 
     **`unjudged` を `ok` と同じ扱いにしない。** 「判定しない」と
@@ -175,25 +206,6 @@ def check(spec, parts, article, inferences=()):
                 out.append(row)
                 continue
 
-            if mod in ("directive", "interrogative"):
-                # 行動の提案・問いかけ。事実の主張ではないが、
-                # **記事に無い操作をさせない**ので対応は要る
-                if ov >= c["term_overlap_min"]:
-                    row.update(verdict="ok", why="記事に同じ操作がある")
-                else:
-                    row.update(verdict="unsupported",
-                               why="記事に対応する操作が見つからない")
-                out.append(row)
-                continue
-
-            if ov < c["term_overlap_min"]:
-                row.update(
-                    verdict="unsupported" if risky else "ok",
-                    why=("記事に対応する記述が見つからない" if risky
-                         else "因果・効果を言っていないので通す"))
-                out.append(row)
-                continue
-
             # 内容語が少ない文は、何にでも高く一致してしまう。
             # **少ない文でモダリティや極性を判定しない。**誤検知になる
             if len(st) < c.get("min_terms_to_judge", 3):
@@ -211,20 +223,54 @@ def check(spec, parts, article, inferences=()):
                 out.append(row)
                 continue
 
+            if mod in ("directive", "interrogative"):
+                # 行動の提案・問いかけ。事実の主張ではないが、
+                # **記事に無い操作をさせない**ので対応は要る
+                if ov >= c["term_overlap_min"]:
+                    row.update(verdict="ok", why="記事に同じ操作がある")
+                else:
+                    row.update(verdict="unsupported",
+                               why="記事に対応する操作が見つからない")
+                out.append(row)
+                continue
+
+            need = (c.get("term_overlap_min_hedged", 0.3)
+                    if mod == "hedged" else c["term_overlap_min"])
+            if ov < need:
+                row.update(
+                    verdict="unsupported" if risky else "ok",
+                    why=("記事に対応する記述が見つからない" if risky
+                         else "因果・効果を言っていないので通す"))
+                out.append(row)
+                continue
+
             # 極性の食い違いは、**言い切っている長い文だけ**で見る。
             # 断片や提案で見ると「〜ない」が普通に出るので誤検知になる
             if (not bullet and mod == "assertive" and len(s) >= 20
                     and ov >= c["contradiction_overlap"]
                     and negated(s) != negated(a)):
-                row.update(verdict="contradiction",
-                           why="記事と肯定・否定が逆になっている")
+                # 文の中に「ない」があるかどうかだけでは、
+                # どの述語を打ち消しているかまで分からない。
+                # **落とさずに人へ回す。** 実際に誤検知が出た
+                row.update(verdict="needs_human_review",
+                           why="記事と肯定・否定が逆に見える。"
+                               "文単位の判定なので人が見る")
                 out.append(row)
                 continue
 
             if mod == "assertive" and article_hedged(a):
                 row.update(verdict="overclaim",
-                           why="記事は確認項目・可能性として書いているのに、"
+                           why="記事は可能性として書いているのに、"
                                "投稿が言い切っている")
+                out.append(row)
+                continue
+
+            if mod == "assertive" and risky and article_labelled(a):
+                # 記事は「確認項目」「提案」の札で書いている。
+                # 断定ではないが弱い主張とも言い切れないので、人へ回す
+                row.update(verdict="needs_human_review",
+                           why="記事は確認項目・提案として書いている。"
+                               "投稿は言い切りなので人が見る")
                 out.append(row)
                 continue
 

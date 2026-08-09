@@ -149,6 +149,9 @@ def main():
                 d.get("post_type_reason", "").split())
             stock["template_ids"] = tids
             stock["template_warnings"] = twarn
+            ex = (d.get("template_exception") or {}).get(platform)
+            if twarn and ex:
+                stock["template_exception_reason"] = ex
             stock["inferences"] = infer
             stock["weighted_len"] = (sg.weighted_len(spec, parts[0])
                                      if platform == "x" else None)

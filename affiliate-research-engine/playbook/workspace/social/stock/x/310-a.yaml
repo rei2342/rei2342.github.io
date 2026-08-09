@@ -1,24 +1,24 @@
 stock_id: X-310-a
 platform: x
 article_id: 310
-article_modified_gmt: '2026-08-09T11:13:38'
+article_modified_gmt: '2026-08-09T13:58:10'
 article_title: 無料・低価格の英語アプリで足りる人と、足りない人の分かれ目
 article_url: https://sakura-eigo.com/cheap-english-learning-apps-free/
-text: '英語アプリを比べるとき、月額の安い順に並べても決まりません。
+text: '英語アプリは、月額だけでは選びきれません。
 
-  無料で試せる期間は、1週間で何日、実際に開けたかを数える時間として使ってみてください。
+  無料期間中に、予定した日のうち何日開けたかを数えると、生活の中で無理なく使えるかを確認できます。
 
 
-  見るのはサービスの良し悪しより、自分の生活が飲み込めるかどうかです
+  無料期間に見る項目はこちら
 
   https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=x'
 thread_parts:
-- '英語アプリを比べるとき、月額の安い順に並べても決まりません。
+- '英語アプリは、月額だけでは選びきれません。
 
-  無料で試せる期間は、1週間で何日、実際に開けたかを数える時間として使ってみてください。
+  無料期間中に、予定した日のうち何日開けたかを数えると、生活の中で無理なく使えるかを確認できます。
 
 
-  見るのはサービスの良し悪しより、自分の生活が飲み込めるかどうかです
+  無料期間に見る項目はこちら
 
   https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=x'
 state: awaiting_approval
@@ -55,27 +55,34 @@ rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: 9659b48dbfda6f00
+content_hash: e1e53ddb77200a04
 generator_version: social-v1
 material:
   search_intent: 無料や低価格の英語アプリだけで足りるのかを知りたい
   core_answer: 無料で試せる期間は、サービスの良し悪しではなく、自分の生活が飲み込めるかを見る時間として使う
   one_check: 1週間で何日、実際に開けたかを数えて、予定した日数と比べる
   unique_artifact: 無料期間中に確認する5項目と、月額ではなく使えた回数で振り返る出し方
-created_at: 2026-08-09T22:03:08+0900
+created_at: 2026-08-09T23:04:09+0900
 history:
-- at: 2026-08-09T22:03:08+0900
+- at: 2026-08-09T23:04:09+0900
   state: generated
-- at: 2026-08-09T22:03:08+0900
+- at: 2026-08-09T23:04:09+0900
   state: gated
-- at: 2026-08-09T22:03:08+0900
+- at: 2026-08-09T23:04:09+0900
   state: awaiting_approval
 post_type: comparison_axis
 post_type_reason: 記事が「無料アプリでできること」と「有料で足されること」を並べ、 無料期間中に見る項目まで出している。軸の作り方を渡す形が合う
 template_ids:
-- condition_open
-- toki
 - topic_open
 template_warnings: []
 inferences: []
-weighted_len: 238
+weighted_len: 191
+claim_counts:
+  supported: 1
+  unsupported: 0
+  unjudged: 1
+  needs_human_review: 1
+  total: 3
+needs_human_review:
+- text: 英語アプリは、月額だけでは選びきれません。
+  why: 内容語が2語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る

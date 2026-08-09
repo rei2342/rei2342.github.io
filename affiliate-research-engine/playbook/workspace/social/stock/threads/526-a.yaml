@@ -47,7 +47,7 @@ thread_parts:
   行き先ごとに並べた表と、年齢や在学の条件で最初から選べない場合は記事のほうに置いています。
 
   https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
-state: awaiting_approval
+state: approved
 gate_results:
 - id: article_published
   ok: true
@@ -75,8 +75,8 @@ gate_results:
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: XとThreadsの近さ 0.17（0.85未満にする）
-approved_at: null
+  detail: XとThreadsの近さ 0.12（0.85未満にする）
+approved_at: 2026-08-09T23:04:10+0900
 rejected_reason: null
 scheduled_at: null
 posted_at: null
@@ -88,17 +88,26 @@ material:
   core_answer: 「早い」には時間の量の話と上達の速さの話が混ざっている。まず分けて、量のほうを数える
   one_check: 総額を、英語に触れる時間で割って1時間あたりを出す
   unique_artifact: 行き先ごとに1時間あたりで並べた表と、年齢や在学の条件で選べない場合
-created_at: 2026-08-09T22:03:08+0900
+created_at: 2026-08-09T23:04:09+0900
 history:
-- at: 2026-08-09T22:03:08+0900
+- at: 2026-08-09T23:04:09+0900
   state: generated
-- at: 2026-08-09T22:03:08+0900
+- at: 2026-08-09T23:04:09+0900
   state: gated
-- at: 2026-08-09T22:03:08+0900
+- at: 2026-08-09T23:04:09+0900
   state: awaiting_approval
+- at: 2026-08-09T23:04:10+0900
+  state: approved
 post_type: misreading
 post_type_reason: 「現地が一番早い」という言われ方を、記事が読み直している。 時間の量と上達の速さを分ける、という正し方が記事の芯
 template_ids: []
 template_warnings: []
 inferences: []
 weighted_len: null
+claim_counts:
+  supported: 3
+  unsupported: 0
+  unjudged: 6
+  needs_human_review: 0
+  total: 9
+needs_human_review: []

@@ -328,11 +328,17 @@ check("決められた順なら posted まで行ける", st["state"] == "posted"
 
 # ── 5. 実際の在庫 ────────────────────────────────────
 rows = inv.all_stock(spec)
-check("在庫に approved 済みが無い（まだ承認していない）",
-      not [s for _, s in rows if s["state"] in ("approved", "scheduled",
-                                                "posted")],
-      " ".join(s["stock_id"] for _, s in rows
-               if s["state"] in ("approved", "scheduled", "posted")))
+# 承認してよいのは、指示で名指しされた3件だけ。**投稿はまだしない**
+APPROVED_OK = {"X-23-a", "THREADS-526-a", "X-546-a"}
+bad_state = [s["stock_id"] for _, s in rows
+             if s["state"] in ("approved", "scheduled", "posted")
+             and s["stock_id"] not in APPROVED_OK]
+check("承認済みは指定の3件だけ", not bad_state, " ".join(bad_state))
+check("投稿済み・予約済みが無い",
+      not [s for _, s in rows if s["state"] in ("scheduled", "posted")])
+check("残り7件は awaiting_approval",
+      sum(1 for _, s in rows if s["state"] == "awaiting_approval") == 7,
+      str(sum(1 for _, s in rows if s["state"] == "awaiting_approval")))
 for _, s in rows:
     check(f"{s['stock_id']}: ゲート全通過",
           all(g["ok"] for g in s["gate_results"]),
@@ -346,13 +352,37 @@ check("試作5記事の型が全部違う", len(set(types.values())) == len(type
 for s in rows:
     check(f"{s['stock_id']}: 型を選んだ理由がある",
           bool(s.get("post_type_reason")))
-    check(f"{s['stock_id']}: 文型の警告が無い",
-          not s.get("template_warnings"),
+    # 警告が出ていても、**理由が書いてあれば例外**として通す。
+    # 指定された本文を書き換えないための逃げ道を、記録つきで用意する
+    check(f"{s['stock_id']}: 文型の警告が無い、または理由つきの例外",
+          not s.get("template_warnings")
+          or bool(s.get("template_exception_reason")),
           " ".join(s.get("template_warnings") or []))
     if s["platform"] == "x":
         check(f"{s['stock_id']}: 加重が上限内",
               s.get("weighted_len", 0) <= spec["x"]["weighted"]["hard_limit"],
               str(s.get("weighted_len")))
+
+# ── 7. 判定の分離 ────────────────────────────────────
+import social_claims as sc
+ART3 = dict(ART, body="無料期間は自分の生活で無理なく使えるかを確かめる時間にもできる。")
+short_plain = "手帳に書きます。"
+short_risky = "月額だけでは決まりません。"
+r1 = sc.check(spec, [short_plain], ART3)[0]
+r2 = sc.check(spec, [short_risky], ART3)[0]
+check("内容語の少ない文を ok にしない", r1["verdict"] == "unjudged",
+      r1["verdict"])
+check("短くても言い切りで危うい話題は人へ回す",
+      r2["verdict"] == "needs_human_review", r2["verdict"])
+c = sc.counts([r1, r2])
+check("supported に unjudged を混ぜていない", c["supported"] == 0, str(c))
+check("counts が4つに分かれている",
+      set(c) == {"supported", "unsupported", "unjudged",
+                 "needs_human_review", "total"})
+for _, st in inv.all_stock(spec):
+    cc = st.get("claim_counts") or {}
+    check(f"{st['stock_id']}: unsupported 0", cc.get("unsupported") == 0,
+          str(cc))
 
 print()
 if fails:

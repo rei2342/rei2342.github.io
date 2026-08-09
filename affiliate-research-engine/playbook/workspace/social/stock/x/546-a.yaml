@@ -21,7 +21,7 @@ thread_parts:
   止まった場所によって、見るところが変わることがあります
 
   https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x'
-state: awaiting_approval
+state: approved
 gate_results:
 - id: article_published
   ok: true
@@ -50,7 +50,7 @@ gate_results:
 - id: cross_platform_gate
   ok: true
   detail: もう片方がまだ無い
-approved_at: null
+approved_at: 2026-08-09T23:04:10+0900
 rejected_reason: null
 scheduled_at: null
 posted_at: null
@@ -62,14 +62,16 @@ material:
   core_answer: 続かない理由は、話し始めるまでに触る回数が多いこと
   one_check: 前にやめたサービスで、やめた瞬間が授業中だったか予約の前だったかを書き出す
   unique_artifact: 操作の数え方と、料金を1回あたりで出す試算、解約日を先に決める7日の手順
-created_at: 2026-08-09T22:03:08+0900
+created_at: 2026-08-09T23:04:09+0900
 history:
-- at: 2026-08-09T22:03:08+0900
+- at: 2026-08-09T23:04:09+0900
   state: generated
-- at: 2026-08-09T22:03:08+0900
+- at: 2026-08-09T23:04:09+0900
   state: gated
-- at: 2026-08-09T22:03:08+0900
+- at: 2026-08-09T23:04:09+0900
   state: awaiting_approval
+- at: 2026-08-09T23:04:10+0900
+  state: approved
 post_type: direct_answer
 post_type_reason: 「続かないのは意志が弱いからか」という1つの問いで来る読者に対して、 記事は「話し始めるまでの手数」という答えを本文の主張として持っている
 template_ids:
@@ -77,3 +79,14 @@ template_ids:
 template_warnings: []
 inferences: []
 weighted_len: 231
+claim_counts:
+  supported: 1
+  unsupported: 0
+  unjudged: 0
+  needs_human_review: 2
+  total: 3
+needs_human_review:
+- text: オンライン英会話が続かないのは、意志の弱さとは限りません。
+  why: 内容語が2語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る
+- text: 止まった場所によって、見るところが変わることがあります
+  why: 内容語が1語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る

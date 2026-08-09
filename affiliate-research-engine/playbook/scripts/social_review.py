@@ -110,6 +110,9 @@ def main():
                     + (s.get("template_warnings") or []))
             L.append(f"\n警告（落とさない）: "
                      + (" / ".join(warn) if warn else "なし") + "\n")
+            if s.get("template_exception_reason"):
+                L.append(f"\n**型の重なりは例外扱い**: "
+                         f"{s['template_exception_reason']}\n")
 
             # 型
             L.append(f"\n**型**: {s.get('post_type', '—')}"
