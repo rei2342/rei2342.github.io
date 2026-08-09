@@ -5,8 +5,6 @@
 
 | 記事 | トピック | 案件 | 字数 | ゲート |
 |---|---|---|---|---|
-| 27 | study_abroad | nativecamp_ryugaku・johokan | 2240 | ✅ 0件 |
-| 28 | eikaiwa | qq_english・nativecamp | 2268 | ✅ 0件 |
-| 33 | eikaiwa | qq_english・nativecamp | 2918 | ✅ 0件 |
+| 281 | philippines | dmm・speek | 1848 | ✅ 0件 |
 
 **ゲートで止まった記事 0本**
