@@ -5,7 +5,10 @@
 
 | 記事 | トピック | 案件 | 字数 | ゲート |
 |---|---|---|---|---|
-| 136 | study_abroad | nativecamp_ryugaku・johokan | 2588 | ✅ 0件 |
-| 287 | eikaiwa | qq_english・nativecamp | 2420 | ✅ 0件 |
+| 235 | philippines | nativecamp_ryugaku・phil_navi | 2350 | ✅ 0件 |
+| 286 | training | speek・nativecamp | 2537 | ✅ 0件 |
+| 301 | agent | nativecamp_ryugaku・johokan | 2395 | ✅ 0件 |
+| 305 | philippines | nativecamp_ryugaku・phil_navi | 2618 | ✅ 0件 |
+| 67 | philippines | nativecamp_ryugaku・phil_navi | 2278 | ✅ 0件 |
 
 **ゲートで止まった記事 0本**
