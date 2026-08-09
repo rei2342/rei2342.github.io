@@ -1,8 +1,9 @@
+package: sakura-eyecatch-ai6-generation-package
 batch: ai-6
-spec: config/eyecatch/sakura-v1.yaml
+spec_file: sakura-v1.yaml
 spec_status: proposal
 category: AI英語学習
-generated_at: 2026-08-09 16:55:47 JST
+generated_at: 2026-08-09 17:34:40 JST
 master:
   size:
   - 1920
@@ -10,6 +11,16 @@ master:
   aspect_ratio: '16:9'
   has_text: false
   format: png
+  filename_pattern: masters/<post_id>.png
+text_safe_area:
+  side: left
+  box:
+  - 0
+  - 0
+  - 960
+  - 1080
+  rule: Japanese text is composited here later, so leave it quiet and uncluttered
+subject_anchor: centre to right
 blog_export:
   size:
   - 1200
@@ -30,6 +41,14 @@ note_export:
   text_overlay: false
   format: jpeg
   quality: 88
+always_append: 'No letters, no words, no numbers, no logos, no watermarks.
+
+  Do not render any interface text, application logo, brand name, score, price, date, duration, or numerical
+  label.
+
+  Keep the entire left half visually quiet and uncluttered for later Japanese typography.
+
+  Do not depict Sakura using a service unless that usage is verified.'
 references:
 - slot: face_and_age
   post_id: 521
@@ -54,17 +73,44 @@ reference_priority:
 - hair_and_sakura
 - style_light_texture
 reject_rule: 人物の顔が521から離れていたら不合格にする。作り直す。 297の顔・大きな目・ちび頭身・ピンクのパーカーは引き継がない
+previews:
+- file: previews/reference-comparison.jpg
+  note: 参照候補3枚の比較。全体と顔の拡大、採るもの／採らないもの
+- file: previews/existing-ai6-contact-sheet.jpg
+  note: 6本の並び見本。**中身は既存画像の流用で、完成版ではない。**文字の位置と読みやすさだけを見るためのもの
 with_person_count: 3
 without_person_count: 3
+post_ids:
+- 993
+- 995
+- 997
+- 999
+- 1001
+- 1003
 items:
 - post_id: 993
   slug: chatgpt-english-learning-steps
   title: ChatGPTで英語学習を始める手順｜社会人が最初に試す3つの使い方
+  search_intent: ChatGPTで英語学習を始めたいが、何をどう入力すればいいのかが分からない
+  role: 手順
   prompt_file: prompts/993.md
   with_person: false
   person_reason: 手順の記事。読者が知りたいのは「何をどう打つか」で、 表情や動作は理解を助けない。手元と紙のノートで足りる
   references:
   - references/297.jpg
+  camera_distance: close on the hands
+  expression: no face in frame
+  pose: both adult hands resting over the open notebook, a pen held loosely, one finger poised as if about
+    to write
+  props:
+  - a paper notebook
+  - a pen
+  - a desk lamp
+  - a cream mug
+  - a closed laptop, lid down
+  background: an indoor room at night, walls in pale cream
+  palette: cream paper and warm lamp amber over a pale sakura-pink room, the periwinkle accent only on
+    the pen barrel
   master_file: masters/993.png
   blog_output: eyecatch-chatgpt-english-learning-steps.jpg
   note_output: eyecatch-chatgpt-english-learning-steps-note.jpg
@@ -77,11 +123,24 @@ items:
 - post_id: 995
   slug: ai-eikaiwa-vs-online-eikaiwa
   title: AI英会話とオンライン英会話の違い｜4つの軸で選ぶ
+  search_intent: AI英会話と人が相手のオンライン英会話の、どちらから始めるべきか迷っている
+  role: 比較
   prompt_file: prompts/995.md
   with_person: false
   person_reason: 比較表の記事。並べる対象そのものを見せるほうが早い。 人物を置くと、どちらを勧めているかの印象が付いてしまう
   references:
   - references/297.jpg
+  camera_distance: top-down over a desk
+  expression: none. no person appears
+  pose: no person. objects laid out in two halves of the desk, seen straight from above
+  props:
+  - two cream mugs
+  - a small featureless speaker-like object
+  - a folded knitted glove
+  - four blank cards
+  background: a wooden desk seen from directly above
+  palette: warm wood brown and cream, both halves lit equally so neither side looks favoured, the periwinkle
+    accent only on one of the four blank cards
   master_file: masters/995.png
   blog_output: eyecatch-ai-eikaiwa-vs-online-eikaiwa.jpg
   note_output: eyecatch-ai-eikaiwa-vs-online-eikaiwa-note.jpg
@@ -94,6 +153,8 @@ items:
 - post_id: 997
   slug: ai-translation-why-learn-english
   title: AI翻訳があるのに英語を学ぶ意味｜場面で分けて考える
+  search_intent: AI翻訳があるのに英語を学ぶ意味があるのか疑っている
+  role: 共感・入口
   prompt_file: prompts/997.md
   with_person: true
   person_reason: 学ぶ意味を疑っている読者の入口。迷いを扱う記事なので、 「待たせている間合い」を人物の姿勢で見せたほうが伝わる
@@ -101,6 +162,17 @@ items:
   - references/521.jpg
   - references/273.jpg
   - references/297.jpg
+  camera_distance: waist-up, half body, from slightly behind
+  expression: eyes lowered, lips closed, faintly troubled but calm. not smiling, not looking at the viewer
+  pose: standing at the right in three-quarter profile seen from slightly behind, shoulders turned a little
+    away, the phone held low at her waist
+  props:
+  - a phone held face-down and dark
+  - another person's shoulder at the frame edge
+  - blurred storefronts
+  background: a street corner in the afternoon, soft light
+  palette: bright afternoon cream and pale grey with blurred warm storefront colour behind, the periwinkle
+    accent only on her cardigan cuff
   master_file: masters/997.png
   blog_output: eyecatch-ai-translation-why-learn-english.jpg
   note_output: eyecatch-ai-translation-why-learn-english-note.jpg
@@ -113,6 +185,8 @@ items:
 - post_id: 999
   slug: ai-pronunciation-app-how-to-choose
   title: AI発音矯正アプリの選び方｜自動判定でできることと、できないこと
+  search_intent: AI発音矯正アプリの選び方が分からない。点数が出ても直し方が分からない
+  role: 選び方
   prompt_file: prompts/999.md
   with_person: true
   person_reason: 発音は身体の動作が主題。顎に手を当てて音の出し方を確かめる動作が、 「点数ではなく直し方」という記事の結論をそのまま見せる
@@ -120,6 +194,17 @@ items:
   - references/521.jpg
   - references/273.jpg
   - references/297.jpg
+  camera_distance: waist-up, half body
+  expression: concentrating inward, eyes lowered, mouth very slightly open as if forming a sound
+  pose: seated at the right in three-quarter view, one hand resting lightly against her jaw, the other
+    hand in her lap
+  props:
+  - simple over-ear headphones
+  - a small plain hand mirror
+  - a window sill
+  background: a window corner in the morning, soft backlight
+  palette: pale morning backlight, white sill and cream knit, the periwinkle accent only on the headphone
+    band
   master_file: masters/999.png
   blog_output: eyecatch-ai-pronunciation-app-how-to-choose.jpg
   note_output: eyecatch-ai-pronunciation-app-how-to-choose-note.jpg
@@ -132,6 +217,8 @@ items:
 - post_id: 1001
   slug: ai-era-english-how-far
   title: AI時代に必要な英語力はどこまでか｜場面から決める
+  search_intent: AI時代に自分はどこまで英語ができれば足りるのかを知りたい
+  role: 線引き（ハブ）
   prompt_file: prompts/1001.md
   with_person: true
   person_reason: 自分に必要な範囲を選ぶ判断が中心。どれを取ってどれを外すかという 迷いは、手だけでは出ない。カードを見比べる視線と表情で見せる
@@ -139,6 +226,16 @@ items:
   - references/521.jpg
   - references/273.jpg
   - references/297.jpg
+  camera_distance: waist-up, seated on the floor, slightly from above
+  expression: thinking. brows softly drawn, eyes lowered toward the cards, mouth closed
+  pose: seated on the floor at the right with legs folded, leaning slightly forward, one hand hovering
+    above one card without touching it
+  props:
+  - four plain cream cards
+  - 'simple hand-drawn icons: an open book, an ear, a speech bubble, a pen'
+  - a pale wooden floor
+  background: a quiet room in the daytime, natural light from a window
+  palette: pale wood floor and daylight cream, the periwinkle accent only on the sleeve cuff of her cardigan
   master_file: masters/1001.png
   blog_output: eyecatch-ai-era-english-how-far.jpg
   note_output: eyecatch-ai-era-english-how-far-note.jpg
@@ -151,11 +248,24 @@ items:
 - post_id: 1003
   slug: english-meeting-transcription-checklist
   title: 英語会議の文字起こしツールを選ぶ前に｜確認する5つのこと
+  search_intent: 英語会議のAI文字起こしツールを選ぶ前に、何を確認すればよいのかを知りたい
+  role: 確認項目（実務）
   prompt_file: prompts/1003.md
   with_person: false
   person_reason: ツールの機能を確かめる記事。人物を置くと、さくらがその会議に出て そのツールを使っているように読めてしまう。会議机と小物だけで表す
   references:
   - references/297.jpg
+  camera_distance: top-down over a meeting table
+  expression: none. no person appears
+  pose: no person. objects laid out on the table top, seen straight from above
+  props:
+  - a folded, unused headset
+  - a sheet of paper with five empty hand-drawn checkboxes
+  - a small card with a hand-drawn sound wave
+  - two plain cups
+  background: a meeting table in the morning, natural light from a window, seen from above
+  palette: cool morning daylight on a pale grey table, white paper and cream cups, the periwinkle accent
+    only on the pen
   master_file: masters/1003.png
   blog_output: eyecatch-english-meeting-transcription-checklist.jpg
   note_output: eyecatch-english-meeting-transcription-checklist-note.jpg

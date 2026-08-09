@@ -111,6 +111,11 @@ export function buildPrompt(
       bullets([
         person,
         `camera: ${article.camera_distance}`,
+        "expression: " + squash(article.expression),
+        "pose: " + squash(article.pose),
+        "props: " + article.props.join(", "),
+        "background: " + article.background,
+        "colour: " + squash(article.palette),
         `accent colour: ${accent.name} (${accent.hex}), ` +
           `used on one small object only`,
         "scene: " + squash(article.scene),

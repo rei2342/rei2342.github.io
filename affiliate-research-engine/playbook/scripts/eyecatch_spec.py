@@ -101,6 +101,11 @@ def build_prompt(spec, article, category):
         + _bullets([
             person,
             f"camera: {article['camera_distance']}",
+            "expression: " + " ".join(article["expression"].split()),
+            "pose: " + " ".join(article["pose"].split()),
+            "props: " + ", ".join(article["props"]),
+            "background: " + article["background"],
+            "colour: " + " ".join(article["palette"].split()),
             f"accent colour: {accent['name']} ({accent['hex']}), "
             f"used on one small object only",
             "scene: " + " ".join(article["scene"].split()),
