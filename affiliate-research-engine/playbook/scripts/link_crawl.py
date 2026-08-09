@@ -73,6 +73,18 @@ def main():
     # 本文の内部リンクを集める。
     # **テーマが自動で出す関連記事カードは本文のリンクではない。**
     # article の中にあるので、そこだけ先に落とす（2026-08-09に分けた）。
+    # 入れ子のある div を正規表現で閉じるのは無理なので、
+    # **本文の入れ物の始まりと終わりで切る。** Cocoon は本文を
+    # <div class="entry-content"> に入れ、その後ろに前後の記事ナビと
+    # 関連記事カードを出す。ここを切らないと、
+    # 「記事IDが1つ違う記事へのリンク」が全記事に付いて数が水増しされる
+    # （2026-08-09に51本の水増しを見つけた）
+    BODY_START = re.compile(r'<div[^>]*class="[^"]*entry-content[^"]*"[^>]*>',
+                            re.I)
+    BODY_END = re.compile(
+        r'<(?:footer|div|nav|aside)[^>]*(?:class|id)="[^"]*'
+        r'(?:entry-footer|article-footer|under-entry-body|pager-post-navi|'
+        r'related-entries|post-navi)[^"]*"', re.I)
     THEME_BLOCK = re.compile(
         r'<(div|aside|nav|section|ul)[^>]*class="[^"]*'
         r'(?:related|carditem|entry-card|navi|breadcrumb|widget|pager|'
@@ -80,10 +92,16 @@ def main():
         re.DOTALL | re.I)
     for src, html in pages.items():
         body = html
-        m = re.search(r'<(?:article|main)[^>]*>(.*)</(?:article|main)>',
-                      html, re.DOTALL | re.I)
-        if m:
-            body = m.group(1)
+        s = BODY_START.search(html)
+        if s:
+            rest = html[s.end():]
+            e = BODY_END.search(rest)
+            body = rest[:e.start()] if e else rest
+        else:
+            m = re.search(r'<(?:article|main)[^>]*>(.*)</(?:article|main)>',
+                          html, re.DOTALL | re.I)
+            if m:
+                body = m.group(1)
         theme_n = len(THEME_BLOCK.findall(body))
         body = THEME_BLOCK.sub(" ", body)
         theme_counts[norm(src)] = theme_n
