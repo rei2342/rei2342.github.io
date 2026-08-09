@@ -168,6 +168,30 @@ def fetch(url):
             "text": re.sub(r"\s+", " ", _q.strip_tags(html))}
 
 
+# ── 年齢条件の文そのものを探す（2026-08-09）──────────────────
+# 語の一致だけだと、ページのJSやナビに含まれる「18」「30」を拾ってしまう。
+# **年齢を述べている文の形**で探して、そのまま引用する。
+AGE_PROBE = re.compile(
+    r"[^.。]{0,120}?(?:"
+    r"aged?\s+\d{2}\s*(?:to|and|-|–)\s*\d{2}"
+    r"|between the ages of\s+\d{2}\s+and\s+\d{2}"
+    r"|\d{2}\s*(?:to|-|–)\s*\d{2}\s*years old"
+    r"|be\s+\d{2}\s+to\s+\d{2}\s+years\s+of\s+age"
+    r"|ages?\s+\d{2}\s*-\s*\d{2}"
+    r"|\d{2}\s*歳から\s*\d{2}\s*歳"
+    r")[^.。]{0,160}[.。]?", re.IGNORECASE)
+
+# 申請時点か渡航時点かを述べている文
+WHEN_PROBE = re.compile(
+    r"[^.。]{0,120}?(?:"
+    r"at the time (?:you|of) appl"
+    r"|when you apply"
+    r"|on the date (?:you|of) appl"
+    r"|申請(?:時|時点)"
+    r"|at the time of (?:entry|arrival)"
+    r")[^.。]{0,160}[.。]?", re.IGNORECASE)
+
+
 def excerpt(text, word, span=90):
     i = text.find(word)
     if i < 0:
@@ -217,6 +241,18 @@ def main():
             print(f"   ○ {url} → {len(hits)}語一致")
             for w, ex in hits[:6]:
                 L.append(f"\n**該当箇所（{w}）**\n\n> …{ex}…\n")
+            # 年齢の条件は、語の一致ではなく**文の形**で拾って引用する。
+            # JSやナビに紛れた「18」「30」を根拠にしないため
+            if cid.startswith("W"):
+                for label, probe in (("年齢条件の文", AGE_PROBE),
+                                     ("判定時点の文", WHEN_PROBE)):
+                    found = [m.group(0).strip()
+                             for m in probe.finditer(r["text"])][:4]
+                    L.append(f"\n**{label}**\n\n"
+                             + ("".join(f"> {x}\n>\n" for x in found)
+                                if found else "> （見つからない）\n"))
+                    for x in found:
+                        print(f"      [{label}] {x[:150]}")
             rows.append({"check_id": cid, "post_id": pid, "claim": claim,
                          "url": r["final_url"], "title": r["title"],
                          "checked_at": stamp, "http": r["status"],
