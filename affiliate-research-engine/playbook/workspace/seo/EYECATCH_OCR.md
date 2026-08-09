@@ -1,10 +1,10 @@
-# アイキャッチ画像の実物監査（OCR） 2026-08-09 12:08:47 JST
+# アイキャッチ画像の実物監査（OCR） 2026-08-09 12:13:26 JST
 
 公開 **49本**の画像を実際に取得して、tesseract（日本語＋英語）で読んだ。
 
-- **差し替え候補: 8本**
-- ファイル名だけ古い: 14本
-- 問題なし: 27本
+- **差し替え候補: 11本**
+- ファイル名だけ古い: 13本
+- 問題なし: 25本
 
 **自動で差し替えていない。**
 
@@ -14,7 +14,7 @@
 |---|---|---|---|---|---|
 | [23](https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/) | 74b9063a-dc86-40e6-b53c-87d44d0498df.png | 27歳、ワーホリに行きたいけど不安… ク 0 W パン / ワーホリ貯金 200A crsxsiic ) 額より先に決めるべき d y 『1 | 旧年齢:27歳 | なし | **差し替え候補。** 画像内の文字を本文と揃える |
 | [27](https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e3%83%9a%e3%83%a9%e3%83%9a%e3%83%a9-%e3%81%ab%e3%81%aa%e3%82%8b-%e6%9c%9f%e9%96%93%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b2000%e6%99%82%e9%96%93%e3%83%bb2%e5%b9%b4/) | eyecatch-27.png | ｜ mi a yas 95 SS NN A) yh y D \ 問 ¥ —— ト /2 x yy Mi SN N の/。 \ NN wh i | なし | なし | ファイル名に古い語。画像の中身は問題なし。名前だけ変える |
-| [32](https://sakura-eigo.com/%e3%80%8ctoeic-500%e7%82%b9-%e3%81%8b%e3%82%89-%e4%b8%8a%e3%81%92%e3%82%8b-%e6%96%b9%e6%b3%95%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b%e5%8f%82%e8%80%83%e6%9b%b8%e3%81%a8200%e6%99%82%e9%96%93%e3%82%92/) | toeic-500-200.png | = の - "BO SN 515 515 515 Ma 4 Gh < | なし | なし | ファイル名に古い語。画像の中身は問題なし。名前だけ変える |
+| [32](https://sakura-eigo.com/%e3%80%8ctoeic-500%e7%82%b9-%e3%81%8b%e3%82%89-%e4%b8%8a%e3%81%92%e3%82%8b-%e6%96%b9%e6%b3%95%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b%e5%8f%82%e8%80%83%e6%9b%b8%e3%81%a8200%e6%99%82%e9%96%93%e3%82%92/) | toeic-500-200.png | = の - "BO SN 515 515 515 Ma 4 Gh < | TOEICスコア:515 | なし | **差し替え候補。** 画像内の文字を本文と揃える |
 | [117](https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e3%82%bc%e3%83%ad%e3%81%8b%e3%82%89-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e3%81%a9%e3%81%ae%e3%81%8f%e3%82%89%e3%81%84%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b61000%e6%99%82%e9%96%93/) | eyecatch-117.png | ンー の (ay ee N AIS « {OORT DU oS %で = wie — | なし | なし | ファイル名に古い語。画像の中身は問題なし。名前だけ変える |
 | [131](https://sakura-eigo.com/%e3%80%8c%e3%82%aa%e3%83%bc%e3%82%b9%e3%83%88%e3%83%a9%e3%83%aa%e3%82%a2-%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%bb%e7%94%a8-%e3%83%aa%e3%82%a2%e3%83%ab%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b6/) | eyecatch-131.png | <*> ｜ ーー時 未来の わたしのために KM ve ae Vv 貯める 5 7 り キー ｜ ｜ \ DP なia 2A ジンクミ Ei | なし | なし | ファイル名に古い語。画像の中身は問題なし。名前だけ変える |
 | [136](https://sakura-eigo.com/%e3%80%8c%e6%b5%b7%e5%a4%96%e7%a7%bb%e4%bd%8f-%e6%ba%96%e5%82%99-%e8%8b%b1%e8%aa%9e%e3%81%a7%e3%81%8d%e3%81%aa%e3%81%84%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b6%e8%8b%b1%e8%aa%9e%e3%81%a7%e3%81%8d/) | 5B2FD5E5-F69F-4168-9EE5-57AEC7FE48C0.png | ど ｜ oe ) のスス (人4 の Ge た KEP I~ * | なし | なし | ファイル名に古い語。画像の中身は問題なし。名前だけ変える |
@@ -26,14 +26,16 @@
 | [207](https://sakura-eigo.com/%e3%80%8c%e7%a4%be%e4%bc%9a%e4%ba%ba-%e7%95%99%e5%ad%a6-%e4%bb%95%e4%ba%8b%e8%be%9e%e3%82%81%e3%82%8b-%e4%b8%8d%e5%ae%89%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e5%86%8d%e5%b0%b1%e8%81%b7%e3%83%bb/) | eyecatch-207.png | aa ied > oe Zo 9 、 容 N、 y! り W N42 SS 4 cos pf ft tf > Lib Es ¢ @ z 本  | なし | なし | ファイル名に古い語。画像の中身は問題なし。名前だけ変える |
 | [232](https://sakura-eigo.com/%e3%80%8c%e8%8b%b1%e8%aa%9e-%e7%99%ba%e9%9f%b3-%e7%9b%b4%e3%82%89%e3%81%aa%e3%81%84-%e5%a4%a7%e4%ba%ba%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6l-r%e3%83%bb%e7%99%ba%e9%9f%b3%e8%a8%98%e5%8f%b7%e3%83%bb/) | eyecatch-232.png | や 2 か Se Ney ・ rat 1｜ jaw Pep, y / M で 5 / VIE こく yy / ペン ｜ } 4 ww ) V | なし | なし | ファイル名に古い語。画像の中身は問題なし。名前だけ変える |
 | [235](https://sakura-eigo.com/%e3%80%8c%e3%82%bb%e3%83%96%e5%b3%b6%e7%95%99%e5%ad%a6-1%e3%83%b6%e6%9c%88-%e4%bd%93%e9%a8%93%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e8%b2%bb%e7%94%a8%e3%83%bb%e3%82%b9%e3%82%b1%e3%82%b8%e3%83%a5/) | eyecatch-235.png | “ i wae > ae << > ンっ4 ( " NN x. a a ) Ace ye 上 @ > 9 ——_ a~ / のや A - e | なし | なし | ファイル名に古い語。画像の中身は問題なし。名前だけ変える |
-| [238](https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-30%e6%ad%b3-%e9%96%93%e3%81%ab%e5%90%88%e3%81%86%e3%81%8b%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e3%82%ae%e3%83%aa%e3%83%9b%e3%83%aa%e3%83%bb%e5%9b%bd/) | eyecatch-238.png | i a se ws 2 Re < * Bia の {の/ o> 4 A N a” die 9 QQ eS NY や い 3 \ @ > し  | なし | QQ | **差し替え候補。** 画像内の文字を本文と揃える |
+| [238](https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-30%e6%ad%b3-%e9%96%93%e3%81%ab%e5%90%88%e3%81%86%e3%81%8b%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e3%82%ae%e3%83%aa%e3%83%9b%e3%83%aa%e3%83%bb%e5%9b%bd/) | eyecatch-238.png | i a se ws 2 Re < * Bia の {の/ o> 4 A N a” die 9 QQ eS NY や い 3 \ @ > し  | なし | なし | ファイル名に古い語。画像の中身は問題なし。名前だけ変える |
 | [281](https://sakura-eigo.com/philippines-english-study-after-return/) | Generated-image-1-14.png | I AUS こさ N 9 = hot! ai \ NN Ms: Eh 5。 ry のno Nay mS Ml eV y J い Je a と | 期間:6ヶ月 | なし | **差し替え候補。** 画像内の文字を本文と揃える |
-| [282](https://sakura-eigo.com/working-holiday-english-anxiety/) | Generated-image-1-15.png | ie ' とる = 人 ” ei WE 4 4 4｜ (= ae * ia ve ( po! k KA Ni / 4 KA ay ‘ y ｜ | TOEICスコア:TOEIC | なし | **差し替え候補。** 画像内の文字を本文と揃える |
+| [282](https://sakura-eigo.com/working-holiday-english-anxiety/) | Generated-image-1-15.png | ie ' とる = 人 ” ei WE 4 4 4｜ (= ae * ia ve ( po! k KA Ni / 4 KA ay ‘ y ｜ | TOEICスコア:420 / TOEICスコア:465 | なし | **差し替え候補。** 画像内の文字を本文と揃える |
+| [287](https://sakura-eigo.com/english-conversation-daily-effectiveness/) | english-conversation-daily-effectiveness.png | Aa & ps wer (e きい の Ns & Sp *% cy, we を。。 em Le よさ ドN (Oe note a “3 \\ | 期間:days | なし | **差し替え候補。** 画像内の文字を本文と揃える |
 | [289](https://sakura-eigo.com/overseas-move-30s-not-late/) | Generated-image-1-19.png | a Pe SAS の 3) ZN os RG 3 aed SA 2 VY es aS i ig} i Dice 72 AR NN 2 ) W | 旧年齢:28 | なし | **差し替え候補。** 画像内の文字を本文と揃える |
-| [294](https://sakura-eigo.com/study-abroad-decision-deadline/) | study-abroad-decision-deadline.png | プン ア を > C alendar Summer decide 5. MoN TUE WED THU FRI SAT 4 5 2 Mw w | 旧年齢:28 / 旧年齢:27 / 期間:2年 | なし | **差し替え候補。** 画像内の文字を本文と揃える |
-| [304](https://sakura-eigo.com/toeic-600-plateau-breakthrough-study/) | Generated-image-1-5.png | Ja : NN に < の) 上 < に wed Lid I al os hy / 2) ンク 4 es / か ( / で* に 1 Ss | TOEICスコア:TOEIC | なし | **差し替え候補。** 画像内の文字を本文と揃える |
-| [305](https://sakura-eigo.com/working-holiday-english-level-needed/) | Generated-image-1-4.png | @ cn a 人 #) a a Sa = Us SG re ee ee FONG m NE 現実 の世界 ｜ i TOEIC 600 ーーン | TOEICスコア:TOEIC | なし | **差し替え候補。** 画像内の文字を本文と揃える |
-| [546](https://sakura-eigo.com/online-english-lessons-90-days-success/) | online-english-lessons-90-days-success.png | いい \ ¥ fh の 人 うま:。 い fed ia \\ Wid a rh し mm ンーー ダイ 5 RS i“) ニー、 a a } | なし | なし | ファイル名に古い語。画像の中身は問題なし。名前だけ変える |
+| [294](https://sakura-eigo.com/study-abroad-decision-deadline/) | study-abroad-decision-deadline.png | プン ア を > C alendar Summer decide 5. MoN TUE WED THU FRI SAT 4 5 2 Mw w | 旧年齢:27 / 旧年齢:28 / 期間:2年 | なし | **差し替え候補。** 画像内の文字を本文と揃える |
+| [304](https://sakura-eigo.com/toeic-600-plateau-breakthrough-study/) | Generated-image-1-5.png | Ja : NN に < の) 上 < に wed Lid I al os hy / 2) ンク 4 es / か ( / で* に 1 Ss | TOEICスコア:710 / TOEICスコア:610 / TOEICスコア:595 / TOEICスコア:600 | なし | **差し替え候補。** 画像内の文字を本文と揃える |
+| [305](https://sakura-eigo.com/working-holiday-english-level-needed/) | Generated-image-1-4.png | @ cn a 人 #) a a Sa = Us SG re ee ee FONG m NE 現実 の世界 ｜ i TOEIC 600 ーーン | TOEICスコア:600 | なし | **差し替え候補。** 画像内の文字を本文と揃える |
+| [526](https://sakura-eigo.com/fast-verify-cost-time-travel/) | Generated-image-1-31.png | 会 1 i ie 7 DA 8 iw. tele ae の ca ie. rs, ‘oh > oN) se ov 内 でー DX 2 / x | TOEICスコア:480 / TOEICスコア:790 | なし | **差し替え候補。** 画像内の文字を本文と揃える |
+| [546](https://sakura-eigo.com/online-english-lessons-90-days-success/) | online-english-lessons-90-days-success.png | いい \ ¥ fh の 人 うま:。 い fed ia \\ Wid a rh し mm ンーー ダイ 5 RS i“) ニー、 a a } | 期間:days | なし | **差し替え候補。** 画像内の文字を本文と揃える |
 
 ---
 
