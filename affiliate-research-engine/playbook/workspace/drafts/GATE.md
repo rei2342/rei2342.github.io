@@ -4,6 +4,14 @@
 落ちた文は自動で書き換えない。人が台帳に登録するか、文を消すかを決める。
 
 
+## ✅ 通過 117.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 117.html
+
+問題なし。WordPressへ送ってよい。
+
 ## ✅ 通過 131.html
 
 問題なし。WordPressへ送ってよい。
@@ -16,7 +24,39 @@
 
 問題なし。WordPressへ送ってよい。
 
+## ✅ 通過 137.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 137.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 138.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 138.html
+
+問題なし。WordPressへ送ってよい。
+
 ## ✅ 通過 149.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 150.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 150.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 151.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 151.html
 
 問題なし。WordPressへ送ってよい。
 
@@ -68,6 +108,14 @@
 
 問題なし。WordPressへ送ってよい。
 
+## ✅ 通過 241.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 241.html
+
+問題なし。WordPressへ送ってよい。
+
 ## ✅ 通過 27.body.html
 
 問題なし。WordPressへ送ってよい。
@@ -77,6 +125,14 @@
 問題なし。WordPressへ送ってよい。
 
 ## ✅ 通過 272.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 273.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 273.html
 
 問題なし。WordPressへ送ってよい。
 
@@ -93,6 +149,14 @@
 問題なし。WordPressへ送ってよい。
 
 ## ✅ 通過 28.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 281.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 281.html
 
 問題なし。WordPressへ送ってよい。
 
@@ -201,6 +265,14 @@
 問題なし。WordPressへ送ってよい。
 
 ## ✅ 通過 40.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 41.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 41.html
 
 問題なし。WordPressへ送ってよい。
 
