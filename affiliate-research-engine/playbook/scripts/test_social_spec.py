@@ -74,6 +74,10 @@ check("drafter: 【Threads用】メモを作っていない",
       "【Threads用】" not in drafter)
 check("drafter: SNSの生成は公開後に回す、と書いてある",
       "social_generate.py" in drafter)
+check("drafter: Instagramにも旧ペルソナが残っていない",
+      "27歳・営業事務" not in drafter)
+check("drafter: Instagramが正本の persona を読んでいる",
+      "social_spec" in drafter and 'persona' in drafter)
 
 # 投稿の口は social_post.py だけ
 posters = [p for p in (REPO / ".github/workflows").glob("*.yml")
@@ -99,7 +103,8 @@ for k in ("persona", "facts", "style", "forbidden", "extraction", "x",
           "threads", "lifecycle", "publish_gates", "rollout", "frequency",
           "paths", "duplicate"):
     check(f"仕様に {k} がある", k in spec)
-check("仕様が承認済み", spec["status"] == "approved")
+check("仕様が pilot（試作の承認まで approved にしない）",
+      spec["status"] == "pilot", spec["status"])
 check("XとThreadsで使う素材が違う",
       set(spec["extraction"]["x_uses"]) &
       set(spec["extraction"]["threads_uses"]) == set(),
@@ -118,8 +123,15 @@ check("1日1件までにしている", spec["frequency"]["posts_per_day_max"] ==
 ART = {"id": "521", "title": "テスト記事", "status": "publish",
        "modified_gmt": "2026-08-09T11:10:13",
        "url": "https://sakura-eigo.com/toeic-listening-325-to-improvement/",
-       "body": "確認項目。音声を1つ聞いたあと、内容を1文で言えるかを試す。"
-               "3つの項目を並べる。2週間の組み方。"}
+       "body": "確認項目：音声を1つ聞いたあと、設問を見ずに内容を1文で言えるかを"
+               "試す。音そのものが拾えていない場合と、拾えているのに設問まで"
+               "残らない場合とでは、次にやることが変わる。"
+               "確認項目：意味が一拍遅れる感覚があるかを確かめる。"
+               "確認項目：自分の音を録って、お手本と比べられる手段があるかを見る。"
+               "流し終わったあとに内容を1文で言えるかを試す。"
+               "言えない回が多いなら、その時間は入力になっていない可能性がある。"
+               "記録するのは再生時間ではなく、言えた回数のほう。"
+               "最初の2週間の組み方を3つの確認項目として並べる。"}
 U = ART["url"] + "?utm_source=x"
 UT = ART["url"] + "?utm_source=threads"
 
@@ -216,6 +228,76 @@ check("落とす: 矢印で終わる1投稿目",
                                          th2.rstrip() + "\n" + UT], ART)))
 check("絵文字0個でも通る", sg.passed(res))
 
+# ── 3b. leak_patterns は止めすぎない ────────────────
+# **数字があるだけで落とさない。** 主語・事実の種類・出典・fact ID を見る
+PASS_CASES = [
+    ("出典つきの公式料金",
+     "受講料は公式サイトで月17600円と案内されています（2026年8月9日時点）。"),
+    ("一般的な年齢条件",
+     "ワーキングホリデーの年齢の上限は国ごとに決まっていて、30歳までの国が多いです。"),
+    ("仮定の試算",
+     "例えば4週間で100時間なら、1時間あたりの費用はこの割り算で出せます。"),
+    ("fact IDつきの一人称",
+     "私はTOEIC600点を取りました。<!--fact:F001-->"),
+    ("読者に向けた年数の話",
+     "英語を3年やっていない人でも、確かめるところは同じです。"),
+]
+for name, sent in PASS_CASES:
+    ok, detail = sg.fact_gate(spec, sent)
+    # fact IDつきは台帳が空なので落ちてよい。**理由が「台帳に無い」であること**を見る
+    if name == "fact IDつきの一人称":
+        check(f"通す/落とす理由が正しい: {name}",
+              (not ok) and "F001" in detail or ok, detail)
+    else:
+        check(f"通す: {name}", ok, detail)
+
+BLOCK_CASES = [
+    ("自分の年齢", "私は27歳から英語をやり直しました。"),
+    ("自分のスコア", "私のTOEICは600点でした。"),
+    ("自分の支払い", "私はスクールに45000円を払いました。"),
+    ("利用の告白", "オンライン英会話に登録しました。"),
+    ("心理の告白", "そのとき、意志の問題ではないと気づいた。"),
+]
+for name, sent in BLOCK_CASES:
+    ok, detail = sg.fact_gate(spec, sent)
+    check(f"落とす: {name}", not ok, detail)
+
+# ── 3c. 加重文字数 ──────────────────────────────────
+w = spec["x"]["weighted"]
+check("URLは長さによらず23で数える",
+      sg.weighted_len(spec, "https://sakura-eigo.com/a-very-long-slug/"
+                            "?utm_source=x") == w["url_weight"])
+check("全角は2・半角は1で数える",
+      sg.weighted_len(spec, "あいう") == 6
+      and sg.weighted_len(spec, "abc") == 3)
+long_x = "あ" * 130 + "\n" + U
+check("加重で上限を超えたら落とす",
+      "length_gate" in gate_ids(sg.run_gates(spec, "x", [long_x], ART)),
+      f"加重{sg.weighted_len(spec, long_x)}")
+
+# ── 3d. 命題の照合 ──────────────────────────────────
+ART2 = dict(ART, body="確認項目：音声を1つ聞いたあと、設問を見ずに内容を1文で"
+                      "言えるかを試す。言えるのに設問で落とすなら保持の問題、"
+                      "言えないなら聞き取りの問題の可能性がある。")
+over = ("リスニングが止まる原因は保持です。音声を1つ聞いて、"
+        "内容を1文で言えるかを試してください。\n\n確認項目をまとめました")
+check("落とす: 記事が可能性としているのに言い切っている",
+      "subset_gate" in gate_ids(
+          sg.run_gates(spec, "x", x_parts(over), ART2)))
+hedged = ("リスニングが止まるのは、保持のほうかもしれません。"
+          "音声を1つ聞いて、内容を1文で言えるかを試してください。\n\n"
+          "確認項目をまとめました")
+check("通す: 同じ内容を可能性として書いたもの",
+      "subset_gate" not in gate_ids(
+          sg.run_gates(spec, "x", x_parts(hedged), ART2)))
+
+# ── 3e. 型の重なり ──────────────────────────────────
+recent = [{"template_ids": ["matomemashita"]} for _ in range(2)]
+_, warn = sg.template_gate(spec, ["確認項目をまとめました"], recent)
+check("同じ締めが3件目になったら警告", bool(warn), " ".join(warn))
+_, warn0 = sg.template_gate(spec, ["確認項目をまとめました"], recent[:1])
+check("2件目までは警告しない", not warn0)
+
 # 重複
 hist = [{"text": good_x, "stock_id": "X-999-a"}]
 check("落とす: 同じ本文",
@@ -255,6 +337,22 @@ for _, s in rows:
     check(f"{s['stock_id']}: ゲート全通過",
           all(g["ok"] for g in s["gate_results"]),
           "; ".join(g["id"] for g in s["gate_results"] if not g["ok"]))
+
+# ── 6. 試作の在庫 ────────────────────────────────────
+rows = [s for _, s in inv.all_stock(spec)]
+types = {s["article_id"]: s.get("post_type") for s in rows}
+check("試作5記事の型が全部違う", len(set(types.values())) == len(types),
+      str(types))
+for s in rows:
+    check(f"{s['stock_id']}: 型を選んだ理由がある",
+          bool(s.get("post_type_reason")))
+    check(f"{s['stock_id']}: 文型の警告が無い",
+          not s.get("template_warnings"),
+          " ".join(s.get("template_warnings") or []))
+    if s["platform"] == "x":
+        check(f"{s['stock_id']}: 加重が上限内",
+              s.get("weighted_len", 0) <= spec["x"]["weighted"]["hard_limit"],
+              str(s.get("weighted_len")))
 
 print()
 if fails:

@@ -35,7 +35,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
         run: |
-          pip install anthropic -q
+          pip install anthropic pyyaml -q
           python3 << 'PYEOF'
           import os, datetime, re, sys
           import anthropic
@@ -55,11 +55,25 @@ jobs:
                   if m2:
                       theme = m2.group(1).strip()
 
+          # 人物設定はここに書かない。**SNSの正本から読む。**
+          # X・Threadsだけ直して、Instagramに旧人格を残さないため
+          import sys as _sys
+          _sys.path.insert(0, "affiliate-research-engine/playbook/scripts")
+          import social_spec as _ss
+          _spec = _ss.load_spec()
+          _p = _spec["persona"]
+          persona = (
+              f"あなたは{_p['name']}。" + " ".join(_p["role"].split()) + "\n"
+              + "\n".join(f"- {v}" for v in _p["voice"]) + "\n"
+              + "次は1つも書かない（事実台帳に無いため）:\n"
+              + "\n".join(f"- {v}" for v in _p["forbidden_self"])
+          )
           prompt = (
-              "田中さくら（27歳・営業事務・東京）として、Instagramに投稿するキャプションを書いて。\n"
+              persona + "\n\n"
+              "この人として、Instagramに投稿するキャプションを書いて。\n"
               f"今日のテーマ: {theme}\n"
-              "条件: 5〜8行・絵文字を自然に使う（多すぎず）・共感を呼ぶ等身大の言葉（大げさにしない）"
-              "・ハッシュタグ8〜10個（最後にまとめて）・リンクなし・宣伝色なし・ナチュラルに\n"
+              "条件: 5〜8行・絵文字を自然に使う（多すぎず）・等身大の言葉（大げさにしない）"
+              "・ハッシュタグ8〜10個（最後にまとめて）・リンクなし・宣伝色なし\n"
               "キャプション本文だけ出力して。余計な説明不要。"
           )
 

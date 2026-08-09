@@ -1,7 +1,7 @@
 stock_id: X-526-a
 platform: x
 article_id: 526
-article_modified_gmt: '2026-08-09T11:09:47'
+article_modified_gmt: '2026-08-09T13:00:03'
 article_title: 「現地が一番早い」を費用と時間で確かめる｜1時間あたりで並べる
 article_url: https://sakura-eigo.com/fast-verify-cost-time-travel/
 text: '「現地が一番早い」という言い方を見かけます。この早いには、英語に触れる時間の量の話と、上達の速さの話が混ざっていることがあります。
@@ -62,13 +62,13 @@ material:
   core_answer: 「早い」には時間の量の話と上達の速さの話が混ざっている。まず分けて、量のほうを数える
   one_check: 総額を、英語に触れる時間で割って1時間あたりを出す
   unique_artifact: 行き先ごとに1時間あたりで並べた表と、年齢や在学の条件で選べない場合
-created_at: 2026-08-09T21:58:25+0900
+created_at: 2026-08-09T22:03:08+0900
 history:
-- at: 2026-08-09T21:58:25+0900
+- at: 2026-08-09T22:03:08+0900
   state: generated
-- at: 2026-08-09T21:58:25+0900
+- at: 2026-08-09T22:03:08+0900
   state: gated
-- at: 2026-08-09T21:58:25+0900
+- at: 2026-08-09T22:03:08+0900
   state: awaiting_approval
 post_type: misreading
 post_type_reason: 「現地が一番早い」という言われ方を、記事が読み直している。 時間の量と上達の速さを分ける、という正し方が記事の芯

@@ -62,6 +62,17 @@ def post(pid, payload):
     return r.status_code, r.text[:200]
 
 
+def trash(pid):
+    """**ゴミ箱へ移すだけ。** force を付けないので完全削除にならない。
+
+    POST の status=trash は REST が受け付けない（rest_invalid_param）。
+    DELETE が既定でゴミ箱へ移す動きになる。
+    """
+    r = requests.delete(f"{WP}/posts/{pid}", auth=AUTH, headers=UA,
+                        params={"force": "false"}, verify=False, timeout=60)
+    return r.status_code, r.text[:160]
+
+
 # ── メモをゴミ箱へ ──────────────────────────────────
 def memo_trash(ids, dry):
     print(f"=== memo-trash {'（読むだけ）' if dry else '（実行）'} ===")
@@ -88,8 +99,11 @@ def memo_trash(ids, dry):
         print("DRY RUN。ゴミ箱へ移していない。")
         return
     for b in backups:
-        code, body = post(b["id"], {"status": "trash"})
-        print(f"[{b['id']}] ゴミ箱へ: HTTP {code} {body if code >= 300 else ''}")
+        code, body = trash(b["id"])
+        after = get(b["id"])
+        print(f"[{b['id']}] ゴミ箱へ: HTTP {code} "
+              f"→ status={(after or {}).get('status')} "
+              f"{body if code >= 300 else ''}")
     print("**完全削除はしていない。** ゴミ箱から戻せる。")
 
 
