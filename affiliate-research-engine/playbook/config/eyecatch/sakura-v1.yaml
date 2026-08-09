@@ -1,0 +1,285 @@
+# さくら アイキャッチ 共通仕様（唯一の正本）
+#
+# **このファイルだけを変更する。**
+# lib/eyecatchPrompt.ts と scripts/eyecatch_spec.py は、これを読んで
+# 各ツール向けのプロンプトへ変換するアダプターにする。
+# 人物設定・画風・禁止事項・比率を、コード側へ直接書かない。
+#
+# 変更したら scripts/test_eyecatch_spec.py を必ず通す。
+# TypeScript側とPython側の出力が一致しない、または
+# どちらかのコードに仕様の直書きが増えたら、テストが落ちる。
+
+version: 1.0.0
+status: proposal          # proposal → approved になったら実装へ進む
+updated: 2026-08-09
+supersedes:
+  - "SAKURA_EYECATCH_TEMPLATE（2026-08-07の固定ちびキャラ）"
+  - "eyecatch_build.py の文字カード型（2026-08-09）"
+rationale: >
+  公開51枚を回収して比較した結果、A判定13枚はすべて2026-08-01〜05の
+  大人の水彩系だった。固定ちびキャラは31枚中9枚にしか適用されておらず、
+  その9枚はA判定が0。子ども向けに見え、固定小物で記事の差が消えていた。
+  詳細は workspace/seo/survey/EYECATCH_PROPOSAL.md。
+
+# ── 比率と書き出し ──────────────────────────────────
+master_aspect_ratio: "16:9"
+master_size: [1920, 1080]
+master_has_text: false        # マスターには文字を一切載せない
+
+blog_export:
+  size: [1200, 675]
+  aspect_ratio: "16:9"
+  text_overlay: true          # 生成後に固定フォントで合成する
+  format: "jpeg"
+  quality: 88
+  max_bytes: 307200           # 300KB を目安
+  filename_pattern: "eyecatch-{slug}.jpg"
+  filename_charset: "半角英数とハイフンのみ。日本語・空白・全角記号・アンダースコアは使わない"
+
+note_export:
+  size: [1200, 628]
+  aspect_ratio: "1.91:1"
+  crop: "center-right anchored"   # 左を切っても主題が残るように右寄せで切る
+  text_overlay: false             # note は原則文字なし
+  format: "jpeg"
+  quality: 88
+
+# ── 人物（固定する特徴だけを書く）────────────────────
+character:
+  name: "さくら"
+  fixed:
+    ethnicity: "Japanese woman"
+    age_impression: "late twenties to early thirties. Clearly an adult. Never a teenager, never chibi proportions"
+    head_body_ratio: "natural adult proportions (about 1:7). No deformed or chibi heads"
+    hair_length: "long, past the shoulders"
+    hair_color: "soft warm brown"
+    hair_texture: "loose natural waves, a few strands falling free"
+    signature_accessory: "one small cherry-blossom hair clip, worn on one side"
+    clothing_base: "clean, simple everyday clothing in cream or pale grey"
+    clothing_accent: "exactly one sakura-pink accent (a cardigan, a scarf, a clip or a cuff)"
+    expression: "calm and thinking. She is sorting something out alongside the reader"
+    eye_treatment: "restrained. Not large glossy anime eyes. Often looking down, aside, or away from the viewer"
+  not_fixed:                  # 記事ごとに変えてよい。固定すると単調になる
+    - "hair up or down (an updo is allowed as a variation)"
+    - "exact garment (blouse, knit, cardigan, shirt)"
+    - "pose"
+    - "camera distance"
+    - "which way she is facing"
+    - "whether the face is visible at all"
+  forbidden:
+    - "a teacher or expert pose. No pointing finger, no raised index finger"
+    - "looking straight at the viewer and smiling for the camera"
+    - "a full pink hoodie as a uniform (this was the old chibi costume)"
+    - "the fixed desk set: rabbit plush, pink mug, pen holder, open notebook, clock icon, question-mark bubble"
+    - "any scene implying she personally used, subscribed to or paid for a named service"
+
+# ── 画風 ────────────────────────────────────────────
+style:
+  medium: "soft hand-drawn watercolour with coloured-pencil linework"
+  linework: "fine and gentle. No hard vector outlines"
+  shading: "light watercolour washes with visible paper texture. No flat cel shading, no heavy gradients"
+  light: "soft natural light. One clear light source. No harsh shadows, no strong contrast"
+  base_colors: ["pale sakura pink", "cream", "white"]
+  saturation: "low. Nothing vivid"
+  forbidden:
+    - "photographic or photo-realistic"
+    - "3D render"
+    - "kawaii chibi anime"
+    - "flat vector illustration"
+    - "vertical or square framing"
+
+# ── 構図 ────────────────────────────────────────────
+composition:
+  subject_anchor: "centre to right"        # 人物と主要な小物はここ
+  text_safe_area:
+    side: "left"
+    box: [0, 0, 960, 1080]                 # マスター1920x1080 における座標
+    rule: "この矩形に人物・主要な小物・強いコントラストを置かない"
+  edge_margin_px: 64                       # マスター基準。すべての端
+  note_crop_safe:
+    rule: "note用に左を切っても主題が残るよう、主題は x>=760 に置く"
+  scene_rule: "記事ごとに場面・小物・カメラ距離を変える。同じ机の同じ構図を繰り返さない"
+  camera_distances:
+    - "close on the hands"
+    - "waist-up, half body"
+    - "wide, the person small in the room"
+    - "top-down over a desk or floor"
+    - "over the shoulder"
+
+# ── 人物を出すかどうか（案C。数合わせをしない）────────
+appearance_policy:
+  mode: "by_article_role"
+  with_person:
+    - "読者の迷い・不安・選択を扱う記事"
+    - "日常の具体的な学習場面を見せる記事"
+    - "共感や入口を担う記事"
+    - "人物の表情や動作が内容理解を助ける記事"
+  without_person:
+    - "費用計算"
+    - "制度・条件"
+    - "比較表"
+    - "手順"
+    - "チェックリスト"
+    - "ツールの機能説明"
+    - "小物・画面・場所だけで内容が伝わる記事"
+  balance_hint: "直近10枚で人物ありが3〜5枚に収まるのが目安"
+  balance_is_not_a_quota: >
+    数を合わせるためだけに人物を入れない。役割で決まらないときだけ、
+    直近の偏りを見て決める
+  hard_rule: >
+    未使用のサービスについて、さくらが操作・受講・契約しているように
+    見える場面を描かない
+
+# ── カテゴリ差し色（基調は共通。差し色だけ変える）──────
+category_colors:
+  "AI英語学習":            { name: "soft periwinkle blue", hex: "#A9B8E8" }
+  "英語学習法":            { name: "soft sakura pink",     hex: "#F2A8C0" }
+  "TOEIC・スコア":         { name: "muted coral",          hex: "#F0A48C" }
+  "英会話サービス比較":    { name: "soft mint green",      hex: "#A6D8C4" }
+  "英語コーチング":        { name: "warm apricot",         hex: "#F3C48A" }
+  "海外留学・ワーホリ":    { name: "light sky blue",       hex: "#9FC9E8" }
+  "フィリピン・セブ留学":  { name: "aqua turquoise",       hex: "#8FD3D8" }
+  "留学エージェント・費用": { name: "soft lavender",        hex: "#C4B5E0" }
+  _default:                { name: "soft sakura pink",     hex: "#F2A8C0" }
+
+# ── 文字合成（画像AIには一切描かせない）──────────────
+text_overlay:
+  applies_to: "blog_export only"
+  engine: "PIL"
+  font_family: "Noto Sans CJK JP"
+  lead:
+    weight: "Bold"
+    size_px: 62               # 1200x675 における値
+    max_lines: 2
+    max_chars_per_line: 14
+    color: "#4A3A3F"
+    origin: [96, 232]
+    line_gap_px: 22
+  sub:
+    weight: "Regular"
+    size_px: 30
+    max_lines: 1
+    max_chars: 18
+    color: "#8A6E76"
+    offset_below_lead_px: 34
+  accent_rule:
+    shape: "リード文の下に幅120px・高さ6pxの角丸バー。カテゴリ差し色を使う"
+  scrim:
+    rule: >
+      左半分の可読性が足りないときだけ、白 55% の縦グラデーションを
+      x=0〜700 に敷く。全面に敷かない
+  forbidden:
+    - "記事タイトルの全文を置く"
+    - "数字を焼き込む（本文で確認済みの事実でも原則入れない）"
+    - "画像だけで意味が完結する長文"
+
+# ── 画像AIへ必ず渡す禁止文 ──────────────────────────
+negative_prompt:
+  always_append: "No letters, no words, no numbers, no logos, no watermarks."
+  forbidden_content:
+    - "ages"
+    - "test scores"
+    - "prices or amounts of money"
+    - "study periods or usage durations"
+    - "words meaning success, improvement or achievement"
+    - "any screen showing real app or service UI"
+    - "brand logos or product packaging"
+    - "the old site name (さくらの英語挑戦記 / Sakura's English Challenge)"
+    - "the old persona details (a stated age, a job title, a personal deadline)"
+    - "any number or conclusion that is not in the article body"
+    - "small print or paragraphs of text"
+
+# ── 参照画像（優先順位つき。無秩序に混ぜない）──────────
+reference_assets:
+  root: "playbook/assets/eyecatch/references/"
+  priority_order:
+    - slot: "face_and_age"
+      file: "character-primary.jpg"
+      source_post: 521
+      source_media_id: 523
+      source_url: "https://sakura-eigo.com/wp-content/uploads/2026/08/Generated-image-1-24.png"
+      take: "顔立ち・年齢感・目の大きさの抑え方・肌の塗り"
+      do_not_take: "まとめ髪・電車の場面・画面に焼かれた文字"
+      why: "3枚で最も安定して大人に見える。目が大きすぎず、頬の陰影が落ち着いている"
+    - slot: "hair_and_sakura"
+      file: "character-secondary.jpg"
+      source_post: 273
+      source_media_id: 464
+      source_url: "https://sakura-eigo.com/wp-content/uploads/2026/08/Generated-image-1-13.png"
+      take: "下ろした長い髪の量感と流れ・桜のヘアクリップの位置と大きさ・人物を右へ置く構図"
+      do_not_take: "顔の角度（伏せすぎ）"
+      why: "ブランドとして最も認識しやすい。クリップが見え、髪型が他記事へ再現しやすい"
+    - slot: "style_light_texture"
+      file: "style-primary.jpg"
+      source_post: 297
+      source_media_id: 554
+      source_url: "https://sakura-eigo.com/wp-content/uploads/2026/08/dmm-eikaiwa-beginner-consistency-check.png"
+      take: "水彩の粒立ち・夜のやわらかい光・紙の質感・にじみの強さ"
+      do_not_take: "ピンクのパーカー（旧ちびキャラの衣装）・顔の目の大きさ"
+      why: "3枚で水彩の質感が最も安定している。光源が1つで陰影が濁っていない"
+  supporting:
+    - slot: "color"
+      file: "color-primary.jpg"
+      source_post: 288
+      source_media_id: 469
+      why: "淡い桜色・クリーム・白の配分がちょうどよい"
+    - slot: "composition"
+      file: "composition-primary.jpg"
+      source_post: 281
+      source_media_id: 466
+      why: "人物が右・左が空く。提案する配置そのもの"
+  conflict_resolution: >
+    3枚で特徴が食い違ったときは priority_order の上から採る。
+    顔は521、髪と桜クリップは273、塗りと光は297。
+    衣装は3枚とも採らず、character.fixed の記述に従う
+    （297のピンクのパーカーは旧ちびキャラの衣装なので引き継がない）
+  status: "candidate"          # 6本のコンタクトシートを見てから confirmed にする
+
+# ── 記事ごとに変える項目 ────────────────────────────
+article_specific_fields:
+  - scene
+  - expression
+  - pose
+  - camera_distance
+  - background
+  - props
+  - category_accent
+  - lead_text
+  - sub_text
+  - alt
+  - filename
+  - with_person
+
+# ── 公開ゲート ──────────────────────────────────────
+quality_checks:
+  items:
+  - id: generated
+    label: "マスター画像が生成済み"
+  - id: no_text_in_master
+    label: "マスターに文字・数字・ロゴが写っていない"
+  - id: uploaded
+    label: "WordPressへアップロード済み"
+  - id: featured_media
+    label: "featured_media へ設定済み"
+  - id: alt
+    label: "alt 設定済み"
+  - id: text_matches_body
+    label: "合成した文字が本文と一致している"
+  - id: no_unverified_claim
+    label: "未確認の主張が無い（年齢・スコア・金額・期間・結果）"
+  - id: thumbnail_readable
+    label: "スマホのサムネイルで読める"
+  - id: ogp_ok
+    label: "OGPで崩れていない"
+  - id: distinct
+    label: "既存の記事と見分けがつく"
+  - id: not_text_card
+    label: "文字カード型ではない"
+  - id: person_policy
+    label: "人物の有無が appearance_policy と合っている"
+  - id: no_fake_usage
+    label: "未使用サービスを操作・受講しているように見せていない"
+  blocking: true
+  on_fail: >
+    記事を下書きで止める。仮画像を設定して公開しない。
+    プロンプトの一時ファイルを削除せず、再実行の対象として残す
