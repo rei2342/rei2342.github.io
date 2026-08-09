@@ -90,6 +90,28 @@ def main():
         r'(?:related|carditem|entry-card|navi|breadcrumb|widget|pager|'
         r'sns-|toc|ez-toc)[^"]*"[^>]*>.*?</\1>',
         re.DOTALL | re.I)
+    def links_in(html_part, src):
+        out = []
+        for a in re.finditer(r'<a\b[^>]*href="([^"]+)"[^>]*>(.*?)</a>',
+                             html_part, re.DOTALL | re.I):
+            href, anchor = a.group(1), _q.strip_tags(a.group(2)).strip()
+            if href.startswith("#") or SKIP.search(href):
+                continue
+            full = urljoin(src, href)
+            if SITE not in full:
+                continue
+            n = norm(full)
+            if n == src:
+                continue
+            out.append((n, anchor))
+        return out
+
+    # 2つに分けて集める。用途が違う
+    #   out_links … 本文の編集リンク。**数えるのはこちら**
+    #   nav_links … カードやナビも含む、読者が実際に押せるリンク全部。
+    #               到達段数はこちらで測る。トップと一覧は記事カードが
+    #               導線そのものなので、落とすと到達できなくなる
+    nav_links = defaultdict(list)
     for src, html in pages.items():
         body = html
         s = BODY_START.search(html)
@@ -105,18 +127,8 @@ def main():
         theme_n = len(THEME_BLOCK.findall(body))
         body = THEME_BLOCK.sub(" ", body)
         theme_counts[norm(src)] = theme_n
-        for a in re.finditer(r'<a\b[^>]*href="([^"]+)"[^>]*>(.*?)</a>',
-                             body, re.DOTALL | re.I):
-            href, anchor = a.group(1), _q.strip_tags(a.group(2)).strip()
-            if href.startswith("#") or SKIP.search(href):
-                continue
-            full = urljoin(src, href)
-            if SITE not in full:
-                continue
-            n = norm(full)
-            if n == src:
-                continue
-            out_links[src].append((n, anchor))
+        out_links[src] = links_in(body, src)
+        nav_links[src] = links_in(html, src)
 
     # 記事間のリンクだけを数える
     edges, bad_anchor, broken, redirected, to_unpub = [], [], [], [], []
@@ -157,8 +169,10 @@ def main():
     no_out = sorted(ids - set(outc), key=int)
 
     # トップと一覧から各記事への到達段数
+    # 到達段数は**押せるリンク全部**で測る。本文の編集リンクだけだと、
+    # トップと一覧の記事カードが数から落ちて「到達せず」になる
     graph = defaultdict(set)
-    for src, lst in out_links.items():
+    for src, lst in nav_links.items():
         for dst, _ in lst:
             graph[src].add(dst)
     def depth_from(start):
