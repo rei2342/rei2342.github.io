@@ -17,6 +17,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 import social_spec as ss
 import social_gate as sg
 import social_inventory as inv
+import social_claims as sc
+import json
+import difflib
 
 JST = timezone(timedelta(hours=9))
 
@@ -28,6 +31,10 @@ def main():
     by_article = {}
     for s in rows:
         by_article.setdefault(s["article_id"], {})[s["platform"]] = s
+
+    prev_f = ROOT / "workspace/social/prev_trial.json"
+    prev = (json.loads(prev_f.read_text(encoding="utf-8"))
+            if prev_f.exists() else {})
 
     L = [f"# X案・Threads案のレビュー（{stamp}）\n\n",
          "**投稿していない。** 承認するまで在庫のまま止まる。\n\n",
@@ -71,9 +78,39 @@ def main():
             for g in s["gate_results"]:
                 v = "通過" if g["ok"] else "**落ちた** " + g["detail"]
                 L.append(f"| {g['id']} | {v} |\n")
-            warn = sg.style_warnings(spec, s["thread_parts"])
-            if warn:
-                L.append("\n警告（落とさない）: " + " / ".join(warn) + "\n")
+            warn = (sg.style_warnings(spec, s["thread_parts"])
+                    + (s.get("template_warnings") or []))
+            L.append(f"\n警告（落とさない）: "
+                     + (" / ".join(warn) if warn else "なし") + "\n")
+
+            # 型
+            L.append(f"\n**型**: {s.get('post_type', '—')}"
+                     f"（{s.get('post_type_reason', '')}）\n")
+            L.append(f"**当たった定型句**: "
+                     + (" ".join(s.get("template_ids") or []) or "なし") + "\n")
+            if platform == "X":
+                lim = spec["x"]["weighted"]["hard_limit"]
+                L.append(f"**X加重文字数**: {s.get('weighted_len')} / {lim}"
+                         f"（URLは23で数える）\n")
+
+            # 命題の照合
+            art = inv.local_article(s["article_id"])
+            claims = sc.check(spec, s["thread_parts"], art,
+                              s.get("inferences") or [])
+            bad = sc.failures(claims)
+            L.append(f"\n<details><summary>命題の照合"
+                     f"（{len(claims)}件中 落ち {len(bad)}件）</summary>\n\n")
+            L.append(sc.fmt(claims))
+            L.append("\n</details>\n")
+
+            # 前回案との差分
+            old_t = (prev.get(s["stock_id"]) or {}).get("text")
+            if old_t:
+                dl = list(difflib.unified_diff(
+                    old_t.split("\n"), s["text"].split("\n"),
+                    fromfile="前回", tofile="今回", lineterm="", n=0))
+                L.append("\n<details><summary>前回案との差分</summary>\n\n"
+                         "```diff\n" + "\n".join(dl) + "\n```\n\n</details>\n")
             if ng:
                 L.append("\n**このままでは承認できない。**\n")
 
