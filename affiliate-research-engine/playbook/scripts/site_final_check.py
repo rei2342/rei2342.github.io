@@ -70,8 +70,11 @@ def main():
         ("トップページ", f"HTTP {top.status_code}" if top else "取得できず"),
         ("記事一覧 /articles/", f"HTTP {arts.status_code}" if arts else "取得できず"),
         ("プロフィール /profile/", f"HTTP {prof.status_code}" if prof else "取得できず"),
-        ("スマホ表示", f"HTTP {sp.status_code}・"
-                   f"viewport {'あり' if sp and 'name=\"viewport\"' in sp.text else 'なし'}"
+        # f式の中にバックスラッシュを書くと Python 3.11 では構文エラーになる。
+        # viewport の判定は先に外へ出す
+        ("スマホ表示",
+         f"HTTP {sp.status_code}・viewport "
+         + ("あり" if sp and 'name="viewport"' in sp.text else "なし")
          if sp else "取得できず"),
         ("RSS", f"HTTP {rss.status_code}・"
                 f"{rss.text.count('<item>')}件" if rss else "取得できず"),
