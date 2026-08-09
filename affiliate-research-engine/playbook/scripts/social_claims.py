@@ -114,8 +114,9 @@ def best_match(spec, s, article_sents):
 
 
 def article_hedged(a):
-    return bool(re.search(r"可能性|かもしれ|ことがあ|場合があ|とは限|"
-                          r"確認項目|提案|目安|例|試算|こともあ", a or ""))
+    # 「例」1文字は「例として」以外にも当たるので使わない
+    return bool(re.search(r"可能性|かもしれ|ことがあ|場合があ|とは限|とはかぎ|"
+                          r"確認項目|提案|目安|例えば|試算|こともあ", a or ""))
 
 
 def check(spec, parts, article, inferences=()):
@@ -136,8 +137,9 @@ def check(spec, parts, article, inferences=()):
             mod = modality(spec, s, bullet)
             risky = is_risky(spec, s)
             a, ov = best_match(spec, s, asents)
+            st = terms(s)
             row = {"text": s, "modality": mod, "risky": risky,
-                   "matched": a, "overlap": round(ov, 2)}
+                   "matched": a, "overlap": round(ov, 2), "terms": len(st)}
 
             if key in declared:
                 # 書き手が判断として宣言したもの。**弱めてあることが条件**
@@ -166,6 +168,14 @@ def check(spec, parts, article, inferences=()):
                     verdict="unsupported" if risky else "ok",
                     why=("記事に対応する記述が見つからない" if risky
                          else "因果・効果を言っていないので通す"))
+                out.append(row)
+                continue
+
+            # 内容語が少ない文は、何にでも高く一致してしまう。
+            # **少ない文でモダリティや極性を判定しない。**誤検知になる
+            if len(st) < c.get("min_terms_to_judge", 3):
+                row.update(verdict="ok",
+                           why=f"内容語が{len(st)}語しかない。判定しない")
                 out.append(row)
                 continue
 

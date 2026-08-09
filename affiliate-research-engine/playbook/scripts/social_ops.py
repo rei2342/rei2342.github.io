@@ -26,9 +26,19 @@ import re
 import sys
 from pathlib import Path
 
+import subprocess
+
 import requests
 import urllib3
-import yaml
+
+# 借りているワークフロー（rewrite-uploader）は pyyaml を入れていない。
+# **足りないものはここで入れる。** ワークフロー側を直すと本来の用途に影響する
+try:
+    import yaml
+except ModuleNotFoundError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-q",
+                           "pyyaml"])
+    import yaml
 
 urllib3.disable_warnings()
 ROOT = Path(__file__).resolve().parents[1]
