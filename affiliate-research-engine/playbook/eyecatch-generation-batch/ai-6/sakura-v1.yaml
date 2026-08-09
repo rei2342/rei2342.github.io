@@ -10,7 +10,7 @@
 # どちらかのコードに仕様の直書きが増えたら、テストが落ちる。
 
 version: 1.0.0
-status: proposal          # proposal → approved になったら実装へ進む
+status: approved          # AI英語学習6本の試験運用が終わり、2026-08-09に正式仕様となった
 updated: 2026-08-09
 supersedes:
   - "SAKURA_EYECATCH_TEMPLATE（2026-08-07の固定ちびキャラ）"
@@ -256,7 +256,7 @@ reference_assets:
     顔は521、髪と桜クリップは273、塗りと光は297。
     衣装は3枚とも採らず、character.fixed の記述に従う
     （297のピンクのパーカーは旧ちびキャラの衣装なので引き継がない）
-  status: "candidate"          # 6本のコンタクトシートを見てから confirmed にする
+  status: "confirmed"          # AI6本で顔が再現できたので確定した
 
 # ── 記事ごとに変える項目 ────────────────────────────
 article_specific_fields:

@@ -1,26 +1,40 @@
-# 返し方と、受領後の処理（AI英語学習6本・2026-08-09 19:37:39 JST）
+# 返し方と、受領後の処理（文字カード型20本の差し替え・2026-08-09 19:37:39 JST）
 
 ## 返してもらう構成
 
 ```
 masters/
-  1003.png
-  1001.png
-  999.png
-  997.png
-  995.png
-  993.png
+  546.png
+  526.png
+  521.png
+  304.png
+  301.png
+  294.png
+  235.png
+  149.png
+  137.png
+  23.png
+  310.png
+  292.png
+  283.png
+  282.png
+  281.png
+  150.png
+  117.png
+  33.png
+  32.png
+  28.png
 ```
 
 これだけでよい。JPEGへの変換・リサイズ・文字入れは**しない**。
-6枚そろってから渡してほしい（**枚数が足りないと受領処理は止まる**）。
+batch_1 の10枚がそろった時点で一度返してほしい。残りは確認のあとで構わない。（**枚数が足りないと受領処理は止まる**）。
 
 ## 受領後に、こちらが実行すること
 
-`masters/` を `eyecatch-generation-batch/ai-6/masters/` へ置き、次を1回走らせる。
+`masters/` を `eyecatch-generation-batch/next-20/masters/` へ置き、次を1回走らせる。
 
 ```bash
-python affiliate-research-engine/playbook/scripts/eyecatch_finish.py --batch ai6
+python affiliate-research-engine/playbook/scripts/eyecatch_finish.py --batch next20
 ```
 
 これで下の4つまで一度に出る。**追加の判断は要らない。**
@@ -38,7 +52,7 @@ python affiliate-research-engine/playbook/scripts/eyecatch_finish.py --batch ai6
 ## そのあと（承認後にだけ動かす）
 
 ```bash
-python affiliate-research-engine/playbook/scripts/eyecatch_apply.py --batch ai6 --approve
+python affiliate-research-engine/playbook/scripts/eyecatch_apply.py --batch next20 --approve
 ```
 
 `--approve` を付けない限り、何が起きるかの一覧を出すだけで**サイトは触らない**。

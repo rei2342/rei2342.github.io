@@ -18,6 +18,7 @@ articles:
       手順の記事。読者が知りたいのは「何をどう打つか」で、
       表情や動作は理解を助けない。手元と紙のノートで足りる
     camera_distance: "close on the hands"
+    uniqueness_reason: "AI6本で唯一の手元の寄り。紙のノートと空の丸だけで手順を表す"
     expression: "no face in frame"
     pose: >
       both adult hands resting over the open notebook, a pen held loosely, one finger poised as if about to write
@@ -46,6 +47,7 @@ articles:
       比較表の記事。並べる対象そのものを見せるほうが早い。
       人物を置くと、どちらを勧めているかの印象が付いてしまう
     camera_distance: "top-down over a desk"
+    uniqueness_reason: "AI6本で唯一、机を真上から見て左右に分ける。対象を並べて比べる"
     expression: "none. no person appears"
     pose: >
       no person. objects laid out in two halves of the desk, seen straight from above
@@ -74,6 +76,7 @@ articles:
       学ぶ意味を疑っている読者の入口。迷いを扱う記事なので、
       「待たせている間合い」を人物の姿勢で見せたほうが伝わる
     camera_distance: "waist-up, half body, from slightly behind"
+    uniqueness_reason: "AI6本で唯一の屋外の街角。相手を待たせている間合いを人物で見せる"
     expression: "eyes lowered, lips closed, faintly troubled but calm. not smiling, not looking at the viewer"
     pose: >
       standing at the right in three-quarter profile seen from slightly behind, shoulders turned a little away, the phone held low at her waist
@@ -103,6 +106,7 @@ articles:
       発音は身体の動作が主題。顎に手を当てて音の出し方を確かめる動作が、
       「点数ではなく直し方」という記事の結論をそのまま見せる
     camera_distance: "waist-up, half body"
+    uniqueness_reason: "AI6本で唯一の朝の窓辺。顎に手を当てて音の出し方を確かめる動作"
     expression: "concentrating inward, eyes lowered, mouth very slightly open as if forming a sound"
     pose: >
       seated at the right in three-quarter view, one hand resting lightly against her jaw, the other hand in her lap
@@ -132,6 +136,7 @@ articles:
       自分に必要な範囲を選ぶ判断が中心。どれを取ってどれを外すかという
       迷いは、手だけでは出ない。カードを見比べる視線と表情で見せる
     camera_distance: "waist-up, seated on the floor, slightly from above"
+    uniqueness_reason: "AI6本で唯一、床に座って選ぶ。カードへ手をかざしてまだ取らない"
     expression: "thinking. brows softly drawn, eyes lowered toward the cards, mouth closed"
     pose: >
       seated on the floor at the right with legs folded, leaning slightly forward, one hand hovering above one card without touching it
@@ -162,6 +167,7 @@ articles:
       ツールの機能を確かめる記事。人物を置くと、さくらがその会議に出て
       そのツールを使っているように読めてしまう。会議机と小物だけで表す
     camera_distance: "top-down over a meeting table"
+    uniqueness_reason: "AI6本で唯一の無人の会議机。画面を1つも点けずに確認項目を表す"
     expression: "none. no person appears"
     pose: >
       no person. objects laid out on the table top, seen straight from above

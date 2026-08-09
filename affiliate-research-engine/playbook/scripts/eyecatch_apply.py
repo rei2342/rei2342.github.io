@@ -3,18 +3,20 @@
 eyecatch_apply.py
 コンタクトシートの承認後に、**1回だけ**走らせる。ここが唯一サイトを触る場所。
 
-  python eyecatch_apply.py            … 何をするかを並べるだけ（サイトは触らない）
-  python eyecatch_apply.py --approve  … 実行する
+  python eyecatch_apply.py --batch next20            … 一覧を出すだけ
+  python eyecatch_apply.py --batch next20 --approve  … 実行する
 
 順番は固定。途中で判断を求めない。
 
-  1. バックアップ（現在の featured_media・画像URL・予約日時）
+  1. バックアップ（今の featured_media・画像URL・状態・予約日時）
   2. メディアへアップロード（半角英数のファイル名・alt を設定）
   3. featured_media を差し替え
-  4. 公開済み993の画像を差し替え
-  5. 予約5本を、**元の予約日時のまま** future へ戻す
-  6. 公開画面・OGP・alt・メディア対応を確認
-  7. ロールバック手順を backups/ へ書く
+  4. 予約中だった記事は、**元の予約日時のまま** future へ戻す
+  5. 公開画面・OGP・alt・メディア対応を確認
+  6. ロールバック手順を backups/ へ書く
+
+**古いメディアは1つも消さない。** featured_media を向け替えるだけ。
+参照に使っている 521・273・297 の画像もそのまま残す。
 
 **検査に落ちた画像がある記事は、その記事だけ飛ばす。** 仮画像を当てない。
 """
@@ -43,11 +45,13 @@ WP_PASS = os.environ.get("WP_APP_PASSWORD", "")
 AUTH = (WP_USER, WP_PASS)
 UA = {"User-Agent": "Mozilla/5.0"}
 
-BATCH = ROOT / "eyecatch-generation-batch/ai-6"
-OUT = BATCH / "out"
-ARTICLES = ROOT / "config/eyecatch/articles-ai-cluster.yaml"
+BATCHES = {
+    "ai6": ("ai-6", "config/eyecatch/articles-ai-cluster.yaml"),
+    "next20": ("next-20", "config/eyecatch/articles-next20.yaml"),
+}
+BATCH = OUT = ARTICLES = None      # --batch で決まる
 STAMP = datetime.now(JST).strftime("%Y-%m-%d")
-BK = ROOT / f"workspace/backups/{STAMP}/eyecatch-ai6"
+BK = None               # --batch で決まる
 # 予約を止めたときの記録。**元の日時はここにしか残っていない**
 PAUSE = ROOT / "workspace/backups/2026-08-09"
 
@@ -106,9 +110,16 @@ def upload(path, alt):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--batch", default="next20", choices=sorted(BATCHES))
     ap.add_argument("--approve", action="store_true",
                     help="実際にWordPressへ反映する")
     args = ap.parse_args()
+    d, articles = BATCHES[args.batch]
+    global BATCH, OUT, ARTICLES, BK
+    BATCH = ROOT / "eyecatch-generation-batch" / d
+    OUT = BATCH / "out"
+    ARTICLES = ROOT / articles
+    BK = ROOT / f"workspace/backups/{STAMP}/eyecatch-{args.batch}"
 
     doc = es.load_articles(ARTICLES)
     rows = plan_rows(doc)
@@ -216,7 +227,7 @@ def main():
         "items": log,
         "verify": checks,
         "rollback": (
-            f"workspace/backups/{STAMP}/eyecatch-ai6/<記事ID>.json の "
+            f"{BK.relative_to(ROOT)}/<記事ID>.json の "
             "old_featured_media と old_status・old_date を戻す。"
             "古いメディアは消していないので、IDを指すだけで戻る"),
     }, allow_unicode=True, sort_keys=False), encoding="utf-8")

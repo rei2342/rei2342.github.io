@@ -12,10 +12,10 @@ eyecatch_finish.py
 マスターが1枚でも足りなければ**何もせずに止まる**。
 仮画像を作って先へ進めない。
 
-  python eyecatch_finish.py
+  python eyecatch_finish.py --batch next20
 出力: eyecatch-generation-batch/ai-6/out/ と CHECKS.md
 """
-import shutil
+import argparse
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -29,8 +29,11 @@ import eyecatch_spec as es
 import eyecatch_mockup as mk
 
 JST = timezone(timedelta(hours=9))
-BATCH = ROOT / "eyecatch-generation-batch/ai-6"
-OUT = BATCH / "out"
+BATCHES = {
+    "ai6": ("ai-6", "config/eyecatch/articles-ai-cluster.yaml"),
+    "next20": ("next-20", "config/eyecatch/articles-next20.yaml"),
+}
+BATCH = OUT = None      # --batch で決まる
 
 
 def font(size, bold=True):
@@ -90,10 +93,17 @@ def checks(spec, art, master, blog, note):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--batch", default="next20", choices=sorted(BATCHES))
+    args = ap.parse_args()
+    d, articles = BATCHES[args.batch]
+    global BATCH, OUT
+    BATCH = ROOT / "eyecatch-generation-batch" / d
+    OUT = BATCH / "out"
+
     spec = es.load_spec()
-    doc = es.load_articles(ROOT / "config/eyecatch/articles-ai-cluster.yaml")
+    doc = es.load_articles(ROOT / articles)
     cat = doc["category"]
-    accent = spec["category_colors"][cat]["hex"]
     stamp = datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S JST")
 
     missing = [str(a["post_id"]) for a in doc["articles"]
@@ -112,6 +122,8 @@ def main():
         im = Image.open(m)
         blog = OUT / a["filename"]
         note = OUT / a["filename"].replace(".jpg", "-note.jpg")
+        accent = spec["category_colors"].get(
+            a.get("category", cat), spec["category_colors"]["_default"])["hex"]
         mk.compose_blog(spec, im, a["lead_text"], a["sub_text"], accent,
                         scrim=False).save(
             blog, "JPEG", quality=spec["blog_export"]["quality"])
@@ -123,10 +135,10 @@ def main():
     # 3種類を並べたコンタクトシート
     tw, th, pad = 380, 214, 16
     W = 3 * (tw + pad) + pad
-    H = 120 + 2 * (th * 3 + 96 + pad) + pad
+    H = 120 + ((len(rows) + 2) // 3) * (th * 3 + 96 + pad) + pad
     cs = Image.new("RGB", (W, H), (250, 248, 249))
     d = ImageDraw.Draw(cs)
-    d.text((pad, 20), f"AI英語学習6本 {stamp}", font=font(30),
+    d.text((pad, 20), f"{len(rows)}本 {stamp}", font=font(30),
            fill=(60, 50, 55))
     d.text((pad, 60), "上=マスター（文字なし） 中=ブログ用 下=note用",
            font=font(21, False), fill=(120, 105, 112))
@@ -146,7 +158,7 @@ def main():
                font=font(19, False), fill=(120, 105, 112))
     cs.save(OUT / "CONTACT.jpg", "JPEG", quality=88)
 
-    L = [f"# AI6本 検査結果 {stamp}\n\n",
+    L = [f"# {len(rows)}本 検査結果 {stamp}\n\n",
          "**WordPressへは何も送っていない。**\n\n",
          "`—` は機械で判定しきれない項目。コンタクトシートを見て人が付ける。\n\n"]
     ids = [c[0] for c in rows[0][4]]

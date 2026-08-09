@@ -3,9 +3,9 @@
 eyecatch_batch.py
 画像生成側へ渡す**単独で完結したパッケージ**を組み立て、ZIPにする。
 
-  eyecatch-generation-batch/ai-6/           ← 作業用の実体
-  eyecatch-generation-batch/sakura-eyecatch-ai6-generation-package.zip
-      └ sakura-eyecatch-ai6-generation-package/   ← ZIP内のルート
+  eyecatch-generation-batch/<バッチ>/        ← 作業用の実体
+  eyecatch-generation-batch/<パッケージ名>.zip
+      └ <パッケージ名>/                        ← ZIP内のルート
 
 受け取る側はリポジトリを読まない。参照画像・プロンプト・見本・仕様・
 手順・返し方をすべてZIPへ入れる。
@@ -13,8 +13,9 @@ eyecatch_batch.py
 **画像は生成しない。生成後の処理も動かさない。**
 それらは scripts/eyecatch_finish.py にあるが、マスターが置かれるまで走らない。
 
-  python eyecatch_batch.py
+  python eyecatch_batch.py --batch next20
 """
+import argparse
 import shutil
 import sys
 import zipfile
@@ -31,28 +32,32 @@ JST = timezone(timedelta(hours=9))
 SRC_IMG = ROOT / "workspace/seo/eyecatch"
 SURVEY = ROOT / "workspace/seo/survey"
 BATCH = ROOT / "eyecatch-generation-batch"
-OUT = BATCH / "ai-6"
-ARTICLES = ROOT / "config/eyecatch/articles-ai-cluster.yaml"
-PKG_NAME = "sakura-eyecatch-ai6-generation-package"
-
-# ZIPへ入れるもの。masters/ は空なので入れず、RETURN_INSTRUCTIONS で作ってもらう
-ZIP_MEMBERS = [
-    "references/521.jpg", "references/273.jpg", "references/297.jpg",
-    "prompts/993.md", "prompts/995.md", "prompts/997.md",
-    "prompts/999.md", "prompts/1001.md", "prompts/1003.md",
-    "previews/reference-comparison.jpg",
-    "previews/existing-ai6-contact-sheet.jpg",
-    "manifest.yaml", "sakura-v1.yaml",
-    "GENERATION_INSTRUCTIONS.md", "RETURN_INSTRUCTIONS.md",
-]
-
-PREVIEWS = [
-    ("REFERENCE_COMPARE.jpg", "reference-comparison.jpg",
-     "参照候補3枚の比較。全体と顔の拡大、採るもの／採らないもの"),
-    ("AI6_CONTACT.jpg", "existing-ai6-contact-sheet.jpg",
-     "6本の並び見本。**中身は既存画像の流用で、完成版ではない。**"
-     "文字の位置と読みやすさだけを見るためのもの"),
-]
+# ── バッチの定義 ────────────────────────────────────
+# 記事の束ごとに、記事データ・出力先・ZIP名・見本を変える。
+# **プロンプトの組み立て方は共通**（sakura-v1.yaml のアダプター）
+BATCHES = {
+    "ai6": {
+        "articles": "config/eyecatch/articles-ai-cluster.yaml",
+        "dir": "ai-6",
+        "package": "sakura-eyecatch-ai6-generation-package",
+        "label": "AI英語学習6本",
+        "previews": [
+            ("REFERENCE_COMPARE.jpg", "reference-comparison.jpg",
+             "参照3枚の比較。全体と顔の拡大、採るもの／採らないもの"),
+            ("AI6_CONTACT.jpg", "existing-ai6-contact-sheet.jpg",
+             "並びの見本。中身は既存画像の流用で、目指す完成形ではない"),
+        ],
+        "split": False,
+    },
+    "next20": {
+        "articles": "config/eyecatch/articles-next20.yaml",
+        "dir": "next-20",
+        "package": "sakura-eyecatch-next20-generation-package",
+        "label": "文字カード型20本の差し替え",
+        "previews": [],          # 20本は見本を同梱しない
+        "split": True,           # manifest を batch_1 / batch_2 に分ける
+    },
+}
 
 
 def ref_line(article, refs):
@@ -110,6 +115,8 @@ def write_prompt(path, spec, article, category, refs):
         f"| 記事の役割 | {article['role']} |\n",
         f"| **人物** | **{'あり' if article['with_person'] else 'なし'}**"
         f"（{' '.join(article['person_reason'].split())}） |\n",
+        f"| **他の19本と何が違うか** | "
+        f"{' '.join(article['uniqueness_reason'].split())} |\n",
         f"| 描く場面 | {' '.join(article['scene'].split())} |\n",
         f"| 表情 | {' '.join(article['expression'].split())} |\n",
         f"| ポーズ | {' '.join(article['pose'].split())} |\n",
@@ -150,15 +157,38 @@ def write_prompt(path, spec, article, category, refs):
     return used
 
 
-def generation_instructions(spec, items, stamp):
+def generation_instructions(spec, items, stamp, cfg, previews):
     w, h = spec["master_size"]
+    n = len(items)
     rows = "".join(
-        f"| {i['post_id']} | {'あり' if i['with_person'] else 'なし'} | "
-        f"`{i['prompt_file']}` | {' '.join(x.split('/')[-1] for x in i['references'])} |\n"
+        f"| {i['post_id']} | {i.get('batch', 1)} | "
+        f"{'あり' if i['with_person'] else 'なし'} | "
+        f"`{i['prompt_file']}` | "
+        f"{' '.join(x.split('/')[-1] for x in i['references'])} |\n"
         for i in items)
-    return f"""# 生成手順（{stamp}）
+    no_person = " ".join(str(i["post_id"]) for i in items
+                         if not i["with_person"])
+    preview_block = ("\n## 見本\n\n" + "".join(
+        f"- `{p['file']}` … {p['note']}\n" for p in previews)) if previews else ""
+    split_block = ""
+    if cfg["split"]:
+        b1 = " ".join(str(i["post_id"]) for i in items if i.get("batch") == 1)
+        b2 = " ".join(str(i["post_id"]) for i in items if i.get("batch") == 2)
+        split_block = f"""
+## 2回に分ける
 
-さくら（sakura-eigo.com）のアイキャッチ用に、**文字なしのマスター画像を6枚**作る。
+品質を確かめやすいよう、**batch_1 を先に返してほしい**。
+
+| 束 | 記事ID |
+|---|---|
+| batch_1 | {b1} |
+| batch_2 | {b2} |
+
+batch_1 を見て画風が合っていることを確かめてから batch_2 に入る。
+"""
+    return f"""# 生成手順（{cfg['label']}・{stamp}）
+
+さくら（sakura-eigo.com）のアイキャッチ用に、**文字なしのマスター画像を{n}枚**作る。
 文字はこちらで後から合成する。**画像の中に文字を描かない。**
 
 ## 手順
@@ -167,18 +197,18 @@ def generation_instructions(spec, items, stamp):
    （`references/` の指定ファイルと `prompts/<記事ID>.md` のプロンプト）
 2. **1記事につき、文字なしマスターを1枚生成する**
 3. **{w}×{h} の PNG で保存する**（{spec['master_aspect_ratio']}）
-4. **ファイル名を `<記事ID>.png` にする**（例 `993.png`）
-5. **6枚を `masters/` フォルダにまとめて返す**
+4. **ファイル名を `<記事ID>.png` にする**（例 `{items[0]['post_id']}.png`）
+5. **{n}枚を `masters/` フォルダにまとめて返す**
 6. **文字・数字・ロゴが出た画像は返さない。** 作り直す
 7. **人物ありの画像は、521と同一人物に見えるか確認する。**
    別人に見えたら作り直す
 8. **左半分に重要な人物・小物を置かない。**
    あとから日本語を載せるので、左は静かに空ける
+{split_block}
+## {n}枚の一覧
 
-## 6枚の一覧
-
-| 記事ID | 人物 | プロンプト | 渡す参照 |
-|---|---|---|---|
+| 記事ID | 束 | 人物 | プロンプト | 渡す参照 |
+|---|---|---|---|---|
 {rows}
 ## 参照画像の使い分け（3枚を均等に混ぜない）
 
@@ -188,15 +218,15 @@ def generation_instructions(spec, items, stamp):
 | 2 | `references/273.jpg` | 長い茶髪・桜クリップ | 顔の角度 |
 | 3 | `references/297.jpg` | 水彩の塗り・光・空気感 | **顔・大きな目・ちび頭身・ピンクのパーカー** |
 
-**人物なしの3本（993・995・1003）には 521 と 273 を渡さない。**
+**人物なしの記事（{no_person}）には 521 と 273 を渡さない。**
+{preview_block}
+## 場面の使い回しをしない
 
-## 見本
+{n}本すべてで場面・小物・カメラ距離が違う。各プロンプトの
+「他と何が違うか」に、その1枚だけの要素が書いてある。
+**同じ机・同じノート・同じマグ・同じ頬杖・同じ右向きの上半身を繰り返さない。**
 
-- `previews/reference-comparison.jpg` … 3枚の違いと、どれから何を採るか
-- `previews/existing-ai6-contact-sheet.jpg` … 並びと文字位置の見本。
-  **中身は既存画像の流用で、目指す完成形ではない**
-
-## 全6枚に共通で入っている禁止文
+## 全{n}枚に共通で入っている禁止文
 
 ```text
 {spec['negative_prompt']['always_append']}
@@ -204,14 +234,19 @@ def generation_instructions(spec, items, stamp):
 
 ## 仕様の原本
 
-`sakura-v1.yaml`。プロンプトはこの仕様から機械的に組み立てている。
+`sakura-v1.yaml`（status: {spec['status']}）。
+プロンプトはこの仕様から機械的に組み立てている。
 プロンプトと仕様が食い違って見えたら、**プロンプトのほうを正とし、こちらへ知らせてほしい**。
 """
 
 
-def return_instructions(items, stamp):
+def return_instructions(items, stamp, cfg):
+    n = len(items)
     files = "\n".join(f"  {i['post_id']}.png" for i in items)
-    return f"""# 返し方と、受領後の処理（{stamp}）
+    unit = ("batch_1 の10枚がそろった時点で一度返してほしい。"
+            "残りは確認のあとで構わない。" if cfg["split"]
+            else f"{n}枚そろってから渡してほしい")
+    return f"""# 返し方と、受領後の処理（{cfg['label']}・{stamp}）
 
 ## 返してもらう構成
 
@@ -221,14 +256,14 @@ masters/
 ```
 
 これだけでよい。JPEGへの変換・リサイズ・文字入れは**しない**。
-{len(items)}枚そろってから渡してほしい（**1枚でも欠けると受領処理が止まる**）。
+{unit}（**枚数が足りないと受領処理は止まる**）。
 
 ## 受領後に、こちらが実行すること
 
-`masters/` を `eyecatch-generation-batch/ai-6/masters/` へ置き、次を1回走らせる。
+`masters/` を `eyecatch-generation-batch/{cfg['dir']}/masters/` へ置き、次を1回走らせる。
 
 ```bash
-python affiliate-research-engine/playbook/scripts/eyecatch_finish.py
+python affiliate-research-engine/playbook/scripts/eyecatch_finish.py --batch {cfg['key']}
 ```
 
 これで下の4つまで一度に出る。**追加の判断は要らない。**
@@ -246,19 +281,20 @@ python affiliate-research-engine/playbook/scripts/eyecatch_finish.py
 ## そのあと（承認後にだけ動かす）
 
 ```bash
-python affiliate-research-engine/playbook/scripts/eyecatch_apply.py --approve
+python affiliate-research-engine/playbook/scripts/eyecatch_apply.py --batch {cfg['key']} --approve
 ```
 
 `--approve` を付けない限り、何が起きるかの一覧を出すだけで**サイトは触らない**。
 付けたときの順番は次のとおり。
 
-1. 全記事のバックアップ（現在の `featured_media` と画像URL）
+1. 全記事のバックアップ（今の `featured_media` と画像URL）
 2. メディアへアップロード（ファイル名は半角英数・altを設定）
 3. `featured_media` を差し替え
-4. **公開済みの993の画像を差し替え**
-5. **予約5本を、元の予約日時のまま再予約へ戻す**
-6. 公開画面・OGP・alt・メディアの対応を確認
-7. ロールバック手順を `backups/` へ記録
+4. 公開画面・OGP・alt・メディアの対応を確認
+5. ロールバック手順を `backups/` へ記録
+
+**今の画像も、参照に使っている旧521・273・297も削除しない。**
+差し替えは featured_media を向け替えるだけで、古いメディアはそのまま残す。
 
 `eyecatch_finish.py` は**WordPressへ一切送らない**。
 サイトへ触るのは `eyecatch_apply.py --approve` だけ。
@@ -266,13 +302,21 @@ python affiliate-research-engine/playbook/scripts/eyecatch_apply.py --approve
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--batch", default="next20", choices=sorted(BATCHES),
+                    help="どの束を組み立てるか")
+    args = ap.parse_args()
+    cfg = dict(BATCHES[args.batch], key=args.batch)
+
+    out = BATCH / cfg["dir"]
+    pkg = cfg["package"]
     stamp = datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S JST")
     spec = es.load_spec()
-    doc = es.load_articles(ARTICLES)
+    doc = es.load_articles(ROOT / cfg["articles"])
     cat = doc["category"]
 
     for d in ("references", "prompts", "previews", "masters"):
-        (OUT / d).mkdir(parents=True, exist_ok=True)
+        (out / d).mkdir(parents=True, exist_ok=True)
 
     # ── 参照画像 ────────────────────────────────
     refs = spec["reference_assets"]["priority_order"]
@@ -280,13 +324,12 @@ def main():
     for r in refs:
         pid = str(r["source_post"])
         src = SRC_IMG / f"{pid}.jpg"
-        dst = OUT / "references" / f"{pid}.jpg"
         if not src.exists() or src.stat().st_size == 0:
             # 1枚でも欠けたら止める。2枚だけ渡すと顔の基準が無いまま生成される
             print(f"参照画像が無い、または空: {src}")
             print("**3枚そろわないと顔の基準が決まらない。** ここで止める。")
             sys.exit(1)
-        shutil.copyfile(src, dst)
+        shutil.copyfile(src, out / "references" / f"{pid}.jpg")
         ref_rows.append({
             "slot": r["slot"], "post_id": r["source_post"],
             "media_id": r["source_media_id"],
@@ -294,35 +337,37 @@ def main():
             "take": r["take"], "do_not_take": r["do_not_take"],
         })
 
-    # ── 見本 ────────────────────────────────────
+    # ── 見本（無い束もある）──────────────────────
     preview_rows = []
-    for src_name, dst_name, why in PREVIEWS:
+    for src_name, dst_name, why in cfg["previews"]:
         src = SURVEY / src_name
         if not src.exists() or src.stat().st_size == 0:
             print(f"見本が無い、または空: {src}")
             sys.exit(1)
-        shutil.copyfile(src, OUT / "previews" / dst_name)
+        shutil.copyfile(src, out / "previews" / dst_name)
         preview_rows.append({"file": f"previews/{dst_name}",
                              "note": " ".join(why.split())})
 
-    # ── 仕様の原本を同梱 ────────────────────────
     shutil.copyfile(ROOT / "config/eyecatch/sakura-v1.yaml",
-                    OUT / "sakura-v1.yaml")
+                    out / "sakura-v1.yaml")
 
     # ── プロンプト ──────────────────────────────
     items = []
     for a in doc["articles"]:
         pid = str(a["post_id"])
-        used = write_prompt(OUT / "prompts" / f"{pid}.md", spec, a, cat, refs)
-        items.append({
+        used = write_prompt(out / "prompts" / f"{pid}.md", spec, a, cat, refs)
+        row = {
             "post_id": a["post_id"],
+            "batch": a.get("batch", 1),
             "slug": a["slug"],
             "title": a["title"],
             "search_intent": a["search_intent"],
             "role": a["role"],
+            "category": a.get("category", cat),
             "prompt_file": f"prompts/{pid}.md",
             "with_person": a["with_person"],
             "person_reason": " ".join(a["person_reason"].split()),
+            "uniqueness_reason": " ".join(a["uniqueness_reason"].split()),
             "references": [f for f, _ in used],
             "camera_distance": a["camera_distance"],
             "expression": " ".join(a["expression"].split()),
@@ -330,6 +375,7 @@ def main():
             "props": a["props"],
             "background": a["background"],
             "palette": " ".join(a["palette"].split()),
+            "scene": " ".join(a["scene"].split()),
             "master_file": f"masters/{pid}.png",
             "blog_output": a["filename"],
             "note_output": a["filename"].replace(".jpg", "-note.jpg"),
@@ -337,14 +383,29 @@ def main():
             "lead_text": a["lead_text"],
             "sub_text": a["sub_text"],
             "status": "awaiting_generation",
-        })
+        }
+        if "current_featured_media" in a:
+            # **差し替え前の控え。** ここが無いと戻せない
+            row["current_featured_media"] = a["current_featured_media"]
+            row["current_media_url"] = a["current_media_url"]
+            row["pre_card_media_id"] = a["pre_card_media_id"]
+            row["verify_after_replace"] = [
+                "featured_media が新しいメディアIDになっている",
+                "alt が設定されている",
+                "ファイル名が半角英数とハイフンだけ",
+                "記事ページのOGP画像が新しい画像を指している",
+                "サムネイルで読める",
+                "旧メディアが消えていない（戻せる）",
+            ]
+        items.append(row)
 
+    items.sort(key=lambda x: (x["batch"], -x["post_id"]))
     manifest = {
-        "package": PKG_NAME,
-        "batch": "ai-6",
+        "package": pkg,
+        "batch": cfg["dir"],
+        "label": cfg["label"],
         "spec_file": "sakura-v1.yaml",
         "spec_status": spec["status"],
-        "category": cat,
         "generated_at": stamp,
         "master": {
             "size": spec["master_size"],
@@ -363,38 +424,54 @@ def main():
         "reject_rule": " ".join(
             spec["reference_assets"]["reject_rule"].split()),
         "previews": preview_rows,
+        "count": len(items),
         "with_person_count": sum(1 for i in items if i["with_person"]),
         "without_person_count": sum(1 for i in items if not i["with_person"]),
         "post_ids": [i["post_id"] for i in items],
-        "items": items,
     }
-    (OUT / "manifest.yaml").write_text(
+    if cfg["split"]:
+        # 10本ずつに分ける。**batch_1 を先に確認してから batch_2 に入る**
+        manifest["batch_1"] = [i for i in items if i["batch"] == 1]
+        manifest["batch_2"] = [i for i in items if i["batch"] == 2]
+        manifest["items"] = items
+    else:
+        manifest["items"] = items
+    (out / "manifest.yaml").write_text(
         yaml.safe_dump(manifest, allow_unicode=True, sort_keys=False,
                        width=100), encoding="utf-8")
 
-    (OUT / "GENERATION_INSTRUCTIONS.md").write_text(
-        generation_instructions(spec, items, stamp), encoding="utf-8")
-    (OUT / "RETURN_INSTRUCTIONS.md").write_text(
-        return_instructions(items, stamp), encoding="utf-8")
-    (OUT / "masters" / ".gitkeep").write_text("", encoding="utf-8")
+    (out / "GENERATION_INSTRUCTIONS.md").write_text(
+        generation_instructions(spec, items, stamp, cfg, preview_rows),
+        encoding="utf-8")
+    (out / "RETURN_INSTRUCTIONS.md").write_text(
+        return_instructions(items, stamp, cfg), encoding="utf-8")
+    (out / "masters" / ".gitkeep").write_text("", encoding="utf-8")
 
     # ── ZIP ─────────────────────────────────────
-    zip_path = BATCH / f"{PKG_NAME}.zip"
-    missing = [m for m in ZIP_MEMBERS if not (OUT / m).exists()]
+    members = ([f"references/{r['post_id']}.jpg" for r in ref_rows]
+               + [i["prompt_file"] for i in items]
+               + [p["file"] for p in preview_rows]
+               + ["manifest.yaml", "sakura-v1.yaml",
+                  "GENERATION_INSTRUCTIONS.md", "RETURN_INSTRUCTIONS.md"])
+    missing = [m for m in members if not (out / m).exists()]
     if missing:
         print("ZIPへ入れるファイルが足りない: " + " ".join(missing))
         sys.exit(1)
+    zip_path = BATCH / f"{pkg}.zip"
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
-        for m in ZIP_MEMBERS:
-            z.write(OUT / m, f"{PKG_NAME}/{m}")
+        for m in members:
+            z.write(out / m, f"{pkg}/{m}")
 
-    print(f"→ {OUT}")
+    print(f"→ {out}")
     print(f"→ {zip_path}  ({zip_path.stat().st_size // 1024}KB / "
-          f"{len(ZIP_MEMBERS)}ファイル)")
+          f"{len(members)}ファイル)")
     print(f"  references {len(ref_rows)}枚 / prompts {len(items)}本 / "
           f"previews {len(preview_rows)}枚")
     print(f"  人物あり {manifest['with_person_count']} / "
           f"なし {manifest['without_person_count']}")
+    if cfg["split"]:
+        print(f"  batch_1 {len(manifest['batch_1'])}本 / "
+              f"batch_2 {len(manifest['batch_2'])}本")
 
 
 if __name__ == "__main__":

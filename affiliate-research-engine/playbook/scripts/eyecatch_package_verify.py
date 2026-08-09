@@ -3,11 +3,12 @@
 eyecatch_package_verify.py
 引き渡しパッケージを**渡す前に**機械で確かめる。
 
-  python eyecatch_package_verify.py
+  python eyecatch_package_verify.py --batch next20
 
-9項目を見る。1つでも落ちたら終了コード1。
+1つでも落ちたら終了コード1。
 ZIPは別の一時フォルダへ展開して読み直す（相対パスの取りこぼしを見つけるため）。
 """
+import argparse
 import re
 import shutil
 import subprocess
@@ -21,10 +22,21 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parents[1]
 BATCH = ROOT / "eyecatch-generation-batch"
-PKG_NAME = "sakura-eyecatch-ai6-generation-package"
-ZIP = BATCH / f"{PKG_NAME}.zip"
-APPROVED = {993: False, 995: False, 997: True,
-            999: True, 1001: True, 1003: False}
+# 束ごとの、承認された人物割り当て。**ここを正とする**
+APPROVED_BY_BATCH = {
+    "ai6": {993: False, 995: False, 997: True,
+            999: True, 1001: True, 1003: False},
+    "next20": {546: True, 526: False, 521: False, 23: False, 149: False,
+               294: True, 137: False, 235: False, 301: True, 304: False,
+               32: False, 282: True, 281: False, 283: False, 310: False,
+               28: True, 33: True, 117: True, 150: True, 292: True},
+}
+PACKAGES = {
+    "ai6": ("sakura-eyecatch-ai6-generation-package",
+            ["previews/reference-comparison.jpg",
+             "previews/existing-ai6-contact-sheet.jpg"]),
+    "next20": ("sakura-eyecatch-next20-generation-package", []),
+}
 MUST_APPEND = [
     "No letters, no words, no numbers, no logos, no watermarks.",
     "Do not render any interface text, application logo, brand name, score,"
@@ -44,6 +56,14 @@ def check(name, ok, detail=""):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--batch", default="next20", choices=sorted(PACKAGES))
+    args = ap.parse_args()
+    global PKG_NAME, ZIP, APPROVED, EXTRA
+    PKG_NAME, EXTRA = PACKAGES[args.batch]
+    ZIP = BATCH / f"{PKG_NAME}.zip"
+    APPROVED = APPROVED_BY_BATCH[args.batch]
+
     if not ZIP.exists():
         print(f"ZIPが無い: {ZIP}")
         sys.exit(1)
@@ -67,7 +87,7 @@ def main():
                   f.exists() and f.stat().st_size > 0,
                   f"{f.stat().st_size}B" if f.exists() else "無い")
 
-        # 2. プロンプト6本が実在する
+        # 2. プロンプトが記事数ぶん実在する
         prompts = {}
         for pid in APPROVED:
             f = P / f"prompts/{pid}.md"
@@ -77,10 +97,9 @@ def main():
                 prompts[pid] = f.read_text(encoding="utf-8")
 
         # 見本・仕様・手順書
-        for rel in ("previews/reference-comparison.jpg",
-                    "previews/existing-ai6-contact-sheet.jpg",
-                    "manifest.yaml", "sakura-v1.yaml",
-                    "GENERATION_INSTRUCTIONS.md", "RETURN_INSTRUCTIONS.md"):
+        for rel in EXTRA + ["manifest.yaml", "sakura-v1.yaml",
+                            "GENERATION_INSTRUCTIONS.md",
+                            "RETURN_INSTRUCTIONS.md"]:
             f = P / rel
             check(f"{rel} がある・0バイトでない",
                   f.exists() and f.stat().st_size > 0)
@@ -88,10 +107,15 @@ def main():
         man = yaml.safe_load((P / "manifest.yaml").read_text(encoding="utf-8"))
         spec = yaml.safe_load((P / "sakura-v1.yaml").read_text(encoding="utf-8"))
 
-        # 3. manifest と記事IDが一致する
-        m_ids = sorted(i["post_id"] for i in man["items"])
-        check("manifestの記事IDが6本そろっている",
+        # 3. manifest と記事IDが一致する。**欠落も重複も0**
+        raw_ids = [i["post_id"] for i in man["items"]]
+        m_ids = sorted(raw_ids)
+        check(f"manifestの記事IDが{len(APPROVED)}本そろっている",
               m_ids == sorted(APPROVED), str(m_ids))
+        check("manifestに重複が無い", len(set(raw_ids)) == len(raw_ids))
+        check("プロンプトに重複・欠落が無い",
+              sorted(int(p.stem) for p in (P / "prompts").glob("*.md"))
+              == sorted(APPROVED))
         check("manifestの記事IDとプロンプトのファイル名が一致",
               m_ids == sorted(int(p.stem) for p in (P / "prompts").glob("*.md")))
         for i in man["items"]:
@@ -109,12 +133,18 @@ def main():
                       "521 as the primary identity reference" in txt)
                 check(f"プロンプト {pid}: 521と別人なら不合格と書いてある",
                       "521と別人に見える" in txt)
+                check(f"プロンプト {pid}: 参照3枚が指定されている",
+                      all(f"references/{r}.jpg" in txt
+                          for r in (521, 273, 297)))
             else:
                 ref = txt.split("REFERENCES:")[1]
                 check(f"プロンプト {pid}: 人物なしなので521・273を渡していない",
                       "521" not in ref and "273" not in ref)
                 check(f"プロンプト {pid}: 人物を描かないと明記",
                       "Do NOT show any person" in txt)
+                used = set(re.findall(r"`references/(\d+)\.jpg`", txt))
+                check(f"プロンプト {pid}: 参照は297だけ", used == {"297"},
+                      " ".join(sorted(used)))
 
         # 5. 数字・文字を描かせる指示が無い
         # 「文字を描け」と読める語が prompts に無いか。
@@ -153,6 +183,37 @@ def main():
             check(f"ファイル名が半角英数とハイフン: {n}",
                   bool(re.fullmatch(r"[a-z0-9\-]+\.jpg", n)))
 
+        # 場面の重複が無いか。**同じ机を繰り返さない**
+        scenes = {}
+        for i in man["items"]:
+            key = " ".join(i.get("scene", "").split())[:120]
+            scenes.setdefault(key, []).append(i["post_id"])
+        dup = {k: v for k, v in scenes.items() if len(v) > 1}
+        check("sceneの重複が無い", not dup,
+              " ".join(str(v) for v in dup.values()))
+        for i in man["items"]:
+            check(f"manifest {i['post_id']}: uniqueness_reason がある",
+                  bool(str(i.get("uniqueness_reason", "")).strip()))
+            check(f"manifest {i['post_id']}: person_reason がある",
+                  bool(str(i.get("person_reason", "")).strip()))
+
+        # 差し替え対象は、今の featured_media を控えてあるか
+        if any("current_featured_media" in i for i in man["items"]):
+            for i in man["items"]:
+                check(f"manifest {i['post_id']}: 今のfeatured_mediaがある",
+                      isinstance(i.get("current_featured_media"), int),
+                      str(i.get("current_featured_media")))
+
+        # 10本ずつに分かれているか
+        if "batch_1" in man:
+            b1 = [i["post_id"] for i in man["batch_1"]]
+            b2 = [i["post_id"] for i in man["batch_2"]]
+            check("batch_1 と batch_2 に分かれている",
+                  len(b1) == 10 and len(b2) == 10, f"{len(b1)}/{len(b2)}")
+            check("束が重なっていない", not (set(b1) & set(b2)))
+            check("画面で確認した 546・526・521 が batch_1 にある",
+                  {546, 526, 521} <= set(b1))
+
         # 8. リポジトリ外・環境依存のパスを参照していない
         docs = {rel: (P / rel).read_text(encoding="utf-8")
                 for rel in ("GENERATION_INSTRUCTIONS.md",
@@ -175,7 +236,7 @@ def main():
             check(f"参照している {rel} が展開先にある", (P / rel).exists())
 
         # 仕様の中身も、同梱した写しで確かめる
-        check("同梱した仕様が proposal のまま", spec["status"] == "proposal")
+        check("同梱した仕様が承認済み", spec["status"] == "approved")
         check("同梱した仕様の禁止文が4行そろっている",
               all(l in spec["negative_prompt"]["always_append"]
                   for l in MUST_APPEND))

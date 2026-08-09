@@ -1,9 +1,9 @@
 package: sakura-eyecatch-ai6-generation-package
 batch: ai-6
+label: AI英語学習6本
 spec_file: sakura-v1.yaml
-spec_status: proposal
-category: AI英語学習
-generated_at: 2026-08-09 17:34:40 JST
+spec_status: approved
+generated_at: 2026-08-09 19:37:39 JST
 master:
   size:
   - 1920
@@ -75,121 +75,108 @@ reference_priority:
 reject_rule: 人物の顔が521から離れていたら不合格にする。作り直す。 297の顔・大きな目・ちび頭身・ピンクのパーカーは引き継がない
 previews:
 - file: previews/reference-comparison.jpg
-  note: 参照候補3枚の比較。全体と顔の拡大、採るもの／採らないもの
+  note: 参照3枚の比較。全体と顔の拡大、採るもの／採らないもの
 - file: previews/existing-ai6-contact-sheet.jpg
-  note: 6本の並び見本。**中身は既存画像の流用で、完成版ではない。**文字の位置と読みやすさだけを見るためのもの
+  note: 並びの見本。中身は既存画像の流用で、目指す完成形ではない
+count: 6
 with_person_count: 3
 without_person_count: 3
 post_ids:
-- 993
-- 995
-- 997
-- 999
-- 1001
 - 1003
+- 1001
+- 999
+- 997
+- 995
+- 993
 items:
-- post_id: 993
-  slug: chatgpt-english-learning-steps
-  title: ChatGPTで英語学習を始める手順｜社会人が最初に試す3つの使い方
-  search_intent: ChatGPTで英語学習を始めたいが、何をどう入力すればいいのかが分からない
-  role: 手順
-  prompt_file: prompts/993.md
+- post_id: 1003
+  batch: 1
+  slug: english-meeting-transcription-checklist
+  title: 英語会議の文字起こしツールを選ぶ前に｜確認する5つのこと
+  search_intent: 英語会議のAI文字起こしツールを選ぶ前に、何を確認すればよいのかを知りたい
+  role: 確認項目（実務）
+  category: AI英語学習
+  prompt_file: prompts/1003.md
   with_person: false
-  person_reason: 手順の記事。読者が知りたいのは「何をどう打つか」で、 表情や動作は理解を助けない。手元と紙のノートで足りる
+  person_reason: ツールの機能を確かめる記事。人物を置くと、さくらがその会議に出て そのツールを使っているように読めてしまう。会議机と小物だけで表す
+  uniqueness_reason: AI6本で唯一の無人の会議机。画面を1つも点けずに確認項目を表す
   references:
   - references/297.jpg
-  camera_distance: close on the hands
-  expression: no face in frame
-  pose: both adult hands resting over the open notebook, a pen held loosely, one finger poised as if about
-    to write
-  props:
-  - a paper notebook
-  - a pen
-  - a desk lamp
-  - a cream mug
-  - a closed laptop, lid down
-  background: an indoor room at night, walls in pale cream
-  palette: cream paper and warm lamp amber over a pale sakura-pink room, the periwinkle accent only on
-    the pen barrel
-  master_file: masters/993.png
-  blog_output: eyecatch-chatgpt-english-learning-steps.jpg
-  note_output: eyecatch-chatgpt-english-learning-steps-note.jpg
-  alt: ChatGPTで英語学習を始めるときに使う、添削プロンプトの3つの型を紙のノートに書き出している手元
-  lead_text: 'ChatGPTに
-
-    何をどう頼むか'
-  sub_text: 添削の頼み方の型
-  status: awaiting_generation
-- post_id: 995
-  slug: ai-eikaiwa-vs-online-eikaiwa
-  title: AI英会話とオンライン英会話の違い｜4つの軸で選ぶ
-  search_intent: AI英会話と人が相手のオンライン英会話の、どちらから始めるべきか迷っている
-  role: 比較
-  prompt_file: prompts/995.md
-  with_person: false
-  person_reason: 比較表の記事。並べる対象そのものを見せるほうが早い。 人物を置くと、どちらを勧めているかの印象が付いてしまう
-  references:
-  - references/297.jpg
-  camera_distance: top-down over a desk
+  camera_distance: top-down over a meeting table
   expression: none. no person appears
-  pose: no person. objects laid out in two halves of the desk, seen straight from above
+  pose: no person. objects laid out on the table top, seen straight from above
   props:
-  - two cream mugs
-  - a small featureless speaker-like object
-  - a folded knitted glove
-  - four blank cards
-  background: a wooden desk seen from directly above
-  palette: warm wood brown and cream, both halves lit equally so neither side looks favoured, the periwinkle
-    accent only on one of the four blank cards
-  master_file: masters/995.png
-  blog_output: eyecatch-ai-eikaiwa-vs-online-eikaiwa.jpg
-  note_output: eyecatch-ai-eikaiwa-vs-online-eikaiwa-note.jpg
-  alt: AI相手と人の講師を、相手・訂正・時間帯・料金の4つの軸で並べて比べる
-  lead_text: 'AIと人、
+  - a folded, unused headset
+  - a sheet of paper with five empty hand-drawn checkboxes
+  - a small card with a hand-drawn sound wave
+  - two plain cups
+  background: a meeting table in the morning, natural light from a window, seen from above
+  palette: cool morning daylight on a pale grey table, white paper and cream cups, the periwinkle accent
+    only on the pen
+  scene: An empty meeting table in the morning, seen from above. A headset rests folded at the right,
+    unused. Beside it a plain sheet of paper with five empty hand-drawn checkboxes and a pen laid across
+    it. A simple hand-drawn sound wave is sketched on a second small card, drawn as a soft pencil line,
+    not a screen. Two plain cups sit further back, suggesting people who have not arrived yet. Every object
+    is unbranded and no screen is switched on.
+  master_file: masters/1003.png
+  blog_output: eyecatch-english-meeting-transcription-checklist.jpg
+  note_output: eyecatch-english-meeting-transcription-checklist-note.jpg
+  alt: 英語会議の文字起こしツールを選ぶ前に確認する項目を並べた、会議机の上のチェックリスト
+  lead_text: '英語会議の
 
-    どちらから始める？'
-  sub_text: 軸を分けて選ぶ
+    AI文字起こし'
+  sub_text: 選ぶ前の確認項目
   status: awaiting_generation
-- post_id: 997
-  slug: ai-translation-why-learn-english
-  title: AI翻訳があるのに英語を学ぶ意味｜場面で分けて考える
-  search_intent: AI翻訳があるのに英語を学ぶ意味があるのか疑っている
-  role: 共感・入口
-  prompt_file: prompts/997.md
+- post_id: 1001
+  batch: 1
+  slug: ai-era-english-how-far
+  title: AI時代に必要な英語力はどこまでか｜場面から決める
+  search_intent: AI時代に自分はどこまで英語ができれば足りるのかを知りたい
+  role: 線引き（ハブ）
+  category: AI英語学習
+  prompt_file: prompts/1001.md
   with_person: true
-  person_reason: 学ぶ意味を疑っている読者の入口。迷いを扱う記事なので、 「待たせている間合い」を人物の姿勢で見せたほうが伝わる
+  person_reason: 自分に必要な範囲を選ぶ判断が中心。どれを取ってどれを外すかという 迷いは、手だけでは出ない。カードを見比べる視線と表情で見せる
+  uniqueness_reason: AI6本で唯一、床に座って選ぶ。カードへ手をかざしてまだ取らない
   references:
   - references/521.jpg
   - references/273.jpg
   - references/297.jpg
-  camera_distance: waist-up, half body, from slightly behind
-  expression: eyes lowered, lips closed, faintly troubled but calm. not smiling, not looking at the viewer
-  pose: standing at the right in three-quarter profile seen from slightly behind, shoulders turned a little
-    away, the phone held low at her waist
+  camera_distance: waist-up, seated on the floor, slightly from above
+  expression: thinking. brows softly drawn, eyes lowered toward the cards, mouth closed
+  pose: seated on the floor at the right with legs folded, leaning slightly forward, one hand hovering
+    above one card without touching it
   props:
-  - a phone held face-down and dark
-  - another person's shoulder at the frame edge
-  - blurred storefronts
-  background: a street corner in the afternoon, soft light
-  palette: bright afternoon cream and pale grey with blurred warm storefront colour behind, the periwinkle
-    accent only on her cardigan cuff
-  master_file: masters/997.png
-  blog_output: eyecatch-ai-translation-why-learn-english.jpg
-  note_output: eyecatch-ai-translation-why-learn-english-note.jpg
-  alt: AI翻訳を開く待ち時間が問題になる場面で、相手を待たせている様子
-  lead_text: 'AI翻訳があっても
+  - four plain cream cards
+  - 'simple hand-drawn icons: an open book, an ear, a speech bubble, a pen'
+  - a pale wooden floor
+  background: a quiet room in the daytime, natural light from a window
+  palette: pale wood floor and daylight cream, the periwinkle accent only on the sleeve cuff of her cardigan
+  scene: 'A quiet room in the daytime. Sakura sits on a pale wooden floor at the right, legs folded, leaning
+    slightly forward. Four plain cream cards are laid out in front of her, each carrying only a simple
+    hand-drawn icon: an open book, an ear, a speech bubble, a pen. Her hand hovers over one of them, not
+    yet picking it up. Her eyes are lowered toward the cards, brows softly drawn in thought. A few cherry
+    blossom petals on the floor. No words on the cards.'
+  master_file: masters/1001.png
+  blog_output: eyecatch-ai-era-english-how-far.jpg
+  note_output: eyecatch-ai-era-english-how-far-note.jpg
+  alt: 読む・聞く・話す・書くの4つから、自分に必要な場面を1つ選ぼうとしている様子
+  lead_text: 'どこまでやれば
 
-    英語は必要？'
-  sub_text: 学ぶ範囲の決め方
+    足りるのか'
+  sub_text: 自分の場面から決める
   status: awaiting_generation
 - post_id: 999
+  batch: 1
   slug: ai-pronunciation-app-how-to-choose
   title: AI発音矯正アプリの選び方｜自動判定でできることと、できないこと
   search_intent: AI発音矯正アプリの選び方が分からない。点数が出ても直し方が分からない
   role: 選び方
+  category: AI英語学習
   prompt_file: prompts/999.md
   with_person: true
   person_reason: 発音は身体の動作が主題。顎に手を当てて音の出し方を確かめる動作が、 「点数ではなく直し方」という記事の結論をそのまま見せる
+  uniqueness_reason: AI6本で唯一の朝の窓辺。顎に手を当てて音の出し方を確かめる動作
   references:
   - references/521.jpg
   - references/273.jpg
@@ -205,6 +192,10 @@ items:
   background: a window corner in the morning, soft backlight
   palette: pale morning backlight, white sill and cream knit, the periwinkle accent only on the headphone
     band
+  scene: A quiet window corner in the morning. Sakura sits at the right in three-quarter view, wearing
+    simple over-ear headphones, her hair down with the sakura clip visible. One hand rests lightly against
+    her jaw as if checking how a sound is formed. Her eyes are lowered, not on any screen. A small plain
+    hand mirror lies face-up on the sill beside her. No phone screen visible anywhere.
   master_file: masters/999.png
   blog_output: eyecatch-ai-pronunciation-app-how-to-choose.jpg
   note_output: eyecatch-ai-pronunciation-app-how-to-choose-note.jpg
@@ -214,64 +205,118 @@ items:
     でも直し方は？'
   sub_text: 選ぶときの確認項目
   status: awaiting_generation
-- post_id: 1001
-  slug: ai-era-english-how-far
-  title: AI時代に必要な英語力はどこまでか｜場面から決める
-  search_intent: AI時代に自分はどこまで英語ができれば足りるのかを知りたい
-  role: 線引き（ハブ）
-  prompt_file: prompts/1001.md
+- post_id: 997
+  batch: 1
+  slug: ai-translation-why-learn-english
+  title: AI翻訳があるのに英語を学ぶ意味｜場面で分けて考える
+  search_intent: AI翻訳があるのに英語を学ぶ意味があるのか疑っている
+  role: 共感・入口
+  category: AI英語学習
+  prompt_file: prompts/997.md
   with_person: true
-  person_reason: 自分に必要な範囲を選ぶ判断が中心。どれを取ってどれを外すかという 迷いは、手だけでは出ない。カードを見比べる視線と表情で見せる
+  person_reason: 学ぶ意味を疑っている読者の入口。迷いを扱う記事なので、 「待たせている間合い」を人物の姿勢で見せたほうが伝わる
+  uniqueness_reason: AI6本で唯一の屋外の街角。相手を待たせている間合いを人物で見せる
   references:
   - references/521.jpg
   - references/273.jpg
   - references/297.jpg
-  camera_distance: waist-up, seated on the floor, slightly from above
-  expression: thinking. brows softly drawn, eyes lowered toward the cards, mouth closed
-  pose: seated on the floor at the right with legs folded, leaning slightly forward, one hand hovering
-    above one card without touching it
+  camera_distance: waist-up, half body, from slightly behind
+  expression: eyes lowered, lips closed, faintly troubled but calm. not smiling, not looking at the viewer
+  pose: standing at the right in three-quarter profile seen from slightly behind, shoulders turned a little
+    away, the phone held low at her waist
   props:
-  - four plain cream cards
-  - 'simple hand-drawn icons: an open book, an ear, a speech bubble, a pen'
-  - a pale wooden floor
-  background: a quiet room in the daytime, natural light from a window
-  palette: pale wood floor and daylight cream, the periwinkle accent only on the sleeve cuff of her cardigan
-  master_file: masters/1001.png
-  blog_output: eyecatch-ai-era-english-how-far.jpg
-  note_output: eyecatch-ai-era-english-how-far-note.jpg
-  alt: 読む・聞く・話す・書くの4つから、自分に必要な場面を1つ選ぼうとしている様子
-  lead_text: 'どこまでやれば
+  - a phone held face-down and dark
+  - another person's shoulder at the frame edge
+  - blurred storefronts
+  background: a street corner in the afternoon, soft light
+  palette: bright afternoon cream and pale grey with blurred warm storefront colour behind, the periwinkle
+    accent only on her cardigan cuff
+  scene: A bright street corner in the afternoon. Sakura stands at the right, seen from slightly behind
+    and to the side so her face is in three-quarter profile, eyes lowered. She holds a phone low at her
+    waist, screen turned away and dark. Another person's shoulder is just visible at the frame edge, waiting.
+    Soft blurred storefronts behind. Her cardigan is cream with one sakura-pink cuff.
+  master_file: masters/997.png
+  blog_output: eyecatch-ai-translation-why-learn-english.jpg
+  note_output: eyecatch-ai-translation-why-learn-english-note.jpg
+  alt: AI翻訳を開く待ち時間が問題になる場面で、相手を待たせている様子
+  lead_text: 'AI翻訳があっても
 
-    足りるのか'
-  sub_text: 自分の場面から決める
+    英語は必要？'
+  sub_text: 学ぶ範囲の決め方
   status: awaiting_generation
-- post_id: 1003
-  slug: english-meeting-transcription-checklist
-  title: 英語会議の文字起こしツールを選ぶ前に｜確認する5つのこと
-  search_intent: 英語会議のAI文字起こしツールを選ぶ前に、何を確認すればよいのかを知りたい
-  role: 確認項目（実務）
-  prompt_file: prompts/1003.md
+- post_id: 995
+  batch: 1
+  slug: ai-eikaiwa-vs-online-eikaiwa
+  title: AI英会話とオンライン英会話の違い｜4つの軸で選ぶ
+  search_intent: AI英会話と人が相手のオンライン英会話の、どちらから始めるべきか迷っている
+  role: 比較
+  category: AI英語学習
+  prompt_file: prompts/995.md
   with_person: false
-  person_reason: ツールの機能を確かめる記事。人物を置くと、さくらがその会議に出て そのツールを使っているように読めてしまう。会議机と小物だけで表す
+  person_reason: 比較表の記事。並べる対象そのものを見せるほうが早い。 人物を置くと、どちらを勧めているかの印象が付いてしまう
+  uniqueness_reason: AI6本で唯一、机を真上から見て左右に分ける。対象を並べて比べる
   references:
   - references/297.jpg
-  camera_distance: top-down over a meeting table
+  camera_distance: top-down over a desk
   expression: none. no person appears
-  pose: no person. objects laid out on the table top, seen straight from above
+  pose: no person. objects laid out in two halves of the desk, seen straight from above
   props:
-  - a folded, unused headset
-  - a sheet of paper with five empty hand-drawn checkboxes
-  - a small card with a hand-drawn sound wave
-  - two plain cups
-  background: a meeting table in the morning, natural light from a window, seen from above
-  palette: cool morning daylight on a pale grey table, white paper and cream cups, the periwinkle accent
-    only on the pen
-  master_file: masters/1003.png
-  blog_output: eyecatch-english-meeting-transcription-checklist.jpg
-  note_output: eyecatch-english-meeting-transcription-checklist-note.jpg
-  alt: 英語会議の文字起こしツールを選ぶ前に確認する項目を並べた、会議机の上のチェックリスト
-  lead_text: '英語会議の
+  - two cream mugs
+  - a small featureless speaker-like object
+  - a folded knitted glove
+  - four blank cards
+  background: a wooden desk seen from directly above
+  palette: warm wood brown and cream, both halves lit equally so neither side looks favoured, the periwinkle
+    accent only on one of the four blank cards
+  scene: A wooden desk seen from directly above, split visually down the middle by the natural grain.
+    On the left half, a plain cream mug and a small featureless speaker-like object. On the right half,
+    a second cream mug and a folded knitted glove, suggesting another person. Between them, four small
+    blank cards laid in a row. Everything plain, no markings.
+  master_file: masters/995.png
+  blog_output: eyecatch-ai-eikaiwa-vs-online-eikaiwa.jpg
+  note_output: eyecatch-ai-eikaiwa-vs-online-eikaiwa-note.jpg
+  alt: AI相手と人の講師を、相手・訂正・時間帯・料金の4つの軸で並べて比べる
+  lead_text: 'AIと人、
 
-    AI文字起こし'
-  sub_text: 選ぶ前の確認項目
+    どちらから始める？'
+  sub_text: 軸を分けて選ぶ
+  status: awaiting_generation
+- post_id: 993
+  batch: 1
+  slug: chatgpt-english-learning-steps
+  title: ChatGPTで英語学習を始める手順｜社会人が最初に試す3つの使い方
+  search_intent: ChatGPTで英語学習を始めたいが、何をどう入力すればいいのかが分からない
+  role: 手順
+  category: AI英語学習
+  prompt_file: prompts/993.md
+  with_person: false
+  person_reason: 手順の記事。読者が知りたいのは「何をどう打つか」で、 表情や動作は理解を助けない。手元と紙のノートで足りる
+  uniqueness_reason: AI6本で唯一の手元の寄り。紙のノートと空の丸だけで手順を表す
+  references:
+  - references/297.jpg
+  camera_distance: close on the hands
+  expression: no face in frame
+  pose: both adult hands resting over the open notebook, a pen held loosely, one finger poised as if about
+    to write
+  props:
+  - a paper notebook
+  - a pen
+  - a desk lamp
+  - a cream mug
+  - a closed laptop, lid down
+  background: an indoor room at night, walls in pale cream
+  palette: cream paper and warm lamp amber over a pale sakura-pink room, the periwinkle accent only on
+    the pen barrel
+  scene: An evening desk seen close up. A pair of adult hands rests over an open paper notebook, a pen
+    held loosely between the fingers. The notebook page is blank except for three small empty circles
+    drawn in a column. A warm desk lamp at the edge of frame, a cream mug, one cherry blossom petal on
+    the wood. A closed laptop is pushed to the back, lid down.
+  master_file: masters/993.png
+  blog_output: eyecatch-chatgpt-english-learning-steps.jpg
+  note_output: eyecatch-chatgpt-english-learning-steps-note.jpg
+  alt: ChatGPTで英語学習を始めるときに使う、添削プロンプトの3つの型を紙のノートに書き出している手元
+  lead_text: 'ChatGPTに
+
+    何をどう頼むか'
+  sub_text: 添削の頼み方の型
   status: awaiting_generation
