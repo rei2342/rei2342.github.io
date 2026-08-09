@@ -134,8 +134,8 @@ CHECKS = [
       "working-holiday-visa"],
      ["18", "30", "age", "Japan", "apply", "eligib"]),
     ("W6", "289,292,238", "イギリス Youth Mobility Scheme の年齢条件",
-     ["https://www.gov.uk/youth-mobility",
-      "https://www.gov.uk/youth-mobility/eligibility"],
+     ["https://www.gov.uk/youth-mobility/eligibility",
+      "https://www.gov.uk/youth-mobility"],
      ["18", "30", "35", "age", "Japan", "eligib", "apply"]),
     ("T4", "32",
      "成績票に項目別の正答率（Abilities Measured）が記載されている",
@@ -190,6 +190,39 @@ WHEN_PROBE = re.compile(
     r"|申請(?:時|時点)"
     r"|at the time of (?:entry|arrival)"
     r")[^.。]{0,160}[.。]?", re.IGNORECASE)
+
+
+# ── 国と条件の対応表（2026-08-09に追加）──────────────────────
+# 記事238・289に「日本人は抽選で選ばれる必要がある」と書いてしまった。
+# GOV.UK のページは条件ごとに対象国のリストを並べていて、
+# 抽選は香港SAR旅券保持者と台湾の条項だったのに、
+# **日本を含むリストの直後に抽選の文があった**ので日本に掛かると読んだ。
+#
+# 近接だけで対応を決めない。**条件の直後に並ぶ国のリストを取り出して、
+# どの条件がどの国のものかを表にする。** 人はこの表を見て確かめる。
+COND_BLOCK = re.compile(
+    r"(?P<cond>"
+    r"(?:you can apply[^.]{0,80}?(?:aged?\s+\d{2}\s*(?:to|and|-|–)\s*\d{2})"
+    r"|must be selected[^.]{0,60}?ballot"
+    r"|aged?\s+\d{2}\s*(?:to|and|-|–)\s*\d{2}[^.]{0,40}?and from)"
+    r")(?P<after>[^.]{0,400})", re.IGNORECASE)
+
+KNOWN_COUNTRIES = (
+    "Japan", "Australia", "Canada", "New Zealand", "South Korea",
+    "Hong Kong", "Taiwan", "Andorra", "Iceland", "Monaco",
+    "San Marino", "Uruguay", "India", "Ireland", "United Kingdom")
+
+
+def country_conditions(text):
+    """条件文と、その条件が掛かる国のリストを組にして返す。"""
+    out = []
+    for m in COND_BLOCK.finditer(text):
+        after = m.group("after")
+        hits = [c for c in KNOWN_COUNTRIES if re.search(rf"\b{re.escape(c)}\b",
+                                                        after)]
+        out.append((re.sub(r"\s+", " ", m.group("cond")).strip()[:150],
+                    hits))
+    return out
 
 
 def excerpt(text, word, span=90):
@@ -253,6 +286,15 @@ def main():
                                 if found else "> （見つからない）\n"))
                     for x in found:
                         print(f"      [{label}] {x[:150]}")
+                # **条件がどの国に掛かるか**を表にする。近接で判断しない
+                pairs = country_conditions(r["text"])
+                if pairs:
+                    L.append("\n**条件と対象国の対応**\n\n"
+                             "| 条件 | この条件が掛かる国 |\n|---|---|\n")
+                    for cond, cs in pairs[:8]:
+                        L.append(f"| {cond.replace('|', '｜')} | "
+                                 f"{'・'.join(cs) or '**（国名が拾えない）**'} |\n")
+                        print(f"      [対応] {cond[:80]} → {cs}")
             rows.append({"check_id": cid, "post_id": pid, "claim": claim,
                          "url": r["final_url"], "title": r["title"],
                          "checked_at": stamp, "http": r["status"],

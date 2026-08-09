@@ -309,6 +309,42 @@ def run_cta_box():
     return ng
 
 
+def run_country_cond():
+    """制度の条件を、別の対象国から取り違えていないか。
+
+    2026-08-09に実際にやった。GOV.UK の Youth Mobility Scheme のページは
+    「18〜35歳の国（豪・加・NZ・韓）」と「18〜30歳の国（日本ほか）」を
+    別々に載せていて、抽選は香港SAR旅券保持者と台湾の条項だった。
+    日本を含むリストの直後に抽選の文があったので、日本に掛かると読み、
+    記事238と289に「日本人は抽選で選ばれる必要がある」と書いてしまった。
+    """
+    CASES = [
+        ("<p>抽選が必要な対象として掲載されているのは、"
+         "香港SAR旅券保持者と台湾です。</p>", False,
+         "国名つきの抽選の条件 → 通過"),
+        ("<p>日本は18〜30歳の対象国として掲載されている。</p>", False,
+         "国名つきの年齢条件 → 通過"),
+        ("<p>申請には抽選がある。抽選に通らなければ申請できない。</p>", True,
+         "**国名の無い抽選の断定 → ブロック**（今回の誤りの型）"),
+        ("<p>年齢制限は申請時に30歳以下だ。</p>", True,
+         "国名の無い年齢条件 → ブロック"),
+        ("<p>イギリスでは申請時に30歳以下であることが条件になる。</p>", False,
+         "国名つき → 通過"),
+        ("<p>確認項目：行きたい国の公式ページで年齢条件を確認する。</p>", False,
+         "読者への確認手順は条件の断定ではない → 通過"),
+    ]
+    ng = 0
+    for html, want, why in CASES:
+        got = q.institution_country_gate(html)
+        ok = bool(got) == want
+        print(("OK  " if ok else "NG  ") + why)
+        if not ok:
+            print(f"      期待: {'ブロック' if want else '通過'} / 実際: {got}")
+            ng += 1
+    print(f"\n対象国ゲートの失敗 {ng}件")
+    return ng
+
+
 def run_cta_expiry():
     """期間限定の訴求が、失効日を過ぎたら自動で不合格になるか。
 
@@ -602,6 +638,8 @@ if __name__ == "__main__":
     ng += run_cta_box()
     print()
     ng += run_cta_expiry()
+    print()
+    ng += run_country_cond()
     print()
     ng += run_claim_parse()
     print()
