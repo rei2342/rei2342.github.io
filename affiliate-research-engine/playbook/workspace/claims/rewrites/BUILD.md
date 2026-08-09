@@ -5,6 +5,7 @@
 
 | 記事 | トピック | 案件 | 字数 | ゲート |
 |---|---|---|---|---|
-| 61 | training | sptr・sapuri_nichijo | 2849 | ✅ 0件 |
+| 136 | study_abroad | nativecamp_ryugaku・johokan | 2588 | ✅ 0件 |
+| 287 | eikaiwa | qq_english・nativecamp | 2420 | ✅ 0件 |
 
 **ゲートで止まった記事 0本**
