@@ -2,7 +2,7 @@
 # 開発環境から sakura-eigo.com へ出られないので、
 # ローカルで生成するときは modified_gmt をここから読む。
 # 本番（--source wp）はWordPressから直接取るので、このファイルは使わない。
-checked_at: "2026-08-09T21:27:24 JST"
+checked_at: "2026-08-09T22:08:44 JST"
 source: "Actions（article-dump.yml を POSTS=state:… で実行）"
 posts:
   "521": {status: publish, modified_gmt: "2026-08-09T11:10:13"}
@@ -10,3 +10,11 @@ posts:
   "526": {status: publish, modified_gmt: "2026-08-09T13:00:03"}
   "23":  {status: publish, modified_gmt: "2026-08-09T11:17:13"}
   "310": {status: publish, modified_gmt: "2026-08-09T11:13:38"}
+
+# 旧【Threads用】メモ。控えたうえでゴミ箱へ移した（完全削除ではない）
+trashed_memos:
+  "547": {status: trash, at: "2026-08-09T13:05:19"}
+  "584": {status: trash, at: "2026-08-09T13:05:20"}
+  "618": {status: trash, at: "2026-08-09T13:05:21"}
+  "640": {status: trash, at: "2026-08-09T13:05:22"}
+  "641": {status: trash, at: "2026-08-09T13:05:23"}
