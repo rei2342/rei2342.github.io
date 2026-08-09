@@ -88,7 +88,8 @@ def _age_hit(need, hay):
     if not n:
         return ""
     for pat in (rf"aged?{n}(?:to|and|-)", rf"(?:to|and|-){n}years?old",
-                rf"aged?{n}\b", rf"\b{n}orunder", rf"\b{n}orover"):
+                rf"aged?{n}", rf"{n}or(?:under|over)",
+                rf"{n}orunderwhenyouapply"):
         m = re.search(pat, hay, re.I)
         if m:
             return m.group(0)
