@@ -30,6 +30,9 @@ import requests
 import urllib3
 
 urllib3.disable_warnings()
+sys.path.insert(0, str(Path(__file__).parent))
+import quality_rules as _q
+
 JST = timezone(timedelta(hours=9))
 WP = "https://sakura-eigo.com/wp-json/wp/v2"
 AUTH = ("rei.00pt2342@gmail.com", os.environ.get("WP_APP_PASSWORD", ""))
@@ -38,29 +41,27 @@ DRY_RUN = os.environ.get("DRY_RUN", "true").lower() != "false"
 BK = Path("affiliate-research-engine/playbook/workspace/backups")
 
 PATCHES = {
-    "131": [(
-        "<p><strong>確認項目</strong>：2ヶ月つけて、実際に開けた日数を数える。"
-        "7割を超えていれば、渡航後も枠は残りやすい。</p>",
-        "<p><strong>確認項目</strong>：2ヶ月のあいだ、上の3問に英語で声に出して"
-        "答えるたびに、最後まで言い切れたか、途中で止まったかを記録する。"
-        "言い切れた回のほうが多くなったなら、面接で言葉が出ない場面は減らせる。"
-        "数えるのは予定を開けた日数ではなく、<strong>答え切れた回数</strong>のほうにする。"
-        "面接は、続けた日数ではなく受け答えで判定されるため。</p>",
-    )],
+    # 131は反映済み（開けた日数 → 3問に答え切れた回数）。
+    # 同じ文を二度当てないよう、済んだ組は消してある
     "288": [
+        # 1回目の書き換えで「レッスン1回ぶんの時間」と書いたら、
+        # 公開ゲートの「レッスン…N回」に引っかかった（出典URLが要る仕様表記に見える）。
+        # ゲートの判定は正しい。書き方のほうを変える
         (
-            "<p><strong>確認項目</strong>：7日間つけて、予定した日数のうち"
-            "何日開けたかを数える。7割を超えていれば、有料に進んでも続きやすい。"
-            "届かないなら、置く時間帯を変えてもう一度試す。</p>",
             "<p><strong>確認項目</strong>：無料期間の各回で、"
             "<strong>自分が声に出していた時間</strong>を測って、7日ぶんを合計する。"
             "合計がレッスン1回ぶんの時間に届かないなら、足りないのは受けた回数ではなく"
             "話した量のほうになる。予習を短くするか、置く時間帯を変えて測り直す。</p>",
+            "<p><strong>確認項目</strong>：無料期間の各回で、"
+            "<strong>自分が声に出していた時間</strong>を測って、7日ぶんを合計する。"
+            "合計が1レッスンぶんの長さに届かないなら、足りないのは受けた数ではなく"
+            "話した量のほうになる。予習を短くするか、置く時間帯を変えて測り直す。</p>",
         ),
         (
-            "<li>7日間つけて、<strong>開けた日数</strong>を数える</li>",
             "<li>7日ぶんの声を出した時間を合計して、"
             "<strong>レッスン1回ぶんの時間を超えたか</strong>を見る</li>",
+            "<li>7日ぶんの声を出した時間を合計して、"
+            "<strong>1レッスンぶんの長さを超えたか</strong>を見る</li>",
         ),
     ],
 }
@@ -96,6 +97,15 @@ def main():
             L.append(f"| {pid} | — | ❌ 元の文が見つからない: "
                      f"{' / '.join(miss)} |\n")
             print(f"[{pid}] 元の文が見つからない")
+            continue
+        # **書く前に公開ゲートへ通す。** 前回はここが無くて、
+        # 直した文が「レッスン1回ぶん」となり仕様表記のゲートに掛かった。
+        # 台帳を見て初めて気づいた
+        blockers = _q.generation_blockers(new)
+        if blockers:
+            L.append(f"| {pid} | — | ❌ 書き換えた文がゲートに掛かる: "
+                     f"{blockers[0][:70]} |\n")
+            print(f"[{pid}] ゲートに掛かるので書かない: {blockers[0][:70]}")
             continue
         if DRY_RUN:
             L.append(f"| {pid} | {len(pairs)}件 | （DRY RUN） |\n")
