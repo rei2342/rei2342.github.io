@@ -58,8 +58,21 @@ def main():
     meta = s.json() if s.status_code == 200 else {}
     top = get(f"{SITE}/")
     arts = get(f"{SITE}/articles/")
-    prof = get(f"{SITE}/profile/")
+    # プロフィールのURLは固定ページのslugで決まる。決め打ちにしない
+    pg = requests.get(f"{SITE}/wp-json/wp/v2/pages", headers=PC, verify=False,
+                      timeout=45, params={"per_page": 100,
+                                          "_fields": "slug,link,title"})
+    prof_url = next((x["link"] for x in (pg.json() if pg.status_code == 200
+                                         else [])
+                     if x["slug"] in ("profile", "about")
+                     or "プロフィール" in x["title"]["rendered"]), "")
+    prof = get(prof_url) if prof_url else None
     sp = get(f"{SITE}/", SP)
+    one = requests.get(f"{WP}/posts", headers=PC, verify=False, timeout=45,
+                       params={"per_page": 1, "_fields": "link"})
+    art = get(one.json()[0]["link"]) if one.status_code == 200 and one.json() \
+        else None
+    art_html = art.text if art else ""
     rss = get(f"{SITE}/feed/")
     smap = get(f"{SITE}/sitemap.xml") or get(f"{SITE}/wp-sitemap.xml")
 
@@ -69,7 +82,9 @@ def main():
         ("キャッチフレーズ", meta.get("description") or "（空）"),
         ("トップページ", f"HTTP {top.status_code}" if top else "取得できず"),
         ("記事一覧 /articles/", f"HTTP {arts.status_code}" if arts else "取得できず"),
-        ("プロフィール /profile/", f"HTTP {prof.status_code}" if prof else "取得できず"),
+        ("プロフィール",
+         f"{prof_url} → HTTP {prof.status_code}" if prof
+         else "固定ページが見つからない"),
         # f式の中にバックスラッシュを書くと Python 3.11 では構文エラーになる。
         # viewport の判定は先に外へ出す
         ("スマホ表示",
@@ -87,7 +102,9 @@ def main():
         ("noindex（トップに付いていないこと）",
          not re.search(r'name="robots"[^>]+noindex', th, re.I)),
         ("構造化データ", 'application/ld+json' in th),
-        ("パンくず", bool(re.search(r'breadcrumb', th, re.I))),
+        # パンくずはトップには出ない。**記事ページで見る**
+        ("パンくず（記事ページ）",
+         bool(re.search(r'breadcrumb|パンくず', art_html, re.I))),
         ("ヘッダーメニュー", bool(re.search(r'<(?:nav|header)', th, re.I))),
         ("フッター", bool(re.search(r'<footer', th, re.I))),
         ("記事一覧への導線（トップ）", "/articles" in th),

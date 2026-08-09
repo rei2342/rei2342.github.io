@@ -151,14 +151,19 @@ def main():
     # 画像矛盾。**判定の本文から正規表現で拾わない。**
     # 太字の数字を拾うと「90 日達成！」のような引用まで記事IDに見えて、
     # 直っている記事が未対応として並ぶ（2026-08-09に6本の誤検出）。
-    # 差し替えが要ると決めた一覧（eyecatch_build.PLAN）を正とする
-    import eyecatch_build as _eb
+    # 差し替えが要ると決めた一覧（eyecatch_build.PLAN）を正とする。
+    # import すると Pillow が要って台帳のステップごと落ちるので、
+    # キーだけをソースから読む（2026-08-09に落ちて古い値が残った）
+    plan_src = Path(__file__).with_name("eyecatch_build.py").read_text(
+        encoding="utf-8")
+    plan_body = plan_src.split("PLAN = {", 1)[1].split("\n}", 1)[0]
+    planned = set(re.findall(r'^\s*"(\d+)":', plan_body, re.M))
     applied = set()
     for d in sorted(Path("affiliate-research-engine/playbook/workspace/"
                          "backups").glob("*/EYECATCH_APPLY.md")):
         applied |= set(re.findall(r'^\| (\d+) \|', d.read_text(
             encoding="utf-8"), re.M))
-    remain = sorted(set(_eb.PLAN) - applied, key=int)
+    remain = sorted(planned - applied, key=int)
 
     dup_head = {k: v for k, v in heads.items() if len(v) > 1
                 and k not in ("あわせて確認したいもの",
