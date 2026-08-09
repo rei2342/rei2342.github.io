@@ -82,6 +82,19 @@ def canon(s):
     return re.sub(r"[,\s　]", "", s)
 
 
+def _age_hit(need, hay):
+    """日本語の「N歳」が、英語ページの年齢表記に含まれるかを見る。"""
+    n = re.sub(r"[^0-9]", "", need)
+    if not n:
+        return ""
+    for pat in (rf"aged?{n}(?:to|and|-)", rf"(?:to|and|-){n}years?old",
+                rf"aged?{n}\b", rf"\b{n}orunder", rf"\b{n}orover"):
+        m = re.search(pat, hay, re.I)
+        if m:
+            return m.group(0)
+    return ""
+
+
 def _suffix_hit(need, hay, least=5):
     """末尾から詰めた部分文字列がページにあれば、それを返す。"""
     for i in range(len(need) - least + 1):
@@ -137,6 +150,13 @@ def main():
             r["match"] = "一致"
             r["page_value"] = r["claim"]
             r["note"] = ""
+        elif r["kind"] == "年齢" and _age_hit(need, hay):
+            # 日本語の「30歳」を英語ページ（aged 18 to 30）と照合すると、
+            # 数字は合っていても「歳」が無いので不一致に見える。
+            # 英語での年齢の書き方に当てはまるかを見る
+            r["match"] = "一致"
+            r["page_value"] = _age_hit(need, hay)
+            r["note"] = "引用元が英語。年齢の表記が一致"
         elif r["kind"] == "プラン名" and _suffix_hit(need, hay):
             # 日本語は語の切れ目が無いので、抜き出しが語の途中から
             # 始まることがある（「リENGLISHの新日常英会話コース」）。
