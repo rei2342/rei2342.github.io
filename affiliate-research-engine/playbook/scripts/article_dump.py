@@ -49,13 +49,13 @@ def raw_content(pid):
 
 def state_only(ids):
     """今の featured_media と画像URLを出すだけ。**何も書かない。**"""
-    print("post_id,status,featured_media,media_url,alt")
+    print("post_id,status,modified_gmt,featured_media,media_url,alt")
     for pid in ids:
         r = requests.get(f"{WP}/posts/{pid}", auth=AUTH, headers=UA,
-                         params={"_fields": "id,status,featured_media"},
+                         params={"_fields": "id,status,featured_media,modified_gmt"},
                          verify=False, timeout=45)
         if r.status_code != 200:
-            print(f"{pid},取得できない,,,")
+            print(f"{pid},取得できない,,,,")
             continue
         p = r.json()
         url = alt = ""
@@ -66,7 +66,8 @@ def state_only(ids):
             if m.status_code == 200:
                 url = m.json().get("source_url", "")
                 alt = (m.json().get("alt_text") or "").replace(",", "、")
-        print(f"{pid},{p.get('status')},{p.get('featured_media')},{url},{alt}")
+        print(f"{pid},{p.get('status')},{p.get('modified_gmt')},"
+              f"{p.get('featured_media')},{url},{alt}")
 
 
 def main():
