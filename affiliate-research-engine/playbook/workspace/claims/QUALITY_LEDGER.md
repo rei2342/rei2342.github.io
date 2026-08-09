@@ -1,8 +1,8 @@
-# 品質台帳 2026-08-09 12:47:20 JST
+# 品質台帳 2026-08-09 12:51:57 JST
 
 公開 **49本**。**公開中の本文だけ**を見ている。
 
-- ブロッカーが残る記事: **1本**
+- ブロッカーが残る記事: **0本**
 - HTTP 200 以外: **0本**
 - noindex あり: **0本**
 - CTAが3本以上: **0本**
@@ -50,7 +50,7 @@
 | [283](https://sakura-eigo.com/cebu-beginner-mistakes-design/) | セブ島留学に初心者で行く前に｜事前学習が続かないときに見るところ | （全面再構成の対象外） | スパトレ | フィリピン留学ナビ | 2 | philippines-university.jp / sptr.jp | 0 | 200 | 自己参照 | なし |
 | [286](https://sakura-eigo.com/english-restart-at-30-speaking/) | 英語のやり直しは「反応が返るか」で3問だけ判定して決める | 反応が返るかの3問判定フロー | speek | ネイティブキャンプ | 2 | nativecamp.net / speek.jp | 0 | 200 | 自己参照 | なし |
 | [287](https://sakura-eigo.com/english-conversation-daily-effectiveness/) | 英会話を毎日受ける意味は、出席ではなく回収の数で決まる | 詰まり回収ノート（出席と回収を分ける） | QQ English | ネイティブキャンプ | 2 | nativecamp.net / qqeng.com | 0 | 200 | 自己参照 | なし |
-| [288](https://sakura-eigo.com/spatalk-review-working-adults-habits/) | スパトレの評判より先に｜予習不要のサービスを選ぶ前に確認したい3つのこと | （全面再構成の対象外） | スパトレ | （なし） | 1 | sptr.jp | 2 | 200 | 自己参照 | なし |
+| [288](https://sakura-eigo.com/spatalk-review-working-adults-habits/) | スパトレの評判より先に｜予習不要のサービスを選ぶ前に確認したい3つのこと | （全面再構成の対象外） | スパトレ | （なし） | 1 | sptr.jp | 0 | 200 | 自己参照 | なし |
 | [289](https://sakura-eigo.com/overseas-move-30s-not-late/) | 30代の海外移住が遅いかは、年齢ではなく締切の有無で決まる | 締切のある入口とない入口の切り分け＋費用6項目 | ネイティブキャンプ留学 | 留学情報館 | 2 | gov.uk / nativecamp.net / ryugaku-johokan.com | 0 | 200 | 自己参照 | なし |
 | [292](https://sakura-eigo.com/english-self-study-procrastination-30s/) | 英語の独学が3日で止まる人が、教材を買う前に確認する3つのこと | 独学の限界を上限と継続に分ける確認項目 | スパトレ | スタディサプリ 新日常英会話 | 2 | eigosapuri.jp / sptr.jp | 0 | 200 | 自己参照 | なし |
 | [294](https://sakura-eigo.com/study-abroad-decision-deadline/) | 留学の比較が終わらないときに、決め方のほうを先に決める手順 | 候補3つの比較表 | ネイティブキャンプ留学 | 留学情報館 | 2 | nativecamp.net / ryugaku-johokan.com | 0 | 200 | 自己参照 | なし |
