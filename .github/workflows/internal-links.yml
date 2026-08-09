@@ -1,0 +1,46 @@
+name: 内部リンクの設計と反映
+
+# 監査を通った公開記事だけを対象にする。下書きは含めない。
+# 反映前に記事ごとのバックアップを取る。
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true なら設計だけ出して書かない'
+        required: false
+        default: 'true'
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    concurrency:
+      group: wp-write
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests janome -q
+      - env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/internal_links.py
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: internal links $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
