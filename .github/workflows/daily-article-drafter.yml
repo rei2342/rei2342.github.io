@@ -37,7 +37,7 @@ jobs:
         run: |
           pip install anthropic -q
           python3 << 'PYEOF'
-          import os, datetime, re
+          import os, datetime, re, sys
           import anthropic
 
           date_str = datetime.date.today().strftime('%Y-%m-%d')
@@ -393,6 +393,14 @@ jobs:
               "===NOTE_TITLE===\n（noteのタイトル案。30〜45字の短い一人称+数字型。"
               "150字級の抽象・反論エッセイ型は禁止）\n"
               "===VISUAL===\n（添える画像の案を1行。スコア推移・費用表など数字が見えるもの）\n"
+              "===EYECATCH_LEAD===\n（アイキャッチの画像内に入れる短い文言。"
+              "**記事タイトルを切り取らず、画像向けに書き直す**。2行まで、改行で区切る。"
+              "1行は12字程度まで。数字・年齢・スコア・金額・期間を入れない）\n"
+              "===EYECATCH_SUB===\n（補助文言。14字程度まで。記事の役割が分かる短い一言）\n"
+              "===EYECATCH_SCENE===\n（アイキャッチの場面と小物を英語で1〜3文。"
+              "この記事にしかない場面にする。人物は右側・左に文言を置く前提。"
+              "画面の中身・ロゴ・読める文字・数字は描かせない）\n"
+              "===EYECATCH_ALT===\n（画像のalt。記事の内容を1文で）\n"
           )
 
           ai = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
@@ -448,6 +456,37 @@ jobs:
                   f.write("## ビジュアル案\n\n" + visual + "\n")
           print(f"Threads set saved: {out_file}")
 
+          # ── ③ アイキャッチ生成プロンプト（記事の3つ目の成果物）──────
+          # **公開コンテンツではない。画像制作専用の一時データ。**
+          # WordPressの本文・SEO項目・SNS投稿文へは入れない。
+          # 画像の生成 → 反映 → 検証が通ったら削除する。失敗したら残す。
+          # slug はこのステップには無いので、投稿した記事のURLから取る。
+          # 取れないときは日付にする（ファイル名が衝突しないことだけが条件）
+          slug = ""
+          if article_url:
+              slug = article_url.split("?")[0].rstrip("/").rsplit("/", 1)[-1]
+          slug = slug or date_str
+          sys.path.insert(
+              0, "affiliate-research-engine/playbook/scripts")
+          try:
+              import eyecatch_prompt as _ep
+              ec_lead = section('EYECATCH_LEAD', out) or title[:14]
+              ec_sub = section('EYECATCH_SUB', out) or "記事の要点"
+              ec_scene = section('EYECATCH_SCENE', out) or (
+                  "Sakura at her desk in the evening, working through the "
+                  "steps described in this article with a paper notebook. "
+                  "Props specific to this article, no readable text on them.")
+              ec_alt = section('EYECATCH_ALT', out) or title
+              ec_cat = section('CATEGORY', out) or ""
+              _ep.OUT.mkdir(parents=True, exist_ok=True)
+              ec_path = _ep.OUT / f"{slug}.md"
+              ec_path.write_text(_ep.build(
+                  "", slug, title, ec_lead, ec_sub, ec_scene, ec_cat, ec_alt,
+                  f"eyecatch-{slug}.png"), encoding="utf-8")
+              print(f"Eyecatch prompt saved: {ec_path}")
+          except Exception as e:
+              print(f"Eyecatch prompt skipped: {e}")
+
           # ── WordPressの下書きにも出す（GitHubを見に行かなくて済むように）──
           wp_pass = os.environ.get('WP_APP_PASSWORD', '')
           if wp_pass and threads:
@@ -497,6 +536,7 @@ jobs:
           git add affiliate-research-engine/playbook/workspace/keywords.csv
           git add affiliate-research-engine/playbook/workspace/instagram/
           git add affiliate-research-engine/playbook/workspace/threads/
+          git add affiliate-research-engine/playbook/workspace/eyecatch-prompts/
           git diff --staged --quiet && exit 0
           git commit -m "chore: daily article draft $(date +%Y-%m-%d)"
           # 他のワークフローと同時に走ると push が弾かれて、生成物が丸ごと消える

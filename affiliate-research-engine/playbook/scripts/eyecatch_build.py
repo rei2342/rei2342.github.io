@@ -182,7 +182,21 @@ def build(pid, chip, l1, l2):
     return im
 
 
+# **文字カード型の画像を、これ以上サイトへ出さない。**
+# 2026-08-09に20本を文字カード型で反映したが、これは
+# 「文字だけのカード型は禁止」「白背景に記事タイトルを置いただけの画像は禁止」
+# に当てはまる。仮画像を設定して公開する処理は禁止なので、
+# **反映は既定で止める。** 画像はイラストで作り直し、
+# workspace/eyecatch-prompts/<記事ID>.md のプロンプトから生成する。
+ALLOW_CARD = os.environ.get("ALLOW_CARD", "false").lower() == "true"
+
+
 def main():
+    if not DRY_RUN and not ALLOW_CARD:
+        print("文字カード型の反映は止めている。"
+              "イラストで作り直す（workspace/eyecatch-prompts/ を見る）。")
+        print("どうしても走らせるなら ALLOW_CARD=true を明示する。")
+        return
     day = datetime.now(JST).strftime("%Y-%m-%d")
     OUT.mkdir(parents=True, exist_ok=True)
     (BK / day / "eyecatch").mkdir(parents=True, exist_ok=True)
