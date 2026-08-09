@@ -94,8 +94,26 @@ EXPERIENCE_VERBS = (
     "使って分かった", "体験した", "自腹", "始めた", "やってみた",
     "試してみ", "使ってみ", "受けてみ", "続けてみ", "登録した", "無料体験",
 )
-EXPERIENCE_CSV = "affiliate-research-engine/playbook/workspace/experience.csv"
-FACTS_CSV = "affiliate-research-engine/playbook/workspace/experience_facts.csv"
+
+def _workspace(name):
+    """台帳のパス。**カレントディレクトリに依らず引けるようにする。**
+
+    相対パスのままだと、リポジトリのルート以外から呼んだときに
+    ファイルが見つからず、_read_csv が空を返す。台帳が空だと
+    「案件が台帳に無い」というブロッカーが全記事に出て、
+    **台帳が読めていないのか、本当に行が無いのかが区別できない**
+    （2026-08-09に49本中48本が誤ってブロッカー扱いになった）。
+    """
+    import os
+    rel = f"affiliate-research-engine/playbook/workspace/{name}"
+    if os.path.exists(rel):
+        return rel
+    here = os.path.dirname(os.path.abspath(__file__))    # .../playbook/scripts
+    return os.path.join(os.path.dirname(here), "workspace", name)
+
+
+EXPERIENCE_CSV = _workspace("experience.csv")
+FACTS_CSV = _workspace("experience_facts.csv")
 
 # 記事に出てくるサービス名。台帳のキーと揃える
 SERVICE_NAMES = (
@@ -699,7 +717,7 @@ def generation_blockers(html):
 # **CTAは読者が最後に見る約束**なので、未確認の訴求が一番害が大きい。
 # ══════════════════════════════════════════════════════════════
 
-CTA_CLAIMS_CSV = "affiliate-research-engine/playbook/workspace/cta_claims.csv"
+CTA_CLAIMS_CSV = _workspace("cta_claims.csv")
 
 # CTAに入っていたら、台帳との一致を要求する語
 CTA_PROMO = ("無料", "割引", "返金", "成果保証", "保証", "限定",
