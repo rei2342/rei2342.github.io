@@ -35,10 +35,14 @@ ALLOWED = ("iibc-global.org", "ets.org", "qqeng.com", "callan.co.uk",
            # cta_claims.csv に行が無い案件を裏取りするため
            "eikaiwa.dmm.com", "rarejob.com", "eigosapuri.jp",
            "u-gaku.jp", "ryugaku-johokan.com", "cebridge.jp", "notta.ai",
-           # ワーホリの年齢条件の一次情報。**外務省と各国の公的機関だけ。**
-           # まとめサイト・エージェントの説明は根拠にしない
-           "mofa.go.jp", "immi.gov.au", "homeaffairs.gov.au",
-           "canada.ca", "cic.gc.ca", "immigration.govt.nz")
+           # ワーホリの年齢条件の一次情報。**政府機関と公式ビザ案内だけ。**
+           # まとめサイト・エージェントの説明は根拠にしない。
+           # 日本の外務省が 403 を返したので、渡航先政府と各国大使館も見る
+           "mofa.go.jp", "immi.homeaffairs.gov.au", "homeaffairs.gov.au",
+           "immi.gov.au", "canada.ca", "cic.gc.ca", "immigration.govt.nz",
+           "gov.uk", "dfa.ie", "irishimmigration.ie",
+           "japan.embassy.gov.au", "nzembassy.com",
+           "international.gc.ca", "canadainternational.gc.ca")
 
 # (主張ID, 記事, 主張, 見に行くURL, 根拠として探す語)
 CHECKS = [
@@ -107,6 +111,32 @@ CHECKS = [
     ("W2", "238", "申請時と渡航時のどちらで年齢を判定するか",
      ["https://www.mofa.go.jp/mofaj/toko/visa/working_h.html"],
      ["申請時", "査証申請", "発給", "入国", "有効期間", "1年"]),
+    # ── 渡航先政府の一次情報（2026-08-09に追加）────────────────
+    # 日本の外務省が 403 を返したので、渡航先政府の移民局・公式ビザ案内を見る。
+    # **国とビザ名が特定できたものだけ**を記事へ戻す。
+    ("W3", "289,292,238", "オーストラリア Working Holiday visa (subclass 417) の年齢条件",
+     ["https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/"
+      "work-holiday-417",
+      "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/"
+      "work-holiday-417/first-working-holiday-417"],
+     ["18", "30", "31", "age", "years old", "apply", "eligib"]),
+    ("W4", "289,292,238", "カナダ International Experience Canada / Working Holiday の年齢条件",
+     ["https://www.canada.ca/en/immigration-refugees-citizenship/services/"
+      "work-canada/iec/eligibility.html",
+      "https://www.canada.ca/en/immigration-refugees-citizenship/services/"
+      "work-canada/iec.html"],
+     ["18", "30", "35", "age", "Japan", "Working Holiday", "eligib"]),
+    ("W5", "289,292,238", "ニュージーランド Working Holiday Visa（日本国籍）の年齢条件",
+     ["https://www.immigration.govt.nz/new-zealand-visas/visas/visa/"
+      "japan-working-holiday-visa",
+      "https://www.immigration.govt.nz/new-zealand-visas/"
+      "options/work/thinking-about-working-in-new-zealand/"
+      "working-holiday-visa"],
+     ["18", "30", "age", "Japan", "apply", "eligib"]),
+    ("W6", "289,292,238", "イギリス Youth Mobility Scheme の年齢条件",
+     ["https://www.gov.uk/youth-mobility",
+      "https://www.gov.uk/youth-mobility/eligibility"],
+     ["18", "30", "35", "age", "Japan", "eligib", "apply"]),
     ("T4", "32",
      "成績票に項目別の正答率（Abilities Measured）が記載されている",
      ["https://www.iibc-global.org/toeic/test/lr/about/score.html",
