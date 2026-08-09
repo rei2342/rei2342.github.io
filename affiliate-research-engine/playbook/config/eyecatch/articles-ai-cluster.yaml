@@ -102,47 +102,51 @@ articles:
     slug: ai-era-english-how-far
     title: "AI時代に必要な英語力はどこまでか｜場面から決める"
     role: "線引き（ハブ）"
-    with_person: false
+    with_person: true
     person_reason: >
-      4つの選択肢から1つを選ぶ、という判断そのものが主題。
-      手だけで「選んでいる」が伝わり、人物の表情は要らない
-    camera_distance: "top-down over the floor"
+      自分に必要な範囲を選ぶ判断が中心。どれを取ってどれを外すかという
+      迷いは、手だけでは出ない。カードを見比べる視線と表情で見せる
+    camera_distance: "waist-up, seated on the floor, slightly from above"
     scene: >
-      A pale wooden floor seen from above. Four plain cream cards are laid in a
-      loose row. Each card carries only a simple hand-drawn icon: an open book,
-      an ear, a speech bubble, a pen. One card is pulled slightly forward toward
-      the viewer, and a single adult hand rests at its edge. A few cherry blossom
-      petals scattered. No words on the cards.
-    props: ["無地のカード4枚", "アイコン（本・耳・吹き出し・ペン）", "手"]
-    background: "淡い木の床。俯瞰"
+      A quiet room in the daytime. Sakura sits on a pale wooden floor at the
+      right, legs folded, leaning slightly forward. Four plain cream cards are
+      laid out in front of her, each carrying only a simple hand-drawn icon:
+      an open book, an ear, a speech bubble, a pen. Her hand hovers over one of
+      them, not yet picking it up. Her eyes are lowered toward the cards, brows
+      softly drawn in thought. A few cherry blossom petals on the floor. No words
+      on the cards.
+    props: ["無地のカード4枚", "アイコン（本・耳・吹き出し・ペン）", "淡い木の床"]
+    background: "昼の静かな室内。窓からの自然光"
     lead_text: "どこまでやれば\n足りるのか"
     sub_text: "自分の場面から決める"
-    alt: "読む・聞く・話す・書くの4つから、自分に必要な場面を1つ選んでいる手元"
+    alt: "読む・聞く・話す・書くの4つから、自分に必要な場面を1つ選ぼうとしている様子"
     filename: "eyecatch-ai-era-english-how-far.jpg"
 
   - post_id: 1003
     slug: english-meeting-transcription-checklist
     title: "英語会議の文字起こしツールを選ぶ前に｜確認する5つのこと"
     role: "確認項目（実務）"
-    with_person: true
+    with_person: false
     person_reason: >
-      実務の場面。会議の直前という状況を、服装と場所と姿勢で見せる必要がある。
-      チェックリストだけだと、どの読者向けか伝わらない
-    camera_distance: "waist-up, half body, over the shoulder"
+      ツールの機能を確かめる記事。人物を置くと、さくらがその会議に出て
+      そのツールを使っているように読めてしまう。会議机と小物だけで表す
+    camera_distance: "top-down over a meeting table"
     scene: >
-      A bright office desk in the morning, seen over Sakura's shoulder from
-      behind and to the right. She wears a pale grey blouse with a cream
-      cardigan, hair loosely tied with the sakura clip visible, head slightly
-      lowered. A headset rests around her neck, unused. On the desk, a plain
-      sheet of paper with five empty hand-drawn checkboxes and a pen. A closed
-      laptop and a small plain recorder-like object, both without any markings
-      or visible screens.
-    props: ["ヘッドセット", "空のチェックボックス5つ", "無地のノートPC", "無地の録音機"]
-    background: "朝のオフィス。窓からの自然光"
+      An empty meeting table in the morning, seen from above. A headset rests
+      folded at the right, unused. Beside it a plain sheet of paper with five
+      empty hand-drawn checkboxes and a pen laid across it. A simple hand-drawn
+      sound wave is sketched on a second small card, drawn as a soft pencil line,
+      not a screen. Two plain cups sit further back, suggesting people who have
+      not arrived yet. Every object is unbranded and no screen is switched on.
+    props: ["ヘッドセット", "空のチェックボックス5つ", "手描きの波形カード", "無地のカップ2つ"]
+    background: "朝の会議机。窓からの自然光。俯瞰"
     lead_text: "英語会議の\nAI文字起こし"
     sub_text: "選ぶ前の確認項目"
-    alt: "英語会議の文字起こしツールを選ぶ前に確認する5つの項目を、紙のチェックリストで見ている様子"
+    alt: "英語会議の文字起こしツールを選ぶ前に確認する項目を並べた、会議机の上のチェックリスト"
     filename: "eyecatch-english-meeting-transcription-checklist.jpg"
 
-# 人物あり3 / なし3。直近10枚の目安（3〜5枚）の範囲に収まる。
-# ただし数合わせで決めておらず、上の person_reason が理由になっている。
+# 人物あり3（997・999・1001） / なし3（993・995・1003）。
+# 2026-08-09に割り当てを変更した。
+#   1001 なし → あり … 必要な範囲を選ぶ迷いは手だけでは出ない
+#   1003 あり → なし … 人物を置くと、そのツールを使っているように読める
+# 直近10枚の目安（3〜5枚）に収まるが、決めたのは役割で数合わせではない。

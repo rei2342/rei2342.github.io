@@ -228,6 +228,24 @@ reference_assets:
       source_post: 281
       source_media_id: 466
       why: "人物が右・左が空く。提案する配置そのもの"
+  # プロンプトへそのまま入れる文。**3枚を均等に混ぜない**
+  directive:
+    with_person: |
+      Use reference 521 as the primary identity reference for Sakura's face,
+      adult age impression, facial proportions, and body proportions.
+      Use reference 273 only for the long brown hairstyle and subtle sakura
+      hair accessory.
+      Use reference 297 only for watercolor texture, soft natural light, and
+      color treatment. Do not copy its face, oversized eyes, chibi proportions,
+      or pink hoodie.
+    without_person: |
+      No person appears in this image.
+      Use reference 297 only for watercolor texture, soft natural light, and
+      color treatment. Do not copy its face, oversized eyes, chibi proportions,
+      or pink hoodie.
+  reject_rule: >
+    人物の顔が521から離れていたら不合格にする。作り直す。
+    297の顔・大きな目・ちび頭身・ピンクのパーカーは引き継がない
   conflict_resolution: >
     3枚で特徴が食い違ったときは priority_order の上から採る。
     顔は521、髪と桜クリップは273、塗りと光は297。

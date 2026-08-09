@@ -117,6 +117,13 @@ export function buildPrompt(
       ]),
   );
 
+  // 参照画像の使い分け。3枚を均等に混ぜない
+  const ref = spec.reference_assets.directive;
+  parts.push(
+    "REFERENCES:\n" +
+      (article.with_person ? ref.with_person : ref.without_person).trim(),
+  );
+
   parts.push(
     "DO NOT INCLUDE:\n" + bullets(neg.forbidden_content) +
       "\n" + neg.always_append,

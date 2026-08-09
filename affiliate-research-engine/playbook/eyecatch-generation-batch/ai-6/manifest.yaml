@@ -1,0 +1,167 @@
+batch: ai-6
+spec: config/eyecatch/sakura-v1.yaml
+spec_status: proposal
+category: AI英語学習
+generated_at: 2026-08-09 16:55:47 JST
+master:
+  size:
+  - 1920
+  - 1080
+  aspect_ratio: '16:9'
+  has_text: false
+  format: png
+blog_export:
+  size:
+  - 1200
+  - 675
+  aspect_ratio: '16:9'
+  text_overlay: true
+  format: jpeg
+  quality: 88
+  max_bytes: 307200
+  filename_pattern: eyecatch-{slug}.jpg
+  filename_charset: 半角英数とハイフンのみ。日本語・空白・全角記号・アンダースコアは使わない
+note_export:
+  size:
+  - 1200
+  - 628
+  aspect_ratio: 1.91:1
+  crop: center-right anchored
+  text_overlay: false
+  format: jpeg
+  quality: 88
+references:
+- slot: face_and_age
+  post_id: 521
+  media_id: 523
+  file: references/521.jpg
+  take: 顔立ち・年齢感・目の大きさの抑え方・肌の塗り
+  do_not_take: まとめ髪・電車の場面・画面に焼かれた文字
+- slot: hair_and_sakura
+  post_id: 273
+  media_id: 464
+  file: references/273.jpg
+  take: 下ろした長い髪の量感と流れ・桜のヘアクリップの位置と大きさ・人物を右へ置く構図
+  do_not_take: 顔の角度（伏せすぎ）
+- slot: style_light_texture
+  post_id: 297
+  media_id: 554
+  file: references/297.jpg
+  take: 水彩の粒立ち・夜のやわらかい光・紙の質感・にじみの強さ
+  do_not_take: ピンクのパーカー（旧ちびキャラの衣装）・顔の目の大きさ
+reference_priority:
+- face_and_age
+- hair_and_sakura
+- style_light_texture
+reject_rule: 人物の顔が521から離れていたら不合格にする。作り直す。 297の顔・大きな目・ちび頭身・ピンクのパーカーは引き継がない
+with_person_count: 3
+without_person_count: 3
+items:
+- post_id: 993
+  slug: chatgpt-english-learning-steps
+  title: ChatGPTで英語学習を始める手順｜社会人が最初に試す3つの使い方
+  prompt_file: prompts/993.md
+  with_person: false
+  person_reason: 手順の記事。読者が知りたいのは「何をどう打つか」で、 表情や動作は理解を助けない。手元と紙のノートで足りる
+  references:
+  - references/297.jpg
+  master_file: masters/993.png
+  blog_output: eyecatch-chatgpt-english-learning-steps.jpg
+  note_output: eyecatch-chatgpt-english-learning-steps-note.jpg
+  alt: ChatGPTで英語学習を始めるときに使う、添削プロンプトの3つの型を紙のノートに書き出している手元
+  lead_text: 'ChatGPTに
+
+    何をどう頼むか'
+  sub_text: 添削の頼み方の型
+  status: awaiting_generation
+- post_id: 995
+  slug: ai-eikaiwa-vs-online-eikaiwa
+  title: AI英会話とオンライン英会話の違い｜4つの軸で選ぶ
+  prompt_file: prompts/995.md
+  with_person: false
+  person_reason: 比較表の記事。並べる対象そのものを見せるほうが早い。 人物を置くと、どちらを勧めているかの印象が付いてしまう
+  references:
+  - references/297.jpg
+  master_file: masters/995.png
+  blog_output: eyecatch-ai-eikaiwa-vs-online-eikaiwa.jpg
+  note_output: eyecatch-ai-eikaiwa-vs-online-eikaiwa-note.jpg
+  alt: AI相手と人の講師を、相手・訂正・時間帯・料金の4つの軸で並べて比べる
+  lead_text: 'AIと人、
+
+    どちらから始める？'
+  sub_text: 軸を分けて選ぶ
+  status: awaiting_generation
+- post_id: 997
+  slug: ai-translation-why-learn-english
+  title: AI翻訳があるのに英語を学ぶ意味｜場面で分けて考える
+  prompt_file: prompts/997.md
+  with_person: true
+  person_reason: 学ぶ意味を疑っている読者の入口。迷いを扱う記事なので、 「待たせている間合い」を人物の姿勢で見せたほうが伝わる
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  master_file: masters/997.png
+  blog_output: eyecatch-ai-translation-why-learn-english.jpg
+  note_output: eyecatch-ai-translation-why-learn-english-note.jpg
+  alt: AI翻訳を開く待ち時間が問題になる場面で、相手を待たせている様子
+  lead_text: 'AI翻訳があっても
+
+    英語は必要？'
+  sub_text: 学ぶ範囲の決め方
+  status: awaiting_generation
+- post_id: 999
+  slug: ai-pronunciation-app-how-to-choose
+  title: AI発音矯正アプリの選び方｜自動判定でできることと、できないこと
+  prompt_file: prompts/999.md
+  with_person: true
+  person_reason: 発音は身体の動作が主題。顎に手を当てて音の出し方を確かめる動作が、 「点数ではなく直し方」という記事の結論をそのまま見せる
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  master_file: masters/999.png
+  blog_output: eyecatch-ai-pronunciation-app-how-to-choose.jpg
+  note_output: eyecatch-ai-pronunciation-app-how-to-choose-note.jpg
+  alt: 発音の自動判定で出る点数の外側にある、直し方を確かめようとしている様子
+  lead_text: '発音の点数が出た。
+
+    でも直し方は？'
+  sub_text: 選ぶときの確認項目
+  status: awaiting_generation
+- post_id: 1001
+  slug: ai-era-english-how-far
+  title: AI時代に必要な英語力はどこまでか｜場面から決める
+  prompt_file: prompts/1001.md
+  with_person: true
+  person_reason: 自分に必要な範囲を選ぶ判断が中心。どれを取ってどれを外すかという 迷いは、手だけでは出ない。カードを見比べる視線と表情で見せる
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  master_file: masters/1001.png
+  blog_output: eyecatch-ai-era-english-how-far.jpg
+  note_output: eyecatch-ai-era-english-how-far-note.jpg
+  alt: 読む・聞く・話す・書くの4つから、自分に必要な場面を1つ選ぼうとしている様子
+  lead_text: 'どこまでやれば
+
+    足りるのか'
+  sub_text: 自分の場面から決める
+  status: awaiting_generation
+- post_id: 1003
+  slug: english-meeting-transcription-checklist
+  title: 英語会議の文字起こしツールを選ぶ前に｜確認する5つのこと
+  prompt_file: prompts/1003.md
+  with_person: false
+  person_reason: ツールの機能を確かめる記事。人物を置くと、さくらがその会議に出て そのツールを使っているように読めてしまう。会議机と小物だけで表す
+  references:
+  - references/297.jpg
+  master_file: masters/1003.png
+  blog_output: eyecatch-english-meeting-transcription-checklist.jpg
+  note_output: eyecatch-english-meeting-transcription-checklist-note.jpg
+  alt: 英語会議の文字起こしツールを選ぶ前に確認する項目を並べた、会議机の上のチェックリスト
+  lead_text: '英語会議の
+
+    AI文字起こし'
+  sub_text: 選ぶ前の確認項目
+  status: awaiting_generation

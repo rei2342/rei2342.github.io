@@ -135,6 +135,41 @@ check("参照画像に優先順位がある",
 check("人物の割合が固定の数値になっていない",
       "balance_is_not_a_quota" in spec["appearance_policy"])
 
+# 参照画像の使い分けが、プロンプトへそのまま入るか
+ref = spec["reference_assets"]
+check("参照の指示文がある（人物あり・なしの2種）",
+      set(ref.get("directive", {})) == {"with_person", "without_person"})
+check("顔が521から離れたら不合格、と書いてある",
+      "521" in ref.get("reject_rule", ""))
+for pid, out in py_out.items():
+    art = next(a for a in doc["articles"] if str(a["post_id"]) == pid)
+    check(f"記事{pid}: プロンプトにREFERENCESがある", "REFERENCES:" in out)
+    if art["with_person"]:
+        check(f"記事{pid}: 521が顔の最優先参照と書いてある",
+              "521 as the primary identity reference" in out)
+        check(f"記事{pid}: 273は髪と桜だけ", "273 only for" in out)
+        check(f"記事{pid}: 297は塗りと光だけ", "297 only for" in out)
+        check(f"記事{pid}: 297の顔・目・パーカーを引き継がない",
+              "Do not copy its face" in out and "pink hoodie" in out)
+    else:
+        check(f"記事{pid}: 人物なしと明記", "No person appears" in out)
+        check(f"記事{pid}: 人物なしなのに521を参照していない",
+              "521" not in out.split("REFERENCES:")[1])
+
+# 承認された人物の割り当てどおりか。ここを変えたら気づけるようにする
+APPROVED = {"993": False, "995": False, "997": True,
+            "999": True, "1001": True, "1003": False}
+for a in doc["articles"]:
+    pid = str(a["post_id"])
+    check(f"記事{pid}: 人物の有無が承認どおり",
+          a["with_person"] is APPROVED[pid],
+          f"承認={APPROVED[pid]} 実際={a['with_person']}")
+check("人物あり3・なし3",
+      sum(1 for a in doc["articles"] if a["with_person"]) == 3)
+
+# 仕様は完成画像の承認まで proposal のまま
+check("仕様が proposal のまま", spec["status"] == "proposal")
+
 # 記事側
 for a in doc["articles"]:
     pid = a["post_id"]

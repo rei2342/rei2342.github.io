@@ -106,6 +106,14 @@ def build_prompt(spec, article, category):
             "scene: " + " ".join(article["scene"].split()),
         ]))
 
+    # 参照画像の使い分け。**3枚を均等に混ぜない**ので、
+    # どれから何を採るかを毎回そのまま渡す
+    ref = spec["reference_assets"]["directive"]
+    parts.append(
+        "REFERENCES:\n"
+        + (ref["with_person"] if article.get("with_person")
+           else ref["without_person"]).strip())
+
     parts.append(
         "DO NOT INCLUDE:\n" + _bullets(neg["forbidden_content"])
         + "\n" + neg["always_append"])
