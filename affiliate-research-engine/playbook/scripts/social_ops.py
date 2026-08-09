@@ -178,9 +178,9 @@ def generate(ids, dry):
                            "awaiting_approval" if sg.passed(res) else
                            "rejected")
             p = inv.save(spec, stock)
-            print(f"\n--- STOCK {platform} {p} ---")
-            print(p.read_text(encoding="utf-8"))
-            print(f"--- END STOCK {platform} ---")
+            # 全文を出すとログの末尾から読めなくなる。**要点だけ出す**
+            print(f"--- STOCK {platform} {p.name} 保存 "
+                  f"({len(p.read_text(encoding='utf-8'))}字) ---")
         # ログの末尾に要点だけ出す。YAML全文は上に出しているが、
         # 末尾から読むので、確かめたいことをここへまとめる
         print("\n=== DRY RUN の結果（末尾にまとめる）===")
