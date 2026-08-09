@@ -20,6 +20,14 @@
 
 問題なし。WordPressへ送ってよい。
 
+## ✅ 通過 207.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 207.html
+
+問題なし。WordPressへ送ってよい。
+
 ## ✅ 通過 23.html
 
 問題なし。WordPressへ送ってよい。
@@ -129,6 +137,14 @@
 問題なし。WordPressへ送ってよい。
 
 ## ✅ 通過 546.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 61.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 61.html
 
 問題なし。WordPressへ送ってよい。
 
