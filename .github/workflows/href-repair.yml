@@ -1,0 +1,46 @@
+name: 自サイトへのリンクの点検
+
+# 本文の中の自サイトリンクが、実在する記事URLと一致しているかを見る。
+# 途中で切れたURLだけを補う。それ以外は一覧に出して人が判断する。
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true なら書かない'
+        required: false
+        default: 'true'
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    concurrency:
+      group: wp-write
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/href_repair.py
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: href repair $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
