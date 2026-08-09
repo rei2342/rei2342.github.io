@@ -1,0 +1,187 @@
+#!/usr/bin/env python3
+"""
+social_claims.py
+SNS文を**命題の単位**へ割って、公開本文の命題と突き合わせる。
+
+数字が合っているかだけでは足りない。
+「Aなら原因はB」「Cで足りる」のような**因果・診断・効果**は、
+記事に無ければ、書き手が勝手に足した断定になる。
+
+見るのは4つ。
+
+  対象   … 何について言っているか（語の重なり）
+  行動   … 読者にさせることか、事実の主張か
+  極性   … 記事が否定していることを肯定していないか
+  モダリティ … 記事が「確認項目」と言っているものを言い切っていないか
+
+完全一致は求めない。**矛盾しないこと**を見る。
+"""
+import re
+import sys
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parents[1]
+
+# 内容語らしきもの。ひらがなだけの語は助詞や語尾が多いので拾わない
+TERM = re.compile(r"[一-龥ァ-ヴー]{2,}|[A-Za-z]{3,}|[0-9]+")
+SENT_END = re.compile(r"(?<=[。？！])|\n")
+STOP = {"こと", "もの", "とき", "ため", "ほう", "場合", "自分", "記事",
+        "確認", "項目", "内容", "今日", "次の", "ここ", "それ", "これ"}
+
+
+def terms(t):
+    return {w for w in TERM.findall(t) if w not in STOP and len(w) >= 2}
+
+
+def sentences(text):
+    """文へ割る。箇条書きの各行も1つの命題として扱う。"""
+    out = []
+    for line in text.split("\n"):
+        line = line.strip()
+        if not line or line.startswith("http"):
+            continue
+        if line.startswith(("・", "-", "*")):
+            out.append(line.lstrip("・-* ").strip())
+            continue
+        for s in SENT_END.split(line):
+            s = (s or "").strip()
+            if s:
+                out.append(s)
+    return [s for s in out if terms(s)]
+
+
+def modality(spec, s):
+    """directive → hedged → interrogative → assertive の順に決める。
+
+    「〜かもしれません。確かめてください」のように混ざるので、
+    **弱いほうを優先**する。強く採ると誤って落とす。
+    """
+    m = spec["claims"]["modality"]
+    for kind in ("directive", "interrogative", "hedged"):
+        for pat in m[kind]:
+            if re.search(pat, s):
+                return kind
+    for pat in m["assertive"]:
+        if re.search(pat, s):
+            return "assertive"
+    return "assertive"          # 体言止めも言い切りとして扱う
+
+
+def is_risky(spec, s):
+    return any(re.search(p, s) for p in spec["claims"]["risky"])
+
+
+def negated(s):
+    return bool(re.search(r"ない|ません|ず[、。]|なく[てなる]", s))
+
+
+def best_match(spec, s, article_sents):
+    """記事側で、いちばん語が重なる文を探す。"""
+    st = terms(s)
+    if not st:
+        return None, 0.0
+    best, score = None, 0.0
+    for a in article_sents:
+        at = terms(a)
+        if not at:
+            continue
+        ov = len(st & at) / len(st)
+        if ov > score:
+            best, score = a, ov
+    return best, score
+
+
+def article_hedged(a):
+    return bool(re.search(r"可能性|かもしれ|ことがあ|場合があ|とは限|"
+                          r"確認項目|提案|目安|例|試算|こともあ", a or ""))
+
+
+def check(spec, parts, article, inferences=()):
+    """命題ごとの判定を返す。
+
+    [{text, modality, risky, matched, overlap, verdict, why}, ...]
+    verdict は ok / unsupported / contradiction / overclaim / declared
+    """
+    c = spec["claims"]
+    asents = sentences(article.get("body", ""))
+    declared = {re.sub(r"\s+", "", x["text"]) for x in inferences}
+    out = []
+    for p in parts:
+        for s in sentences(p):
+            key = re.sub(r"\s+", "", s)
+            mod = modality(spec, s)
+            risky = is_risky(spec, s)
+            a, ov = best_match(spec, s, asents)
+            row = {"text": s, "modality": mod, "risky": risky,
+                   "matched": a, "overlap": round(ov, 2)}
+
+            if key in declared:
+                # 書き手が判断として宣言したもの。**弱めてあることが条件**
+                if mod == "assertive":
+                    row.update(verdict="overclaim",
+                               why="判断として宣言しているが言い切っている。"
+                                   "弱める")
+                else:
+                    row.update(verdict="declared", why="判断として宣言済み")
+                out.append(row)
+                continue
+
+            if mod in ("directive", "interrogative"):
+                # 行動の提案・問いかけ。事実の主張ではないが、
+                # **記事に無い操作をさせない**ので対応は要る
+                if ov >= c["term_overlap_min"]:
+                    row.update(verdict="ok", why="記事に同じ操作がある")
+                else:
+                    row.update(verdict="unsupported",
+                               why="記事に対応する操作が見つからない")
+                out.append(row)
+                continue
+
+            if ov < c["term_overlap_min"]:
+                row.update(
+                    verdict="unsupported" if risky else "ok",
+                    why=("記事に対応する記述が見つからない" if risky
+                         else "因果・効果を言っていないので通す"))
+                out.append(row)
+                continue
+
+            if ov >= c["contradiction_overlap"] and negated(s) != negated(a):
+                row.update(verdict="contradiction",
+                           why="記事と肯定・否定が逆になっている")
+                out.append(row)
+                continue
+
+            if mod == "assertive" and article_hedged(a):
+                row.update(verdict="overclaim",
+                           why="記事は確認項目・可能性として書いているのに、"
+                               "投稿が言い切っている")
+                out.append(row)
+                continue
+
+            row.update(verdict="ok", why="記事の記述と矛盾しない")
+            out.append(row)
+    return out
+
+
+def failures(rows):
+    return [r for r in rows if r["verdict"] in
+            ("unsupported", "contradiction", "overclaim")]
+
+
+def fmt(rows):
+    L = ["| 命題 | モダリティ | 一致 | 判定 | 理由 |\n|---|---|---|---|---|\n"]
+    for r in rows:
+        L.append(f"| {r['text'][:38]} | {r['modality']} | {r['overlap']} "
+                 f"| {r['verdict']} | {r['why']} |\n")
+    return "".join(L)
+
+
+if __name__ == "__main__":
+    import social_spec as ss
+    import social_inventory as inv
+    spec = ss.load_spec()
+    art = inv.local_article(sys.argv[1])
+    rows = check(spec, [sys.argv[2]], art)
+    print(fmt(rows))

@@ -18,6 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import quality_rules as qr
+import social_claims as sc
 
 EMOJI = re.compile(r"[\U0001F000-\U0001FAFF☀-➿←-⇿"
                    r"⬀-⯿️]")
@@ -47,10 +48,22 @@ def fact_gate(spec, text):
     印が無くても落とすものを仕様の leak_patterns から足す。
     """
     hits = [str(h) for h in qr.unverified_self_facts(text)]
-    for pat in spec["persona"].get("leak_patterns", []):
-        m = re.search(pat["re"], text)
-        if m:
-            hits.append(f"{pat['name']}: {m.group(0)}")
+    pers = spec["persona"]
+    marks = pers.get("self_markers", [])
+    exempt = pers.get("exempt", [])
+    for sent in sc.sentences(text):
+        # 出典つきの公式情報・一般的な条件・仮定の試算・fact ID つきは通す
+        why = next((e["name"] for e in exempt if re.search(e["re"], sent)),
+                   None)
+        if why:
+            continue
+        has_self = any(m in sent for m in marks)
+        for pat in pers.get("leak_patterns", []):
+            if pat.get("needs_self") and not has_self:
+                continue        # 数字があるだけでは落とさない
+            m = re.search(pat["re"], sent)
+            if m:
+                hits.append(f"{pat['name']}: {m.group(0)}")
     return (not hits, "; ".join(hits[:3]))
 
 
@@ -98,10 +111,10 @@ def length_gate(spec, platform, parts):
         lo, hi = spec["x"]["length"]["min"], spec["x"]["length"]["max"]
         if not lo <= n <= hi:
             bad.append(f"{n}字（{lo}〜{hi}）")
-        # X本体の上限。URLは23文字換算
-        raw = URL.sub("x" * 23, parts[0])
-        if len(raw) > spec["x"]["hard_limit"]:
-            bad.append(f"URL込みで{len(raw)}字（上限{spec['x']['hard_limit']}）")
+        w = weighted_len(spec, parts[0])
+        lim = spec["x"]["weighted"]["hard_limit"]
+        if w > lim:
+            bad.append(f"加重{w}（上限{lim}）")
     else:
         t = spec["threads"]
         keys = ["part1", "part2"]
@@ -179,19 +192,62 @@ def cross_platform_gate(spec, text, other_text):
     return (j < th, f"XとThreadsの近さ {j:.2f}（{th}未満にする）")
 
 
-def subset_gate(spec, parts, article):
-    """記事に無い言い切りを足していないか。**警告ではなく落とす。**
+def weighted_len(spec, text):
+    """Xの数え方に合わせる。**Pythonの文字数では通さない。**
 
-    記事本文に出てこない数値を投稿へ書いたら止める。
-    数値は言い切りになりやすく、あとから直せない。
+    URLは長さによらず 23。CJKと全角記号は2、半角は1。
     """
-    body = article.get("body", "")
+    w = spec["x"]["weighted"]
+    n = len(URL.findall(text)) * w["url_weight"]
+    for ch in URL.sub("", text):
+        if ch == "\n":
+            n += w["narrow_weight"]
+        elif ord(ch) < 0x1100 or 0xFF61 <= ord(ch) <= 0xFF9F:
+            n += w["narrow_weight"]
+        else:
+            n += w["wide_weight"]
+    return n
+
+
+def subset_gate(spec, parts, article, inferences=()):
+    """記事に無い**命題**を足していないか。数字だけでは足りない。
+
+    因果・診断・効果は、記事に無ければ勝手な断定になる。
+    記事が「確認項目」として書いているものを言い切っていたら、それも落とす。
+    """
     bad = []
+    body = article.get("body", "")
     for p in parts:
         for n in re.findall(r"[0-9]+(?:\.[0-9]+)?", _plain(p)):
             if len(n) >= 2 and n not in body:
                 bad.append(f"記事に無い数字: {n}")
-    return (not bad, " / ".join(sorted(set(bad))))
+    for r in sc.failures(sc.check(spec, parts, article, inferences)):
+        bad.append(f"{r['verdict']}: {r['text'][:26]}（{r['why']}）")
+    return (not bad, " / ".join(dict.fromkeys(bad)))
+
+
+def template_gate(spec, parts, recent=()):
+    """定型句と文型の重なり。**落とさずに警告する。**
+
+    直近の投稿と、冒頭・締め・定型句が3件以上重なったら知らせる。
+    """
+    t = spec["template_variety"]
+    text = "\n".join(parts)
+    mine = set()
+    for group in ("phrases", "openers", "closers"):
+        for pat in t[group]:
+            for line in [l for l in text.split("\n") if l.strip()]:
+                if re.search(pat["re"], line.strip()):
+                    mine.add(pat["id"])
+                    break
+    warn = []
+    for pid in sorted(mine):
+        same = sum(1 for r in list(recent)[-t["window"]:]
+                   if pid in (r.get("template_ids") or []))
+        if same >= t["max_same"]:
+            warn.append(f"「{pid}」が直近{t['window']}本で{same}件目"
+                        f"（{t['max_same']}件を超えた）")
+    return sorted(mine), warn
 
 
 def style_warnings(spec, parts):
@@ -211,7 +267,7 @@ def style_warnings(spec, parts):
 
 # ── まとめて走らせる ────────────────────────────────
 def run_gates(spec, platform, parts, article, history=(), other_text="",
-              stock_modified=None):
+              stock_modified=None, inferences=()):
     text = "\n\n".join(parts)
     res = [
         ("article_published", *article_gate(spec, article)),
@@ -220,7 +276,8 @@ def run_gates(spec, platform, parts, article, history=(), other_text="",
         ("style_gate", *shape_gate(spec, platform, parts)),
         ("length_gate", *length_gate(spec, platform, parts)),
         ("link_gate", *link_gate(spec, platform, parts, article)),
-        ("subset_gate", *subset_gate(spec, parts, article)),
+        ("subset_gate", *subset_gate(spec, parts, article,
+                                     inferences)),
         ("duplicate_gate", *duplicate_gate(spec, text, history)),
         ("cross_platform_gate", *cross_platform_gate(spec, text, other_text)),
     ]
