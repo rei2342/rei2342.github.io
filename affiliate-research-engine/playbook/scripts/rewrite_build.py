@@ -45,7 +45,28 @@ def main():
         tf = SRC / f"{pid}.topic"
         topic = (tf.read_text(encoding="utf-8").strip() if tf.exists()
                  else _ai.classify_full(titles.get(pid, ""), body))
-        cta, progs = _ai.build_cta(topic)
+        # 記事ごとにCTAを選ぶ。`<id>.cta` に案件キーを改行区切りで書くと、
+        # トピックの既定より優先する。**本文で役割を説明した案件だけ置く。**
+        cf = SRC / f"{pid}.cta"
+        if cf.exists():
+            keys = [x.strip() for x in cf.read_text(encoding="utf-8").split()
+                    if x.strip()]
+            if keys:
+                items = "\n".join(f"<p>{_ai.LINKS[k][1]}</p>" for k in keys)
+                cta = ("\n<hr>\n<div style=\"background:#f9f9f9;"
+                       "border-left:4px solid #27ae60;padding:16px 20px;"
+                       "margin:32px 0\">\n"
+                       f"<p style=\"margin-top:0;font-weight:bold\">"
+                       f"{_ai.CTA_HEADING}</p>\n" + items +
+                       "\n<p style=\"margin-bottom:0;font-size:0.8em;"
+                       f"color:#999\">{_ai.CTA_NOTE}<br>"
+                       "※本記事にはアフィリエイトリンクが含まれます（PR）</p>\n"
+                       "</div>")
+                progs = keys
+            else:
+                cta, progs = "", ["（CTAなし）"]
+        else:
+            cta, progs = _ai.build_cta(topic)
         html = _ai.strip_box(body) + cta
 
         issues = _q.generation_blockers(html)
