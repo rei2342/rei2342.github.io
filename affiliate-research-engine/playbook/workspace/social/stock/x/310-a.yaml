@@ -4,21 +4,21 @@ article_id: 310
 article_modified_gmt: '2026-08-09T11:13:38'
 article_title: 無料・低価格の英語アプリで足りる人と、足りない人の分かれ目
 article_url: https://sakura-eigo.com/cheap-english-learning-apps-free/
-text: '無料の英語アプリで足りるかどうかは、点数が出るかではなく、直し方まで返ってくるかで分かれます。
+text: '英語アプリを比べるとき、機能の数で並べても決まりません。
 
-  無料期間のうちに、自分の音や文に対して直し方の指示が付くかを見てください。
+  無料期間のうちに、自分の音や文に対して直し方まで返ってくるかどうかを見てみてください。
 
 
-  足りる人と足りない人の分かれ目をまとめました
+  点数だけが返るのか、直し方まで返るのかで軸が変わります
 
   https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=x'
 thread_parts:
-- '無料の英語アプリで足りるかどうかは、点数が出るかではなく、直し方まで返ってくるかで分かれます。
+- '英語アプリを比べるとき、機能の数で並べても決まりません。
 
-  無料期間のうちに、自分の音や文に対して直し方の指示が付くかを見てください。
+  無料期間のうちに、自分の音や文に対して直し方まで返ってくるかどうかを見てみてください。
 
 
-  足りる人と足りない人の分かれ目をまとめました
+  点数だけが返るのか、直し方まで返るのかで軸が変わります
 
   https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=x'
 state: awaiting_approval
@@ -55,18 +55,30 @@ rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: f147982f3bb558b0
+content_hash: 83ecc287566265b3
 generator_version: social-v1
 material:
   search_intent: 無料や低価格の英語アプリだけで足りるのかを知りたい
-  core_answer: 足りるかどうかは機能の多さではなく、直し方まで返ってくるかで分かれる
+  core_answer: 機能の数ではなく、返ってくるものの中身で比べる
   one_check: 無料期間のうちに、自分の音や文へ直し方の指示が付くかを見る
   unique_artifact: 無料期間中に確認する項目と、月額ではなく使えた回数で振り返る出し方
-created_at: 2026-08-09T21:28:20+0900
+created_at: 2026-08-09T21:53:10+0900
 history:
-- at: 2026-08-09T21:28:20+0900
+- at: 2026-08-09T21:53:10+0900
   state: generated
-- at: 2026-08-09T21:28:20+0900
+- at: 2026-08-09T21:53:10+0900
   state: gated
-- at: 2026-08-09T21:28:20+0900
+- at: 2026-08-09T21:53:10+0900
   state: awaiting_approval
+post_type: comparison_axis
+post_type_reason: 記事が「無料アプリでできること」と「有料で足されること」を 機能の並びで比べている。軸の作り方を渡す形が合う
+template_ids:
+- condition_open
+- toki
+template_warnings: []
+inferences:
+- text: 自分で間違いに気づける範囲かどうかは、比べるときの材料の1つになることがあります。
+  basis: '記事は「安いアプリで足りる人」「アプリ以外の練習も検討したい人」を 分けて書いている。その分け方を投稿側で1行に言い直したもの
+
+    '
+weighted_len: 223

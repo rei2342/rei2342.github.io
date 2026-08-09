@@ -21,8 +21,11 @@ TARGET_IDS = [27, 67, 64, 61, 19, 18, 32, 42, 40, 41, 37, 33, 28, 23]
 
 # 環境変数 TARGET_IDS で対象を上書きできる（例: "292,289,286"）。
 # フェーズごとに対象を切り替えて流すため。
-if os.environ.get("TARGET_IDS", "").strip():
-    TARGET_IDS = [int(x) for x in os.environ["TARGET_IDS"].replace(" ", "").split(",") if x]
+_raw_targets = os.environ.get("TARGET_IDS", "").strip()
+# `ops:` で始まるときは rewrite_uploader.py が social_ops.py へ渡す合図。
+# ここで数値へ変換しようとすると読み込み時に落ちる
+if _raw_targets and not _raw_targets.startswith("ops:"):
+    TARGET_IDS = [int(x) for x in _raw_targets.replace(" ", "").split(",") if x]
 
 MODEL = os.environ.get("REWRITE_MODEL", "claude-opus-4-8")
 MIN_CHARS = int(os.environ.get("MIN_CHARS", "4000"))

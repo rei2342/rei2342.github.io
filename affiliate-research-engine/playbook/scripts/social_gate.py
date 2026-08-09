@@ -245,8 +245,8 @@ def template_gate(spec, parts, recent=()):
         same = sum(1 for r in list(recent)[-t["window"]:]
                    if pid in (r.get("template_ids") or []))
         if same >= t["max_same"]:
-            warn.append(f"「{pid}」が直近{t['window']}本で{same}件目"
-                        f"（{t['max_same']}件を超えた）")
+            warn.append(f"「{pid}」がこれで{same + 1}件目"
+                        f"（直近{t['window']}本・{t['max_same']}件まで）")
     return sorted(mine), warn
 
 

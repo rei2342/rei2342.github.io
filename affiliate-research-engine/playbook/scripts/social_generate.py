@@ -78,7 +78,12 @@ def generate_api(spec, article):
 def generate_file(spec, article, drafts):
     """用意した下書きを使う。ゲートと在庫の作り方は API と同じ。"""
     d = drafts["articles"][str(article["id"])]
-    return d["material"], [d["x"].strip()], [p.strip() for p in d["threads"]]
+    return d, d["material"], [d["x"].strip()], [p.strip() for p in d["threads"]]
+
+
+def generate_api2(spec, article):
+    material, x, th = generate_api(spec, article)
+    return {}, material, x, th
 
 
 def attach_url(spec, platform, parts, article):
@@ -114,9 +119,11 @@ def main():
             continue
 
         if a.source == "local" and drafts:
-            material, x_parts, th_parts = generate_file(spec, article, drafts)
+            d, material, x_parts, th_parts = generate_file(spec, article,
+                                                           drafts)
         else:
-            material, x_parts, th_parts = generate_api(spec, article)
+            d, material, x_parts, th_parts = generate_api2(spec, article)
+        infer = d.get("inferences", [])
 
         texts = {}
         for platform, raw in (("x", x_parts), ("threads", th_parts)):
@@ -129,10 +136,21 @@ def main():
             hist += [{"text": s["text"], "stock_id": s["stock_id"]}
                      for _, s in inv.all_stock(spec, platform)
                      if s["article_id"] != int(pid)]
+            recent = [s for _, s in inv.all_stock(spec, platform)]
             res = sg.run_gates(spec, platform, parts, article,
-                               history=hist, other_text=other)
+                               history=hist, other_text=other,
+                               inferences=infer)
+            tids, twarn = sg.template_gate(spec, parts, recent)
             stock = inv.new_stock(spec, platform, article, parts,
                                   material, res)
+            stock["post_type"] = d.get("post_type", "")
+            stock["post_type_reason"] = " ".join(
+                d.get("post_type_reason", "").split())
+            stock["template_ids"] = tids
+            stock["template_warnings"] = twarn
+            stock["inferences"] = infer
+            stock["weighted_len"] = (sg.weighted_len(spec, parts[0])
+                                     if platform == "x" else None)
             if sg.passed(res):
                 inv.transition(spec, stock, "gated")
                 inv.transition(spec, stock, "awaiting_approval")
@@ -149,7 +167,7 @@ def main():
             for line in sg.fmt(res).split("\n"):
                 if line.startswith("NG"):
                     print("      " + line)
-            for w in sg.style_warnings(spec, parts):
+            for w in sg.style_warnings(spec, parts) + twarn:
                 print("      警告 " + w)
 
     print(f"\n承認待ち {len(made)} / ゲートで止めた {len(blocked)}")

@@ -4,24 +4,24 @@ article_id: 526
 article_modified_gmt: '2026-08-09T11:09:47'
 article_title: 「現地が一番早い」を費用と時間で確かめる｜1時間あたりで並べる
 article_url: https://sakura-eigo.com/fast-verify-cost-time-travel/
-text: '現地が一番早いと言われたとき、早さは単位をそろえないと比べられません。
+text: '「現地が一番早い」の早いには、英語に触れる時間の量の話と、上達の速さの話が混ざっています。
 
-  候補の総額を、実際に授業がある時間で割って1時間あたりを出すと、同じ物差しに乗ります。
+  候補の総額を、実際に授業がある時間で割ってみてください。
 
 
-  行き先ごとに並べた比較と、年齢の条件で選べない場合をまとめました
+  出てくるのは費用の側で、速さのほうは別に置きます
 
   https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=x'
 thread_parts:
-- '現地が一番早いと言われたとき、早さは単位をそろえないと比べられません。
+- '「現地が一番早い」の早いには、英語に触れる時間の量の話と、上達の速さの話が混ざっています。
 
-  候補の総額を、実際に授業がある時間で割って1時間あたりを出すと、同じ物差しに乗ります。
+  候補の総額を、実際に授業がある時間で割ってみてください。
 
 
-  行き先ごとに並べた比較と、年齢の条件で選べない場合をまとめました
+  出てくるのは費用の側で、速さのほうは別に置きます
 
   https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=x'
-state: awaiting_approval
+state: rejected
 gate_results:
 - id: article_published
   ok: true
@@ -42,8 +42,8 @@ gate_results:
   ok: true
   detail: ''
 - id: subset_gate
-  ok: true
-  detail: ''
+  ok: false
+  detail: 'unsupported: 候補の総額を、実際に授業がある時間で割ってみてくださ（記事に対応する操作が見つからない）'
 - id: duplicate_gate
   ok: true
   detail: ''
@@ -51,22 +51,33 @@ gate_results:
   ok: true
   detail: もう片方がまだ無い
 approved_at: null
-rejected_reason: null
+rejected_reason: 'subset_gate: unsupported: 候補の総額を、実際に授業がある時間で割ってみてくださ（記事に対応する操作が見つからない）'
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: 5e8d7a27d6fb3e8d
+content_hash: bbe30bc8c95aefd1
 generator_version: social-v1
 material:
   search_intent: 留学と国内の学習で、どちらが早いのかを同じ物差しで比べたい
-  core_answer: 「早い」は単位をそろえないと比べられない。授業時間と、1時間あたりの費用で並べる
+  core_answer: 「早い」には時間の量の話と上達の速さの話が混ざっている。まず分けて、量のほうを数える
   one_check: 候補の総額を、実際に授業がある時間で割って1時間あたりを出す
   unique_artifact: 行き先ごとに1時間あたりで並べた比較と、年齢や在学の条件で選べない場合
-created_at: 2026-08-09T21:28:20+0900
+created_at: 2026-08-09T21:53:09+0900
 history:
-- at: 2026-08-09T21:28:20+0900
+- at: 2026-08-09T21:53:09+0900
   state: generated
-- at: 2026-08-09T21:28:20+0900
+- at: 2026-08-09T21:53:09+0900
   state: gated
-- at: 2026-08-09T21:28:20+0900
-  state: awaiting_approval
+- at: 2026-08-09T21:53:09+0900
+  state: rejected
+post_type: misreading
+post_type_reason: 「現地が一番早い」という言われ方を、記事が読み直している。 時間の量と上達の速さを分ける、という正し方が記事の芯
+template_ids:
+- topic_open
+template_warnings: []
+inferences:
+- text: 1時間あたりで見えるのは費用の側で、上達の速さは別に置く必要があります。
+  basis: '記事は「ここで出るのは触れる時間あたりの費用で、上達の速さを 保証するものではない」と書いている。その一文を投稿側で言い直したもの
+
+    '
+weighted_len: 221

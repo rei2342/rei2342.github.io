@@ -340,7 +340,7 @@ template_variety:
   openers:                     # 冒頭の構文
     - {id: "condition_open", re: "^[^。\n]{0,30}(とき|場合|なら)[、,]"}
     - {id: "question_open", re: "^[^。\n]{0,30}(でしょうか|ますか|ですか)"}
-    - {id: "topic_open", re: "^[^。\n]{0,20}(は|とは)[、,]?"}
+    - {id: "topic_open", re: "^[^。、\n]{1,14}(は|とは)、"}
   closers:
     - {id: "article_close", re: "記事に(まとめて|書いて)"}
     - {id: "summary_close", re: "まとめました"}

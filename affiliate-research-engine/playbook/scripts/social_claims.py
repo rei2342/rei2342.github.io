@@ -35,30 +35,48 @@ def terms(t):
     return {w for w in TERM.findall(t) if w not in STOP and len(w) >= 2}
 
 
-def sentences(text):
-    """文へ割る。箇条書きの各行も1つの命題として扱う。"""
+# 記事へ送るための一言。**主張ではない**ので照合の対象から外す
+META = re.compile(r"記事(の(ほう|中))?(に|へ|で)(置いて|書いて|まとめて|あります)"
+                  r"|続きは|詳しくは")
+
+
+def split(text):
+    """(文, 箇条書きか) の組で返す。
+
+    箇条書きは名詞止めや操作の断片になる。文と同じ物差しで
+    「言い切っている」と見るとほぼ全部が引っかかるので、分けて扱う。
+    """
     out = []
     for line in text.split("\n"):
         line = line.strip()
         if not line or line.startswith("http"):
             continue
         if line.startswith(("・", "-", "*")):
-            out.append(line.lstrip("・-* ").strip())
+            out.append((line.lstrip("・-* ").strip(), True))
             continue
         for s in SENT_END.split(line):
             s = (s or "").strip()
             if s:
-                out.append(s)
-    return [s for s in out if terms(s)]
+                out.append((s, False))
+    return [(s, b) for s, b in out if terms(s)]
 
 
-def modality(spec, s):
+def sentences(text):
+    return [s for s, _ in split(text)]
+
+
+def modality(spec, s, bullet=False):
     """directive → hedged → interrogative → assertive の順に決める。
 
     「〜かもしれません。確かめてください」のように混ざるので、
     **弱いほうを優先**する。強く採ると誤って落とす。
     """
     m = spec["claims"]["modality"]
+    if re.search(r"か$", s):
+        return "interrogative"          # 箇条書きの「〜か」も問い
+    if bullet:
+        # 箇条書きは操作か項目。言い切りとして扱わない
+        return "directive"
     for kind in ("directive", "interrogative", "hedged"):
         for pat in m[kind]:
             if re.search(pat, s):
@@ -74,7 +92,9 @@ def is_risky(spec, s):
 
 
 def negated(s):
-    return bool(re.search(r"ない|ません|ず[、。]|なく[てなる]", s))
+    """「ではなく」は対比であって否定ではない。数えない。"""
+    s = re.sub(r"ではなく|じゃなく|だけでなく", "", s)
+    return bool(re.search(r"ない|ません|ず[、。]", s))
 
 
 def best_match(spec, s, article_sents):
@@ -109,9 +129,11 @@ def check(spec, parts, article, inferences=()):
     declared = {re.sub(r"\s+", "", x["text"]) for x in inferences}
     out = []
     for p in parts:
-        for s in sentences(p):
+        for s, bullet in split(p):
+            if META.search(s):
+                continue            # 記事へ送る一言。主張ではない
             key = re.sub(r"\s+", "", s)
-            mod = modality(spec, s)
+            mod = modality(spec, s, bullet)
             risky = is_risky(spec, s)
             a, ov = best_match(spec, s, asents)
             row = {"text": s, "modality": mod, "risky": risky,
@@ -147,7 +169,11 @@ def check(spec, parts, article, inferences=()):
                 out.append(row)
                 continue
 
-            if ov >= c["contradiction_overlap"] and negated(s) != negated(a):
+            # 極性の食い違いは、**言い切っている長い文だけ**で見る。
+            # 断片や提案で見ると「〜ない」が普通に出るので誤検知になる
+            if (not bullet and mod == "assertive" and len(s) >= 20
+                    and ov >= c["contradiction_overlap"]
+                    and negated(s) != negated(a)):
                 row.update(verdict="contradiction",
                            why="記事と肯定・否定が逆になっている")
                 out.append(row)
