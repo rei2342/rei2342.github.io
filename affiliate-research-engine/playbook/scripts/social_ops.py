@@ -181,7 +181,21 @@ def generate(ids, dry):
             print(f"\n--- STOCK {platform} {p} ---")
             print(p.read_text(encoding="utf-8"))
             print(f"--- END STOCK {platform} ---")
-        print(f"[{pid}] **投稿していない。** 在庫を作っただけ")
+        # ログの末尾に要点だけ出す。YAML全文は上に出しているが、
+        # 末尾から読むので、確かめたいことをここへまとめる
+        print("\n=== DRY RUN の結果（末尾にまとめる）===")
+        print(f"記事 {pid} / status={art['status']} / "
+              f"modified_gmt={art['modified_gmt']} / 本文{len(art['body'])}字")
+        for platform in ("x", "threads"):
+            f = inv.stock_path(spec, platform, pid)
+            if not f.exists():
+                continue
+            st = inv.load(f)
+            ng = [g["id"] for g in st["gate_results"] if not g["ok"]]
+            print(f"{platform}: state={st['state']} / "
+                  f"hash={st['content_hash']} / "
+                  f"ゲート落ち={ng or 'なし'} / 保存={f.name}")
+        print("**投稿していない。在庫を作っただけ。**")
 
 
 def run(arg, dry=True):
