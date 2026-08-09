@@ -1,0 +1,44 @@
+name: 表示項目の旧設定チェック
+
+# 本文を直しても、検索結果とSNSのプレビューには古いタイトルが出続ける。
+# SEOタイトル・メタ・OGP・alt・構造化データ・パンくず・関連記事カードを見る。
+
+on:
+  workflow_dispatch:
+    inputs:
+      posts:
+        description: '記事ID（カンマ区切り。空なら全公開記事）'
+        required: false
+        default: ''
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests janome -q
+      - name: 監査
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          POSTS: ${{ inputs.posts }}
+        run: python affiliate-research-engine/playbook/scripts/seo_field_audit.py
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/seo/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: seo field audit $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin main || true
+            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
