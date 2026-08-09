@@ -58,6 +58,7 @@ def main():
     # 記事＋トップ＋一覧をクロールする
     seeds = [f"{SITE}/", f"{SITE}/articles/"] + [p["link"] for p in posts]
     pages, out_links, status = {}, defaultdict(list), {}
+    theme_counts = {}
     for u in seeds:
         try:
             r = requests.get(u, headers=UA, verify=False, timeout=45,
@@ -69,13 +70,23 @@ def main():
             pages[norm(u)] = ""
         print(f"  {u} → {status[norm(u)][0]}")
 
-    # 本文の内部リンクを集める（ナビ・サイドバーは除く）
+    # 本文の内部リンクを集める。
+    # **テーマが自動で出す関連記事カードは本文のリンクではない。**
+    # article の中にあるので、そこだけ先に落とす（2026-08-09に分けた）。
+    THEME_BLOCK = re.compile(
+        r'<(div|aside|nav|section|ul)[^>]*class="[^"]*'
+        r'(?:related|carditem|entry-card|navi|breadcrumb|widget|pager|'
+        r'sns-|toc|ez-toc)[^"]*"[^>]*>.*?</\1>',
+        re.DOTALL | re.I)
     for src, html in pages.items():
         body = html
         m = re.search(r'<(?:article|main)[^>]*>(.*)</(?:article|main)>',
                       html, re.DOTALL | re.I)
         if m:
             body = m.group(1)
+        theme_n = len(THEME_BLOCK.findall(body))
+        body = THEME_BLOCK.sub(" ", body)
+        theme_counts[norm(src)] = theme_n
         for a in re.finditer(r'<a\b[^>]*href="([^"]+)"[^>]*>(.*?)</a>',
                              body, re.DOTALL | re.I):
             href, anchor = a.group(1), _q.strip_tags(a.group(2)).strip()
@@ -165,7 +176,8 @@ def main():
     L = [f"# 内部リンクのクロール検証 {stamp}\n\n",
          "## まとめ\n\n| 項目 | 値 |\n|---|---|\n",
          f"| 公開記事 | {len(ids)}本 |\n",
-         f"| **内部リンク総数（記事間）** | **{len(edges)}本** |\n",
+         f"| **本文の内部リンク（記事間）** | **{len(edges)}本** |\n",
+         "| （参考）テーマが自動で出す関連記事カード | 本文のリンクとは別に集計から除外 |\n",
          f"| 孤立記事（発も被も0） | {len(orphan)}本 {' '.join(orphan) or ''} |\n",
          f"| 被リンク0 | {len(no_in)}本 {' '.join(no_in) or ''} |\n",
          f"| 発リンク0 | {len(no_out)}本 {' '.join(no_out) or ''} |\n",
