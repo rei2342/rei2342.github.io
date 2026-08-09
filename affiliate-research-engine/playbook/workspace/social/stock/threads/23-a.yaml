@@ -1,0 +1,98 @@
+stock_id: THREADS-23-a
+platform: threads
+article_id: 23
+article_modified_gmt: '2026-08-09T11:17:13'
+article_title: ワーホリの貯金はいくら必要か｜200万を自分の数字に組み替える
+article_url: https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/
+text: 'ワーホリの貯金がいくら必要かを調べると、大きな総額がひとつ出てきます。
+
+
+  その数字の中身は、国と滞在期間と、語学学校に行くかどうかで変わります。だから自分の条件に合っているかを先に見ます。いま読んでいる記事がどの前提で書かれているかを確かめてください。前提が違えば、金額もそのまま使えません。
+
+
+  自分の条件で出すときは、3つに分けます。
+
+
+  ・出発までに必ず要るお金
+
+  ・現地で収入が始まるまでの生活費
+
+  ・帰ってきたあとの当座
+
+
+  分けてから足すと、目標額を上げるほど貯める期間も延びることが見えます。金額と期間はセットで動くので、片方だけを決めると出発日のほうが動きます。足りない分は、額を上げるか期間を延ばすかのどちらかで調整することになります。
+
+
+  3つの箱の埋め方と、ビザの残高証明が目標額とは別の話であることは記事にまとめています。
+
+  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=threads'
+thread_parts:
+- 'ワーホリの貯金がいくら必要かを調べると、大きな総額がひとつ出てきます。
+
+
+  その数字の中身は、国と滞在期間と、語学学校に行くかどうかで変わります。だから自分の条件に合っているかを先に見ます。いま読んでいる記事がどの前提で書かれているかを確かめてください。前提が違えば、金額もそのまま使えません。'
+- '自分の条件で出すときは、3つに分けます。
+
+
+  ・出発までに必ず要るお金
+
+  ・現地で収入が始まるまでの生活費
+
+  ・帰ってきたあとの当座
+
+
+  分けてから足すと、目標額を上げるほど貯める期間も延びることが見えます。金額と期間はセットで動くので、片方だけを決めると出発日のほうが動きます。足りない分は、額を上げるか期間を延ばすかのどちらかで調整することになります。
+
+
+  3つの箱の埋め方と、ビザの残高証明が目標額とは別の話であることは記事にまとめています。
+
+  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=threads'
+state: awaiting_approval
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: XとThreadsの近さ 0.08（0.85未満にする）
+approved_at: null
+rejected_reason: null
+scheduled_at: null
+posted_at: null
+posted_id: null
+content_hash: 9dcff1d3db3643eb
+generator_version: social-v1
+material:
+  search_intent: ワーキングホリデーに必要な貯金額を、自分の条件で知りたい
+  core_answer: まとめ記事の総額はそのまま使えない。自分の条件で3つに分けて出し直す
+  one_check: 見ている記事が、どの国・どの期間・語学学校ありなしのどれを前提にしているかを確かめる
+  unique_artifact: 必要額を3つの箱に分ける出し方と、ビザの残高証明が目標額とは別だという話
+created_at: 2026-08-09T21:28:20+0900
+history:
+- at: 2026-08-09T21:28:20+0900
+  state: generated
+- at: 2026-08-09T21:28:20+0900
+  state: gated
+- at: 2026-08-09T21:28:20+0900
+  state: awaiting_approval

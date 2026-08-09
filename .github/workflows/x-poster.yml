@@ -1,236 +1,54 @@
-name: X Poster (sakura, human-like)
+name: X Poster（承認済み在庫だけを出す）
 
-# さくらのX投稿を「2日に1回くらい・時間バラバラ・botっぽくない」頻度で回す。
-# 記事生成(daily-article-drafter)からは切り離し、複数スロット×確率×最小間隔で自然化する。
+# **生成しない。** 承認済みの在庫を1日1件だけ投稿する。
+# 2026-08-09に、生成して即投稿する運用を止めた。
+# 文面は scripts/social_generate.py が作り、人が承認するまで出ない。
+# ルールは config/social/sakura-social-v1.yaml が正本。
 
 on:
   schedule:
-    # 1日5スロット（JSTの生活時間・分は半端に）。実際に投稿するかは中で確率判定。
-    - cron: '10 22 * * *'   # 07:10 JST 出勤前
-    - cron: '40 3 * * *'    # 12:40 JST 昼休み
-    - cron: '30 10 * * *'   # 19:30 JST 退勤後
-    - cron: '50 13 * * *'   # 22:50 JST 夜
-    - cron: '20 15 * * *'   # 00:20 JST 深夜たまに
+    - cron: '30 3 * * *'    # 12:30 JST。1日1枠だけ
   workflow_dispatch:
     inputs:
-      force:
-        description: '確率・間隔を無視して必ず投稿する'
+      approve:
+        description: '実際に投稿する（外すと出す予定を表示するだけ）'
         type: boolean
         default: false
-      text:
-        description: '指定テキストをそのまま投稿（空なら自動生成）'
-        type: string
-        default: ''
 
 jobs:
   post:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Decide & post
+      - run: pip install requests tweepy pyyaml -q
+      - name: 承認済みを1件だけ出す
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
-          FORCE: ${{ inputs.force }}
-          MANUAL_TEXT: ${{ inputs.text }}
+          APPROVE: ${{ inputs.approve }}
         run: |
-          pip install anthropic tweepy -q
-          python3 << 'PYEOF'
-          import os, json, random, glob, re, sys
-          from datetime import datetime, timezone, timedelta
-
-          STATE = "affiliate-research-engine/playbook/workspace/x_state.json"
-          now = datetime.now(timezone.utc)
-          force = os.environ.get("FORCE", "false").lower() == "true"
-          manual_text = os.environ.get("MANUAL_TEXT", "").strip()
-
-          # ── 指定テキストがあればそれをそのまま投稿（生成・判定スキップ）──
-          if manual_text:
-              import tweepy, json as _json
-              tw = manual_text.replace("——", "、").replace("—", "、").strip()
-              client = tweepy.Client(
-                  consumer_key=os.environ["X_API_KEY"],
-                  consumer_secret=os.environ["X_API_SECRET"],
-                  access_token=os.environ["X_ACCESS_TOKEN"],
-                  access_token_secret=os.environ["X_ACCESS_TOKEN_SECRET"],
-              )
-              client.create_tweet(text=tw)
-              print(f"Tweeted (manual): {tw}")
-              try:
-                  st = _json.load(open(STATE))
-              except Exception:
-                  st = {}
-              gap = 47
-              st["last_post"] = now.isoformat()
-              st["next_allowed"] = (now + timedelta(hours=gap)).isoformat()
-              st["last_text"] = tw
-              _json.dump(st, open(STATE, "w"), ensure_ascii=False, indent=2)
-              sys.exit(0)
-
-          # ── 頻度パラメータ（ここを変えれば頻度調整できる）────────────
-          POST_PROB   = 0.55          # 間隔クリア後、各スロットで投稿する確率
-          GAP_MIN_H   = 64            # 前回からの最小間隔（時間）≒約3日
-          GAP_MAX_H   = 80            # 次回許可までの最大間隔（時間）
-          OVERDUE_H   = 20            # next_allowed をこれ以上過ぎたら強制投稿
-
-          def load():
-              try:
-                  with open(STATE) as f: return json.load(f)
-              except Exception:
-                  return {"last_post": None, "next_allowed": None, "last_text": ""}
-
-          st = load()
-          def parse(x):
-              return datetime.fromisoformat(x) if x else None
-          next_allowed = parse(st.get("next_allowed"))
-
-          # ── 投稿するか判定 ───────────────────────────────────────
-          if not force:
-              if next_allowed and now < next_allowed:
-                  print(f"skip: まだ間隔内（next_allowed={next_allowed.isoformat()}）")
-                  sys.exit(0)
-              overdue = next_allowed and now > next_allowed + timedelta(hours=OVERDUE_H)
-              if not overdue and random.random() > POST_PROB:
-                  print("skip: このスロットは確率でパス（bot回避のゆらぎ）")
-                  sys.exit(0)
-
-          # ── テーマ：直近ドラフトのタイトルを緩い着想に（半分は素の関心事）──
-          theme = random.choice([
-              "英語学習で役立つ工夫", "リスニング上達のコツ", "英単語の覚え方",
-              "スキマ時間の使い方", "ワーホリ準備で分かったこと", "続ける仕組みづくり",
-              "スピーキングの練習法", "英語アプリ活用",
-          ])
-          drafts = sorted(glob.glob("affiliate-research-engine/playbook/workspace/drafts/*.md"))
-          if drafts and random.random() < 0.4:
-              try:
-                  raw = open(drafts[-1], encoding="utf-8").read()
-                  m = re.search(r'^title:\s*(.+)$', raw, re.MULTILINE) or re.search(r'^#\s+(.+)$', raw, re.MULTILINE)
-                  if m: theme = m.group(1).strip()
-              except Exception:
-                  pass
-
-          # ── 文体モード（気づき・有益性を中心に。ネガ一辺倒にしない）──────
-          mode = random.choice([
-              "最近気づいた英語学習の小さなコツを1つ共有する",
-              "やってみて意外と効いた方法を1つ教える",
-              "よくある思い込みを1つ、実はこうだと訂正する",
-              "調べて分かった意外な事実・数字を1つシェアする",
-              "続けるための工夫を1つ共有する",
-              "同じ悩みの人に効くヒントを1つ渡す",
-              "つまずきの原因に気づいて、次どう変えたかを書く",
-              "小さく前進したことを、何が効いたか添えて報告する",
-              # 2026-08-04の実測で最高値(54)を出した型。他より明確に強いので重みを増やす
-              "読者に問いかけて終わる。『〜な経験ない？』『〜どうしてる？』で共感を確かめる",
-              "読者に問いかけて終わる。『〜な経験ない？』『〜どうしてる？』で共感を確かめる",
-              "気づきを1行で言い切るだけ。説明を足さない",
-          ])
-          length = random.choice(["50字前後", "60字前後", "70字前後", "80字前後"])
-          emoji_n = random.choice([2, 2, 3])   # 2個寄り
-
-          prompt = "\n".join([
-              "あなたは田中さくら（27歳・営業事務・東京）。英語を5年後回しにしてきたが、今はワーホリに向けて英語学習を進めている。過去にスクールで失敗した経験があるからこそ、同じ人に役立つことを等身大で発信したい。",
-              "",
-              f"今日の切り口: {theme}",
-              f"今回のモード: {mode}",
-              f"長さ: {length}",
-              "",
-              "このモードで、読んだ人に『へぇ』『やってみよ』が残るツイートを1つ書いて。",
-              "",
-              "方針（最優先）:",
-              "・有益性ファースト。読む人が1つ持ち帰れる具体的な気づき・コツ・事実を必ず入れる",
-              "・ネガティブで終わらせない。弱音・愚痴だけの投稿は禁止。前向きかフラットに締める",
-              "・上から教える/意識高い説教にしない。自分が実際に試した・気づいた体験として書く",
-              "・具体を1つ入れる（数字・実際の場面・やった行動のどれか）",
-              "",
-              "書き方:",
-              "・短く言い切る。1ツイート1メッセージ（最長90字）",
-              "・2ブロック構成: 前半（状況・切り口を1〜2行）→空行を1つ→後半（気づき・結論を1〜2行）",
-              "・全体3〜4行。1行は短く。句読点はほぼ使わない（読点・句点をつけずに改行と空行で区切る）",
-              "・口語でOK・主語省略OK",
-              "・宣伝/告知しない。ハッシュタグ・リンク・URLなし",
-              "・「——」(emダッシュ)禁止",
-              "・漢数字でなくアラビア数字（27歳・3ヶ月・15分）",
-              f"・絵文字を{emoji_n}個、毎回違う組み合わせで。内容に合うものを選ぶ。文末2連続は避ける",
-              "・絵文字の直前に半角スペースを入れない（×『音声入力 💡』 ○『音声入力💡』）",
-              "　候補（都度変える）: ✨ 💡 💭 🫶 👀 🤔 🙃 🌱 🔑 📝 🗓️ ⏰ 🚪 🌸 🫧 ☕ 🌙 🍵 🪴 ☺️ 🥹 🗣️ 😯 👂 💪 📱 🎧 ✍️ 🔁 🙌",
-              "・毎回同じ言い回し・同じ絵文字にしない",
-              "",
-              "【実測で伸びた投稿】2026-08-04時点の表示回数。この短さと質感を真似る（内容は丸写ししない）:",
-              "（54回）「留学エージェントって無料なんだ」って知ったとき、うれしいより先に身構えた経験ない？",
-              "（40回）意志が弱いんじゃなかったんだと最近気づいた 😔",
-              "（38回）「30歳でも遅くない」って読むたびに少し安心して、そのまま何も決めずにタブを閉じてきた。5年間ずっと。",
-              "（37回）昨日30分だけど英語の勉強続いた、これって進んでるってことなのか 🥹",
-              "",
-              "【実測で伸びなかった投稿】この型は書かない:",
-              "（11回）読むことと動くことって、全然別物だったな 💭",
-              "（14回）ワーホリ行けば英語話せるようになるって、ビザの年齢制限の話ばっかりで 🫠 本当に必要なのは「今からでも間に合うのか」じゃなくて「行った時点で後悔しない状態に間に合うのか」だったりして。そこが一番怖い 😮‍💨",
-              "（16回）フィリピン留学の広告って「安い・短期・マンツーマン」ばっかり推してるけど、本当の勝負は帰国後だよね。会社戻ったら英語使う場面ないし、数週間で身につけたものなんて3ヶ月で消える。結局、帰ってからどう継続するかが全てなのに、そこまで見据えてる学校の情報って全然ない。",
-              "→ 長い考察・分析は数字が出ていない。1投稿に主張を2つ以上入れない。",
-              "",
-              "ツイート本文だけ出力して。説明不要。",
-          ])
-
-          import anthropic, tweepy
-          ai = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-          msg = ai.messages.create(
-              model="claude-haiku-4-5-20251001",
-              max_tokens=300,
-              messages=[{"role": "user", "content": prompt}],
-          )
-          tweet = msg.content[0].text.strip().strip('"').strip("「」")
-          # 保険: emダッシュが混ざったら除去
-          tweet = tweet.replace("——", "、").replace("—", "、").strip()
-          # 絵文字の直前の半角スペースを落とす（指示しても入ることがある）。
-          # 行頭の絵文字と、英単語のあとの区切りスペースは残す。
-          tweet = re.sub(
-              r'(?<=[ぁ-んァ-ヴ一-龥ー、。！？…])[  ]+(?=[\U0001F000-\U0001FAFF☀-➿←-⇿⬀-⯿])',
-              '', tweet)
-          # 長すぎる場合は「文の切れ目」で切る（語の途中でぶった切らない）
-          LIMIT = 128
-          if len(tweet) > LIMIT:
-              cut = max(tweet.rfind(p, 0, LIMIT) for p in "。！？…!?")
-              if cut < 25:                       # 文末が見つからなければ読点で
-                  cut = tweet.rfind("、", 0, LIMIT)
-              tweet = tweet[:cut + 1].rstrip("、") if cut >= 25 else tweet[:LIMIT]
-              # 句点の直後に絵文字が続いていたら1つだけ拾って余韻を残す
-              tail = tweet_full[len(tweet):len(tweet) + 2] if (tweet_full := (msg.content[0].text)) else ""
-
-          client = tweepy.Client(
-              consumer_key=os.environ["X_API_KEY"],
-              consumer_secret=os.environ["X_API_SECRET"],
-              access_token=os.environ["X_ACCESS_TOKEN"],
-              access_token_secret=os.environ["X_ACCESS_TOKEN_SECRET"],
-          )
-          resp = client.create_tweet(text=tweet)
-          print(f"Tweeted ({mode} / {length} / 絵文字{emoji_n}): {tweet}")
-
-          # ── 次回許可時刻を 40〜54h 後にランダム設定 ─────────────────
-          gap = random.uniform(GAP_MIN_H, GAP_MAX_H)
-          st["last_post"] = now.isoformat()
-          st["next_allowed"] = (now + timedelta(hours=gap)).isoformat()
-          st["last_text"] = tweet
-          with open(STATE, "w") as f:
-              json.dump(st, f, ensure_ascii=False, indent=2)
-          print(f"next_allowed = {st['next_allowed']} (gap {gap:.1f}h)")
-          PYEOF
-
-      - name: Commit state
+          cd affiliate-research-engine/playbook
+          if [ "$APPROVE" = "true" ]; then
+            python scripts/social_post.py --platform x --approve
+          else
+            python scripts/social_post.py --platform x
+          fi
+      - name: Commit
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add affiliate-research-engine/playbook/workspace/x_state.json
-          git diff --staged --quiet || git commit -m "chore: X post state $(date -u +%Y-%m-%dT%H:%MZ)"
+          git add affiliate-research-engine/playbook/workspace/social/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: social post state $(date -u +%Y-%m-%dT%H:%MZ)"
           git pull --rebase origin main || true
           git push origin HEAD:main || true

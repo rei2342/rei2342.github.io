@@ -1,0 +1,72 @@
+stock_id: X-526-a
+platform: x
+article_id: 526
+article_modified_gmt: '2026-08-09T11:09:47'
+article_title: 「現地が一番早い」を費用と時間で確かめる｜1時間あたりで並べる
+article_url: https://sakura-eigo.com/fast-verify-cost-time-travel/
+text: '現地が一番早いと言われたとき、早さは単位をそろえないと比べられません。
+
+  候補の総額を、実際に授業がある時間で割って1時間あたりを出すと、同じ物差しに乗ります。
+
+
+  行き先ごとに並べた比較と、年齢の条件で選べない場合をまとめました
+
+  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=x'
+thread_parts:
+- '現地が一番早いと言われたとき、早さは単位をそろえないと比べられません。
+
+  候補の総額を、実際に授業がある時間で割って1時間あたりを出すと、同じ物差しに乗ります。
+
+
+  行き先ごとに並べた比較と、年齢の条件で選べない場合をまとめました
+
+  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=x'
+state: awaiting_approval
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: もう片方がまだ無い
+approved_at: null
+rejected_reason: null
+scheduled_at: null
+posted_at: null
+posted_id: null
+content_hash: 5e8d7a27d6fb3e8d
+generator_version: social-v1
+material:
+  search_intent: 留学と国内の学習で、どちらが早いのかを同じ物差しで比べたい
+  core_answer: 「早い」は単位をそろえないと比べられない。授業時間と、1時間あたりの費用で並べる
+  one_check: 候補の総額を、実際に授業がある時間で割って1時間あたりを出す
+  unique_artifact: 行き先ごとに1時間あたりで並べた比較と、年齢や在学の条件で選べない場合
+created_at: 2026-08-09T21:28:20+0900
+history:
+- at: 2026-08-09T21:28:20+0900
+  state: generated
+- at: 2026-08-09T21:28:20+0900
+  state: gated
+- at: 2026-08-09T21:28:20+0900
+  state: awaiting_approval

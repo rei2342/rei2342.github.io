@@ -14,14 +14,25 @@
   `playbook/workspace/program_candidates.csv`（機械可読）と `program_candidates.md`（申請おすすめTOP＋申請前チェック）を更新する。
   **ASP会員エリアへのログイン/スクレイピングは絶対にしない**（BAN回避）。
   承認難易度 low を上位に出す。承認された候補は CLAUDE.md の主力/稼働中リストへ手動で昇格させる。
-- **勝ちループ量産ライン**: `.github/workflows/threads-note-cannon.yml`（月・木 06:00 JST ＋手動）。
-  勝ち型（Threads3行フック → note数字告白 → アフィ記事）で **note原稿＋Threads投稿文＋ビジュアル案＋アフィ導線**をセット生成し
-  `playbook/workspace/threads/YYYY-MM-DD.md` に保存する。
-  **Threads APIは未接続なので自動投稿はしない**（生成 → 人間が手直しして投稿、が実運用）。
-  紐付ける案件は**稼働中のもののみ**。未承認案件（スタディサプリ等）のリンクは絶対に作らない。
-  **本文で名前を出すのも稼働中のものだけ**にする（リンクが付かない案件を宣伝しても収益にならない。
-  2026-08-05の定説記事で夢カナ留学＝再申込中を本文で紹介してしまい、差し替えた）
-  → 承認され次第 `playbook/scripts/affiliate_inserter.py` の `LINKS`/`TOPIC_MAP` に追加して昇格させる。
+- **SNS投稿（X・Threads）は2026-08-09に作り直した**。ルールの正本は
+  `playbook/config/social/sakura-social-v1.yaml` の**1か所だけ**。
+  ワークフローやスクリプトへ人物設定・文体・禁止事項・文字数を直接書かない
+  （書くと `scripts/test_social_spec.py` の直書き検査が落ちる）。
+  - 流れ: 記事を公開 → `social_generate.py`（在庫を作る）→ ゲート →
+    **人が承認** → `social_post.py`（承認済みだけ投稿）
+  - **生成と投稿を同じ処理でやらない。** Xの「生成して即投稿」は廃止した
+  - 在庫は `workspace/social/stock/<platform>/<記事ID>-<変種>.yaml` だけ。
+    `workspace/threads/`・`workspace/x_promo/`・WordPressの【Threads用】メモは
+    新規生成しない（2026-08-09にアーカイブ済み）
+  - **XとThreadsで同じ文を使わない。** 記事から素材を4つ抜き、
+    Xは `core_answer + one_check`、Threadsは `search_intent + unique_artifact`
+  - Xは「短い判断基準 → 具体的な確認方法 → 同じ投稿の末尾にURL」
+  - Threadsは「単体で役立つ本文 → 記事固有の手順や表 → 最終投稿の末尾にURL」。
+    **句点は使ってよい。細切れ改行と強制の「↓」は廃止**
+  - **Threadsに投稿用トークンは無い。** 手で貼ってから
+    `social_post.py --mark-posted <stock_id> --posted-id <ID>` で記録する
+  - 廃止したもの: `threads-note-cannon.yml` / `threads-builder.yml` /
+    `x-promo.yml` / `scripts/threads_builder.py` / `scripts/x_promo.py`
 
 ## 運用は2路線（路線で分ける／トーンが逆向きなので絶対に混ぜない）
 
@@ -313,8 +324,9 @@ Clean kawaii flat illustration style. 16:9 aspect ratio.
 | 毎週月 06:00 | `affiliate-collector.yml` | 新規案件の候補を集める | — |
 | 毎週月 07:00 | `weekly-report.yml` | 記事点検 ＋ Search Console ＋ 案件候補 | **Issue** |
 | 毎週火 08:00 | `keyword-expander.yml` | キーワード補充 | — |
-| 3日ごと 05:30 | `daily-article-drafter.yml` | 記事生成 → WP下書き → Threads文面 | — |
-| 毎日3枠 | `x-poster.yml` | X投稿（各枠55%抽選・64時間間隔 ≒ 3日に1回） | — |
+| 3日ごと 05:30 | `daily-article-drafter.yml` | 記事生成 → WP下書き → アイキャッチ用プロンプト | — |
+| 毎日 12:30 | `x-poster.yml` | **承認済み在庫を1件だけ投稿**（無ければ何もしない） | — |
+| 手動 | `social-generate.yml` | 公開記事から X案・Threads案を作る（投稿しない） | — |
 
 **届くIssueは日次と週次の2種類だけ**。取得と集計を分けていた
 `threads-insights` / `ga4-fetch` / `daily-patrol` / `gsc-weekly` / `wp-audit` は統合して削除した。

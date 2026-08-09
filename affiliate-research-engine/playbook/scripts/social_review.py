@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+"""
+social_review.py
+承認待ちの在庫を、記事ごとに X案とThreads案を並べて1枚にする。
+
+  python social_review.py
+出力: workspace/social/review/REVIEW_<日付>.md
+
+**この文書を見て承認する。** 投稿はしない。
+"""
+import sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).parent))
+import social_spec as ss
+import social_gate as sg
+import social_inventory as inv
+
+JST = timezone(timedelta(hours=9))
+
+
+def main():
+    spec = ss.load_spec()
+    stamp = datetime.now(JST).strftime("%Y-%m-%d")
+    rows = [s for _, s in inv.all_stock(spec)]
+    by_article = {}
+    for s in rows:
+        by_article.setdefault(s["article_id"], {})[s["platform"]] = s
+
+    L = [f"# X案・Threads案のレビュー（{stamp}）\n\n",
+         "**投稿していない。** 承認するまで在庫のまま止まる。\n\n",
+         f"記事 {len(by_article)}本 / 在庫 {len(rows)}件"
+         f"（X {sum(1 for s in rows if s['platform'] == 'x')} / "
+         f"Threads {sum(1 for s in rows if s['platform'] == 'threads')}）\n\n",
+         "承認するとき:\n\n```bash\n"
+         "python scripts/social_approve.py --approve X-521-a\n"
+         "python scripts/social_approve.py --reject TH-521-a "
+         "--reason \"記事の内容と違う\"\n```\n\n",
+         "## 一覧\n\n| 記事 | X | Threads | 状態 |\n|---|---|---|---|\n"]
+    for aid, d in sorted(by_article.items()):
+        x, t = d.get("x"), d.get("threads")
+        L.append(f"| {aid} {(x or t)['article_title'][:22]} "
+                 f"| {len(x['text']) if x else '—'}字 "
+                 f"| {len(t['text']) if t else '—'}字 "
+                 f"| {(x or t)['state']} |\n")
+
+    for aid, d in sorted(by_article.items()):
+        x, t = d.get("x"), d.get("threads")
+        head = x or t
+        L.append(f"\n---\n\n## 記事 {aid}｜{head['article_title']}\n\n")
+        L.append(f"{head['article_url']}\n\n")
+        m = head.get("material", {})
+        L.append("### この記事から抜いた4つ\n\n| 項目 | 中身 |\n|---|---|\n")
+        for k in spec["extraction"]["fields"]:
+            L.append(f"| {k} | {m.get(k, '')} |\n")
+        L.append(f"\n**Xが使ったのは `one_check`**、"
+                 f"**Threadsが使ったのは `unique_artifact`**。素材から分けている。\n")
+
+        for platform, s in (("X", x), ("Threads", t)):
+            if not s:
+                continue
+            L.append(f"\n### {platform}案（{s['stock_id']}・{s['state']}）\n\n")
+            for i, p in enumerate(s["thread_parts"], 1):
+                label = ("" if len(s["thread_parts"]) == 1
+                         else f"**{i}投稿目**\n\n")
+                L.append(label + "```\n" + p + "\n```\n\n")
+            ng = [g for g in s["gate_results"] if not g["ok"]]
+            L.append(f"| ゲート | 結果 |\n|---|---|\n")
+            for g in s["gate_results"]:
+                v = "通過" if g["ok"] else "**落ちた** " + g["detail"]
+                L.append(f"| {g['id']} | {v} |\n")
+            warn = sg.style_warnings(spec, s["thread_parts"])
+            if warn:
+                L.append("\n警告（落とさない）: " + " / ".join(warn) + "\n")
+            if ng:
+                L.append("\n**このままでは承認できない。**\n")
+
+    out = ROOT / spec["paths"]["review"] / f"REVIEW_{stamp}.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text("".join(L), encoding="utf-8")
+    print(f"→ {out}")
+    print(f"記事 {len(by_article)}本 / 在庫 {len(rows)}件")
+
+
+if __name__ == "__main__":
+    main()

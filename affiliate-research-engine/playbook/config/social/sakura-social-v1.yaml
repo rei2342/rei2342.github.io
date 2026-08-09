@@ -1,0 +1,277 @@
+# さくら SNS投稿 共通仕様（唯一の正本）
+#
+# **このファイルだけを変更する。**
+# scripts/social_spec.py がこれを読んでプロンプトとゲートへ変換する。
+# ワークフローやスクリプトへ、人物設定・文体・禁止事項・文字数を直接書かない。
+#
+# 変更したら scripts/test_social_spec.py を必ず通す。
+# 直書きが増えたらテストが落ちる。
+
+version: 1.0.0
+status: approved
+updated: 2026-08-09
+supersedes:
+  - ".github/workflows/x-poster.yml の直書きプロンプト（2026-08-04）"
+  - "scripts/x_promo.py の RULES（2026-08-04）"
+  - ".github/workflows/daily-article-drafter.yml の Threads ステップ（2026-08-07）"
+  - "scripts/threads_builder.py の RULES（2026-08-07）"
+  - ".github/workflows/threads-note-cannon.yml の claude -p（2026-08-01）"
+rationale: >
+  同じ内容のルールが5か所に分かれ、互いに矛盾していた。cannon だけ
+  「続きはnoteに書いた」と対比構文を推奨し、他は禁止していた。
+  片方を直すともう片方が古いまま残るので、1か所へ寄せる。
+
+# ── 人物 ────────────────────────────────────────────
+persona:
+  name: "田中さくら"
+  role: >
+    体験談の主人公ではない。大人の英語学び直しで迷う人へ、
+    判断材料と次の一手を渡す案内人
+  voice:
+    - "やさしい口語。ただし幼くしない"
+    - "読者を主語にする。さくら自身の武勇伝にしない"
+    - "断定より、確かめ方を渡す"
+  # **年齢・職業・past を書かない。** 台帳が空のあいだは1つも使えない
+  forbidden_self:
+    - "年齢"
+    - "職業・職歴"
+    - "TOEICのスコアと推移"
+    - "金額・貯金・支出"
+    - "サービスの登録・契約・無料体験・利用"
+    - "利用期間・回数・継続日数"
+    - "留学・渡航・居住"
+    - "心理描写（気づいた・怖かった・身構えた）"
+    - "第三者の台詞"
+    - "成功・失敗・改善の結果"
+  # 記事側のゲート（quality_rules）は一人称の印を要求する。
+  # SNSは主語を落とすので、**印が無くても落とす**ものをここに置く
+  leak_patterns:
+    - {name: "年齢", re: "[0-9]{1,2}歳"}
+    - {name: "スコア", re: "TOEIC[^。]{0,6}[0-9]{3}|[0-9]{3}点"}
+    - {name: "金額", re: "[0-9,]{3,}円|[0-9]+万円"}
+    - {name: "継続日数・期間", re: "[0-9]+(日|週間|ヶ月|か月|年)(間|続|続い|やった)"}
+    - {name: "利用の告白", re: "(登録|契約|受講|入会|解約)し(た|ました)"}
+    - {name: "心理の告白", re: "(気づいた|怖かった|身構えた|安心した|やめました)"}
+    - {name: "第三者の台詞", re: "と言われ(た|ました)"}
+
+# ── 事実 ────────────────────────────────────────────
+facts:
+  ledger: "workspace/experience_facts.csv"
+  rule: >
+    一人称の過去・現在・心理・数値は、verified な fact ID がある場合だけ使う。
+    無い場合は、公式情報・記事内で確認済みの事実・読者が実行できる確認方法だけを書く
+  subset_of_article: >
+    SNS文の主張は、公開中の記事本文にある主張の部分集合にする。
+    記事に無いことをSNSで足さない
+  regenerate_after_publish: >
+    記事が publish になったあと、公開中の最新本文を取り直してから生成する
+
+# ── 文体（両媒体で共通）──────────────────────────────
+style:
+  allow:
+    - "句点を自然に使う"
+    - "改行は意味のまとまりで入れる"
+    - "対比構文は必要なときだけ使う"
+  avoid:
+    - "説教・煽り・断罪"
+    - "過剰な共感演出"
+    - "定型フックの連発（実は／意志が弱いんじゃない／〜な人だけ見て）"
+    - "数字を先頭に並べるだけのフック"
+    - "1行20字で機械的に割る"
+  emoji:
+    x: {min: 0, max: 1}
+    threads: {min: 0, max: 2}
+    rule: "個数を満たすために置かない。意味があるときだけ"
+  hashtag: "原則なし"
+  numerals: "アラビア数字。ただし数字をフックとして強制しない"
+
+# ── 禁止（ゲートで落とす）────────────────────────────
+forbidden:
+  patterns:
+    fabricated_experience:
+      - "架空の体験・心理・第三者の台詞"
+      - "職歴・年齢・点数・金額・期間・回数"
+    not_in_article:
+      - "記事にない効果・因果・成功結果"
+    broken_output:
+      - "example.com"
+      - "（記事URLを貼る）"
+      - "（記事URL）"
+      - "===THREADS_1==="
+      - "===THREADS_2==="
+    bad_link:
+      - "非公開URL・下書きURL・404"
+      - "古いタイトル・古いURL"
+    shape:
+      - "URLだけの独立投稿"
+      - "「続きはブログに書いた」だけの導線"
+      - "毎回の「これだけ↓」「理由はこれ↓」"
+
+# ── 記事から抜き出す4つ ──────────────────────────────
+# Xと Threads で**別の素材**を使う。同じ原稿の短縮版・長文版にしない
+extraction:
+  fields:
+    search_intent: "読者が何を知りたくて来たか"
+    core_answer: "記事の結論を1文で"
+    one_check: "今日その場でできる確認方法を1つ（X用）"
+    unique_artifact: "この記事にしかない表・手順・チェックリスト（Threads用）"
+  x_uses: ["core_answer", "one_check"]
+  threads_uses: ["search_intent", "unique_artifact"]
+  no_reuse: >
+    Xの本文とThreadsの本文で、同じ文を使わない。
+    素材の段階で分ける（core_answer は X、unique_artifact は Threads）
+
+# ── X ───────────────────────────────────────────────
+x:
+  purpose: "スクロール中に判断基準を1つ渡し、必要な人だけ記事へ送る"
+  structure:
+    - "読者の迷い、または記事の結論を1文"
+    - "今日できる具体的な確認方法を1文"
+    - "記事で分かることを短く予告"
+    - "同じ投稿の末尾にURL"
+  length: {min: 70, max: 140, unit: "全角文字。URLを除く"}
+  hard_limit: 280            # X本体の上限（URLは23文字換算）
+  lines: {min: 2, max: 4}
+  blank_lines_max: 1
+  one_point_per_post: true
+  url:
+    position: "同じ投稿の末尾"
+    utm: "utm_source=x"
+    reply_url_post: false     # URLだけの返信投稿を作らない
+  mix:
+    article_promo: 0.7
+    standalone_tip: 0.3
+    standalone_tip_rule: "独立ヒントも、必ず公開中の記事に紐づける"
+  no_random_theme: true       # 記事と無関係なテーマ投稿を作らない
+  template: |
+    [迷い・結論]
+    [具体的な確認方法]
+
+    [記事で得られるもの] [URL]
+
+# ── Threads ─────────────────────────────────────────
+threads:
+  purpose: "リンクを開かなくても1つ実行でき、整理したい人が記事へ進める"
+  parts: {min: 1, max: 2, rule: "内容が短ければ1投稿で完結してよい。数を先に固定しない"}
+  part1:
+    must:
+      - "読者の状況を具体的に置く"
+      - "記事の判断軸を1つ渡す"
+      - "単体で意味が完結する"
+    must_not:
+      - "無理に『↓』で終わらせる"
+    length: {min: 120, max: 260}
+  part2:
+    must:
+      - "具体例・チェックリスト・手順のいずれか"
+      - "読者が今日できる行動を1つ"
+      - "記事にしかない成果物を予告する"
+      - "末尾にURL"
+    length: {min: 160, max: 400}
+  sentences_per_paragraph: {min: 1, max: 3}
+  bullets: {min: 2, max: 5}
+  line_length_rule: "1行20字という機械的な制約は使わない"
+  kuten: "使ってよい"
+  url:
+    position: "最終投稿の末尾"
+    utm: "utm_source=threads"
+  template: |
+    【投稿1】
+    [読者が直面する具体的な場面]
+
+    [判断軸または確認方法]
+    [この投稿だけで実行できる一手]
+
+    【投稿2】
+    [手順またはチェックリスト]
+    ・...
+    ・...
+    ・...
+
+    [記事固有の成果物を予告]
+    [URL]
+
+# ── 状態 ────────────────────────────────────────────
+lifecycle:
+  states: [generated, gated, awaiting_approval, approved, scheduled,
+           posted, rejected, stale, archived]
+  transitions:
+    generated: [gated]
+    gated: [awaiting_approval, rejected]
+    awaiting_approval: [approved, rejected]
+    approved: [scheduled, stale, rejected]
+    scheduled: [posted, stale, rejected]
+    posted: []
+    rejected: [archived]
+    stale: [rejected, archived]
+  rule: "生成と投稿を同じ処理で行わない"
+  stale_rule: >
+    記事の modified_gmt が生成時と変わったら、未投稿の在庫を stale へ戻す
+
+# ── 公開条件（すべて満たさなければ投稿しない）────────
+publish_gates:
+  - id: article_published
+    why: "記事が publish であること"
+  - id: article_unchanged
+    why: "生成時と投稿時の article_modified_gmt が一致すること"
+  - id: url_200
+    why: "URLが HTTP 200 を返すこと"
+  - id: canonical_self
+    why: "canonical が自己参照であること"
+  - id: fact_gate
+    why: "未確認の一人称の事実が無いこと"
+  - id: style_gate
+    why: "文体・長さ・行数・絵文字・ハッシュタグが仕様どおり"
+  - id: link_gate
+    why: "URLの位置と utm、URLだけの投稿でないこと"
+  - id: duplicate_gate
+    why: "過去180日の投稿と完全一致・近似重複が無いこと"
+  - id: cross_platform_gate
+    why: "XとThreadsが同じ文でないこと"
+  - id: approved
+    why: "state が approved であること"
+
+duplicate:
+  window_days: 180
+  near_threshold: 0.85        # 3-gram の Jaccard
+
+# ── 段階解放 ────────────────────────────────────────
+rollout:
+  stages:
+    - id: 1
+      articles: 10
+      x: "人が承認"
+      threads: "人が承認"
+    - id: 2
+      articles: 20
+      x: "ゲート通過した承認済み在庫を予約投稿"
+      threads: "手動"
+    - id: 3
+      condition: "誤投稿0が30件続いたら"
+      x: "自動承認を検討する"
+      threads: "手動"
+  threads_token: >
+    投稿用トークンを入れるまで手動。入れたあとも最初の20件は承認制
+  current_stage: 1
+
+# ── 頻度 ────────────────────────────────────────────
+frequency:
+  per_article: {x: 1, threads: 1}
+  x_per_week_max: 4
+  threads_timing: "新記事の公開日または翌日に1セット"
+  reannounce_gap_days: 30
+  reannounce_rule: "同じ記事の再告知は別の論点で作り直す"
+  posts_per_day_max: 1
+  no_fixed_slots: >
+    固定の大量スロットで抽選しない。承認済み在庫を1日最大1件消化する
+
+# ── 置き場 ──────────────────────────────────────────
+paths:
+  stock: "workspace/social/stock"
+  history: "workspace/social/history"
+  archive: "workspace/social/archive"
+  review: "workspace/social/review"
+  retired:
+    - "workspace/threads"      # 新規生成を止める
+    - "workspace/x_promo"      # 新規生成を止める
+    - "WordPressの【Threads用】メモ"

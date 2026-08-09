@@ -1,0 +1,72 @@
+stock_id: X-521-a
+platform: x
+article_id: 521
+article_modified_gmt: '2026-08-09T11:10:13'
+article_title: TOEICリスニングが止まっているとき、聞き流しを続ける前に確認する3つのこと
+article_url: https://sakura-eigo.com/toeic-listening-325-to-improvement/
+text: 'リスニングだけ動かないとき、教材を増やす前に見る場所があります。
+
+  音声を1つ聞いたあと、設問を見ずに内容を1文で言えるか試すと、聞き取りの問題か保持の問題かを分けられます。
+
+
+  止まっている場所を切り分ける3つの確認項目をまとめました
+
+  https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x'
+thread_parts:
+- 'リスニングだけ動かないとき、教材を増やす前に見る場所があります。
+
+  音声を1つ聞いたあと、設問を見ずに内容を1文で言えるか試すと、聞き取りの問題か保持の問題かを分けられます。
+
+
+  止まっている場所を切り分ける3つの確認項目をまとめました
+
+  https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x'
+state: awaiting_approval
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: もう片方がまだ無い
+approved_at: null
+rejected_reason: null
+scheduled_at: null
+posted_at: null
+posted_id: null
+content_hash: 80cd0ca1fdafced9
+generator_version: social-v1
+material:
+  search_intent: TOEICのリスニングだけが伸びない。聞き流しを続けていいのかを知りたい
+  core_answer: 聞き流しを増やす前に、音が拾えていないのか、拾えても設問まで残らないのかを切り分ける
+  one_check: 音声を1つ聞いたあと、設問を見ずに内容を1文で言えるかを試す
+  unique_artifact: 止まっている場所を切り分ける3つの確認項目と、最初の2週間の組み方
+created_at: 2026-08-09T21:28:20+0900
+history:
+- at: 2026-08-09T21:28:20+0900
+  state: generated
+- at: 2026-08-09T21:28:20+0900
+  state: gated
+- at: 2026-08-09T21:28:20+0900
+  state: awaiting_approval

@@ -1,0 +1,98 @@
+stock_id: THREADS-526-a
+platform: threads
+article_id: 526
+article_modified_gmt: '2026-08-09T11:09:47'
+article_title: 「現地が一番早い」を費用と時間で確かめる｜1時間あたりで並べる
+article_url: https://sakura-eigo.com/fast-verify-cost-time-travel/
+text: '留学と国内の学習、どちらが早いのかを比べようとすると、途中で分からなくなります。
+
+
+  週の数も総額も、書いてある単位がばらばらだからです。だから先に単位をそろえます。見るのは2つだけ。授業が実際に何時間あるかと、その1時間にいくらかかるか。この形に置き直すと、離れた候補どうしでもはじめて横に並びます。
+
+
+  手元の候補で、次の順に出します。
+
+
+  ・案内に載っている総額を書き出す
+
+  ・実際に授業がある時間を数える
+
+  ・総額を授業時間で割る
+
+
+  割ってみると、短くて安いほうが1時間あたりでは高い、ということが起こります。期間の長さだけで早さを決めていると、ここが見えません。
+
+
+  行き先ごとに並べた比較と、年齢や在学の条件で最初から選べない場合は記事にまとめています。
+
+  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
+thread_parts:
+- '留学と国内の学習、どちらが早いのかを比べようとすると、途中で分からなくなります。
+
+
+  週の数も総額も、書いてある単位がばらばらだからです。だから先に単位をそろえます。見るのは2つだけ。授業が実際に何時間あるかと、その1時間にいくらかかるか。この形に置き直すと、離れた候補どうしでもはじめて横に並びます。'
+- '手元の候補で、次の順に出します。
+
+
+  ・案内に載っている総額を書き出す
+
+  ・実際に授業がある時間を数える
+
+  ・総額を授業時間で割る
+
+
+  割ってみると、短くて安いほうが1時間あたりでは高い、ということが起こります。期間の長さだけで早さを決めていると、ここが見えません。
+
+
+  行き先ごとに並べた比較と、年齢や在学の条件で最初から選べない場合は記事にまとめています。
+
+  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
+state: awaiting_approval
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: XとThreadsの近さ 0.13（0.85未満にする）
+approved_at: null
+rejected_reason: null
+scheduled_at: null
+posted_at: null
+posted_id: null
+content_hash: 634d1e12f7aa4eac
+generator_version: social-v1
+material:
+  search_intent: 留学と国内の学習で、どちらが早いのかを同じ物差しで比べたい
+  core_answer: 「早い」は単位をそろえないと比べられない。授業時間と、1時間あたりの費用で並べる
+  one_check: 候補の総額を、実際に授業がある時間で割って1時間あたりを出す
+  unique_artifact: 行き先ごとに1時間あたりで並べた比較と、年齢や在学の条件で選べない場合
+created_at: 2026-08-09T21:28:20+0900
+history:
+- at: 2026-08-09T21:28:20+0900
+  state: generated
+- at: 2026-08-09T21:28:20+0900
+  state: gated
+- at: 2026-08-09T21:28:20+0900
+  state: awaiting_approval

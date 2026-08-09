@@ -1,0 +1,49 @@
+name: SNS投稿文を作る（投稿はしない）
+
+# 公開中の記事から X案と Threads案を作り、在庫へ入れる。
+# **投稿しない。** state は awaiting_approval で止まる。
+# ルールは config/social/sakura-social-v1.yaml が正本。
+
+on:
+  workflow_dispatch:
+    inputs:
+      articles:
+        description: '記事ID（カンマ区切り。公開済みであること）'
+        required: true
+      platforms:
+        description: 'x / threads / x,threads'
+        required: false
+        default: 'x,threads'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests anthropic pyyaml -q
+      - name: 生成してゲートに通す
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
+        run: |
+          cd affiliate-research-engine/playbook
+          python scripts/social_generate.py \
+            --articles "${{ inputs.articles }}" \
+            --platforms "${{ inputs.platforms }}" --source wp
+          python scripts/social_review.py
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/social/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: social stock $(date +%Y-%m-%d)"
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true

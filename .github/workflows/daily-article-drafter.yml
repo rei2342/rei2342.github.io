@@ -236,296 +236,82 @@ jobs:
               sys.exit(1)
           PYEOF
 
-      - name: Generate Threads post from the article
+      - name: Generate eyecatch prompt from the article
         env:
           ANTHROPIC_API_KEY: ${{ secrets.REI_AFFSAKU }}
-          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
         run: |
-          pip install anthropic requests -q
+          pip install anthropic -q
           python3 << 'PYEOF'
-          import os, datetime, re
+          # SNS文はここで作らない。**記事が publish になってから**
+          # scripts/social_generate.py が公開中の本文から作る。
+          # 下書きの段階で作ると、開けないURLの在庫が残る（2026-08-09に整理）。
+          # ここで作るのは、記事の3つ目の成果物であるアイキャッチのプロンプトだけ。
+          import os, sys, datetime, re
           import anthropic
 
           date_str = datetime.date.today().strftime('%Y-%m-%d')
           draft_file = f"affiliate-research-engine/playbook/workspace/drafts/{date_str}.md"
-
           if not os.path.exists(draft_file):
               print("draft not found; skip")
               raise SystemExit(0)
 
           raw = open(draft_file, encoding='utf-8').read()
-
-          # 直前のステップで投稿した記事のURL。どこから来た読者か分けて測れるよう印を付ける。
-          article_url = ""
-          if os.path.exists('/tmp/article_url.txt'):
-              u = open('/tmp/article_url.txt', encoding='utf-8').read().strip()
-              if u:
-                  article_url = u + ("&" if "?" in u else "?") + "utm_source=threads"
-          link_line = article_url or "（記事URLを貼る）"
-
-          # front matter を落として本文だけにする
           body = re.sub(r'^---.*?^---\s*', '', raw, flags=re.DOTALL | re.MULTILINE)
-          # SERP分析メモ以降は社内用なので捨てる
           body = re.split(r'^###?\s*SERP分析メモ', body, maxsplit=1, flags=re.MULTILINE)[0]
-
-          m = re.search(r'^title:\s*(.+)$', raw, re.MULTILINE) or re.search(r'^#\s+(.+)$', body, re.MULTILINE)
+          m = (re.search(r'^title:\s*(.+)$', raw, re.MULTILINE)
+               or re.search(r'^#\s+(.+)$', body, re.MULTILINE))
           title = m.group(1).strip() if m else "英語学習"
 
-          # 記事が長いので冒頭を渡す（フックは冒頭に宿るため）
-          excerpt = body[:3000]
+          article_url = ""
+          if os.path.exists('/tmp/article_url.txt'):
+              article_url = open('/tmp/article_url.txt', encoding='utf-8').read().strip()
 
           prompt = (
-              "あなたは田中さくら（27歳・営業事務・東京）。英語を5年後回しにしてきて、"
-              "過去にスクールで4.5万円を溶かした経験がある。30歳になる前に動こうとしている。\n\n"
-              f"下の記事から、Threadsの投稿文を作って。\n\n"
-              f"記事タイトル: {title}\n"
-              f"記事本文（冒頭）:\n{excerpt}\n\n"
-              "【投稿はスレッド2連で作る】\n"
-              "1投稿目=フック。最後を『これだけ↓』のように次へ送る形で止める。リンクは入れない\n"
-              "2投稿目=中身。手順・結果・読者への翻訳。ここに価値を全部入れる。\n"
-              "  **記事リンクはこの2投稿目の末尾に置く**（本文では書かない。こちらで差し込む）\n\n"
-              "リンクを3投稿目に分けるのは2026-08-05に試して失敗した。\n"
-              "1投稿目780表示に対し、①いいね2 ②いいね1 ③反応0。\n"
-              "3枚目まで開く人がほとんどおらず、記事への遷移がほぼ0だった。\n"
-              "1投稿目にリンクを入れないのは維持する（表示が伸びなくなるため）が、\n"
-              "**2投稿目まで来た人の目の前にリンクを置く**。\n\n"
-              "【お手本】2026-08-07に人間が推敲して決めた理想形。この見た目と密度と順番を再現する。\n"
-              "（記事URLは2投稿目の末尾にこちらで差し込むので、本文には書かない）\n"
-              "--- 1投稿目 ---\n"
-              "3日、4日、2日\n"
-              "\n"
-              "オンライン英会話に3回登録して\n"
-              "続いた日数がこれ\n"
-              "\n"
-              "レッスンが嫌だったわけじゃない\n"
-              "毎回、話す前にスマホを閉じてた\n"
-              "\n"
-              "閉じてた理由がわかってから\n"
-              "90日続いてる\n"
-              "\n"
-              "理由はこれ↓\n"
-              "--- 2投稿目 ---\n"
-              "オンライン英会話が続かなかった理由は\n"
-              "予約だった\n"
-              "\n"
-              "仕事から帰って、やっとスマホを開いて\n"
-              "「いつにしよう」で閉じる\n"
-              "\n"
-              "やめたのは3つ\n"
-              "・レッスンの予約\n"
-              "・先生を毎回選ぶこと\n"
-              "・30分まとめて取ること\n"
-              "\n"
-              "予約なしで話せるアプリに変えて\n"
-              "歯みがきのあと、5分だけ話す\n"
-              "\n"
-              "最初の週は、7日のうち5日できた\n"
-              "それから90日続いてる\n"
-              "\n"
-              "前にやめたとき、どこで閉じた？\n"
-              "授業中か、始める前か\n"
-              "\n"
-              "始める前なら\n"
-              "直すのは英語力じゃない\n"
-              "\n"
-              "予約なしで話せるところは、ほかにもある\n"
-              "私が何を見て決めたかはブログに書いた\n"
-              "---\n"
-              "\n"
-              "【お手本の順番】この並びを守る。\n"
-              "1投稿目: 数字を3つ並べる → 何の数字か説明 → 否定で誤解を潰す → 情景 → 結果 → 「↓」で送る\n"
-              "2投稿目: 1行目で何の話か言う → 情景（独り言） → やめたN個を箇条書き → 代わりにやったこと\n"
-              "        → 結果 → 読者への問いかけ → 読者が今日できること → 「私が何を見て決めたか」で締める\n"
-              "\n"
-              "【締め方】「◯◯はブログに書いた」ではなく **「私が何を見て決めたかはブログに書いた」** 型にする。\n"
-              "おすすめではなく判断の共有にすると宣伝の顔をしない。\n"
-              "「ほかにもある」を先に置いて、1つを推していないことを明示する。\n"
-              "【必ず守る型】\n"
-              "・**句点（。）を使わない**。改行が句点の代わり。お手本に句点は1つも無い\n"
-              "・**誰でも分かる言葉で、読者が自分の場面として思い浮かべられるように書く**（最優先）\n"
-              "  抽象語（手数・設計・最適化）で説明しない。実際の動作と場面で見せる。\n"
-              "  ×『話し始めるまでの手数が減った』 ○『歯みがきが終わったら、そのままアプリを開いて話す』\n"
-              "  読者が「それ私だ」と言える具体を必ず入れる（時間帯・場所・指の動き・心の中の独り言）。\n"
-              "  例『仕事から帰って、ご飯作って、やっとスマホを開いたあと』\n"
-              "  専門用語やカタカナの概念語を使わない。中学生が読んで分かる語彙にする\n"
-              "  **できるだけシンプルに**。1投稿で言うことを1つに絞る。足す前に削れないか考える\n"
-              "  **読者は賢くない前提**。流し読みしていて推測も逆算もしない。書いていないことは伝わらない。\n"
-              "  指示語で受けない（×『そこをやめたら』 ○『予約をやめたら』）。前の行を覚えている前提にしない。\n"
-              "  比喩・言い換え・ひねりを使わない。そのままの言葉で言う\n"
-              "  **どの投稿から読み始めても分かるように書く**。2投稿目だけが流れてくる人がいる。\n"
-              "  1行目で『何の話か』を言い、前の投稿を読んでいる前提の指示語を使わない。\n"
-              "  結果（何がどうなったか）はどちらの投稿にも入れる\n"
-              "・**1行は20字前後**。1行に情報を2つ入れない\n"
-              "  読点（、）は自然に必要なところで使ってよい（2026-08-07に緩和）。\n"
-              "  ただし読点でつないで1行を長くしない。切るときは改行で切る\n"
-              "  （×『8コマ⇒6コマに減らして復習に2時間回した。』→ 2行に割る）\n"
-              "・意味のまとまりごとに**空行**を入れる\n"
-              "・**有益性が芯**。読者が今日できる手順を必ず入れる。\n"
-              "  手順は箇条書きで独立させ、真似できる粒度にする（『3つ選ぶ／10回／翌朝1回』のように数える形）\n"
-              "・**読者への翻訳を1行入れる**。体験談で終わらせず『日本でもできる』『◯◯を見る』など持ち帰れる形にする\n"
-              "・数字は**記事に実際に書かれているもの**だけ使う。作らない。\n"
-              "  冒頭に数字を3つ並べない（『35万円、120コマ、28日。』は演出になる）\n"
-              "・短いほど良い（300字以内目安）\n"
-              "・**1投稿目で答えを言い切らない**（2026-08-06の実測から）。\n"
-              "  さくらの全12投稿を比べると、伸びた2本（1038表示・780表示）は\n"
-              "  冒頭で答えを出さずに引いており、伸びなかった2本（45表示・43表示）は\n"
-              "  『聞き流しをやめたら2ヶ月で動いた』『8コマ入れて水曜に潰れた』と\n"
-              "  1投稿目で結論まで言い切っていた。\n"
-              "  状況と数字までを出し、**何をしたか・何が分かったかは2投稿目に置く**\n"
-              "・最終行は**その投稿で扱った具体の続き**を予告する形にする\n"
-              "  （○『コマ数の決め方はブログにまとめた』『学校選びの基準はブログに書いた』）\n"
-              "  『noteに書いた』『続きはこちら』のような固定文言は使わない。押し売りもしない\n"
-              "・ハッシュタグ・URL羅列は入れない\n"
-              "【禁止】\n"
-              "・**対比構文**（『〜じゃなかった』『〜ではなく』『〜のほうだ』）は使わない\n"
-              "・**「設計」「構造」「物差し」「本質」**を使わない\n"
-              "・教訓や説教で締めない（×『27歳のいま動かないと30歳で後悔する』）\n"
-              "・感情を演出しない（×『泣きそうになった』）。事実を淡々と置けば感情は伝わる\n"
-              "・「——」(emダッシュ)禁止。漢数字禁止（27歳・3ヶ月のようにアラビア数字）\n"
-              "・金額の表記を混ぜない（35万円と45000円を同じ投稿に置かない）\n"
-              "・絵文字は入れても2個まで。無理に入れない。絵文字の直前に半角スペースを入れない(×『音声入力 💡』 ○『音声入力💡』)\n"
-              "・**記事に再現できる手順が無ければ、無理に作らず THREADS を空にする**。"
-              "有益性の無い投稿を出すより出さないほうがよい\n\n"
-              "【出力形式】以下のブロックだけを出力する。説明不要。\n"
-              "===THREADS_1===\n（1投稿目・フック。最後は『↓』で次へ送る。リンク禁止）\n"
-              "===THREADS_2===\n（2投稿目・中身。手順の箇条書きと読者への翻訳を必ず入れる。"
-              "最終行は記事へ送る一言だけ書き、URLは書かない。URLはこちらで末尾に付ける）\n"
-              "===NOTE_TITLE===\n（noteのタイトル案。30〜45字の短い一人称+数字型。"
-              "150字級の抽象・反論エッセイ型は禁止）\n"
-              "===VISUAL===\n（添える画像の案を1行。スコア推移・費用表など数字が見えるもの）\n"
-              "===EYECATCH_LEAD===\n（アイキャッチの画像内に入れる短い文言。"
-              "**記事タイトルを切り取らず、画像向けに書き直す**。2行まで、改行で区切る。"
-              "1行は12字程度まで。数字・年齢・スコア・金額・期間を入れない）\n"
-              "===EYECATCH_SUB===\n（補助文言。14字程度まで。記事の役割が分かる短い一言）\n"
-              "===EYECATCH_SCENE===\n（アイキャッチの場面と小物を英語で1〜3文。"
-              "この記事にしかない場面にする。人物は右側・左に文言を置く前提。"
-              "画面の中身・ロゴ・読める文字・数字は描かせない）\n"
+              f"次の記事のアイキャッチ画像に使う項目を出す。\n\n"
+              f"記事タイトル: {title}\n記事本文（冒頭）:\n{body[:3000]}\n\n"
+              "【出力形式】このブロックだけ。説明不要。\n"
+              "===EYECATCH_LEAD===\n（画像内に入れる短い文言。記事タイトルを切り取らず"
+              "画像向けに書き直す。2行まで、改行で区切る。1行は12字程度まで。"
+              "数字・年齢・スコア・金額・期間を入れない）\n"
+              "===EYECATCH_SUB===\n（補助文言。14字程度まで）\n"
+              "===EYECATCH_SCENE===\n（場面と小物を英語で1〜3文。この記事にしかない場面。"
+              "人物は右側・左に文言を置く前提。画面の中身・ロゴ・読める文字・数字は描かせない）\n"
               "===EYECATCH_ALT===\n（画像のalt。記事の内容を1文で）\n"
           )
-
           ai = anthropic.Anthropic(api_key=os.environ['ANTHROPIC_API_KEY'])
-          msg = ai.messages.create(
-              model='claude-haiku-4-5-20251001',
-              max_tokens=800,
+          out = ai.messages.create(
+              model='claude-haiku-4-5-20251001', max_tokens=500,
               messages=[{'role': 'user', 'content': prompt}]
-          )
-          out = msg.content[0].text.strip().replace("——", "、").replace("—", "、")
-          # URLはこちらが差し込むものだけにする。モデルが書いたURLは
-          # 存在しない場所を指すことがある（2026-08-07に example.com を書いてきた）
-          out = re.sub(r"https?://\S+", "", out)
-          # 記事のCTAボックスから案件名を書き写すことがあるので行ごと落とす
-          out = "\n".join(
-              ln for ln in out.split("\n")
-              if not ln.lstrip().startswith("▶")
-              and not re.search(r"(無料体験|無料トライアル|無料相談|無料カウンセリング)\s*$", ln.strip())
-          )
-          # 絵文字の直前の半角スペースを落とす（指示しても入ることがある）
-          out = re.sub(
-              r'(?<=[ぁ-んァ-ヴ一-龥ー、。！？…])[  ]+(?=[\U0001F000-\U0001FAFF☀-➿←-⇿⬀-⯿])',
-              '', out)
+          ).content[0].text.strip().replace("——", "、").replace("—", "、")
 
           def section(tag, text):
-              # 区切りに数字が入る（THREADS_2）。[A-Z_]だけだと止まれず、
-              # 1投稿目に2投稿目が丸ごと混入する
-              m = re.search(rf'==={tag}===\s*(.*?)(?====[A-Z0-9_]+===|$)', text, re.DOTALL)
-              return m.group(1).strip() if m else ""
+              mm = re.search(rf'==={tag}===\s*(.*?)(?====[A-Z0-9_]+===|$)', text, re.DOTALL)
+              return mm.group(1).strip() if mm else ""
 
-          threads_1 = section('THREADS_1', out)
-          threads_2 = section('THREADS_2', out)
-          threads = (threads_1 + "\n\n" + threads_2).strip() if threads_2 else threads_1
-          note_title = section('NOTE_TITLE', out)
-          visual = section('VISUAL', out)
-
-          out_dir = "affiliate-research-engine/playbook/workspace/threads"
-          os.makedirs(out_dir, exist_ok=True)
-          out_file = f"{out_dir}/{date_str}.md"
-          with open(out_file, 'w', encoding='utf-8') as f:
-              f.write(f"# Threads / note セット -- {date_str}\n\n")
-              f.write(f"元記事: {title}\n")
-              f.write(f"元ドラフト: `{draft_file}`\n\n")
-              f.write("## ① 1投稿目（フック・リンクなし）\n\n")
-              f.write((threads_1 or out) + "\n\n")
-              if threads_2:
-                  # リンクは2投稿目の末尾に置く。3投稿目に分けると読まれない
-                  # （2026-08-05: ①780表示に対し③は反応0、記事への遷移もほぼ0）
-                  f.write("## ② 2投稿目（スレッドに続けて投稿・末尾にリンク）\n\n")
-                  f.write(threads_2 + "\n\n" + link_line + "\n\n")
-              if note_title:
-                  f.write("## note タイトル案\n\n" + note_title + "\n\n")
-              if visual:
-                  f.write("## ビジュアル案\n\n" + visual + "\n")
-          print(f"Threads set saved: {out_file}")
-
-          # ── ③ アイキャッチ生成プロンプト（記事の3つ目の成果物）──────
-          # **公開コンテンツではない。画像制作専用の一時データ。**
-          # WordPressの本文・SEO項目・SNS投稿文へは入れない。
-          # 画像の生成 → 反映 → 検証が通ったら削除する。失敗したら残す。
-          # slug はこのステップには無いので、投稿した記事のURLから取る。
-          # 取れないときは日付にする（ファイル名が衝突しないことだけが条件）
           slug = ""
           if article_url:
               slug = article_url.split("?")[0].rstrip("/").rsplit("/", 1)[-1]
           slug = slug or date_str
-          sys.path.insert(
-              0, "affiliate-research-engine/playbook/scripts")
+          sys.path.insert(0, "affiliate-research-engine/playbook/scripts")
           try:
               import eyecatch_prompt as _ep
-              ec_lead = section('EYECATCH_LEAD', out) or title[:14]
-              ec_sub = section('EYECATCH_SUB', out) or "記事の要点"
-              ec_scene = section('EYECATCH_SCENE', out) or (
-                  "Sakura at her desk in the evening, working through the "
-                  "steps described in this article with a paper notebook. "
-                  "Props specific to this article, no readable text on them.")
-              ec_alt = section('EYECATCH_ALT', out) or title
-              ec_cat = section('CATEGORY', out) or ""
               _ep.OUT.mkdir(parents=True, exist_ok=True)
               ec_path = _ep.OUT / f"{slug}.md"
               ec_path.write_text(_ep.build(
-                  "", slug, title, ec_lead, ec_sub, ec_scene, ec_cat, ec_alt,
+                  "", slug, title,
+                  section('EYECATCH_LEAD', out) or title[:14],
+                  section('EYECATCH_SUB', out) or "記事の要点",
+                  section('EYECATCH_SCENE', out) or (
+                      "A quiet desk in the evening with the objects this "
+                      "article talks about. No readable text on them."),
+                  "", section('EYECATCH_ALT', out) or title,
                   f"eyecatch-{slug}.png"), encoding="utf-8")
               print(f"Eyecatch prompt saved: {ec_path}")
           except Exception as e:
               print(f"Eyecatch prompt skipped: {e}")
 
-          # ── WordPressの下書きにも出す（GitHubを見に行かなくて済むように）──
-          wp_pass = os.environ.get('WP_APP_PASSWORD', '')
-          if wp_pass and threads:
-              import requests, urllib3, html as htmlmod
-              urllib3.disable_warnings()
-
-              def block(label, text, mono=False):
-                  if not text:
-                      return ""
-                  style = ("background:#f6f6f6;padding:16px 20px;border-radius:6px;"
-                           "white-space:pre-wrap;font-size:1.05em;line-height:1.9")
-                  return (f"<h3>{label}</h3>\n<div style=\"{style}\">"
-                          f"{htmlmod.escape(text)}</div>\n")
-
-              body = (
-                  "<p style=\"color:#c0392b;font-weight:bold\">"
-                  "※これは投稿用メモです。公開せず、コピーして使ったら削除してください。</p>\n"
-                  + block("① 1投稿目（フック・リンクなし）", threads_1)
-                  + block("② 2投稿目（スレッドに続けて・末尾のURLまで含めて貼る）",
-                          (threads_2 + "\n\n" + link_line) if threads_2 else link_line)
-                  + block("note タイトル案", note_title)
-                  + block("ビジュアル案", visual)
-                  + f"<p style=\"font-size:0.85em;color:#999\">元記事: {htmlmod.escape(title)}</p>"
-              )
-
-              try:
-                  r = requests.post(
-                      'https://sakura-eigo.com/wp-json/wp/v2/posts',
-                      auth=('rei.00pt2342@gmail.com', wp_pass),
-                      json={'title': f'【Threads用】{date_str}', 'content': body, 'status': 'draft'},
-                      headers={'User-Agent': 'Mozilla/5.0'},
-                      verify=False, timeout=30,
-                  )
-                  if r.status_code in (200, 201):
-                      print(f"Threads memo posted to WP: {r.json().get('link')}")
-                  else:
-                      print(f"WP post failed {r.status_code}: {r.text[:200]}")
-              except Exception as e:
-                  print(f"WP post skipped: {e}")
+          print("SNS文はここでは作らない。記事を公開してから "
+                "scripts/social_generate.py --articles <記事ID> を回す。")
           PYEOF
 
       - name: Commit draft and caption
@@ -535,7 +321,6 @@ jobs:
           git add affiliate-research-engine/playbook/workspace/drafts/
           git add affiliate-research-engine/playbook/workspace/keywords.csv
           git add affiliate-research-engine/playbook/workspace/instagram/
-          git add affiliate-research-engine/playbook/workspace/threads/
           git add affiliate-research-engine/playbook/workspace/eyecatch-prompts/
           git diff --staged --quiet && exit 0
           git commit -m "chore: daily article draft $(date +%Y-%m-%d)"

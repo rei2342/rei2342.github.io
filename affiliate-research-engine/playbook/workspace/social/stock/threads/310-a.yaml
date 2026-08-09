@@ -1,0 +1,98 @@
+stock_id: THREADS-310-a
+platform: threads
+article_id: 310
+article_modified_gmt: '2026-08-09T11:13:38'
+article_title: 無料・低価格の英語アプリで足りる人と、足りない人の分かれ目
+article_url: https://sakura-eigo.com/cheap-english-learning-apps-free/
+text: '無料や低価格の英語アプリで足りるのか迷ったとき、機能の多さで比べても決まりません。
+
+
+  見るのは、返ってくるものの中身です。点数だけが返るのか、どこをどう直すかまで返るのか。自分で間違いに気づける範囲なら前者で足ります。気づけない部分があるなら、そこだけは人の目が要ります。
+
+
+  無料期間のうちに、次を確かめます。
+
+
+  ・点数だけでなく直し方が返るか
+
+  ・自分の音や文に対して個別に返るか
+
+  ・続けられる時間帯に使えるか
+
+
+  そのうえで、振り返りは月額ではなく使えた回数で見ます。開かなかった月は、金額ではなく回数のほうに出ます。
+
+
+  無料期間中の確認項目と、1回あたりで振り返る出し方は記事にまとめています。
+
+  https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=threads'
+thread_parts:
+- '無料や低価格の英語アプリで足りるのか迷ったとき、機能の多さで比べても決まりません。
+
+
+  見るのは、返ってくるものの中身です。点数だけが返るのか、どこをどう直すかまで返るのか。自分で間違いに気づける範囲なら前者で足ります。気づけない部分があるなら、そこだけは人の目が要ります。'
+- '無料期間のうちに、次を確かめます。
+
+
+  ・点数だけでなく直し方が返るか
+
+  ・自分の音や文に対して個別に返るか
+
+  ・続けられる時間帯に使えるか
+
+
+  そのうえで、振り返りは月額ではなく使えた回数で見ます。開かなかった月は、金額ではなく回数のほうに出ます。
+
+
+  無料期間中の確認項目と、1回あたりで振り返る出し方は記事にまとめています。
+
+  https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=threads'
+state: awaiting_approval
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: XとThreadsの近さ 0.10（0.85未満にする）
+approved_at: null
+rejected_reason: null
+scheduled_at: null
+posted_at: null
+posted_id: null
+content_hash: 979f3036cdeba7c0
+generator_version: social-v1
+material:
+  search_intent: 無料や低価格の英語アプリだけで足りるのかを知りたい
+  core_answer: 足りるかどうかは機能の多さではなく、直し方まで返ってくるかで分かれる
+  one_check: 無料期間のうちに、自分の音や文へ直し方の指示が付くかを見る
+  unique_artifact: 無料期間中に確認する項目と、月額ではなく使えた回数で振り返る出し方
+created_at: 2026-08-09T21:28:20+0900
+history:
+- at: 2026-08-09T21:28:20+0900
+  state: generated
+- at: 2026-08-09T21:28:20+0900
+  state: gated
+- at: 2026-08-09T21:28:20+0900
+  state: awaiting_approval
