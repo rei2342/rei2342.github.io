@@ -8,6 +8,14 @@
 
 問題なし。WordPressへ送ってよい。
 
+## ✅ 通過 136.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 136.html
+
+問題なし。WordPressへ送ってよい。
+
 ## ✅ 通過 149.html
 
 問題なし。WordPressへ送ってよい。
@@ -61,6 +69,14 @@
 問題なし。WordPressへ送ってよい。
 
 ## ✅ 通過 283.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 287.body.html
+
+問題なし。WordPressへ送ってよい。
+
+## ✅ 通過 287.html
 
 問題なし。WordPressへ送ってよい。
 
