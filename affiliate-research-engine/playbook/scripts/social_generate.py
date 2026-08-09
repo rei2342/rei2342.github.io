@@ -27,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import social_spec as ss
 import social_gate as sg
 import social_inventory as inv
+import social_claims as sc
 
 WP_BASE = "https://sakura-eigo.com/wp-json/wp/v2"
 WP_USER = "rei.00pt2342@gmail.com"
@@ -151,6 +152,12 @@ def main():
             stock["inferences"] = infer
             stock["weighted_len"] = (sg.weighted_len(spec, parts[0])
                                      if platform == "x" else None)
+            rows = sc.check(spec, parts, article, infer)
+            stock["claim_counts"] = sc.counts(rows)
+            # 人が見る必要のある短文は、本文をそのまま残す
+            stock["needs_human_review"] = [
+                {"text": r["text"], "why": r["why"]}
+                for r in rows if r["verdict"] == "needs_human_review"]
             if sg.passed(res):
                 inv.transition(spec, stock, "gated")
                 inv.transition(spec, stock, "awaiting_approval")

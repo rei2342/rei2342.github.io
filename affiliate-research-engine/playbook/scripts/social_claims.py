@@ -91,6 +91,18 @@ def is_risky(spec, s):
     return any(re.search(p, s) for p in spec["claims"]["risky"])
 
 
+# 判定できない短文でも、これを含むなら人が見る。
+# 比較・因果・診断・効果・全面否定
+SENSITIVE = re.compile(
+    r"より|ほうが|比べ|決まりません|決まらない|足り|向い|"
+    r"原因|理由|だから|なので|効く|伸び|変わ|"
+    r"ではありません|ではない|ありません$|ません。?$|ない。?$")
+
+
+def is_sensitive(s):
+    return bool(SENSITIVE.search(s))
+
+
 def negated(s):
     """「ではなく」は対比であって否定ではない。数えない。"""
     s = re.sub(r"ではなく|じゃなく|だけでなく", "", s)
@@ -123,7 +135,18 @@ def check(spec, parts, article, inferences=()):
     """命題ごとの判定を返す。
 
     [{text, modality, risky, matched, overlap, verdict, why}, ...]
-    verdict は ok / unsupported / contradiction / overclaim / declared
+    verdict は次の7つ。
+
+      ok                 記事の記述と矛盾しない
+      declared           判断として宣言済み（弱めてある）
+      unjudged           内容語が少なく、**判定していない**
+      needs_human_review 判定できないのに、言い切りかつ危うい話題
+      unsupported        記事に対応する記述が無い
+      contradiction      記事と肯定・否定が逆
+      overclaim          記事が可能性としているのに言い切っている
+
+    **`unjudged` を `ok` と同じ扱いにしない。** 「判定しない」と
+    「記事に支持されている」を混ぜると、支持の件数が水増しになる。
     """
     c = spec["claims"]
     asents = sentences(article.get("body", ""))
@@ -174,8 +197,17 @@ def check(spec, parts, article, inferences=()):
             # 内容語が少ない文は、何にでも高く一致してしまう。
             # **少ない文でモダリティや極性を判定しない。**誤検知になる
             if len(st) < c.get("min_terms_to_judge", 3):
-                row.update(verdict="ok",
-                           why=f"内容語が{len(st)}語しかない。判定しない")
+                # 試作のあいだは、判定できない短文のうち
+                # **言い切っていて、しかも危うい話題のもの**を人へ回す
+                if mod in ("assertive", "hedged") and (risky or is_sensitive(s)):
+                    row.update(
+                        verdict="needs_human_review",
+                        why=f"内容語が{len(st)}語で判定できない。"
+                            "言い切りで、比較・因果・診断・効果・否定のどれかを"
+                            "含むので人が見る")
+                else:
+                    row.update(verdict="unjudged",
+                               why=f"内容語が{len(st)}語しかない。判定しない")
                 out.append(row)
                 continue
 
@@ -202,8 +234,20 @@ def check(spec, parts, article, inferences=()):
 
 
 def failures(rows):
+    """**落とすもの。** unjudged と needs_human_review は落とさない。
+    落とさないが、数えて出す。"""
     return [r for r in rows if r["verdict"] in
             ("unsupported", "contradiction", "overclaim")]
+
+
+def counts(rows):
+    """supported / unsupported / unjudged / needs_human_review を数える。"""
+    sup = sum(1 for r in rows if r["verdict"] in ("ok", "declared"))
+    uns = len(failures(rows))
+    unj = sum(1 for r in rows if r["verdict"] == "unjudged")
+    nhr = sum(1 for r in rows if r["verdict"] == "needs_human_review")
+    return {"supported": sup, "unsupported": uns,
+            "unjudged": unj, "needs_human_review": nhr, "total": len(rows)}
 
 
 def fmt(rows):
