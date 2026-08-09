@@ -82,6 +82,15 @@ def canon(s):
     return re.sub(r"[,\s　]", "", s)
 
 
+def _suffix_hit(need, hay, least=5):
+    """末尾から詰めた部分文字列がページにあれば、それを返す。"""
+    for i in range(len(need) - least + 1):
+        tail = need[i:]
+        if tail in hay:
+            return tail
+    return ""
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S JST")
@@ -128,6 +137,13 @@ def main():
             r["match"] = "一致"
             r["page_value"] = r["claim"]
             r["note"] = ""
+        elif r["kind"] == "プラン名" and _suffix_hit(need, hay):
+            # 日本語は語の切れ目が無いので、抜き出しが語の途中から
+            # 始まることがある（「リENGLISHの新日常英会話コース」）。
+            # 末尾から詰めて、実在する名前で一致するかを見る
+            r["match"] = "一致"
+            r["page_value"] = _suffix_hit(need, hay)
+            r["note"] = "抜き出しが語の途中から始まっていた。末尾で一致"
         else:
             # 数字だけ抜いて、単位違いを見る（7日間 と 7日 など）
             num = re.sub(r"[^0-9]", "", need)
