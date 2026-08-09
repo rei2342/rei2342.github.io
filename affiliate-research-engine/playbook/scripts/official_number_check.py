@@ -48,7 +48,10 @@ CLAIM_PATTERNS = [
     ("年齢", re.compile(r"[0-9]{1,2}\s*歳")),
     ("手数料", re.compile(r"手数料\s*[0-9][0-9,]*\s*円|手数料\s*0\s*円")),
     ("仕様", re.compile(r"無制限|予約不要|回数制限なし|使い放題|完全オンライン")),
-    ("プラン名", re.compile(r"[ぁ-んァ-ヶ一-龥A-Za-z]+プラン|[ぁ-んァ-ヶ一-龥]+コース")),
+    # 「の新日常英会話コース」のように直前の助詞まで取らないようにする
+    ("プラン名", re.compile(
+        r"(?<![のなをにへとがはもや])"
+        r"[ァ-ヶA-Za-z一-龥][ぁ-んァ-ヶ一-龥A-Za-z0-9・ー]{1,14}(?:プラン|コース)")),
     ("キャンペーン", re.compile(r"キャンペーン|初月|今だけ|半額|割引")),
     ("認定", re.compile(r"正式認定校|認定校|公認")),
 ]
@@ -99,10 +102,13 @@ def main():
             if not urls:
                 continue
             text = _q.strip_tags(para)
+            # 「2026年8月8日時点」の「8日」を無料期間として拾っていた。
+            # 確認日は主張ではないので、照合の前に外す
+            text_for_claims = re.sub(
+                r"20[0-9]{2}\s*年\s*[0-9]{1,2}\s*月\s*[0-9]{1,2}\s*日"
+                r"(?:時点)?", " ", text)
             for label, rx in CLAIM_PATTERNS:
-                for hit in set(rx.findall(text)):
-                    if label == "年齢" and "確認日" in text:
-                        pass
+                for hit in set(rx.findall(text_for_claims)):
                     rows.append({"post_id": pid, "kind": label,
                                  "claim": hit, "url": urls[0],
                                  "sentence": text[:200]})
