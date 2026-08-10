@@ -4,55 +4,50 @@ article_id: 526
 article_modified_gmt: '2026-08-09T13:00:03'
 article_title: 「現地が一番早い」を費用と時間で確かめる｜1時間あたりで並べる
 article_url: https://sakura-eigo.com/fast-verify-cost-time-travel/
-text: '「現地に行くのが一番早い」という言い方を見かけます。ただ、何と比べて早いのかは、たいてい書かれていません。
+text: '「現地に行けば早く伸びる」と聞くと、留学の総額も正当化したくなります。
 
 
-  その「早い」の中身が、英語に触れる時間の量のことなのか、上達の速さのことなのか。まずここを分けます。数えられるのは前の1つだけで、同じ100時間でも、身につく速さが同じとはかぎりません。
+  でも、ここは2つに分けて見たいところです。
 
 
-  手元の候補で、次の順に出します。
+  ・英語に触れる時間がどれくらい増えるか
+
+  ・その時間でどれくらい上達するか
 
 
-  ・案内に載っている総額を書き出す
-
-  ・授業のコマ数×1コマの長さで、触れる時間の合計を出す
-
-  ・総額を触れる時間で割って1時間あたりを出す
+  総額を授業時間で割ると分かるのは、1時間あたりの費用。上達の速さまでは、その割り算だけでは分かりません。
 
 
-  1時間あたりで出るのは触れる時間あたりの費用で、上達の速さを保証するものではありません。短くて安い候補が、1時間あたりでは高く出ることもあります。
-
-
-  行き先ごとに並べた表と、年齢や在学の条件で最初から選べない場合は記事のほうに置いています。
+  比較表を見るときは「この数字は何を測っている？」を一度だけ確認してみてください📝
 
   https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
 thread_parts:
-- '「現地に行くのが一番早い」という言い方を見かけます。ただ、何と比べて早いのかは、たいてい書かれていません。
+- '「現地に行けば早く伸びる」と聞くと、留学の総額も正当化したくなります。
 
 
-  その「早い」の中身が、英語に触れる時間の量のことなのか、上達の速さのことなのか。まずここを分けます。数えられるのは前の1つだけで、同じ100時間でも、身につく速さが同じとはかぎりません。'
-- '手元の候補で、次の順に出します。
+  でも、ここは2つに分けて見たいところです。
 
 
-  ・案内に載っている総額を書き出す
+  ・英語に触れる時間がどれくらい増えるか
 
-  ・授業のコマ数×1コマの長さで、触れる時間の合計を出す
-
-  ・総額を触れる時間で割って1時間あたりを出す
+  ・その時間でどれくらい上達するか
 
 
-  1時間あたりで出るのは触れる時間あたりの費用で、上達の速さを保証するものではありません。短くて安い候補が、1時間あたりでは高く出ることもあります。
+  総額を授業時間で割ると分かるのは、1時間あたりの費用。上達の速さまでは、その割り算だけでは分かりません。
 
 
-  行き先ごとに並べた表と、年齢や在学の条件で最初から選べない場合は記事のほうに置いています。
+  比較表を見るときは「この数字は何を測っている？」を一度だけ確認してみてください📝
 
   https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
-state: approved
+state: awaiting_approval
 gate_results:
 - id: article_published
   ok: true
   detail: ''
 - id: fact_gate
+  ok: true
+  detail: ''
+- id: empathy_without_evidence
   ok: true
   detail: ''
 - id: broken_output
@@ -75,21 +70,28 @@ gate_results:
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: XとThreadsの近さ 0.12（0.85未満にする）
-approved_at: 2026-08-09T23:04:10+0900
+  detail: XとThreadsの近さ 0.09（0.85未満にする）
+approved_at: null
 rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: c43d21b2821e011f
+content_hash: 5fc0e268303e0b58
 generator_version: social-v1
 material:
   search_intent: 留学と国内の学習で、どちらが早いのかを同じ物差しで比べたい
   core_answer: 「早い」には時間の量の話と上達の速さの話が混ざっている。まず分けて、量のほうを数える
   one_check: 総額を、英語に触れる時間で割って1時間あたりを出す
   unique_artifact: 行き先ごとに1時間あたりで並べた表と、年齢や在学の条件で選べない場合
-created_at: 2026-08-09T23:04:09+0900
+created_at: 2026-08-10T09:08:38+0900
 history:
+- at: 2026-08-10T09:08:38+0900
+  state: generated
+- at: 2026-08-10T09:08:38+0900
+  state: gated
+- at: 2026-08-10T09:08:38+0900
+  state: awaiting_approval
+prior_history:
 - at: 2026-08-09T23:04:09+0900
   state: generated
 - at: 2026-08-09T23:04:09+0900
@@ -98,16 +100,35 @@ history:
   state: awaiting_approval
 - at: 2026-08-09T23:04:10+0900
   state: approved
+- at: 2026-08-09T23:04:10+0900
+  state: awaiting_approval
+  note: 承認を取り消した（--revoke）
+- at: 2026-08-10T09:05:22+0900
+  state: generated
+- at: 2026-08-10T09:05:22+0900
+  state: gated
+- at: 2026-08-10T09:05:22+0900
+  state: awaiting_approval
+- at: 2026-08-10T09:07:54+0900
+  state: generated
+- at: 2026-08-10T09:07:54+0900
+  state: gated
+- at: 2026-08-10T09:07:54+0900
+  state: awaiting_approval
+revoked_reason: マーケットイン仕様（2026-08-10）で本文と検査が変わったため、投稿前に承認をやり直す
 post_type: misreading
 post_type_reason: 「現地が一番早い」という言われ方を、記事が読み直している。 時間の量と上達の速さを分ける、という正し方が記事の芯
 template_ids: []
 template_warnings: []
 inferences: []
+tone_warnings: []
 weighted_len: null
 claim_counts:
-  supported: 3
+  supported: 2
   unsupported: 0
-  unjudged: 6
-  needs_human_review: 0
-  total: 9
-needs_human_review: []
+  unjudged: 4
+  needs_human_review: 1
+  total: 7
+needs_human_review:
+- text: 上達の速さまでは、その割り算だけでは分かりません。
+  why: 内容語が1語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る

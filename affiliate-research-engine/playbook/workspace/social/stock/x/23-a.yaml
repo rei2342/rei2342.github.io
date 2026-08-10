@@ -4,29 +4,34 @@ article_id: 23
 article_modified_gmt: '2026-08-09T11:17:13'
 article_title: ワーホリの貯金はいくら必要か｜200万を自分の数字に組み替える
 article_url: https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/
-text: 'ワーホリの貯金額を調べると、大きな総額がひとつ出てきます。
-
-  見ている記事が、どの国・どの期間・語学学校ありなしのどれを前提にしているかを確かめてください。
+text: 'ワーホリの費用を調べると、大きな総額が出てきて不安になりますよね。
 
 
-  前提が違えば、その金額は自分の数字ではありません
+  でも、その数字が自分に当てはまるとは限りません。国・期間・語学学校の有無だけ、先に見ておくと安心です📝
+
+
+  自分用の金額に直す手順はこちら
 
   https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=x'
 thread_parts:
-- 'ワーホリの貯金額を調べると、大きな総額がひとつ出てきます。
-
-  見ている記事が、どの国・どの期間・語学学校ありなしのどれを前提にしているかを確かめてください。
+- 'ワーホリの費用を調べると、大きな総額が出てきて不安になりますよね。
 
 
-  前提が違えば、その金額は自分の数字ではありません
+  でも、その数字が自分に当てはまるとは限りません。国・期間・語学学校の有無だけ、先に見ておくと安心です📝
+
+
+  自分用の金額に直す手順はこちら
 
   https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=x'
-state: approved
+state: awaiting_approval
 gate_results:
 - id: article_published
   ok: true
   detail: ''
 - id: fact_gate
+  ok: true
+  detail: ''
+- id: empathy_without_evidence
   ok: true
   detail: ''
 - id: broken_output
@@ -50,20 +55,27 @@ gate_results:
 - id: cross_platform_gate
   ok: true
   detail: もう片方がまだ無い
-approved_at: 2026-08-09T23:04:10+0900
+approved_at: null
 rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: 6a53bfcd19997b25
+content_hash: e9c076b88681af18
 generator_version: social-v1
 material:
   search_intent: ワーキングホリデーに必要な貯金額を、自分の条件で知りたい
   core_answer: まとめ記事の総額はそのまま使えない。自分の条件で3つに分けて出し直す
   one_check: 見ている記事が、どの国・どの期間・語学学校ありなしのどれを前提にしているかを確かめる
   unique_artifact: 必要額を3つの箱に分ける出し方と、ビザの残高証明が目標額とは別だという話
-created_at: 2026-08-09T23:04:09+0900
+created_at: 2026-08-10T09:08:38+0900
 history:
+- at: 2026-08-10T09:08:38+0900
+  state: generated
+- at: 2026-08-10T09:08:38+0900
+  state: gated
+- at: 2026-08-10T09:08:38+0900
+  state: awaiting_approval
+prior_history:
 - at: 2026-08-09T23:04:09+0900
   state: generated
 - at: 2026-08-09T23:04:09+0900
@@ -72,16 +84,35 @@ history:
   state: awaiting_approval
 - at: 2026-08-09T23:04:10+0900
   state: approved
+- at: 2026-08-09T23:04:10+0900
+  state: awaiting_approval
+  note: 承認を取り消した（--revoke）
+- at: 2026-08-10T09:05:22+0900
+  state: generated
+- at: 2026-08-10T09:05:22+0900
+  state: gated
+- at: 2026-08-10T09:05:22+0900
+  state: awaiting_approval
+- at: 2026-08-10T09:07:54+0900
+  state: generated
+- at: 2026-08-10T09:07:54+0900
+  state: gated
+- at: 2026-08-10T09:07:54+0900
+  state: awaiting_approval
+revoked_reason: マーケットイン仕様（2026-08-10）で本文と検査が変わったため、投稿前に承認をやり直す
 post_type: checklist
 post_type_reason: 記事が「3つの箱」と「相談前に書き出す条件」を並べている。 読者が埋める枠を渡す形が合う
 template_ids: []
 template_warnings: []
 inferences: []
-weighted_len: 227
+tone_warnings: []
+weighted_len: 226
 claim_counts:
   supported: 3
   unsupported: 0
   unjudged: 0
-  needs_human_review: 0
-  total: 3
-needs_human_review: []
+  needs_human_review: 1
+  total: 4
+needs_human_review:
+- text: でも、その数字が自分に当てはまるとは限りません。
+  why: 内容語が1語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る

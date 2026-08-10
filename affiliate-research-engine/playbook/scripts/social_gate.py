@@ -115,6 +115,13 @@ def length_gate(spec, platform, parts):
         lim = spec["x"]["weighted"]["hard_limit"]
         if w > lim:
             bad.append(f"加重{w}（上限{lim}）")
+    elif len(parts) == 1 and spec["threads"].get("single"):
+        # 1投稿で完結する形。part1 の上限で測ると必ず落ちる
+        lo = spec["threads"]["single"]["length"]["min"]
+        hi = spec["threads"]["single"]["length"]["max"]
+        n = len(_plain(parts[0]))
+        if not lo <= n <= hi:
+            bad.append(f"1投稿完結で{n}字（{lo}〜{hi}）")
     else:
         t = spec["threads"]
         keys = ["part1", "part2"]
@@ -233,11 +240,16 @@ def template_gate(spec, parts, recent=()):
     """
     t = spec["template_variety"]
     text = "\n".join(parts)
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    # **冒頭の型は冒頭の行だけで見る。** 全行で見ると
+    # 「今日ためせるのは、この順番です」のような本文中の一文まで
+    # 「冒頭の型」として数えてしまう（2026-08-10に誤検知した）
+    where = {"phrases": lines, "openers": lines[:1], "closers": lines[-1:]}
     mine = set()
     for group in ("phrases", "openers", "closers"):
         for pat in t[group]:
-            for line in [l for l in text.split("\n") if l.strip()]:
-                if re.search(pat["re"], line.strip()):
+            for line in where[group]:
+                if re.search(pat["re"], line):
                     mine.add(pat["id"])
                     break
     warn = []
@@ -248,6 +260,160 @@ def template_gate(spec, parts, recent=()):
             warn.append(f"「{pid}」がこれで{same + 1}件目"
                         f"（直近{t['window']}本・{t['max_same']}件まで）")
     return sorted(mine), warn
+
+
+# ── 温度と会話（2026-08-09 追加）──────────────────────
+# 事実として安全でも、説明調だと読まれない。
+# **落とすのは架空の共感だけ。** 残りは警告にして人が見る。
+def empathy_without_evidence(spec, text):
+    """「私も」「わかります」「経験した」。**fact ID が無ければ落とす。**
+
+    温度を上げようとして真っ先に出るのがこれで、
+    そのまま出すと台帳に無い体験を書いたことになる。
+    """
+    t = spec["tone"]["empathy_without_evidence"]
+    if t.get("allow_with_fact_id"):
+        for e in spec["persona"].get("exempt", []):
+            if e["name"] == "fact IDつき" and re.search(e["re"], text):
+                return (True, "fact ID がある")
+    hit = [p for p in t["patterns"] if p in text]
+    # 「わかります」は語として拾うと「〜が分かります」まで落ちる。
+    # **一節まるごとがそれだけ**のときに、はじめて相づちだと分かる
+    bare = {i + b for b in t.get("bare_patterns", [])
+            for i in t.get("bare_intensifiers", [""])}
+    for chunk in re.split(r"[、。！？\n]", EMOJI.sub("", text)):
+        if chunk.strip() in bare:
+            hit.append(chunk.strip())
+    return (not hit, "台帳に無い共感: " + " ".join(hit) if hit else "")
+
+
+def cold_tone_warning(spec, text):
+    """「してください」「ではありません」が**合計**で多いと説明調になる。"""
+    t = spec["tone"]["cold_tone"]
+    n = sum(text.count(p) for p in t["patterns"])
+    if n > t["max_total"]:
+        return [f"命令・否定の言い切りが合計{n}回（{t['max_total']}回まで）"]
+    return []
+
+
+def emoji_role(spec, parts):
+    """絵文字は飾りではなく役割。**役割の無いものを知らせる。**"""
+    roles = spec["style"]["emoji"]["roles"]
+    warn = []
+    for i, p in enumerate(parts, 1):
+        found = EMOJI.findall(p)
+        unknown = [e for e in found if e not in roles]
+        if unknown:
+            warn.append(f"{i}投稿目に役割の無い絵文字 {' '.join(unknown)}")
+        for a, b in zip(found, found[1:]):
+            if p.find(a + b) >= 0:
+                warn.append(f"{i}投稿目で絵文字が連続している（{a}{b}）")
+        for line in p.split("\n"):
+            line = line.strip()
+            if line and line[0] in roles:
+                warn.append(f"{i}投稿目の行頭に絵文字がある（{line[0]}）")
+    return warn
+
+
+def emoji_repetition(spec, parts, recent=()):
+    """同じ絵文字が直近3投稿続いたら知らせる。"""
+    roles = spec["style"]["emoji"]["roles"]
+    mine = {e for e in EMOJI.findall("\n".join(parts)) if e in roles}
+    warn = []
+    prev = list(recent)[-2:]
+    for e in sorted(mine):
+        if prev and len(prev) == 2 and all(e in r.get("text", "")
+                                           for r in prev):
+            warn.append(f"{e} が3投稿続いている")
+    return warn
+
+
+def sentence_height(spec, parts):
+    """同じ語尾が3文続くと、全部が同じ高さになって平坦に読める。"""
+    t = spec["tone"]["sentence_height"]
+    warn = []
+    for i, p in enumerate(parts, 1):
+        run, last = 0, None
+        # **内容語で絞らずに割る。** sc.sentences() は内容語の無い文を
+        # 落とすので、「朝に開きます。昼に開きます。」の連続が消える
+        for s in re.split(r"(?<=[。！？])|\n", URL.sub("", p)):
+            # 絵文字を落としてから語尾を見る。「〜です🌿」を数え落とさない
+            s = EMOJI.sub("", s or "").strip()
+            if not s:
+                continue
+            end = next((e for e in t["endings"]
+                        if re.search(e + r"[。！？]?$", s)), None)
+            if end and end == last:
+                run += 1
+            else:
+                run, last = 1, end
+            if end and run > t["max_run"]:
+                warn.append(f"{i}投稿目で「{end}」止めが{run}文続いている")
+                run = 0
+    return warn
+
+
+def conversation_mix(spec, platform, parts, recent=()):
+    """Threadsに問いかけが無いと、読むだけで終わって会話にならない。
+
+    逆に**全部が問いかけでも**警告する。毎回聞かれると答える気が失せる。
+    """
+    t = spec["tone"]["conversation_mix"]
+    if platform != t["platform"]:
+        return []
+
+    def has_q(x):
+        # **URLを外してから見る。** `?utm_source=threads` の `?` を
+        # 問いかけと数えて、全投稿が問いかけ扱いになっていた
+        return any(m in URL.sub("", x) for m in t["question_marks"])
+
+    window = [r.get("text", "") for r in list(recent)[-(t["window"] - 1):]]
+    window.append("\n".join(parts))
+    n = sum(1 for x in window if has_q(x))
+    if len(window) < t["window"]:
+        return []
+    if n < t["min_questions"]:
+        return [f"直近{t['window']}本に問いかけが{n}件"
+                f"（{t['min_questions']}件以上）"]
+    if n > t["max_questions"]:
+        return [f"直近{t['window']}本のうち{n}件が問いかけ"
+                f"（{t['max_questions']}件まで）"]
+    return []
+
+
+def market_reference_gate(spec):
+    """参考にした投稿を記録しているか。**文章は採らない。構造だけ採る。**
+
+    記録が無いまま「ベンチマークを見た」と言えてしまうと、
+    次の月にどこを見直せばよいか追えなくない。落とさずに知らせる。
+    """
+    mr = spec["market_reference"]
+    f = Path(__file__).resolve().parents[1] / mr["file"]
+    if not f.exists():
+        return [f"{mr['file']} が無い"]
+    import yaml
+    d = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+    rows = d.get("references") or []
+    if not rows:
+        return [f"{mr['file']} に記録が無い"]
+    warn = []
+    for r in rows:
+        miss = [k for k in mr["required_fields"] if not r.get(k)]
+        if miss:
+            warn.append(f"{r.get('url', '(URL無し)')} に "
+                        f"{'・'.join(miss)} が無い")
+    return warn
+
+
+def tone_warnings(spec, platform, parts, recent=()):
+    """温度の警告をまとめる。**落とさない。** 人が見て判断する。"""
+    same = [r for r in recent if r.get("platform") == platform]
+    return (cold_tone_warning(spec, "\n".join(parts))
+            + emoji_role(spec, parts)
+            + emoji_repetition(spec, parts, same)
+            + sentence_height(spec, parts)
+            + conversation_mix(spec, platform, parts, same)
+            + market_reference_gate(spec))
 
 
 def style_warnings(spec, parts):
@@ -272,6 +438,7 @@ def run_gates(spec, platform, parts, article, history=(), other_text="",
     res = [
         ("article_published", *article_gate(spec, article)),
         ("fact_gate", *fact_gate(spec, text)),
+        ("empathy_without_evidence", *empathy_without_evidence(spec, text)),
         ("broken_output", *broken_gate(spec, text)),
         ("style_gate", *shape_gate(spec, platform, parts)),
         ("length_gate", *length_gate(spec, platform, parts)),

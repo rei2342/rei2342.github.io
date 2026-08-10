@@ -116,6 +116,20 @@ def is_sensitive(s):
     return bool(SENSITIVE.search(s))
 
 
+# 「〜」と聞くと／と言われる／という言い方。**世間の言い方の引用**であって、
+# 書き手の主張ではない。中身をそのまま主張として照合すると、
+# 記事が否定している言い方を引用しただけで unsupported になる
+ATTRIBUTED = re.compile(
+    r"[「『][^」』]{2,60}[」』](?=\s*(と|という|って)\s*"
+    r"(聞く|聞くと|聞いた|聞きます|言わ|言う|いう|見かけ|書かれ|され))")
+
+
+def strip_attribution(s):
+    """引用された言い方を外す。**外した事実を呼び出し側へ返す。**"""
+    out = ATTRIBUTED.sub("", s)
+    return (out, out != s)
+
+
 def negated(s):
     """「ではなく」は対比であって否定ではない。数えない。"""
     s = re.sub(r"ではなく|じゃなく|だけでなく", "", s)
@@ -188,12 +202,16 @@ def check(spec, parts, article, inferences=()):
             if META.search(s):
                 continue            # 記事へ送る一言。主張ではない
             key = re.sub(r"\s+", "", s)
-            mod = modality(spec, s, bullet)
-            risky = is_risky(spec, s)
-            a, ov = best_match(spec, s, asents)
-            st = terms(s)
+            # 引用された言い方は、書き手の主張から外してから見る。
+            # 表示は元の文のまま残す
+            judged, quoted = strip_attribution(s)
+            mod = modality(spec, judged, bullet)
+            risky = is_risky(spec, judged)
+            a, ov = best_match(spec, judged, asents)
+            st = terms(judged)
             row = {"text": s, "modality": mod, "risky": risky,
-                   "matched": a, "overlap": round(ov, 2), "terms": len(st)}
+                   "matched": a, "overlap": round(ov, 2), "terms": len(st),
+                   "quoted": quoted}
 
             if key in declared:
                 # 書き手が判断として宣言したもの。**弱めてあることが条件**
@@ -211,7 +229,7 @@ def check(spec, parts, article, inferences=()):
             if len(st) < c.get("min_terms_to_judge", 3):
                 # 試作のあいだは、判定できない短文のうち
                 # **言い切っていて、しかも危うい話題のもの**を人へ回す
-                if mod in ("assertive", "hedged") and (risky or is_sensitive(s)):
+                if mod in ("assertive", "hedged") and (risky or is_sensitive(judged)):
                     row.update(
                         verdict="needs_human_review",
                         why=f"内容語が{len(st)}語で判定できない。"
@@ -246,9 +264,9 @@ def check(spec, parts, article, inferences=()):
 
             # 極性の食い違いは、**言い切っている長い文だけ**で見る。
             # 断片や提案で見ると「〜ない」が普通に出るので誤検知になる
-            if (not bullet and mod == "assertive" and len(s) >= 20
+            if (not bullet and mod == "assertive" and len(judged) >= 20
                     and ov >= c["contradiction_overlap"]
-                    and negated(s) != negated(a)):
+                    and negated(judged) != negated(a)):
                 # 文の中に「ない」があるかどうかだけでは、
                 # どの述語を打ち消しているかまで分からない。
                 # **落とさずに人へ回す。** 実際に誤検知が出た

@@ -328,17 +328,22 @@ check("決められた順なら posted まで行ける", st["state"] == "posted"
 
 # ── 5. 実際の在庫 ────────────────────────────────────
 rows = inv.all_stock(spec)
-# 承認してよいのは、指示で名指しされた3件だけ。**投稿はまだしない**
-APPROVED_OK = {"X-23-a", "THREADS-526-a", "X-546-a"}
+# 2026-08-10 マーケットイン改訂で、承認済み3件も awaiting_approval へ戻した。
+# **10件すべてが承認待ち。** 人が4観点（冷たさ・媚び・不自然な女性語・
+# 事実逸脱）で見るまで、承認も投稿もしない
 bad_state = [s["stock_id"] for _, s in rows
-             if s["state"] in ("approved", "scheduled", "posted")
-             and s["stock_id"] not in APPROVED_OK]
-check("承認済みは指定の3件だけ", not bad_state, " ".join(bad_state))
+             if s["state"] in ("approved", "scheduled", "posted")]
+check("承認済みが1件も無い（改訂で取り消した）", not bad_state,
+      " ".join(bad_state))
 check("投稿済み・予約済みが無い",
       not [s for _, s in rows if s["state"] in ("scheduled", "posted")])
-check("残り7件は awaiting_approval",
-      sum(1 for _, s in rows if s["state"] == "awaiting_approval") == 7,
+check("10件すべてが awaiting_approval",
+      sum(1 for _, s in rows if s["state"] == "awaiting_approval") == 10,
       str(sum(1 for _, s in rows if s["state"] == "awaiting_approval")))
+# 取り消しは履歴に残っていること。**黙って戻さない**
+revoked = [s for _, s in rows if s.get("revoked_reason")]
+check("承認の取り消しに理由が残っている", len(revoked) == 3,
+      f"{len(revoked)}件")
 for _, s in rows:
     check(f"{s['stock_id']}: ゲート全通過",
           all(g["ok"] for g in s["gate_results"]),
@@ -383,6 +388,67 @@ for _, st in inv.all_stock(spec):
     cc = st.get("claim_counts") or {}
     check(f"{st['stock_id']}: unsupported 0", cc.get("unsupported") == 0,
           str(cc))
+
+# ── 7. 温度と会話（2026-08-10 追加）──────────────────
+# 温度を上げるゲートは、**通すべきものまで落としやすい。**
+# 実際に誤爆した4つを、そのまま検査として残す
+check("架空の共感は落とす",
+      not sg.empathy_without_evidence(spec, "私も3日でやめました。")[0])
+check("相づちだけの共感も落とす",
+      not sg.empathy_without_evidence(spec, "その気持ち、わかります。")[0])
+check("「〜が分かります」は落とさない（2026-08-10に誤爆）",
+      sg.empathy_without_evidence(
+          spec, "1回だけ数えてみると、どこで手が止まるかが分かります。")[0])
+check("fact ID があれば通す",
+      sg.empathy_without_evidence(
+          spec, "私も3日でやめました。<!--fact:F001-->")[0])
+
+check("命令と否定が続くと警告",
+      sg.cold_tone_warning(
+          spec, "確かめてください。これは原因ではありません。"
+                "次に見てください。"))
+check("1回までなら警告しない",
+      not sg.cold_tone_warning(spec, "一度だけ確かめてみてください。"))
+
+check("同じ語尾が3文続くと警告",
+      sg.sentence_height(spec, ["朝に開きます。昼に開きます。夜に開きます。"]))
+check("絵文字があっても語尾を数える（2026-08-10に数え落とした）",
+      sg.sentence_height(spec, ["朝に開きます。昼に開きます。夜に開きます🌿"]))
+check("役割の無い絵文字は警告",
+      sg.emoji_role(spec, ["音を聞いてみます🎧"]))
+check("役割のある絵文字は警告しない",
+      not sg.emoji_role(spec, ["音を聞いてみます🌿"]))
+
+TQ = [{"platform": "threads", "text": "問いはありません。"}] * 4
+check("Threadsの直近5本に問いかけが無いと警告",
+      sg.conversation_mix(spec, "threads", ["問いはありません。"], TQ))
+check("utmの`?`を問いかけと数えない（2026-08-10に誤爆）",
+      sg.conversation_mix(
+          spec, "threads",
+          ["問いはありません。\nhttps://x.test/a?utm_source=threads"],
+          [{"platform": "threads",
+            "text": "問いはありません。https://x.test/b?utm_source=threads"}] * 4))
+
+check("参考投稿の記録がある", not sg.market_reference_gate(spec),
+      " / ".join(sg.market_reference_gate(spec)))
+
+# 引用された世間の言い方を、書き手の主張として照合しない
+q, was = sc.strip_attribution(
+    "「現地に行けば早く伸びる」と聞くと、留学の総額も正当化したくなります。")
+check("引用は主張から外す", was and "伸びる" not in q, q)
+check("引用でない鉤括弧は外さない",
+      not sc.strip_attribution("「予定した日に開けたか」を見ます。")[1])
+
+# 冒頭の型は冒頭の行だけで見る
+_, tw = sg.template_gate(
+    spec, ["場面を置きます。\n今日ためせるのは、この順番です。"],
+    [{"template_ids": ["topic_open"]}] * 3)
+check("本文中の一文を「冒頭の型」に数えない（2026-08-10に誤検知）", not tw,
+      " / ".join(tw))
+
+for _, st in inv.all_stock(spec):
+    check(f"{st['stock_id']}: 温度の検査を記録している",
+          "tone_warnings" in st)
 
 print()
 if fails:

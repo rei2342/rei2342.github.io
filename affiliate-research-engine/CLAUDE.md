@@ -33,6 +33,22 @@
     `social_post.py --mark-posted <stock_id> --posted-id <ID>` で記録する
   - 廃止したもの: `threads-note-cannon.yml` / `threads-builder.yml` /
     `x-promo.yml` / `scripts/threads_builder.py` / `scripts/x_promo.py`
+  - **2026-08-10 マーケットイン改訂。** 事実は安全でも説明調だと読まれないので、
+    温め方を正本へ入れた。**この順で書く**（`persona.warm_order`）:
+    ① 読者の小さな迷いを代弁 → ② 否定せず受け止める →
+    ③ 確認方法を命令ではなく「一緒に見る提案」で渡す → ④ 安心か余白を残す
+    - 「〜してください」より「〜してみると分かりやすいです」を選ぶ
+    - **架空の共感（「私もそうでした」「わかります」）はゲートで落とす**
+    - 絵文字は**4役だけ**。📝☑️整理／💭気づき／🌿😌安心／🌸署名（10本に1〜2本）。
+      Xは0〜1個・Threadsは0〜2個。**0個でも正常**。行頭・連続・3投稿連続は禁止
+    - 追加ゲート: `empathy_without_evidence`（落とす）／`cold_tone_warning`・
+      `emoji_role`・`emoji_repetition`・`sentence_height`・`conversation_mix`・
+      `market_reference`（警告）
+    - 参考にした投稿は `workspace/social/market_reference.yaml` に記録する。
+      **文章はコピーしない。採るのは構造・改行・語尾・絵文字の役割だけ**
+    - Threadsは指定の改訂例に合わせて**1投稿完結**にした。
+      CLAUDE.md 既存の実測（2連・リンクは2投稿目）とは逆なので、
+      投稿を始めたら表示と遷移を測り直す
 
 ## 運用は2路線（路線で分ける／トーンが逆向きなので絶対に混ぜない）
 

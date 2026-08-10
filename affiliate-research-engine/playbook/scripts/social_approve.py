@@ -6,7 +6,11 @@ social_approve.py
   python social_approve.py --list
   python social_approve.py --approve X-521-a
   python social_approve.py --reject TH-521-a --reason "手順が記事と違う"
+  python social_approve.py --revoke X-521-a --reason "仕様が変わった"
   python social_approve.py --stale-check          # 記事が改稿されたものを戻す
+
+**承認は取り消せる。** 仕様を変えたのに承認済みのまま残ると、
+古い基準で通った文が投稿される。`--revoke` で awaiting_approval へ戻す。
 
 **ここでも投稿はしない。** 投稿は social_post.py だけ。
 """
@@ -35,12 +39,15 @@ def main():
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--approve", default="")
     ap.add_argument("--reject", default="")
+    ap.add_argument("--revoke", default="",
+                    help="承認を取り消して awaiting_approval へ戻す")
     ap.add_argument("--reason", default="")
     ap.add_argument("--stale-check", action="store_true")
     a = ap.parse_args()
     spec = ss.load_spec()
 
-    if a.list or not (a.approve or a.reject or a.stale_check):
+    if a.list or not (a.approve or a.reject or a.revoke
+                      or a.stale_check):
         rows = inv.all_stock(spec)
         print(f"在庫 {len(rows)}件\n")
         print("| stock_id | 記事 | 状態 | 文字数 |")
@@ -69,7 +76,7 @@ def main():
         print(f"stale へ戻した: {len(moved)}件 " + " ".join(moved))
         return
 
-    sid = a.approve or a.reject
+    sid = a.approve or a.reject or a.revoke
     hit = [(p, s) for p, s in inv.all_stock(spec) if s["stock_id"] == sid]
     if not hit:
         print(f"見つからない: {sid}")
@@ -80,6 +87,14 @@ def main():
             print("ゲートに落ちている在庫は承認できない")
             sys.exit(1)
         inv.transition(spec, s, "approved", approved_at=inv.now())
+    elif a.revoke:
+        # 承認を取り消す。**消さずに履歴へ残す。**
+        # いつ・なぜ戻したかが追えないと、同じ文がまた承認される
+        if not a.reason:
+            print("--reason が要る（なぜ取り消すか）")
+            sys.exit(1)
+        inv.transition(spec, s, "awaiting_approval", approved_at=None,
+                       revoked_reason=a.reason)
     else:
         if not a.reason:
             print("--reason が要る。候補: " + " / ".join(REASONS))

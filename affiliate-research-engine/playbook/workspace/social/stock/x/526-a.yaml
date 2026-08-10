@@ -4,21 +4,17 @@ article_id: 526
 article_modified_gmt: '2026-08-09T13:00:03'
 article_title: 「現地が一番早い」を費用と時間で確かめる｜1時間あたりで並べる
 article_url: https://sakura-eigo.com/fast-verify-cost-time-travel/
-text: '「現地が一番早い」という言葉には、英語に触れる時間の量と、上達の速さが混ざることがあります。
-
-  総額を英語に触れる時間で割ると分かるのは、1時間あたりの費用です。
+text: '「現地に行くのが一番早い」と聞くと、焦って決めたくなることがあります。
 
 
-  比較できることと、できないこと
+  ただ、英語に触れる時間の多さと、上達の速さは別の話。費用を時間で割って分かること・分からないことを分けました📝
 
   https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=x'
 thread_parts:
-- '「現地が一番早い」という言葉には、英語に触れる時間の量と、上達の速さが混ざることがあります。
-
-  総額を英語に触れる時間で割ると分かるのは、1時間あたりの費用です。
+- '「現地に行くのが一番早い」と聞くと、焦って決めたくなることがあります。
 
 
-  比較できることと、できないこと
+  ただ、英語に触れる時間の多さと、上達の速さは別の話。費用を時間で割って分かること・分からないことを分けました📝
 
   https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=x'
 state: awaiting_approval
@@ -27,6 +23,9 @@ gate_results:
   ok: true
   detail: ''
 - id: fact_gate
+  ok: true
+  detail: ''
+- id: empathy_without_evidence
   ok: true
   detail: ''
 - id: broken_output
@@ -55,31 +54,45 @@ rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: af7acf611b09a646
+content_hash: 1730cee1524e2050
 generator_version: social-v1
 material:
   search_intent: 留学と国内の学習で、どちらが早いのかを同じ物差しで比べたい
   core_answer: 「早い」には時間の量の話と上達の速さの話が混ざっている。まず分けて、量のほうを数える
   one_check: 総額を、英語に触れる時間で割って1時間あたりを出す
   unique_artifact: 行き先ごとに1時間あたりで並べた表と、年齢や在学の条件で選べない場合
-created_at: 2026-08-09T23:04:09+0900
+created_at: 2026-08-10T09:08:38+0900
 history:
-- at: 2026-08-09T23:04:09+0900
+- at: 2026-08-10T09:08:38+0900
   state: generated
-- at: 2026-08-09T23:04:09+0900
+- at: 2026-08-10T09:08:38+0900
   state: gated
-- at: 2026-08-09T23:04:09+0900
+- at: 2026-08-10T09:08:38+0900
+  state: awaiting_approval
+prior_history:
+- at: 2026-08-10T09:05:22+0900
+  state: generated
+- at: 2026-08-10T09:05:22+0900
+  state: gated
+- at: 2026-08-10T09:05:22+0900
+  state: awaiting_approval
+- at: 2026-08-10T09:07:54+0900
+  state: generated
+- at: 2026-08-10T09:07:54+0900
+  state: gated
+- at: 2026-08-10T09:07:54+0900
   state: awaiting_approval
 post_type: misreading
 post_type_reason: 「現地が一番早い」という言われ方を、記事が読み直している。 時間の量と上達の速さを分ける、という正し方が記事の芯
 template_ids: []
 template_warnings: []
 inferences: []
-weighted_len: 214
+tone_warnings: []
+weighted_len: 206
 claim_counts:
-  supported: 2
+  supported: 1
   unsupported: 0
-  unjudged: 1
+  unjudged: 2
   needs_human_review: 0
   total: 3
 needs_human_review: []

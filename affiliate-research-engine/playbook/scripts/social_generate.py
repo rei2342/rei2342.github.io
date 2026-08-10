@@ -79,7 +79,12 @@ def generate_api(spec, article):
 def generate_file(spec, article, drafts):
     """用意した下書きを使う。ゲートと在庫の作り方は API と同じ。"""
     d = drafts["articles"][str(article["id"])]
-    return d, d["material"], [d["x"].strip()], [p.strip() for p in d["threads"]]
+    x = d["x"].strip()
+    # 導線の一言は本文と分けて持つ。URLはこのあと attach_url が付ける。
+    # 「〜はこちら」だけの行を作らないため、同じ塊にしない
+    if d.get("x_tail"):
+        x += "\n\n" + d["x_tail"].strip()
+    return d, d["material"], [x], [p.strip() for p in d["threads"]]
 
 
 def generate_api2(spec, article):
@@ -137,13 +142,25 @@ def main():
             hist += [{"text": s["text"], "stock_id": s["stock_id"]}
                      for _, s in inv.all_stock(spec, platform)
                      if s["article_id"] != int(pid)]
-            recent = [s for _, s in inv.all_stock(spec, platform)]
+            # **同じ記事の古い在庫を「直近の投稿」に数えない。**
+            # 作り直すたびに自分と比べて、型も絵文字も重複扱いになる
+            recent = [s for _, s in inv.all_stock(spec, platform)
+                      if s["article_id"] != int(pid)]
             res = sg.run_gates(spec, platform, parts, article,
                                history=hist, other_text=other,
                                inferences=infer)
             tids, twarn = sg.template_gate(spec, parts, recent)
             stock = inv.new_stock(spec, platform, article, parts,
                                   material, res)
+            # **作り直しで前の履歴を消さない。**
+            # 承認を取り消した記録が消えると、なぜ戻したのかを追えなくなる
+            old_p = inv.stock_path(spec, platform, pid, "a")
+            if old_p.exists():
+                old = inv.load(old_p)
+                stock["prior_history"] = ((old.get("prior_history") or [])
+                                          + (old.get("history") or []))
+                if old.get("revoked_reason"):
+                    stock["revoked_reason"] = old["revoked_reason"]
             stock["post_type"] = d.get("post_type", "")
             stock["post_type_reason"] = " ".join(
                 d.get("post_type_reason", "").split())
@@ -153,6 +170,8 @@ def main():
             if twarn and ex:
                 stock["template_exception_reason"] = ex
             stock["inferences"] = infer
+            stock["tone_warnings"] = sg.tone_warnings(spec, platform, parts,
+                                                      recent)
             stock["weighted_len"] = (sg.weighted_len(spec, parts[0])
                                      if platform == "x" else None)
             rows = sc.check(spec, parts, article, infer)
@@ -177,7 +196,8 @@ def main():
             for line in sg.fmt(res).split("\n"):
                 if line.startswith("NG"):
                     print("      " + line)
-            for w in sg.style_warnings(spec, parts) + twarn:
+            for w in (sg.style_warnings(spec, parts) + twarn
+                      + stock["tone_warnings"]):
                 print("      警告 " + w)
 
     print(f"\n承認待ち {len(made)} / ゲートで止めた {len(blocked)}")

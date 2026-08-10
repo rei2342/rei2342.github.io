@@ -48,6 +48,7 @@ def main():
     wl = [s.get("weighted_len") for s in rows if s["platform"] == "x"]
     posted = sum(1 for s in rows if s["state"] == "posted")
     approved = sum(1 for s in rows if s["state"] == "approved")
+    warn_n = sum(len(s.get("tone_warnings") or []) for s in rows)
     art310 = inv.local_article(310) or {"body": ""}
     OLD310 = ["サービスの良し悪しを見る時間ではない",
               "声を出した回数ではない"]
@@ -63,6 +64,7 @@ def main():
          f"| X加重文字数 | {' / '.join(str(x) for x in sorted(wl))}"
          f"（上限{spec['x']['weighted']['hard_limit']}）|\n",
          f"| 記事310本文の旧断定 残存 | {left310} |\n",
+         f"| 温度の警告 | {warn_n}件（落とさない）|\n",
          f"| 投稿 | {posted}件 |\n",
          f"| 承認 | {approved}件 |\n\n",
          "**投稿していない。** 承認するまで在庫のまま止まる。\n\n",
@@ -107,9 +109,12 @@ def main():
                 v = "通過" if g["ok"] else "**落ちた** " + g["detail"]
                 L.append(f"| {g['id']} | {v} |\n")
             warn = (sg.style_warnings(spec, s["thread_parts"])
-                    + (s.get("template_warnings") or []))
+                    + (s.get("template_warnings") or [])
+                    + (s.get("tone_warnings") or []))
             L.append(f"\n警告（落とさない）: "
                      + (" / ".join(warn) if warn else "なし") + "\n")
+            if s.get("revoked_reason"):
+                L.append(f"\n**承認を取り消した**: {s['revoked_reason']}\n")
             if s.get("template_exception_reason"):
                 L.append(f"\n**型の重なりは例外扱い**: "
                          f"{s['template_exception_reason']}\n")
