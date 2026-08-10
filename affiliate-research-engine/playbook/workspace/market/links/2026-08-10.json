@@ -11,6 +11,22 @@
   ],
   "internal": [
    {
+    "url": "https://sakura-eigo.com/online-english-conversation-speaking-time/",
+    "anchor": "1回のレッスンで話した秒数を測る",
+    "http": 200,
+    "title_match": "不一致（title: オンライン英会話で自分が話した秒数を、録音して測る - さくらの大人英語学び直し）",
+    "published": "公開",
+    "noindex": "なし"
+   },
+   {
+    "url": "https://sakura-eigo.com/spatalk-review-working-adults-habits/",
+    "anchor": "予習が要るサービスを選ぶ前の確認",
+    "http": 200,
+    "title_match": "不一致（title: スパトレの評判より先に｜予習不要のサービスを選ぶ前に確認したい3つのこと - さ）",
+    "published": "公開",
+    "noindex": "なし"
+   },
+   {
     "url": "https://sakura-eigo.com/dmm-eikaiwa-beginner-consistency-check/",
     "anchor": "4つの脱落地点のどこで止まるか",
     "http": 200,
@@ -46,7 +62,7 @@
     "anchor": "→ speek公式サイトで発音矯正スクールの内容を確認する",
     "href": "https://af.moshimo.com/af/c/click?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056&url=https%3A%2F%2Fwww.speek.j",
     "status": 200,
-    "final_url": "https://speek.jp/?maf=4940_5640991.65056.0..2600445391.1786329655",
+    "final_url": "https://speek.jp/?maf=4940_5640991.65056.0..2600449915.1786330331",
     "final_host": "speek.jp",
     "status_with_referer": 404,
     "final_with_referer": "https://af.moshimo.com/af/c/click?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056&url=https%3A%2F%2Fwww.speek.j"
@@ -55,10 +71,10 @@
     "anchor": "→ スパトレ（第二言語習得論ベースの英語トレーニング）の7日間無料体験を見る",
     "href": "https://af.moshimo.com/af/c/click?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559&url=https%3A%2F%2Fsptr.jp",
     "status": 200,
-    "final_url": "https://sptr.jp?maf=2409_5640981.31559.0..2600445412.1786329658",
-    "final_host": "sptr.jp?maf=2409_5640981.31559.0..2600445412.1786329658",
+    "final_url": "https://sptr.jp?maf=2409_5640981.31559.0..2600449933.1786330334",
+    "final_host": "sptr.jp?maf=2409_5640981.31559.0..2600449933.1786330334",
     "status_with_referer": 200,
-    "final_with_referer": "https://sptr.jp?maf=2409_5640981.31559.0..2600445456.1786329664"
+    "final_with_referer": "https://sptr.jp?maf=2409_5640981.31559.0..2600449975.1786330341"
    }
   ],
   "internal": [
@@ -106,10 +122,10 @@
     "anchor": "→ フィリピン留学ナビ公式サイトで語学学校の情報を確認する",
     "href": "https://af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992",
     "status": 200,
-    "final_url": "https://philippines-university.jp?rd_code=21yjZBq7SKEPTO6srE_kPo6OsDraos04rjL_Tc6xCd0NHl3lLuf7hTinjlEcDG7lWJ-ZklHYs8ypaYYiFRpVkSg",
-    "final_host": "philippines-university.jp?rd_code=21yjZBq7SKEPTO6srE_kPo6OsDraos04rjL_Tc6xCd0NHl3lLuf7hTinjlEcDG7lWJ-ZklHYs8ypaYYiFRpVkSg",
+    "final_url": "https://philippines-university.jp?rd_code=2cz4S2pmcIvNoqd7ziN7dTN9z5kIobLQVqB6Dak95rSqPLEJlKxqJ0a_tqxCuAhzIaXJk9e-BGVa7NsnvcXmpYQ",
+    "final_host": "philippines-university.jp?rd_code=2cz4S2pmcIvNoqd7ziN7dTN9z5kIobLQVqB6Dak95rSqPLEJlKxqJ0a_tqxCuAhzIaXJk9e-BGVa7NsnvcXmpYQ",
     "status_with_referer": 200,
-    "final_with_referer": "https://philippines-university.jp?rd_code=2ViD6RTKOccKuQXwIprRMZUsCF5SM7RIhq_gmmDvXWq8Gx7hiW-WXHRdIEEdTMzVira6fJLOl2SZ-b"
+    "final_with_referer": "https://philippines-university.jp?rd_code=2U6z9KnwHB-G3oRa3Wct2NIUXGRGIW7YhgSjYge17NLMDPdZzcxH8Q6EN1Tfw3vFiyJKoq3u_hEoD_"
    }
   ],
   "internal": [
