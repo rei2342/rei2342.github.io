@@ -145,6 +145,70 @@ cta:
     必ず照合する。台帳に無い条件をアンカーへ書かない
   role_must_be_explained: "誰が・どの判断の後に押すかを本文に書く"
 
+# ── 記事の役割とCTAの役割（**警告の前に必ず付ける**）──
+# 「案件紹介があるのに合わない人・注意点がない」を、全記事に同じ重さで
+# 出していた。学習手順の記事にまで出て、14本が部分再構成へ入った。
+# **役割で分ける。** 役割が未分類のまま警告しない（2026-08-10）
+roles:
+  article_role:
+    - key: comparison
+      name: "比較記事"
+      caveat: blocker
+      signs: ["比較", "どっち", "違い", "vs", "選び方", "ランキング"]
+    - key: review
+      name: "レビュー記事"
+      caveat: blocker
+      signs: ["レビュー", "使ってみた", "体験談", "評判", "口コミ"]
+    - key: recommendation
+      name: "おすすめ記事"
+      caveat: blocker
+      signs: ["おすすめ", "人気", "厳選", "選[0-9]+"]
+    - key: pricing
+      name: "料金記事"
+      caveat: blocker
+      signs: ["費用", "料金", "いくら", "相場", "総額", "貯金"]
+    - key: signup_decision
+      name: "申込判断を主目的とする記事"
+      caveat: blocker
+      signs: ["申し込む前", "契約する前", "始める前に確認", "無料体験を"]
+    - key: howto
+      name: "学習手順記事"
+      caveat: silent
+      signs: ["勉強法", "확認する[0-9]+つ", "手順", "やり方", "組み方",
+              "続かない", "止まっている"]
+    - key: diagnosis
+      name: "診断記事"
+      caveat: silent
+      signs: ["切り分け", "どこで止まって", "分かれ目", "確認項目"]
+    - key: rules
+      name: "制度解説記事"
+      caveat: silent
+      signs: ["ビザ", "年齢制限", "残高証明", "制度", "条件"]
+    - key: other
+      name: "その他"
+      caveat: silent
+  cta_role:
+    - key: primary_recommendation
+      name: "本文の結論としてCTA先を推奨している"
+      caveat: blocker
+      signs: ["おすすめは", "選ぶなら", "まずは.{0,10}から", "が最適"]
+    - key: supporting
+      name: "補助。読者の一部にだけ関係する"
+      caveat: silent
+    - key: none
+      name: "CTAなし"
+      caveat: silent
+  judge_on: "タイトル＋H2見出し。本文全体では、例示に引っぱられる"
+  rule: >
+    **`article_role` と `cta_role` を付けてから判定する。**
+    どちらかが blocker のときだけ「合わない人・注意点」を採点へ入れる。
+    両方 silent なら**警告もしない**。
+    役割が付いていない記事を、部分再構成へ入れない
+  precedence: >
+    article_role が blocker なら、cta_role にかかわらず blocker。
+    article_role が silent でも、cta_role が primary_recommendation なら
+    blocker（本文が推奨していれば、型に関係なく注意点が要る）
+
 # ── 改善の優先度（この加重で並べる）──────────────────
 priority:
   weights:

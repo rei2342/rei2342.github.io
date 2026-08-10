@@ -183,16 +183,63 @@ def terms(t):
     return {w for w in TERM.findall(t) if w not in STOP}
 
 
-def fact_risk(spec, pid, txt, led, sa, sa_date="不明", weekly=None):
+def classify_roles(spec, txt, led, anchors):
+    """記事の役割とCTAの役割を決める。**警告より先に、これを付ける。**
+
+    見るのはタイトルとH2だけ。本文全体で見ると、例として出てくる語に
+    引っぱられて、学習手順の記事が比較記事になる。
+    """
+    r = spec["roles"]
+    title = (led or {}).get("title", "")
+    heads = " ".join(m.group(2) for m in HEAD.finditer(txt))
+
+    # **タイトルを先に見る。** H2まで同じ重さで見ると、
+    # 「料金は月額ではなく1回あたりで出す」という小節があるだけで、
+    # 学習手順の記事が料金記事になる（546で実際に起きた）
+    art = "other"
+    for hay in (title, heads):
+        for row in r["article_role"]:               # 定義順＝blocker が先
+            if any(re.search(p, hay) for p in row.get("signs", [])):
+                art = row["key"]
+                break
+        if art != "other":
+            break
+    art_caveat = next(x["caveat"] for x in r["article_role"]
+                      if x["key"] == art)
+
+    if not anchors:
+        cta = "none"
+    elif any(re.search(p, txt) for row in r["cta_role"]
+             if row["key"] == "primary_recommendation"
+             for p in row.get("signs", [])):
+        cta = "primary_recommendation"
+    else:
+        cta = "supporting"
+    cta_caveat = next(x["caveat"] for x in r["cta_role"] if x["key"] == cta)
+
+    # article_role が blocker なら blocker。silent でも
+    # 本文が推奨していれば blocker
+    caveat = "blocker" if "blocker" in (art_caveat, cta_caveat) else "silent"
+    return art, cta, caveat
+
+
+def fact_risk(spec, pid, txt, led, sa, sa_date="不明", weekly=None,
+              caveat_mode="blocker"):
     """事実リスク。**手元で判定できるものだけ**を挙げる。
 
     週次点検を最新の控えで回し直した結果を**こちらの権威にする。**
     AUDIT.md の控えではなく、いま再現するかどうかで決める。
     """
     out = []
+    CAVEAT = "案件を紹介しているのに、合わない人も注意点も書いていない"
     for name, (verdict, detail, scored) in (weekly or {}).items():
-        if verdict == "再現" and scored:
-            out.append(f"週次点検を回し直して再現: {name}")
+        if verdict != "再現" or not scored:
+            continue
+        if name == CAVEAT and caveat_mode != "blocker":
+            # **役割で分ける。** 学習手順・診断・制度解説で、CTAが補助なら
+            # 「合わない人」を書かせない。読者の判断を邪魔する
+            continue
+        out.append(f"週次点検を回し直して再現: {name}")
     if led and led.get("blockers") not in ("0", "", None):
         out.append(f"生成ブロッカーが{led['blockers']}件残っている")
     if qr.price_without_basedate(txt):
@@ -434,9 +481,15 @@ def losses(f, led):
         l.append(f"検索での評価（90日で表示{f['imp']}・"
                  f"平均順位{f['pos']}）。作り直すと失う可能性がある")
     else:
-        l.append("検索での表示が0（GSCで確認済み）。**捨てる評価は無い**")
+        # **検索だけで判定しない。** 内部リンクとSNSの役割を必ず添える
+        l.append("検索での表示が0（GSCで確認済み）。"
+                 "**ただしこれだけで「失うものが無い」とは判定しない**")
     if f["inbound"]:
-        l.append(f"この記事へ入る内部リンク{f['inbound']}本の行き先")
+        l.append(f"**この記事へ入る内部リンク{f['inbound']}本**の着地内容。"
+                 "サイト内の受け皿としての役割")
+    else:
+        l.append("入る内部リンクは0本。サイト内では孤立している"
+                 "（**SNSや直接流入で立っている可能性は別に見る**）")
     if f["has_artifact"]:
         l.append(f"固有の成果物「{led.get('artifact')}」")
     if f["anchors"]:
@@ -482,8 +535,9 @@ def main():
         has_art, art_why = artifact_ok(led, txt)
         sib, topic = siblings(pid, led, led_all, topics)
         wk = weekly_recheck(pid)
+        art_role, cta_role, caveat = classify_roles(spec, txt, led, anchors)
         risks, stale_note = fact_risk(spec, pid, txt, led, sa.get(pid),
-                                      sa.get("_date", "不明"), wk)
+                                      sa.get("_date", "不明"), wk, caveat)
         days, stale_why = staleness(txt)
         g = pc.get(pid, {})
         f = {
@@ -516,6 +570,9 @@ def main():
         f["bucket"], f["bucket_why"] = bucket(f)
         # **調査の進み具合は分類とは別の軸。**
         # SERP・公式・GSC・CTA実績を取るまで improvement_not_needed にしない
+        f["article_role"] = art_role
+        f["cta_role"] = cta_role
+        f["caveat_mode"] = caveat
         f["assessment_status"] = "local_only"
         f["weekly"] = wk
         f["gains"] = gains(f)
@@ -627,6 +684,28 @@ def write(spec, rows, missing, ids, pc, sa=None, sa_date="不明"):
                  "（「TOEIC 600点で止まっているとき…」）を拾う誤検知が"
                  "混ざる。人が見て、本物だけを次の点検へ送る。\n\n")
 
+    ar = defaultdict(int)
+    cr = defaultdict(int)
+    for r in rows:
+        ar[r["article_role"]] += 1
+        cr[r["cta_role"]] += 1
+    blocker = sum(1 for r in rows if r["caveat_mode"] == "blocker")
+    L.append("## 記事の役割（警告を分岐させる軸）\n\n"
+             "「案件紹介があるのに合わない人・注意点がない」を、"
+             "**全記事に同じ重さで出していた。** 学習手順の記事にまで出て、"
+             "14本が部分再構成へ入っていた。役割で分けた。\n\n"
+             "| article_role | 件数 |\n|---|---|\n")
+    for k, n in sorted(ar.items(), key=lambda x: -x[1]):
+        c = next(x["caveat"] for x in spec["roles"]["article_role"]
+                 if x["key"] == k)
+        L.append(f"| `{k}`（{c}） | {n} |\n")
+    L.append("\n| cta_role | 件数 |\n|---|---|\n")
+    for k, n in sorted(cr.items(), key=lambda x: -x[1]):
+        L.append(f"| `{k}` | {n} |\n")
+    L.append(f"\n**「合わない人・注意点」を採点へ入れるのは {blocker}本**"
+             f"（残り {len(rows) - blocker}本は警告もしない）。\n"
+             f"役割が未分類の記事は0本。\n\n")
+
     L.append("## 調査の進み具合（分類とは別の軸）\n\n"
              "| 状態 | 件数 | 意味 |\n|---|---|---|\n")
     for a in spec["initial_audit"]["assessment_status"]:
@@ -716,6 +795,9 @@ def write(spec, rows, missing, ids, pc, sa=None, sa_date="不明"):
             L.append(f"{r['url']}\n\n")
         L.append(f"**分類 {r['bucket']} {names[r['bucket']]}**"
                  f"（優先度 {r['score']}）… {r['bucket_why']}\n\n")
+        L.append(f"**役割**: `article_role={r['article_role']}` / "
+                 f"`cta_role={r['cta_role']}` → "
+                 f"「合わない人・注意点」は **{r['caveat_mode']}**\n\n")
         L.append("**なぜ直すか**\n\n")
         why = (r["fact_risk"] + r["cta_issues"]
                + ([] if r["has_artifact"] else [r["artifact_why"]])
@@ -763,7 +845,8 @@ def write(spec, rows, missing, ids, pc, sa=None, sa_date="不明"):
                     "impressions", "clicks", "position", "gsc_known",
                     "inbound_links", "cta_count", "has_artifact",
                     "artifact", "stale", "topic", "cluster_n",
-                    "cluster_risk", "siblings", "fact_risk",
+                    "cluster_risk", "siblings", "article_role", "cta_role",
+                    "caveat_mode", "fact_risk",
                     "cta_issues", "stale_finding", "url"])
         for r in rows:
             w.writerow([r["id"], r["bucket"], names[r["bucket"]], r["score"],
@@ -772,6 +855,7 @@ def write(spec, rows, missing, ids, pc, sa=None, sa_date="不明"):
                         r["has_artifact"], r["artifact_why"], r["stale_why"],
                         r["topic"], r["cluster_n"], r["cluster_risk"],
                         " ".join(str(c[0]) for c in r["siblings"]),
+                        r["article_role"], r["cta_role"], r["caveat_mode"],
                         " / ".join(r["fact_risk"]),
                         " / ".join(r["cta_issues"]),
                         r["stale_finding"] or "", r["url"]])

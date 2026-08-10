@@ -1,0 +1,225 @@
+# 公式一次情報 2026-08-10（546・310・526 が本文で扱う案件だけ）
+#
+# ⚠️ **このファイルの5件すべてが「取得不能」。**
+# 開発コンテナは外向きのHTTPが全部遮断されていて、公式サイトを1つも
+# 開けていない（curl も `CONNECT tunnel failed, 403`）。
+#
+# **取得不能を0や「条件なし」として扱わない。**
+# ここに `fetched_at` が入るまで、改修案で**新しい**料金・無料期間・回数・
+# 解約条件の主張を作らない。既に記事にある確認日つきの記述は、
+# 「2026-08-08 に確認したもの」として**そのまま残す**（作り直さない）。
+
+meta:
+  attempted_on: "2026-08-10"
+  scope: "546・310・526 が本文で扱っている案件だけ"
+  status: 全件取得不能
+  why: >
+    このコンテナからは外向きのHTTPが通らない。
+    WebFetch も curl も同じく遮断されている
+  how_to_complete: >
+    Actions（外向き通信あり）で
+    `rewrite-uploader.yml` を workflow_dispatch し、
+    TARGET_IDS に `ops:market:546,310,526` を渡す。
+    scripts/market_research.py の scan_official() が
+    このファイルを上書きする
+  rule_for_drafts: >
+    **公式情報が取れない主張は、改修案で新しく使わない。**
+    546・310・526 の改修案では、料金・無料期間・回数・解約条件を
+    1件も新規に書いていない（下の `used_in_draft` を見る）
+
+programs:
+  # ── 546 が扱う案件 ────────────────────────────────
+  nativecamp:
+    article: 546
+    service: "ネイティブキャンプ（オンライン英会話）"
+    plan: 未取得
+    official_url: "https://nativecamp.net/"
+    page_title: 取得不能
+    fetched_at: null
+    fetch_status: 取得不能
+    fetch_reason: "egress 遮断（CONNECT tunnel failed, 403）"
+    quote: 取得不能
+    # 記事にすでに書いてある主張。**再確認できていない**
+    existing_claim_in_article: >
+      公式情報：ネイティブキャンプは予約なしでレッスンを受けられ、
+      レッスン回数は無制限、7日間の無料体験があると案内されている
+      （ネイティブキャンプ公式サイト・2026年8月8日時点）
+    existing_claim_checked_on: "2026-08-08"
+    claim_mapping:
+      - claim: "予約なしでレッスンを受けられる"
+        used_for: "「予約の前で止まった人」へのCTAの根拠"
+        verification: 未再確認（2026-08-08の記載のまま）
+      - claim: "レッスン回数は無制限"
+        used_for: "同上"
+        verification: 未再確認
+      - claim: "7日間の無料体験"
+        used_for: "CTAアンカーの条件"
+        verification: 未再確認。**cta_claims 台帳との照合も要る**
+    validity:
+      price: 未取得
+      free_period: "7日間（2026-08-08時点の記載。再確認していない）"
+      count: "無制限（同上）"
+      cancel_terms: 未取得
+      valid_until: 不明
+      recheck_on: "取得できた日から7日"
+    used_in_draft:
+      new_claims_added: 0
+      note: >
+        546の改修案では、**料金・無料期間・回数を1件も新しく書いていない。**
+        既存の「公式情報」段落をそのまま残し、位置だけ動かす
+
+  # ── 310 が扱う案件 ────────────────────────────────
+  speek:
+    article: 310
+    service: "speek（発音矯正スクール）"
+    plan: 未取得
+    official_url: "https://www.speek.jp/"
+    page_title: 取得不能
+    fetched_at: null
+    fetch_status: 取得不能
+    fetch_reason: "egress 遮断"
+    quote: 取得不能
+    existing_claim_in_article: >
+      公式情報：speekは、上智大学の北原真冬教授が監修する音声学ベースの
+      発音矯正スクールで、講師は言語系の学位保持者のみ、完全オンラインで
+      対応している（speek公式サイト・2026年8月8日時点）
+    existing_claim_checked_on: "2026-08-08"
+    claim_mapping:
+      - claim: "音声学ベース／監修者名"
+        used_for: "アプリの自動判定と扱う範囲が違う、という対比"
+        verification: 未再確認
+      - claim: "講師は言語系の学位保持者のみ"
+        used_for: "同上"
+        verification: 未再確認。**人物名と所属を含むので特に再確認が要る**
+    validity:
+      price: 未取得
+      free_period: 未取得
+      count: 未取得
+      cancel_terms: 未取得
+      valid_until: 不明
+      recheck_on: "取得できた日から7日"
+    used_in_draft:
+      new_claims_added: 0
+
+  sptr:
+    article: 310
+    service: "スパトレ（第二言語習得論ベースの英語トレーニング）"
+    plan: 未取得
+    official_url: "https://sptr.jp/"
+    page_title: 取得不能
+    fetched_at: null
+    fetch_status: 取得不能
+    fetch_reason: "egress 遮断"
+    quote: 取得不能
+    existing_claim_in_article: >
+      公式情報：スパトレは第二言語習得論に基づく学習方法で、自習とレッスンを
+      組み合わせる形になっていて、7日間の無料期間がある
+      （スパトレ公式サイト・2026年8月8日時点）
+    existing_claim_checked_on: "2026-08-08"
+    claim_mapping:
+      - claim: "7日間の無料期間"
+        used_for: "CTAアンカー「7日間無料体験を見る」"
+        verification: 未再確認。**cta_claims 台帳との照合も要る**
+      - claim: "自習とレッスンを組み合わせる"
+        used_for: "「返事が来る回数を自分で数えられる」という説明"
+        verification: 未再確認
+    validity:
+      price: 未取得
+      free_period: "7日間（2026-08-08時点の記載）"
+      count: 未取得
+      cancel_terms: 未取得
+      valid_until: 不明
+      recheck_on: "取得できた日から7日"
+    used_in_draft:
+      new_claims_added: 0
+      note: >
+        310の改修案には**解約期限と次回請求日の確認手順**を足すが、
+        これは**読者が自分のアプリで確かめる手順**であって、
+        特定サービスの解約条件を書くものではない。
+        個別の解約条件は公式が取れるまで書かない
+
+  # ── 526 が扱う案件 ────────────────────────────────
+  nativecamp_ryugaku:
+    article: 526
+    service: "ネイティブキャンプ留学"
+    plan: 未取得
+    official_url: "https://nativecamp.net/ryugaku"
+    page_title: 取得不能
+    fetched_at: null
+    fetch_status: 取得不能
+    fetch_reason: "egress 遮断"
+    quote: 取得不能
+    existing_claim_in_article: >
+      公式情報：ネイティブキャンプ留学は、仲介手数料0円・最低価格保証を
+      掲げていて、渡航前のオンライン英会話が無料で使える
+      （ネイティブキャンプ留学 公式・2026年8月8日時点）
+    existing_claim_checked_on: "2026-08-08"
+    claim_mapping:
+      - claim: "仲介手数料0円"
+        used_for: "見積もりを取る側のCTAの根拠"
+        verification: 未再確認
+      - claim: "最低価格保証"
+        used_for: "同上"
+        verification: >
+          未再確認。**「最低価格保証」は景表法に触れうる強い語。**
+          公式の文言と条件（対象・除外）を取ってから使う
+      - claim: "渡航前のオンライン英会話が無料"
+        used_for: "同上"
+        verification: 未再確認
+    validity:
+      price: 未取得
+      free_period: 未取得
+      count: 未取得
+      cancel_terms: 未取得
+      valid_until: 不明
+      recheck_on: "取得できた日から7日"
+    used_in_draft:
+      new_claims_added: 0
+      note: >
+        526の改修案では、**特定の費用相場を断定しない。**
+        比較表は読者が自分で埋める空欄にしてあり、
+        金額の例を1つも入れていない
+
+  phil_navi:
+    article: 526
+    service: "フィリピン留学ナビ"
+    plan: 未取得
+    official_url: "https://philippines-university.jp/"
+    page_title: 取得不能
+    fetched_at: null
+    fetch_status: 取得不能
+    fetch_reason: "egress 遮断"
+    quote: 取得不能
+    existing_claim_in_article: >
+      公式情報：フィリピン留学ナビは、フィリピンの語学学校留学と大学進学を
+      扱う専門エージェントで、相談の窓口がある
+      （フィリピン留学ナビ 公式・2026年8月8日時点）
+    existing_claim_checked_on: "2026-08-08"
+    claim_mapping:
+      - claim: "語学学校留学と大学進学を扱う"
+        used_for: "年齢・在学条件で選べない場合の相談先"
+        verification: 未再確認
+    validity:
+      price: 未取得
+      free_period: 未取得
+      count: 未取得
+      cancel_terms: 未取得
+      valid_until: 不明
+      recheck_on: "取得できた日から7日"
+    used_in_draft:
+      new_claims_added: 0
+
+# ── 改修案での扱いのまとめ ──────────────────────────
+draft_policy:
+  new_official_claims_added: 0
+  existing_claims_reused: 5
+  rule_applied: >
+    **公式情報が取れない主張は、改修案で新しく使っていない。**
+    既存の5つの「公式情報」段落は、確認日（2026-08-08）つきのまま残し、
+    位置だけを動かす。文言は変えない
+  before_publish:
+    - "Actions で公式を取り直す"
+    - "「最低価格保証」の対象と除外条件を確認する（景表法）"
+    - "speek の監修者名・所属を確認する（人物情報）"
+    - "無料期間（7日間）を cta_claims 台帳と照合する"
+    - "確認日を 2026-08-08 から取得日へ更新する"

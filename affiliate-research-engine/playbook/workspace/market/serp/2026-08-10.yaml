@@ -10,12 +10,26 @@
 #     件数は記事ごとに `fetched_count` に書いた。10件と書かない
 #   - **検索地域が日本ではない**（サービス側の仕様）。
 #     日本のGoogleで見た順位とは違う可能性がある。順位は参考値
-#   - よって serp[].rank は「この取得での並び」であって、
-#     日本の検索結果の掲載順位ではない
+#   - よって serp[].observed_order は「この取得での並び」であって、
+#     **日本の検索結果の掲載順位ではない。**
+#     `rank` という名前は使わない（順位と読まれるため。2026-08-10に改名）
+#   - 広告・動画枠・ショッピング枠・強調スニペットは**区別できていない**。
+#     検索サービスは自然検索のリンクだけを返すので、枠の内訳が分からない
+#   - 同一ドメインの重複も、この取得では判別できるものだけ記録している
 
 meta:
   fetched_on: "2026-08-10"
   method: "検索サービス（WebSearch）。ページ本文の取得は不可"
+  order_field: observed_order
+  order_is_not_rank: >
+    **これは検索順位ではない。** 取得サービスが返した並びをそのまま
+    番号にしただけ。Googleの掲載順位として引用しない
+  conditions:
+    locale: 未指定（サービス側の既定）
+    country: "日本ではない（サービスの仕様でUS）"
+    device: 未分離（モバイル／デスクトップの区別なし）
+    result_types: 未区別（広告・動画・ショッピング・強調スニペットを見分けられない）
+    duplicates_same_domain: 記録した分だけ（判別できないものがある）
   region: "日本以外。日本のSERPとずれる可能性がある"
   not_obtained:
     - "上位記事のH2/H3構成"
@@ -23,9 +37,19 @@ meta:
     - "上位記事のCTA位置・案件・訴求"
     - "上位記事の独自要素（表・診断・計算機・一次調査）"
     - "各ページの更新日表示"
+  duplicates_same_domain_observed:
+    526: {nativecamp.net: 2}
+    310: {migaku.com: 2}
+    304: {note.com: 2, gariben.me: 2}
+  duplicates_note: >
+    同じドメインが2件入っている。**別々の記事として数えている**が、
+    Googleは通常1ドメイン1〜2件に絞るので、
+    ここも取得サービスの並びであって掲載順位ではない
   how_to_complete: >
     Actions（外向き通信あり）で scripts/market_research.py を回す。
-    .github/workflows/market-research.yml から起動する
+    .github/workflows/market-research.yml から起動する。
+    **locale=ja-JP / country=JP / device をモバイルとデスクトップで分離**して
+    取り直す。件数を10へ合わせない
 
 articles:
   272:
@@ -33,13 +57,13 @@ articles:
     intent: "社会人が、フィリピン留学に自分の条件でいくらかかるかを知りたい"
     fetched_count: 7
     serp:
-      - {rank: 1, domain: studyabroad.co.jp, type: 料金, title: "フィリピン留学の費用（1年・半年・１ヵ月・生活費）"}
-      - {rank: 2, domain: alc.co.jp, type: 料金, title: "フィリピン留学の費用はいくら？期間別の総額と内訳を解説"}
-      - {rank: 3, domain: nativecamp.net, type: 料金, title: "【社会人のフィリピン留学】セブ島の英語学校留学費用について解説"}
-      - {rank: 4, domain: smaryu.com, type: 料金, title: "期間別！フィリピンの留学費用まとめ【2026年最新】"}
-      - {rank: 5, domain: ryugaku-onebridge.com, type: 比較, title: "フィリピン留学の最新状況（2026年）留学費用、おすすめ学校一覧"}
-      - {rank: 6, domain: ryugaku.merise.asia, type: 料金, title: "社会人がセブ島留学するならいくら必要？期間別に一覧化した！"}
-      - {rank: 7, domain: ph-ryugaku.com, type: 料金, title: "フィリピン留学の費用はいくら？1週間〜1年までの総額・内訳"}
+      - {observed_order: 1, domain: studyabroad.co.jp, type: 料金, title: "フィリピン留学の費用（1年・半年・１ヵ月・生活費）"}
+      - {observed_order: 2, domain: alc.co.jp, type: 料金, title: "フィリピン留学の費用はいくら？期間別の総額と内訳を解説"}
+      - {observed_order: 3, domain: nativecamp.net, type: 料金, title: "【社会人のフィリピン留学】セブ島の英語学校留学費用について解説"}
+      - {observed_order: 4, domain: smaryu.com, type: 料金, title: "期間別！フィリピンの留学費用まとめ【2026年最新】"}
+      - {observed_order: 5, domain: ryugaku-onebridge.com, type: 比較, title: "フィリピン留学の最新状況（2026年）留学費用、おすすめ学校一覧"}
+      - {observed_order: 6, domain: ryugaku.merise.asia, type: 料金, title: "社会人がセブ島留学するならいくら必要？期間別に一覧化した！"}
+      - {observed_order: 7, domain: ph-ryugaku.com, type: 料金, title: "フィリピン留学の費用はいくら？1週間〜1年までの総額・内訳"}
     common_answer: "期間別（1週間・1ヶ月・3ヶ月・半年・1年）に総額と内訳を並べる"
     axes_used: [期間, 学校グレード, 都市, 内訳項目]
     gaps:
@@ -52,14 +76,14 @@ articles:
     intent: "カナダのワーホリに1年でいくら要るかを知りたい"
     fetched_count: 8
     serp:
-      - {rank: 1, domain: alc.co.jp, type: 料金, title: "カナダワーホリの費用はいくら？総額・内訳・節約術【2026年】"}
-      - {rank: 2, domain: world-avenue.co.jp, type: 料金, title: "カナダでワーキングホリデーした場合にかかる費用"}
-      - {rank: 3, domain: ryugaku.co.jp, type: 料金, title: "カナダのワーキングホリデーに必要な費用｜残高証明はいくらあればいい？"}
-      - {rank: 4, domain: studyabroad.co.jp, type: 料金, title: "カナダのワーホリに必要な費用は100万円で足りる？【2026年最新版】"}
-      - {rank: 5, domain: ises.jp, type: 料金, title: "カナダワーキングホリデーの平均費用"}
-      - {rank: 6, domain: nativecamp.net, type: 料金, title: "カナダでのワーホリ費用はどれくらい？目安や内訳"}
-      - {rank: 7, domain: akageno-anne.jp, type: 料金, title: "カナダワーホリ費用の目安を知ろう！"}
-      - {rank: 8, domain: canada-school.com, type: 料金, title: "カナダのワーホリに必要な費用【2026年 最新版】"}
+      - {observed_order: 1, domain: alc.co.jp, type: 料金, title: "カナダワーホリの費用はいくら？総額・内訳・節約術【2026年】"}
+      - {observed_order: 2, domain: world-avenue.co.jp, type: 料金, title: "カナダでワーキングホリデーした場合にかかる費用"}
+      - {observed_order: 3, domain: ryugaku.co.jp, type: 料金, title: "カナダのワーキングホリデーに必要な費用｜残高証明はいくらあればいい？"}
+      - {observed_order: 4, domain: studyabroad.co.jp, type: 料金, title: "カナダのワーホリに必要な費用は100万円で足りる？【2026年最新版】"}
+      - {observed_order: 5, domain: ises.jp, type: 料金, title: "カナダワーキングホリデーの平均費用"}
+      - {observed_order: 6, domain: nativecamp.net, type: 料金, title: "カナダでのワーホリ費用はどれくらい？目安や内訳"}
+      - {observed_order: 7, domain: akageno-anne.jp, type: 料金, title: "カナダワーホリ費用の目安を知ろう！"}
+      - {observed_order: 8, domain: canada-school.com, type: 料金, title: "カナダのワーホリに必要な費用【2026年 最新版】"}
     common_answer: "1年で150〜250万円。ビザ申請料・語学学校・生活費に分けて内訳を出す"
     axes_used: [滞在期間, 語学学校の月数, 都市, 就労収入の有無]
     gaps:
@@ -67,7 +91,7 @@ articles:
       - "日本側で止まらない支出（返済・保険・サブスク）が入らない"
       - "残高証明と目標貯金額が混ざって説明されることがある"
     note: >
-      rank3（留学ジャーナル）だけが残高証明を正面から扱っている。
+      observed_order 3（留学ジャーナル）だけが残高証明を正面から扱っている。
       さくら記事の「残高証明は目標額とは別」という軸と重なる
 
   23:
@@ -75,30 +99,30 @@ articles:
     intent: "ワーホリの前にいくら貯めればよいかを知りたい"
     fetched_count: 5
     serp:
-      - {rank: 1, domain: jawhm.or.jp, type: 手順, title: "ワーキングホリデー貯金完全ガイド：支出項目の把握から節約術まで"}
-      - {rank: 2, domain: smaryu.com, type: 料金, title: "ワーホリの貯金事情！必要な資金・現地で貯金する方法"}
-      - {rank: 3, domain: smbc-card.com, type: 料金, title: "ワーホリ費用には50万円用意すればいい？節約法や必要なもの"}
-      - {rank: 4, domain: tabiken-ryugaku.co.jp, type: 比較, title: "ワーホリはいくら必要？国別費用・貯金額・節約のコツ【2025年最新版】"}
-      - {rank: 5, domain: ryugaku.yume-kana.com, type: 料金, title: "ワーホリに貯金はいくら必要？渡航前に用意しておくべき最低限の資金額"}
+      - {observed_order: 1, domain: jawhm.or.jp, type: 手順, title: "ワーキングホリデー貯金完全ガイド：支出項目の把握から節約術まで"}
+      - {observed_order: 2, domain: smaryu.com, type: 料金, title: "ワーホリの貯金事情！必要な資金・現地で貯金する方法"}
+      - {observed_order: 3, domain: smbc-card.com, type: 料金, title: "ワーホリ費用には50万円用意すればいい？節約法や必要なもの"}
+      - {observed_order: 4, domain: tabiken-ryugaku.co.jp, type: 比較, title: "ワーホリはいくら必要？国別費用・貯金額・節約のコツ【2025年最新版】"}
+      - {observed_order: 5, domain: ryugaku.yume-kana.com, type: 料金, title: "ワーホリに貯金はいくら必要？渡航前に用意しておくべき最低限の資金額"}
     common_answer: "100〜200万円（出典により90〜230万、200〜250万とばらつく）"
     axes_used: [国, 滞在期間, 生活スタイル, 初期費用の内訳]
     gaps:
       - "**金額のばらつきの理由が説明されない。** 前提が書かれていない"
-      - "残高証明と目標貯金額の区別が rank1 以外では弱い"
+      - "残高証明と目標貯金額の区別が observed_order 1 以外では弱い"
       - "「収入が始まるまでの月数」を読者が2通りで置ける形が無い"
     note: >
-      rank5 は夢カナ留学（A8の主力①）の自社メディア。**競合であり案件でもある**
+      observed_order 5 は夢カナ留学（A8の主力①）の自社メディア。**競合であり案件でもある**
 
   526:
     query: "セブ島留学 費用 1ヶ月 時間 効果"
     intent: "セブ島留学1ヶ月の費用と、それで本当に伸びるのかを知りたい"
     fetched_count: 5
     serp:
-      - {rank: 1, domain: nativecamp.net, type: 料金, title: "セブ島留学1ヶ月間の費用や英語の学習効果を解説"}
-      - {rank: 2, domain: nativecamp.net, type: 料金, title: "セブ島1ヶ月留学の費用まとめ｜社会人のための準備・持ち物"}
-      - {rank: 3, domain: cebu.global-click.jp, type: 料金, title: "【2026年版】1ヶ月（4週間）セブ島留学にかかる費用と内訳"}
-      - {rank: 4, domain: ph-ryugaku.com, type: 手順, title: "セブ島1ヶ月留学の攻略ガイド！費用・効果・準備・おすすめ学校"}
-      - {rank: 5, domain: ryugaku.merise.asia, type: 料金, title: "セブ島留学1ヶ月の費用はどのぐらい？予算の目安や内訳"}
+      - {observed_order: 1, domain: nativecamp.net, type: 料金, title: "セブ島留学1ヶ月間の費用や英語の学習効果を解説"}
+      - {observed_order: 2, domain: nativecamp.net, type: 料金, title: "セブ島1ヶ月留学の費用まとめ｜社会人のための準備・持ち物"}
+      - {observed_order: 3, domain: cebu.global-click.jp, type: 料金, title: "【2026年版】1ヶ月（4週間）セブ島留学にかかる費用と内訳"}
+      - {observed_order: 4, domain: ph-ryugaku.com, type: 手順, title: "セブ島1ヶ月留学の攻略ガイド！費用・効果・準備・おすすめ学校"}
+      - {observed_order: 5, domain: ryugaku.merise.asia, type: 料金, title: "セブ島留学1ヶ月の費用はどのぐらい？予算の目安や内訳"}
     common_answer: "1ヶ月15〜35万円（別の出典では40〜63万、43〜58万）。学校と寮のグレードで動く"
     axes_used: [期間, 学校グレード, 寮のタイプ, 都市]
     gaps:
@@ -116,13 +140,13 @@ articles:
     intent: "無料の英語アプリだけで足りるのか、課金する意味があるのかを知りたい"
     fetched_count: 7
     serp:
-      - {rank: 1, domain: englishhub.jp, type: 比較, title: "英会話アプリ無料・有料おすすめ46選をジャンル別に比較"}
-      - {rank: 2, domain: migaku.com, type: 比較, title: "英語学習アプリ課金の全比較｜2026年コスパ最強プラン"}
-      - {rank: 3, domain: note.com, type: 比較, title: "【目的別】英語学習アプリを紹介！（無料＆有料）"}
-      - {rank: 4, domain: migaku.com, type: 料金, title: "英語学習アプリ料金比較2026年版｜コスパ最強プラン解説"}
-      - {rank: 5, domain: tanzam.net, type: 比較, title: "無料で使える英単語アプリおすすめ12選｜どこまで無料かを徹底比較"}
-      - {rank: 6, domain: kidswonderful.com, type: レビュー, title: "英単語アプリmikanの無料と有料の違いまとめ"}
-      - {rank: 7, domain: ryugaku.net, type: 比較, title: "有料版英語学習アプリおすすめ9選"}
+      - {observed_order: 1, domain: englishhub.jp, type: 比較, title: "英会話アプリ無料・有料おすすめ46選をジャンル別に比較"}
+      - {observed_order: 2, domain: migaku.com, type: 比較, title: "英語学習アプリ課金の全比較｜2026年コスパ最強プラン"}
+      - {observed_order: 3, domain: note.com, type: 比較, title: "【目的別】英語学習アプリを紹介！（無料＆有料）"}
+      - {observed_order: 4, domain: migaku.com, type: 料金, title: "英語学習アプリ料金比較2026年版｜コスパ最強プラン解説"}
+      - {observed_order: 5, domain: tanzam.net, type: 比較, title: "無料で使える英単語アプリおすすめ12選｜どこまで無料かを徹底比較"}
+      - {observed_order: 6, domain: kidswonderful.com, type: レビュー, title: "英単語アプリmikanの無料と有料の違いまとめ"}
+      - {observed_order: 7, domain: ryugaku.net, type: 比較, title: "有料版英語学習アプリおすすめ9選"}
     common_answer: "違いは4つ（学習回数の制限・広告・教材の質と量・フィードバックの精度）"
     axes_used: [機能, 月額, 制限の有無, 対象レベル]
     gaps:
@@ -138,13 +162,13 @@ articles:
     intent: "オンライン英会話が続かない理由と、続ける方法を知りたい"
     fetched_count: 7
     serp:
-      - {rank: 1, domain: aeonet.co.jp, type: 手順, title: "オンライン英会話が上達しない原因とプロ直伝の改善ステップ"}
-      - {rank: 2, domain: bizmates.jp, type: 手順, title: "オンライン英会話が続かない理由 継続に必要な3つの方法とは？"}
-      - {rank: 3, domain: eigosapuri.jp, type: 手順, title: "オンライン英会話が続かないのはなぜ？理由と継続できる方法"}
-      - {rank: 4, domain: progrit.co.jp, type: 手順, title: "オンライン英会話で挫折したあなたへ｜続かなかった理由と学び方"}
-      - {rank: 5, domain: qqeng.com, type: 手順, title: "オンライン英会話が続かない主な要因6つ＆続けるコツ4つ"}
-      - {rank: 6, domain: best-teacher-inc.com, type: 手順, title: "オンライン英会話が続かない3つの理由と継続するための7つのコツ"}
-      - {rank: 7, domain: phlight.co.jp, type: 手順, title: "オンライン英会話が続かない理由12選と続けるための対策"}
+      - {observed_order: 1, domain: aeonet.co.jp, type: 手順, title: "オンライン英会話が上達しない原因とプロ直伝の改善ステップ"}
+      - {observed_order: 2, domain: bizmates.jp, type: 手順, title: "オンライン英会話が続かない理由 継続に必要な3つの方法とは？"}
+      - {observed_order: 3, domain: eigosapuri.jp, type: 手順, title: "オンライン英会話が続かないのはなぜ？理由と継続できる方法"}
+      - {observed_order: 4, domain: progrit.co.jp, type: 手順, title: "オンライン英会話で挫折したあなたへ｜続かなかった理由と学び方"}
+      - {observed_order: 5, domain: qqeng.com, type: 手順, title: "オンライン英会話が続かない主な要因6つ＆続けるコツ4つ"}
+      - {observed_order: 6, domain: best-teacher-inc.com, type: 手順, title: "オンライン英会話が続かない3つの理由と継続するための7つのコツ"}
+      - {observed_order: 7, domain: phlight.co.jp, type: 手順, title: "オンライン英会話が続かない理由12選と続けるための対策"}
     common_answer: "モチベーション・時間・レベル不一致・インプット不足・自律性・講師の相性"
     axes_used: [心構え, 時間管理, 教材レベル, 講師]
     gaps:
@@ -163,20 +187,20 @@ articles:
     intent: "TOEIC600点で止まった原因と、次にやることを知りたい"
     fetched_count: 5
     serp:
-      - {rank: 1, domain: note.com, type: 手順, title: "TOEIC 600点 伸びない壁を突破するための最速攻略法とは？"}
-      - {rank: 2, domain: note.com, type: 体験, title: "TOEIC600点の壁を突破した勉強法：500点からの脱出法"}
-      - {rank: 3, domain: langhacks.com, type: 手順, title: "TOEIC600点台の勉強法｜730点・800点が見えてくる学習戦略"}
-      - {rank: 4, domain: gariben.me, type: 手順, title: "TOEIC600点を取れない… 500点台の壁で伸び悩む原因と対策法"}
-      - {rank: 5, domain: gariben.me, type: 手順, title: "TOEIC700点の壁を超えられない…600点台で伸び悩む原因と対策法"}
+      - {observed_order: 1, domain: note.com, type: 手順, title: "TOEIC 600点 伸びない壁を突破するための最速攻略法とは？"}
+      - {observed_order: 2, domain: note.com, type: 体験, title: "TOEIC600点の壁を突破した勉強法：500点からの脱出法"}
+      - {observed_order: 3, domain: langhacks.com, type: 手順, title: "TOEIC600点台の勉強法｜730点・800点が見えてくる学習戦略"}
+      - {observed_order: 4, domain: gariben.me, type: 手順, title: "TOEIC600点を取れない… 500点台の壁で伸び悩む原因と対策法"}
+      - {observed_order: 5, domain: gariben.me, type: 手順, title: "TOEIC700点の壁を超えられない…600点台で伸び悩む原因と対策法"}
     common_answer: "自己流への固執・長文の情報処理不足。復習を語彙／語法／時間切れに分類する"
     axes_used: [スコア帯, パート別, 復習のしかた, 学習期間]
     gaps:
-      - "rank4 と rank5 が**別のスコア帯**（500台／600台）を同じ語で扱っている。
+      - "observed_order 4 と 5 が**別のスコア帯**（500台／600台）を同じ語で扱っている。
          読者が自分の帯を選べない"
       - "LとRの内訳を分解する手順が無い（合計点だけで語る）"
       - "自分の音を録って比べる、という確認が無い"
     note: >
-      **上位に個人noteが2件。** ドメインの強さで負けている記事ではない。
+      **個人noteが2件。** ドメインの強さで負けている記事ではない。
       表示0なのは順位ではなくインデックス・内部リンク側を先に見る
 
   521:
@@ -184,11 +208,11 @@ articles:
     intent: "聞き流しを続けてリスニングが伸びるのかを知りたい"
     fetched_count: 5
     serp:
-      - {rank: 1, domain: qqeng.com, type: 手順, title: "TOEICのリスニングが聞き取れないのはなぜ？原因と効果的な学習法"}
-      - {rank: 2, domain: resemom.jp, type: 手順, title: "TOEICリスニング対策の効果的な勉強法とは？聞き取れない理由など"}
-      - {rank: 3, domain: ej.alc.co.jp, type: 手順, title: "【TOEICのリスニング対策】勉強法やコツ、聞き取れない原因と対策"}
-      - {rank: 4, domain: chichimaguro.blog, type: レビュー, title: "【TOEIC初心者向け】聞き流しの有効性について徹底解説"}
-      - {rank: 5, domain: ushikubou.com, type: 手順, title: "TOEICリスニングが聞き取れないあなたへ｜聞き取る3つのコツ"}
+      - {observed_order: 1, domain: qqeng.com, type: 手順, title: "TOEICのリスニングが聞き取れないのはなぜ？原因と効果的な学習法"}
+      - {observed_order: 2, domain: resemom.jp, type: 手順, title: "TOEICリスニング対策の効果的な勉強法とは？聞き取れない理由など"}
+      - {observed_order: 3, domain: ej.alc.co.jp, type: 手順, title: "【TOEICのリスニング対策】勉強法やコツ、聞き取れない原因と対策"}
+      - {observed_order: 4, domain: chichimaguro.blog, type: レビュー, title: "【TOEIC初心者向け】聞き流しの有効性について徹底解説"}
+      - {observed_order: 5, domain: ushikubou.com, type: 手順, title: "TOEICリスニングが聞き取れないあなたへ｜聞き取る3つのコツ"}
     common_answer: "BGMのような聞き流しは効かない。問題演習と組み合わせ、意識して聞く"
     axes_used: [聞き流しの是非, パート別, レベル別, 練習法]
     gaps:
@@ -206,13 +230,13 @@ articles:
     local_body: 未取得
     local_body_why: "記事647は draft（workspace/site/RECENT.md）。本文の控えが無い"
     serp:
-      - {rank: 1, domain: resemom.jp, type: 手順, title: "【画像付き】カランメソッドの効果とは？効果的な勉強法3つ"}
-      - {rank: 2, domain: note.com, type: レビュー, title: "カランメソッドって本当に効果ある？メリット・デメリット"}
-      - {rank: 3, domain: english-search.jp, type: 比較, title: "カランメソッドについて徹底解説！対応のオンライン英会話も"}
-      - {rank: 4, domain: eigo-j-hi.com, type: 体験, title: "【体験談】カランメソッドは本当に効果ある？数週間続けた結果"}
-      - {rank: 5, domain: taka3blog.com, type: 体験, title: "【レビュー】カランメソッドはstage11まで受講した結果"}
-      - {rank: 6, domain: ryugaku.net, type: 手順, title: "カランメソッドの効果とは？向いている人や成果を出すための学習方法"}
-      - {rank: 7, domain: apps.apple.com, type: 無関係, title: "（英語と無関係のアプリ。検索ノイズ）"}
+      - {observed_order: 1, domain: resemom.jp, type: 手順, title: "【画像付き】カランメソッドの効果とは？効果的な勉強法3つ"}
+      - {observed_order: 2, domain: note.com, type: レビュー, title: "カランメソッドって本当に効果ある？メリット・デメリット"}
+      - {observed_order: 3, domain: english-search.jp, type: 比較, title: "カランメソッドについて徹底解説！対応のオンライン英会話も"}
+      - {observed_order: 4, domain: eigo-j-hi.com, type: 体験, title: "【体験談】カランメソッドは本当に効果ある？数週間続けた結果"}
+      - {observed_order: 5, domain: taka3blog.com, type: 体験, title: "【レビュー】カランメソッドはstage11まで受講した結果"}
+      - {observed_order: 6, domain: ryugaku.net, type: 手順, title: "カランメソッドの効果とは？向いている人や成果を出すための学習方法"}
+      - {observed_order: 7, domain: apps.apple.com, type: 無関係, title: "（英語と無関係のアプリ。検索ノイズ）"}
     common_answer: "通常の1/4の期間。初心者には向かない。疲れる。継続しないと効果が薄い"
     axes_used: [レベル, 効果, 疲労度, 対応スクール]
     gaps:
@@ -234,20 +258,20 @@ articles:
       本文の控えも無い。AI英語学習6本のうちの1本で、アイキャッチは設定済み。
       公開状態の確認には WordPress API が要る
     serp:
-      - {rank: 1, domain: chiebukuro.yahoo.co.jp, type: FAQ, title: "AI英会話と、人間がやってるオンライン英会話ではどちらがよかったか"}
-      - {rank: 2, domain: miralab.co.jp, type: 比較, title: "オンライン英会話とAI英会話アプリのどっちが良い？違いを徹底比較"}
-      - {rank: 3, domain: english-dialogclub.com, type: 比較, title: "AI英会話とオンライン英会話の最適な併用で英語学習を加速させる理由"}
-      - {rank: 4, domain: app.speakbuddy.me, type: 比較, title: "オンライン英会話とAI英会話、それぞれのメリットって？"}
-      - {rank: 5, domain: kimini.online, type: 比較, title: "英会話アプリとオンライン英会話どっちがいい？違いと使い分け"}
-      - {rank: 6, domain: spice-of-englishgrammar.com, type: 比較, title: "AI英会話とは？オンライン英会話との違いと向き不向きを解説"}
-      - {rank: 7, domain: apps.apple.com, type: 無関係, title: "（アプリストアの掲載。検索ノイズ）"}
+      - {observed_order: 1, domain: chiebukuro.yahoo.co.jp, type: FAQ, title: "AI英会話と、人間がやってるオンライン英会話ではどちらがよかったか"}
+      - {observed_order: 2, domain: miralab.co.jp, type: 比較, title: "オンライン英会話とAI英会話アプリのどっちが良い？違いを徹底比較"}
+      - {observed_order: 3, domain: english-dialogclub.com, type: 比較, title: "AI英会話とオンライン英会話の最適な併用で英語学習を加速させる理由"}
+      - {observed_order: 4, domain: app.speakbuddy.me, type: 比較, title: "オンライン英会話とAI英会話、それぞれのメリットって？"}
+      - {observed_order: 5, domain: kimini.online, type: 比較, title: "英会話アプリとオンライン英会話どっちがいい？違いと使い分け"}
+      - {observed_order: 6, domain: spice-of-englishgrammar.com, type: 比較, title: "AI英会話とは？オンライン英会話との違いと向き不向きを解説"}
+      - {observed_order: 7, domain: apps.apple.com, type: 無関係, title: "（アプリストアの掲載。検索ノイズ）"}
     common_answer: "AIは月4,000円以下・反復向き。人は月7,000円程度・実践向き。初心者はAI7:人3から"
     axes_used: [料金, 練習の種類, 気楽さ, カスタマイズ性]
     gaps:
-      - "**rank4 と rank5 はサービス提供側の自社メディア。** 中立ではない"
+      - "**observed_order 4・5 はサービス提供側の自社メディア。** 中立ではない"
       - "「AI7:人3」のような配分に根拠が示されない"
       - "**切り替える時期の判断基準が無い**（いつAIをやめて人に移るか）"
       - "AI側の無料枠・回数制限と、人側の予約手数を同じ表で比べていない"
     note: >
-      Yahoo!知恵袋が rank1。**読者の生の問いがそこにある。**
+      Yahoo!知恵袋が observed_order 1。**読者の生の問いがそこにある。**
       比較記事ではなく、判断の順番を渡す形が空いている

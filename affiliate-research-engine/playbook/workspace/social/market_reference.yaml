@@ -11,10 +11,15 @@ meta:
   observed_by: "運用者（人）"
   recorded_on: "2026-08-10"
   fetch_note: >
-    **反応数はツール側で取得できていない。** x.com と threads.com は
+    **ツールからは取得できない。** x.com と threads.com は
     このコンテナの egress で遮断されている（about.fb.com も同じ）。
-    観測は人が行い、反応数は共有されていないので `未提供` と書く。
-    **0とは書かない。** 数字が要るときは、観測者が手で入れる
+    Xの3件は 2026-08-10 に人が公開画面を見て数字を入れた。
+    Threadsの2件は**まだ未取得**。**0を入れていない。**
+  reaction_source_x: "公開X画面を人が確認（2026-08-10）"
+  approximate_note: >
+    Xの表示は概数で丸められる（35万・2.4万など）。
+    丸められている値には `approximate: true` を付けた。
+    **丸め値を厳密な数として比較に使わない**
 
 references:
   # ── X ──────────────────────────────────────────────
@@ -23,9 +28,21 @@ references:
     platform: x
     observed_on: "2026-08-10"
     reactions_at_observation:
-      status: 未提供
-      why: "観測は人。数値は共有されていない。ツールからは取得できない"
-      fields: {views: 未提供, likes: 未提供, replies: 未提供, reposts: 未提供}
+      status: 取得済み
+      source: "公開X画面を人が確認"
+      observed_on: "2026-08-10"
+      fields:
+        views: {value: 350000, approximate: true}
+        likes: {value: 24000, approximate: true}
+        reposts: {value: 147, approximate: false}
+        replies: {value: 176, approximate: false}
+      ratios:
+        likes_per_view: "約6.9%（概数どうしの割り算。目安）"
+        replies_per_view: "約0.05%"
+      read: >
+        **桁が違う。** 他の2件と同じ土俵で比べない。
+        いいねが伸びた投稿で、返信は views 比では多くない。
+        「応援できる余白」は**共感の量**に効いていて、会話の量ではない
     observation: >
       短い本音。緊張を開示している。応援できる余白がある。
       説明やノウハウを詰めずに会話を生んでいる
@@ -46,10 +63,23 @@ references:
     account: "英語オタクMiyu"
     platform: x
     observed_on: "2026-08-10"
+    pinned: true
     reactions_at_observation:
-      status: 未提供
-      why: "同上"
-      fields: {views: 未提供, likes: 未提供, replies: 未提供, reposts: 未提供}
+      status: 取得済み
+      source: "公開X画面を人が確認"
+      observed_on: "2026-08-10"
+      fields:
+        views: {value: 55000, approximate: true}
+        likes: {value: 224, approximate: false}
+        reposts: {value: 5, approximate: false}
+        replies: {value: 2, approximate: false}
+      ratios:
+        likes_per_view: "約0.41%"
+        replies_per_view: "約0.004%"
+      read: >
+        **固定投稿。** プロフィール訪問者の分が加算され続けるので、
+        views を他の投稿と並べない（CLAUDE.md の Threads 固定投稿と同じ扱い）。
+        いいね率は3件でいちばん低い
     observation: >
       苦労への理解を先に置く。完成された先生口調ではなく、
       読者と近い距離から話している
@@ -70,9 +100,22 @@ references:
     platform: x
     observed_on: "2026-08-10"
     reactions_at_observation:
-      status: 未提供
-      why: "同上"
-      fields: {views: 未提供, likes: 未提供, replies: 未提供, reposts: 未提供}
+      status: 取得済み
+      source: "公開X画面を人が確認"
+      observed_on: "2026-08-10"
+      fields:
+        views: {value: 2235, approximate: false}
+        likes: {value: 30, approximate: false}
+        reposts: {value: 未取得, approximate: null}
+        replies: {value: 2, approximate: false}
+      ratios:
+        likes_per_view: "約1.34%"
+        replies_per_view: "約0.09%"
+      read: >
+        **同じアカウントの固定でない投稿。** 固定（55,000view・0.41%）と
+        比べると、views は 1/25 だが**いいね率は3倍**。
+        「未完成の本音」は、届いた人に対しては強く効いている。
+        reposts は**未取得**（0ではない）
     observation: >
       「耐えの時期ですね...」のような未完成の本音。短い段落。
       説明しすぎない余白
@@ -94,9 +137,11 @@ references:
     platform: threads
     observed_on: "2026-08-10"
     reactions_at_observation:
-      status: 未提供
-      why: "同上"
-      fields: {views: 未提供, likes: 未提供, replies: 未提供, reposts: 未提供}
+      status: 未取得
+      why: >
+        threads.com が egress で遮断されている。人の観測でも数値は
+        まだ共有されていない。**0を入れない**
+      fields: {views: 未取得, likes: 未取得, replies: 未取得, reposts: 未取得}
     observation: >
       参考書選びの段階を扱っている。「〜なんだよね」という会話の入口。
       読者が自分事化しやすい具体的な場面
@@ -120,9 +165,11 @@ references:
     observed_on: "2026-08-10"
     scope: "個別投稿ではなくアカウントの投稿群を通して観測"
     reactions_at_observation:
-      status: 未提供
-      why: "同上。投稿群なので、そもそも1件の数値には対応しない"
-      fields: {views: 未提供, likes: 未提供, replies: 未提供, reposts: 未提供}
+      status: 未取得
+      why: >
+        threads.com が egress で遮断されている。
+        投稿群なので、そもそも1件の数値には対応しない。**0を入れない**
+      fields: {views: 未取得, likes: 未取得, replies: 未取得, reposts: 未取得}
     observation: >
       一覧型。場面別の具体性。柔らかい呼びかけ。
       ただし「こっそり教えます」「習慣化の鬼」のような強い煽りがある
@@ -180,5 +227,6 @@ review:
     数字が良かった投稿の**文章**を持ち帰らない。
     採るのは構造・改行・語尾・絵文字の役割だけで、正本の該当箇所を直す
   todo:
-    - "反応数を観測者が手で入れる（いまは全件 `未提供`）"
+    - "Threads 2件の反応数を観測者が手で入れる（いま `未取得`。0ではない）"
+    - "英語オタクMiyu・学習記録の reposts を入れる（`未取得`）"
     - "about.fb.com を Actions で取得して、原文抜粋と取得日時を残す"

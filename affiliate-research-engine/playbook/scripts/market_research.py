@@ -7,8 +7,18 @@ market_research.py
   python market_research.py all               # SERPの控えにある全記事
 
 取るもの
-  1. SERP上位10件のページ構造（型・冒頭の答え・H2・比較軸・独自要素・CTA）
-  2. 記事が使っている案件の公式一次情報（料金・無料期間・条件・確認日）
+  1. SERP（locale=ja-JP / country=JP / モバイルとデスクトップを分けて取得）
+     広告・動画・ショッピング・強調スニペット・自然検索を**枠ごとに分ける**。
+     自然検索が10件に満たなくても、**取れた件数のまま完了する。**
+     並び番号は `observed_order`。**掲載順位ではない**
+  2. 取れた自然検索のページ構造（型・冒頭の答え・H2・独自要素・CTA）
+  3. 対象記事が本文で扱っている案件だけの公式一次情報
+
+やらないこと
+  - Googleを直接スクレイピングしない（規約と安定性。取得サービス経由）
+  - 件数を10へ合わせない
+  - **本文が取れないとき、検索スニペットで埋めない**
+  - 同一ドメインの重複を消さない（別に記録する）
 
 **記事を書き換えない。WordPressへ触らない。**
 書くのは workspace/market/ の下だけ。
@@ -36,6 +46,105 @@ OFFICIAL_DIR = ROOT / "workspace/market/official"
 
 UA = {"User-Agent": "Mozilla/5.0 (compatible; sakura-market-research/1.0)"}
 TIMEOUT = 30
+
+# ── SERPの取得条件。**この条件を控えへ必ず書く** ──────
+# 取得サービスは環境変数で選ぶ。**Googleを直接スクレイピングしない**
+# （利用規約に触れるうえ、壊れやすい）。鍵が無ければ「取得不能」と書く
+SERP_LOCALE = "ja-JP"
+SERP_COUNTRY = "JP"
+SERP_DEVICES = ["mobile", "desktop"]
+# 区別して記録する枠。**混ぜない**
+RESULT_TYPES = ["organic", "ad", "video", "shopping", "featured_snippet",
+                "people_also_ask", "other"]
+
+
+def serp_provider():
+    """使える取得サービスを返す。無ければ None。**推測で埋めない。**"""
+    if os.environ.get("SERPAPI_KEY"):
+        return "serpapi"
+    if os.environ.get("BING_SEARCH_KEY"):
+        return "bing"
+    return None
+
+
+def fetch_serp(query, device):
+    """1クエリ・1デバイスぶん取る。
+
+    返すのは (results, meta)。results は枠ごとに分けた辞書の配列で、
+    **自然検索が10件に満たなくても、取れた件数のまま返す。**
+    足りない分を他の枠やスニペットで埋めない。
+    """
+    prov = serp_provider()
+    at = now()
+    base = {"query": query, "locale": SERP_LOCALE, "country": SERP_COUNTRY,
+            "device": device, "provider": prov, "fetched_at": at}
+    if not prov:
+        return [], dict(base, status="取得不能",
+                        why="SERPAPI_KEY も BING_SEARCH_KEY も無い。"
+                            "**Googleを直接取得しない**（規約と安定性）。"
+                            "鍵をSecretsへ入れてから回す")
+    if prov == "serpapi":
+        import requests
+        r = requests.get("https://serpapi.com/search", timeout=TIMEOUT,
+                         params={"q": query, "hl": "ja", "gl": "jp",
+                                 "google_domain": "google.co.jp",
+                                 "device": device, "num": 10,
+                                 "api_key": os.environ["SERPAPI_KEY"]})
+        if r.status_code != 200:
+            return [], dict(base, status="取得不能",
+                            why=f"HTTP {r.status_code}")
+        d = r.json()
+        out = []
+        for i, x in enumerate(d.get("organic_results") or [], 1):
+            out.append({"result_type": "organic", "observed_order": i,
+                        "url": x.get("link"), "title": x.get("title"),
+                        "domain": (x.get("link") or "").split("/")[2:3],
+                        "displayed_date": x.get("date")})
+        for key, t in (("ads", "ad"), ("inline_videos", "video"),
+                       ("shopping_results", "shopping"),
+                       ("related_questions", "people_also_ask")):
+            for x in (d.get(key) or []):
+                out.append({"result_type": t, "observed_order": None,
+                            "url": x.get("link"), "title": x.get("title")})
+        if d.get("answer_box"):
+            out.append({"result_type": "featured_snippet",
+                        "observed_order": 0,
+                        "url": d["answer_box"].get("link"),
+                        "title": d["answer_box"].get("title")})
+        return out, dict(base, status="取得",
+                         organic_count=sum(1 for x in out
+                                           if x["result_type"] == "organic"))
+    # bing は枠の内訳が取れない。**取れないことを書く**
+    import requests
+    r = requests.get("https://api.bing.microsoft.com/v7.0/search",
+                     headers={"Ocp-Apim-Subscription-Key":
+                              os.environ["BING_SEARCH_KEY"]},
+                     params={"q": query, "mkt": "ja-JP", "count": 10},
+                     timeout=TIMEOUT)
+    if r.status_code != 200:
+        return [], dict(base, status="取得不能", why=f"HTTP {r.status_code}")
+    d = r.json()
+    out = [{"result_type": "organic", "observed_order": i,
+            "url": x.get("url"), "title": x.get("name")}
+           for i, x in enumerate((d.get("webPages") or {}).get("value") or [],
+                                 1)]
+    return out, dict(base, status="取得", engine_note="Bing。Googleではない",
+                     result_types_note="広告・動画・強調スニペットの区別は取れない",
+                     organic_count=len(out))
+
+
+def same_domain_duplicates(results):
+    """同一ドメインの重複を**別に記録する。** 消さない。"""
+    seen = {}
+    for x in results:
+        if x.get("result_type") != "organic":
+            continue
+        d = (x.get("url") or "").split("/")[2] if "//" in (x.get("url") or "") \
+            else x.get("domain")
+        if isinstance(d, list):
+            d = d[0] if d else None
+        seen.setdefault(d, []).append(x.get("observed_order"))
+    return {k: v for k, v in seen.items() if k and len(v) > 1}
 
 # 公式一次情報を取りに行く先。**案件ごとに1つ。**
 # ここに無いものは「未取得」と書く。**推測で埋めない**
@@ -205,42 +314,82 @@ def scan_official(slugs):
     return out
 
 
+# 記事 → その記事が本文で扱っている案件だけ。**関係ない案件を取りに行かない**
+ARTICLE_PROGRAMS = {
+    "546": ["nativecamp"],
+    "310": ["speek", "sptr"],
+    "526": ["nativecamp_ryugaku", "phil_navi"],
+}
+
+
 def main(arg):
     import yaml
-    src = sorted(SERP_DIR.glob("*.yaml"))
+    src = sorted(x for x in SERP_DIR.glob("*.yaml") if "_full" not in x.name)
     if not src:
         print("SERPの控えが無い。先に検索結果を保存する")
         sys.exit(1)
-        return
     data = yaml.safe_load(src[-1].read_text(encoding="utf-8"))
     want = ([str(x) for x in data["articles"]] if arg in ("all", "")
             else [x.strip() for x in arg.split(",") if x.strip()])
 
     stamp = datetime.now(JST).strftime("%Y-%m-%d")
-    full, slugs = {}, set()
+    full = {}
     for pid in want:
         rec = data["articles"].get(int(pid)) or data["articles"].get(pid)
         if not rec:
             print(f"[{pid}] 控えに無い。飛ばす")
             continue
-        print(f"[{pid}] {rec['query']}")
-        full[pid] = {"query": rec["query"], "serp": scan_serp(pid, rec)}
-    for slug in OFFICIAL:
-        slugs.add(slug)
+        q = rec["query"]
+        print(f"[{pid}] {q}")
+        by_device = {}
+        for dev in SERP_DEVICES:
+            # **モバイルとデスクトップを分ける。** 混ぜて1つにしない
+            results, meta = fetch_serp(q, dev)
+            organic = [x for x in results if x["result_type"] == "organic"]
+            by_device[dev] = {
+                "meta": meta,
+                "counts": {t: sum(1 for x in results
+                                  if x["result_type"] == t)
+                           for t in RESULT_TYPES},
+                # **10件に満たなくても、そのまま。** 数合わせをしない
+                "organic_count": len(organic),
+                "padded_to_ten": False,
+                "same_domain_duplicates": same_domain_duplicates(results),
+                "results": results,
+                # 本文の構造は、取れた自然検索だけを開いて取る
+                "pages": scan_serp(pid, {"serp": organic}) if organic else [],
+            }
+            print(f"  {dev}: {meta['status']} / 自然検索 {len(organic)}件")
+        full[pid] = {"query": q, "intent": rec.get("intent"),
+                     "by_device": by_device}
+
+    # 公式は、**その記事が本文で扱っている案件だけ**
+    slugs = sorted({s for pid in want for s in ARTICLE_PROGRAMS.get(pid, [])})
+    official = scan_official(slugs) if slugs else {}
 
     SERP_DIR.mkdir(parents=True, exist_ok=True)
     OFFICIAL_DIR.mkdir(parents=True, exist_ok=True)
     p1 = SERP_DIR / f"{stamp}_full.yaml"
     p1.write_text(yaml.safe_dump(
-        {"fetched_at": now(), "note": "本文は保存していない。構造だけ",
+        {"fetched_at": now(),
+         "order_field": "observed_order",
+         "order_is_not_rank": "取得順であって掲載順位ではない",
+         "conditions": {"locale": SERP_LOCALE, "country": SERP_COUNTRY,
+                        "devices": SERP_DEVICES,
+                        "result_types_separated": RESULT_TYPES},
+         "rules": ["自然検索が10件未満でも、取れた件数のまま完了する",
+                   "本文が取れないとき、検索スニペットで補完しない",
+                   "同一ドメインの重複は消さず別に記録する"],
+         "note": "他社の本文は保存していない。構造だけ",
          "articles": full}, allow_unicode=True, sort_keys=False, width=200),
         encoding="utf-8")
     p2 = OFFICIAL_DIR / f"{stamp}.yaml"
     p2.write_text(yaml.safe_dump(
         {"fetched_at": now(),
+         "scope": "対象記事が本文で扱っている案件だけ",
          "rule": "取れなかった項目は None。**0として扱わない**",
-         "programs": scan_official(sorted(slugs))},
-        allow_unicode=True, sort_keys=False, width=200), encoding="utf-8")
+         "programs": official}, allow_unicode=True, sort_keys=False,
+        width=200), encoding="utf-8")
     print(f"\n→ {p1}\n→ {p2}")
     print("**記事もWordPressも触っていない。**")
 
