@@ -1,0 +1,37 @@
+# 実投稿テストの計測予定（2026-08-10）
+#
+# **未取得は 0 にしない。`未取得` と書く。**
+# 0 と書くと「見られたが反応が無かった」という意味になり、
+# 取れていないだけの欄と区別できなくなる。
+#
+# 見る場所（役割が違うので混ぜない）:
+#   views / likes / replies / reposts / profile_visits → 各SNSの画面
+#   link_clicks                                        → GA4（utm_content で在庫を特定）
+#   followers_at_observation                           → プロフィール画面
+
+campaign: social_pilot_20260810
+
+items:
+  - stock_id: X-546-b
+    platform: x
+    article_id: 546
+    posted_id: "2086693958860841429"
+    posted_url: https://x.com/sakura_eigo30/status/2086693958860841429
+    posted_at: "2026-08-10T14:59:43+0900"
+    utm_content: x_546_b
+    pinned: false          # 固定していない。固定すると比較に使えなくなる
+    observations:
+      - {at: "2026-08-11T14:59+0900", elapsed_hours: 24, status: 未取得}
+      - {at: "2026-08-12T14:59+0900", elapsed_hours: 48, status: 未取得}
+
+  - stock_id: THREADS-546-b
+    platform: threads
+    article_id: 546
+    posted_id: 未取得       # 手で貼ったあとに入れる
+    posted_url: 未取得
+    posted_at: 未取得
+    utm_content: threads_546_b
+    pinned: false
+    observations:
+      - {at: 投稿から24時間後, elapsed_hours: 24, status: 未取得}
+      - {at: 投稿から48時間後, elapsed_hours: 48, status: 未取得}
