@@ -267,6 +267,61 @@ def article_fetch(ids, dry=True):
     _git_push([LIVE_DIR], "公開中の本文を取り直す（反映の土台にする）")
 
 
+def link_check(ids, dry=True):
+    """**実際のリンク先**を確かめる。CTAも内部リンクも、最終URLまで追う。
+
+    ブランドのトップページを見ても、CTAの着地先は分からない。
+    本文に入っているhrefをそのまま辿る。
+    """
+    import json
+    import requests
+    sys.path.insert(0, str(Path(__file__).parent))
+    import quality_rules as qr
+
+    out = {}
+    for pid in ids:
+        f = LIVE_DIR / f"{pid}.html"
+        if not f.exists():
+            print(f"[{pid}] live の控えが無い。先に article-fetch")
+            continue
+        html = f.read_text(encoding="utf-8")
+        rec = {"cta": [], "internal": []}
+        # CTA（アフィリのリンク）
+        for m in re.finditer(r'<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>', html, re.S):
+            url, label = m.group(1), re.sub(r"<[^>]+>", "", m.group(2)).strip()
+            if not re.search(r"af\.moshimo\.com|px\.a8\.net", url):
+                continue
+            if url.startswith("//"):
+                url = "https:" + url
+            row = {"anchor": label[:70], "href": url[:110]}
+            try:
+                r = requests.get(url, headers=UA, timeout=40,
+                                 allow_redirects=True, verify=False)
+                row["status"] = r.status_code
+                row["final_url"] = r.url[:140]
+                row["final_host"] = r.url.split("/")[2] if "//" in r.url else ""
+            except Exception as e:                      # noqa: BLE001
+                row["status"] = f"取得できない（{type(e).__name__}）"
+            rec["cta"].append(row)
+            print(f"[{pid}] CTA {row.get('status')} {row.get('final_host','')} "
+                  f"← {label[:40]}")
+        # 内部リンク
+        rec["internal"] = qr.internal_link_gate(html, check_http=True)
+        for x in rec["internal"]:
+            print(f"[{pid}] 内部 {x['http']} noindex={x['noindex']} "
+                  f"{x['title_match']} ← {x['anchor'][:30]}")
+        out[str(pid)] = rec
+
+    d = ROOT / "workspace/market/links"
+    d.mkdir(parents=True, exist_ok=True)
+    from datetime import datetime, timedelta, timezone
+    stamp = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
+    (d / f"{stamp}.json").write_text(json.dumps(out, ensure_ascii=False,
+                                                indent=1), encoding="utf-8")
+    print(f"\n→ workspace/market/links/{stamp}.json")
+    _git_push([d], "CTAと内部リンクの着地先を確認")
+
+
 def article_apply(ids, dry=True):
     """**取り直した本文へ**、指定した置換だけを当てて反映する。
 
@@ -425,6 +480,8 @@ def run(arg, dry=True):
         generate(ids, dry)
     elif cmd == "article-fetch":
         article_fetch(ids, dry)
+    elif cmd == "link-check":
+        link_check(ids, dry)
     elif cmd == "article-apply":
         article_apply(ids, dry)
     elif cmd == "market":

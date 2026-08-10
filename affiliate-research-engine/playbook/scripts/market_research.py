@@ -152,7 +152,8 @@ OFFICIAL = {
     "speek": "https://www.speek.jp/",
     "sptr": "https://sptr.jp/",
     "nativecamp": "https://nativecamp.net/",
-    "nativecamp_ryugaku": "https://nativecamp.net/ryugaku",
+    # 台帳と本文のリンク先に合わせる。/ryugaku は404だった（2026-08-10）
+    "nativecamp_ryugaku": "https://nativecamp.net/study_abroad/counseling-reserve",
     "johokan": "https://www.ryugaku-johokan.com/",
     "phil_navi": "https://philippines-university.jp/",
     "qq_english": "https://www.qqeng.com/",
