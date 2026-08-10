@@ -7,20 +7,20 @@ article_url: https://sakura-eigo.com/toeic-listening-325-to-improvement/
 text: 'リスニングが伸びないと、教材を増やしたくなりますよね。
 
 
-  その前に、音声を1つだけ設問なしで聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります💭
+  その前に、音声を1つだけ、設問を見ずに聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります💭
 
 
-  記事では、確認する順番をまとめました。
+  次に確認する場所を、記事で順番に整理しています。
 
   https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x'
 thread_parts:
 - 'リスニングが伸びないと、教材を増やしたくなりますよね。
 
 
-  その前に、音声を1つだけ設問なしで聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります💭
+  その前に、音声を1つだけ、設問を見ずに聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります💭
 
 
-  記事では、確認する順番をまとめました。
+  次に確認する場所を、記事で順番に整理しています。
 
   https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x'
 state: approved
@@ -54,28 +54,28 @@ gate_results:
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: XとThreadsの近さ 0.12（0.85未満にする）
-approved_at: 2026-08-10T14:06:21+0900
+  detail: XとThreadsの近さ 0.14（0.85未満にする）
+approved_at: 2026-08-10T14:12:46+0900
 rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: bdd03a9436438e36
+content_hash: 586bde3c915659d5
 generator_version: social-v1
 material:
   search_intent: TOEICのリスニングだけが伸びない。聞き流しを続けていいのかを知りたい
   core_answer: 聞き流しを増やす前に、音が拾えていないのか、拾えても設問まで残らないのかを切り分ける
   one_check: 音声を1つ聞いたあと、設問を見ずに内容を1文で言えるかを試す
   unique_artifact: 止まっている場所を切り分ける3つの確認項目と、最初の2週間の組み方
-created_at: 2026-08-10T14:04:56+0900
+created_at: 2026-08-10T14:11:59+0900
 history:
-- at: 2026-08-10T14:04:56+0900
+- at: 2026-08-10T14:11:59+0900
   state: generated
-- at: 2026-08-10T14:04:56+0900
+- at: 2026-08-10T14:11:59+0900
   state: gated
-- at: 2026-08-10T14:04:56+0900
+- at: 2026-08-10T14:11:59+0900
   state: awaiting_approval
-- at: 2026-08-10T14:06:21+0900
+- at: 2026-08-10T14:12:46+0900
   state: approved
 prior_history:
 - at: 2026-08-10T09:05:21+0900
@@ -118,7 +118,17 @@ prior_history:
   state: gated
 - at: 2026-08-10T14:02:19+0900
   state: awaiting_approval
-revoked_reason: CTA末尾の「こちら」を変更するため、いったん承認待ちへ戻す
+- at: 2026-08-10T14:04:56+0900
+  state: generated
+- at: 2026-08-10T14:04:56+0900
+  state: gated
+- at: 2026-08-10T14:04:56+0900
+  state: awaiting_approval
+- at: 2026-08-10T14:06:21+0900
+  state: approved
+- at: 2026-08-10T14:11:58+0900
+  state: awaiting_approval
+revoked_reason: Xの締めの重複を解消するため
 post_type: small_experiment
 post_type_reason: 記事に「音声を1つ聞いて、設問を見ずに内容を1文で言えるか試す」という、 その場で1回できる操作がある。読者が今日試せる形が中心
 template_ids: []
@@ -141,11 +151,11 @@ metrics:
   profile_visits: null
 metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
 tone_warnings: []
-weighted_len: 226
+weighted_len: 240
 claim_counts:
-  supported: 0
+  supported: 1
   unsupported: 0
-  unjudged: 3
+  unjudged: 2
   needs_human_review: 1
   total: 4
 needs_human_review:

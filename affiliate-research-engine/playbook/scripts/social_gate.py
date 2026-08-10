@@ -460,18 +460,53 @@ def variety_check(spec, rows):
         warn.append(f"同じ導入構造が{mx}件続いている"
                     f"（{conf['same_opener_run']['max_run']}件まで）")
 
-    from collections import Counter
-    closers = Counter()
-    for r in win:
-        ps = _paras(r["text"])
-        if ps:
-            closers[re.sub(r"[^ぁ-んァ-ヶ一-龥？?]", "", ps[-1])[-6:]] += 1
-    counts["closers"] = dict(closers)
-    for k, c in closers.items():
+    counts["closers"] = closer_counts(spec, win)
+    for k, c in counts["closers"].items():
         if c > conf["same_closer"]["max"]:
-            warn.append(f"同じ締め方「…{k}」が{c}件"
+            warn.append(f"同じ締め方「{k}」が{c}件"
                         f"（{conf['same_closer']['max']}件まで）")
     return warn, counts
+
+
+def closer_class(spec, text):
+    """締めの**意味の型**を返す。
+
+    語尾の完全一致だけで見ると、「まとめました」を「整理しました」へ
+    言い換えただけで別物になる。**同じ意味・同じ構文を1つに数える。**
+    どの型にも当たらないものは、語尾の見た目でまとめる。
+    """
+    conf = next((c for c in spec["variety"]["checks"]
+                 if c["id"] == "same_closer"), {})
+    ps = _paras(text)
+    if not ps:
+        return "（空）"
+    last = ps[-1]
+    for cl in conf.get("classes", []):
+        if re.search(cl["re"], last):
+            return cl["id"]
+    return "尾:" + re.sub(r"[^ぁ-んァ-ヶ一-龥？?]", "", last)[-6:]
+
+
+def closer_counts(spec, rows):
+    from collections import Counter
+    return dict(Counter(closer_class(spec, r["text"]) for r in rows))
+
+
+def same_closer_gate(spec, rows):
+    """**承認ゲート。** 同じ意味・同じ構文の締めが上限を超えたら止める。
+
+    記事への導線そのものは禁止しない。型ごとに数えて、
+    5件のうち上限を超えた型だけを落とす。
+    """
+    conf = next((c for c in spec["variety"]["checks"]
+                 if c["id"] == "same_closer"), {})
+    if not conf.get("blocking"):
+        return True, ""
+    win = list(rows)[-spec["variety"]["window"]:]
+    bad = [f"{k}が{n}件" for k, n in closer_counts(spec, win).items()
+           if n > conf["max"]]
+    return (not bad, f"同じ締めの型: {' / '.join(bad)}"
+                     f"（{conf['max']}件まで）" if bad else "")
 
 
 def market_reference_gate(spec):

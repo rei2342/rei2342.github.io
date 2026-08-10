@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).parent))
 import social_spec as ss
 import social_inventory as inv
+import social_gate as sg
 
 REASONS = [
     "記事の内容と違う",
@@ -87,6 +88,15 @@ def main():
     if a.approve:
         if any(not g["ok"] for g in s["gate_results"]):
             print("ゲートに落ちている在庫は承認できない")
+            sys.exit(1)
+        # **締めの型の偏りは承認で止める。** 1件ずつでは分からないので、
+        # 同じ媒体の5件の窓で見る（2026-08-10に警告から昇格）
+        peers = sorted([x for _, x in inv.all_stock(spec, s["platform"])
+                        if x["state"] not in ("stale", "rejected", "archived")],
+                       key=lambda y: y["article_id"])
+        ok, why = sg.same_closer_gate(spec, peers)
+        if not ok:
+            print(f"承認できない: {why}")
             sys.exit(1)
         inv.transition(spec, s, "approved", approved_at=inv.now())
     elif a.stale:
