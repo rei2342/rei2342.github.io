@@ -111,6 +111,9 @@ history:
 - at: 2026-08-10T15:44:53+0900
   state: posted
   note: '画面で確認: 返信が親にぶら下がっている（1/2・2/2）／OGPカード表示'
+- at: 2026-08-10T15:51:08+0900
+  state: posted
+  note: 投稿記録の項目を確定（share URLを正式な記録・canonicalは未取得）
 prior_history:
 - at: 2026-08-10T13:27:08+0900
   state: generated
@@ -186,3 +189,30 @@ reply_id_kind: share_code
 canonical_post_url: 未取得
 reply_attached_verified: 確認済み
 ogp_card: 表示された
+thread_root_url: https://www.threads.com/share/Gb3pbY9x2/
+thread_reply_urls:
+- https://www.threads.com/share/EbjWJllwT/
+canonical_url: 未取得
+canonical_url_reason: もらったのは共有リンク(/share/)。投稿URL(/post/)は未取得
+record_of_truth: share_url
+post_ids:
+  root:
+    id: Gb3pbY9x2
+    kind: share_code
+    url: https://www.threads.com/share/Gb3pbY9x2/
+  reply:
+    id: EbjWJllwT
+    kind: share_code
+    url: https://www.threads.com/share/EbjWJllwT/
+  api_media_id: 未取得
+post_structure: 2投稿構成（1投稿目=新規 / 2投稿目=1投稿目への返信）
+parts_count: 2
+utm_campaign: social_pilot_20260810
+utm_content: threads_546_b
+comparison_group:
+  id: pilot_546
+  members:
+  - X-546-b
+  - THREADS-546-b
+  article_id: 546
+  note: 同じ記事・同じ日。媒体差を見るための組。1組だけなので一般則は出さない
