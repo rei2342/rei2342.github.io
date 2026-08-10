@@ -57,5 +57,5 @@ jobs:
           git add affiliate-research-engine/playbook/workspace/program_candidates.csv \
                   affiliate-research-engine/playbook/workspace/program_candidates.md
           git diff --staged --quiet || git commit -m "chore: affiliate program candidates $(date -u +%Y-%m-%d)"
-          git pull --rebase origin main || true
-          git push origin HEAD:main || true
+          git pull --rebase origin "${{ github.ref_name }}" || true
+          git push origin "HEAD:${{ github.ref_name }}" || true
