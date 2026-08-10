@@ -1,0 +1,136 @@
+stock_id: THREADS-546-b
+platform: threads
+article_id: 546
+article_modified_gmt: '2026-08-10T02:47:26'
+article_title: オンライン英会話が続かないのは、話し始めるまでの手数が多いから
+article_url: https://sakura-eigo.com/online-english-lessons-90-days-success/
+text: 'オンライン英会話が続かなかったとき、意志の弱さだけを責めなくて大丈夫です。
+
+
+  分かれ道は、最後に閉じたのがレッスンの最中だったか、予約の画面だったか。ここで見直すものが変わります。まずどちらだったかだけ思い出してみると、進みやすいです。
+
+
+  レッスンの最中に閉じていた場合に見直すのは、この3つです。
+
+
+  ・教材のレベル。直近3回で、知らない単語が1文に何個あったか
+
+  ・レッスンの型。フリートークだったか、教材ありだったか
+
+  ・講師との相性。同じ講師だったか、毎回違ったか
+
+
+  予約の画面で閉じていた場合は、見るところが変わります。話し始めるまでに指を何回動かしているかを、1回だけ数えるところから。
+
+
+  思い出せたのは、どちらの場面でしたか？
+
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads'
+thread_parts:
+- 'オンライン英会話が続かなかったとき、意志の弱さだけを責めなくて大丈夫です。
+
+
+  分かれ道は、最後に閉じたのがレッスンの最中だったか、予約の画面だったか。ここで見直すものが変わります。まずどちらだったかだけ思い出してみると、進みやすいです。'
+- 'レッスンの最中に閉じていた場合に見直すのは、この3つです。
+
+
+  ・教材のレベル。直近3回で、知らない単語が1文に何個あったか
+
+  ・レッスンの型。フリートークだったか、教材ありだったか
+
+  ・講師との相性。同じ講師だったか、毎回違ったか
+
+
+  予約の画面で閉じていた場合は、見るところが変わります。話し始めるまでに指を何回動かしているかを、1回だけ数えるところから。
+
+
+  思い出せたのは、どちらの場面でしたか？
+
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads'
+state: awaiting_approval
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: empathy_without_evidence
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: XとThreadsの近さ 0.14（0.85未満にする）
+approved_at: null
+rejected_reason: null
+scheduled_at: null
+posted_at: null
+posted_id: null
+content_hash: 513f1916fbd96d08
+generator_version: social-v1
+material:
+  search_intent: オンライン英会話が続かない理由と、続ける方法を知りたい
+  core_answer: やめた瞬間が授業中だったか予約の前だったかで、見直すものが変わる
+  one_check: 最後にアプリを閉じた場面が、レッスン中だったか予約の画面だったかを思い出す
+  unique_artifact: 授業中で止まった場合の3項目と、予約の前で止まった場合の手数の数え方
+created_at: 2026-08-10T13:27:08+0900
+history:
+- at: 2026-08-10T13:27:08+0900
+  state: generated
+- at: 2026-08-10T13:27:08+0900
+  state: gated
+- at: 2026-08-10T13:27:08+0900
+  state: awaiting_approval
+post_type: small_experiment
+post_type_reason: 記事の冒頭に「最後にアプリを閉じた場面はどちらか」という その場で1回できる切り分けが入った。読者が今日できる形が中心
+template_ids:
+- condition_open
+- toki
+template_warnings: []
+inferences: []
+threads_format: two_part
+artifact_used: 授業中／予約前の分岐ごとの見直し項目
+metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
+  views: null
+  likes: null
+  replies: null
+  reposts: null
+  link_clicks: null
+  profile_visits: null
+metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
+tone_warnings: []
+weighted_len: null
+claim_counts:
+  supported: 6
+  unsupported: 0
+  unjudged: 2
+  needs_human_review: 2
+  total: 10
+needs_human_review:
+- text: ここで見直すものが変わります。
+  why: 内容語が1語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る
+- text: 予約の画面で閉じていた場合は、見るところが変わります。
+  why: 内容語が2語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る

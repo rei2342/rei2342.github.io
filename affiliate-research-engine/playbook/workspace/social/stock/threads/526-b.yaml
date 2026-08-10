@@ -1,0 +1,138 @@
+stock_id: THREADS-526-b
+platform: threads
+article_id: 526
+article_modified_gmt: '2026-08-10T02:51:23'
+article_title: 「現地が一番早い」を費用と時間で確かめる｜1時間あたりで並べる
+article_url: https://sakura-eigo.com/fast-verify-cost-time-travel/
+text: '留学の候補を並べるとき、費用と効果を1つの表に入れたくなります。
+
+
+  でも、数えられるものと数えられないものは、同じカードに入れないほうが見やすいです。
+
+
+  第1カードに入れるのは、この3つ。
+
+
+  ・費用総額
+
+  ・英語に触れる時間
+
+  ・1時間あたりの費用（総額 ÷ 時間）
+
+
+  第2カードに置くのは「上達の速さ」で、これは第1カードからは出せません。比べたいなら、1コマ中に自分が話している時間や、直してもらえる回数を別に記録することになります。
+
+
+  いま埋められそうなのは、第1カードのどこまでですか？
+
+  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
+thread_parts:
+- '留学の候補を並べるとき、費用と効果を1つの表に入れたくなります。
+
+
+  でも、数えられるものと数えられないものは、同じカードに入れないほうが見やすいです。
+
+
+  第1カードに入れるのは、この3つ。
+
+
+  ・費用総額
+
+  ・英語に触れる時間
+
+  ・1時間あたりの費用（総額 ÷ 時間）
+
+
+  第2カードに置くのは「上達の速さ」で、これは第1カードからは出せません。比べたいなら、1コマ中に自分が話している時間や、直してもらえる回数を別に記録することになります。
+
+
+  いま埋められそうなのは、第1カードのどこまでですか？
+
+  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
+state: awaiting_approval
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: empathy_without_evidence
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: XとThreadsの近さ 0.10（0.85未満にする）
+approved_at: null
+rejected_reason: null
+scheduled_at: null
+posted_at: null
+posted_id: null
+content_hash: ce42166648f0b0ed
+generator_version: social-v1
+material:
+  search_intent: 留学と国内の学習で、どちらが早いのかを同じ物差しで比べたい
+  core_answer: 1時間あたりの費用は出せるが、上達の速さはその割り算からは出ない
+  one_check: 費用を英語に触れる時間で割って、何が出て何が出ないかを分ける
+  unique_artifact: 数えられる3つの第1カードと、上達の速さを置く第2カード
+created_at: 2026-08-10T13:27:09+0900
+history:
+- at: 2026-08-10T13:27:09+0900
+  state: generated
+- at: 2026-08-10T13:27:09+0900
+  state: gated
+- at: 2026-08-10T13:27:09+0900
+  state: awaiting_approval
+post_type: misreading
+post_type_reason: 「現地が一番早い」という言われ方を、記事が読み直している。 費用から出るものと出ないものを分ける、という正し方が芯
+template_ids:
+- condition_open
+- toki
+template_warnings: []
+inferences: []
+threads_format: single
+artifact_used: 第1カードと第2カードの判断手順
+metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
+  views: null
+  likes: null
+  replies: null
+  reposts: null
+  link_clicks: null
+  profile_visits: null
+metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
+tone_warnings: []
+weighted_len: null
+claim_counts:
+  supported: 2
+  unsupported: 0
+  unjudged: 5
+  needs_human_review: 2
+  total: 9
+needs_human_review:
+- text: 留学の候補を並べるとき、費用と効果を1つの表に入れたくなります。
+  why: 記事と肯定・否定が逆に見える。文単位の判定なので人が見る
+- text: 第2カードに置くのは「上達の速さ」で、これは第1カードからは出せません。
+  why: 内容語が2語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る

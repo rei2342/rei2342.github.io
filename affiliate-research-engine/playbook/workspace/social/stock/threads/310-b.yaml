@@ -1,0 +1,140 @@
+stock_id: THREADS-310-b
+platform: threads
+article_id: 310
+article_modified_gmt: '2026-08-10T02:51:19'
+article_title: 無料・低価格の英語アプリで足りる人と、足りない人の分かれ目
+article_url: https://sakura-eigo.com/cheap-english-learning-apps-free/
+text: '無料で試せる期間、機能を比べるほど迷ってしまうことがあります。
+
+
+  そんなときは「高機能か」より「自分の生活の中で無理なく開けたか」を先に見てみると分かりやすいです。
+
+
+  1日につき、この5行だけ書き出します。
+
+
+  ・使う予定だった日
+
+  ・実際に開けた日
+
+  ・準備時間
+
+  ・アプリ使用時間
+
+  ・発話時間
+
+
+  これとは別に、初日のうちに「無料で試せる期間の最終日」と「次回の請求日」を見てカレンダーへ入れておくと安心です📝
+
+
+  7日ぶん並べると、予定と実際のずれが見えてきます。
+
+  https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=threads'
+thread_parts:
+- '無料で試せる期間、機能を比べるほど迷ってしまうことがあります。
+
+
+  そんなときは「高機能か」より「自分の生活の中で無理なく開けたか」を先に見てみると分かりやすいです。
+
+
+  1日につき、この5行だけ書き出します。
+
+
+  ・使う予定だった日
+
+  ・実際に開けた日
+
+  ・準備時間
+
+  ・アプリ使用時間
+
+  ・発話時間
+
+
+  これとは別に、初日のうちに「無料で試せる期間の最終日」と「次回の請求日」を見てカレンダーへ入れておくと安心です📝
+
+
+  7日ぶん並べると、予定と実際のずれが見えてきます。
+
+  https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=threads'
+state: awaiting_approval
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: empathy_without_evidence
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: XとThreadsの近さ 0.16（0.85未満にする）
+approved_at: null
+rejected_reason: null
+scheduled_at: null
+posted_at: null
+posted_id: null
+content_hash: b75fb4288358db65
+generator_version: social-v1
+material:
+  search_intent: 無料や低価格の英語アプリだけで足りるのかを知りたい
+  core_answer: 無料で試せる期間は、機能ではなく自分の生活で無理なく開けたかを見る時間にできる
+  one_check: 使う予定だった日に、実際に開けたかどうかを見る
+  unique_artifact: 1日ぶん5行の記入欄を7日ぶんと、初日に見る解約期限と次回の請求日
+created_at: 2026-08-10T13:27:08+0900
+history:
+- at: 2026-08-10T13:27:08+0900
+  state: generated
+- at: 2026-08-10T13:27:08+0900
+  state: gated
+- at: 2026-08-10T13:27:08+0900
+  state: awaiting_approval
+post_type: comparison_axis
+post_type_reason: 記事が「無料でできること」と「有料で増えること」を並べたうえで、 生活側の記録欄を渡している。軸の作り方を渡す形が合う
+template_ids: []
+template_warnings: []
+inferences: []
+threads_format: single
+artifact_used: 7日ぶんの縦型記録と解約期限
+metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
+  views: null
+  likes: null
+  replies: null
+  reposts: null
+  link_clicks: null
+  profile_visits: null
+metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
+tone_warnings: []
+weighted_len: null
+claim_counts:
+  supported: 3
+  unsupported: 0
+  unjudged: 6
+  needs_human_review: 0
+  total: 9
+needs_human_review: []

@@ -415,7 +415,9 @@ def format_mix_gate(spec, stock_rows):
     fm = spec["threads"].get("format_mix")
     if not fm:
         return []
-    th = [s for s in stock_rows if s["platform"] == "threads"]
+    # **退役した在庫は形の勘定に入れない**（stale/rejected/archived）
+    th = [s for s in stock_rows if s["platform"] == "threads"
+          and s.get("state") not in ("stale", "rejected", "archived")]
     if not th:
         return []
     bad = []
