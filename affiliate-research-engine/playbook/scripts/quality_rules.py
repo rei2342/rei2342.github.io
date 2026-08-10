@@ -223,6 +223,13 @@ def internal_link_gate(html, check_http=False):
     return out
 
 
+# 出典（公式）と確認日が同じ文脈にあるか。**あれば公式情報の記述**
+SOURCED_SPEC_RE = re.compile(
+    r"公式(?:サイト|ページ|情報)[^。]{0,40}?"
+    r"[0-9]{4}年[0-9]{1,2}月[0-9]{1,2}日時点"
+    r"|[0-9]{4}年[0-9]{1,2}月[0-9]{1,2}日時点[^。]{0,40}?公式")
+
+
 def experience_claims(text, html=None):
     """体験表現の使い方が台帳と合っているかを見る。問題を文字列で返す。
 
@@ -240,6 +247,17 @@ def experience_claims(text, html=None):
             around = text[max(0, m.start() - 70):m.end() + 70]
             verb = next((v for v in EXPERIENCE_VERBS if v in around), None)
             if not verb:
+                continue
+            # **出典と確認日が付いたサービス説明は、体験ではない。**
+            # 「ネイティブキャンプは…7日間の無料体験があると案内されている
+            # （公式サイト・2026年8月8日時点）」を体験表現として数えていた。
+            # ここは official_spec_without_source と cta_claims の担当
+            # 判定は**文まるごと**で見る。±70字だと、文末の
+            # 「（公式サイト・2026年8月8日時点）」が窓の外へ出る
+            ls = text.rfind("。", 0, m.start()) + 1
+            rs = text.find("。", m.end())
+            sentence = text[ls:(rs + 1) if rs > 0 else len(text)]
+            if SOURCED_SPEC_RE.search(sentence):
                 continue
 
             row = ledger.get(name)
