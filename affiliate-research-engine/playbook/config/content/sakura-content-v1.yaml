@@ -213,19 +213,46 @@ cadence:
 # ── 最初の監査（**自動改稿しない。一覧を作るだけ**）───
 initial_audit:
   rule: "公開記事すべてを自動改稿しない。まず一覧を作り、人が承認してから着手する"
+  # **「改善不要」という名前を使わない。** 外部の市場調査より前に
+  # その判定は出せない。名前が結論を先取りしていた（2026-08-10に改名）
   buckets:
     - id: 1
-      name: "改善不要"
+      key: no_local_issue_detected
+      name: "手元のデータでは指摘なし"
+      means: "SERP・公式情報・GSC・CTA実績を見る前の状態。完成ではない"
     - id: 2
-      name: "軽微修正"
+      key: minor_local_issue
+      name: "手元で見つかる軽微な指摘"
       examples: ["タイトル", "導入", "CTA", "出典更新"]
     - id: 3
+      key: partial_restructure
       name: "部分再構成"
       examples: ["不足セクション", "比較表", "成果物"]
     - id: 4
+      key: full_restructure
       name: "全面再構成"
     - id: 5
+      key: merge_or_unpublish_candidate
       name: "統合／非公開候補"
+  # 調査がどこまで進んだか。**分類とは別の軸。**
+  assessment_status:
+    - key: local_only
+      means: "手元のデータだけで見た。外部の市場調査は未実施"
+    - key: market_research_completed
+      means: "SERP・公式一次情報・GSC・CTA実績をすべて取得した"
+    - key: improvement_not_needed
+      means: "取得したうえで、直すところが無いと人が判断した"
+      requires: [serp, official, gsc, cta]
+      rule: >
+        **4つすべてを取得するまで付けてはいけない。**
+        取得できなかったものを0として扱わない
+  # 過去の点検の控えは、そのまま採点に使わない
+  stale_audit_finding:
+    rule: >
+      控えの指摘が最新の本文で再現しないとき、**「修正済み」と断定しない。**
+      `stale_audit_finding` として隔離し、最新本文で点検を回し直して、
+      新旧の対応表を出す
+    source: "workspace/site/AUDIT.md"
   must_state_per_article: ["なぜ直すか", "直すと何が良くなるか", "何を失うか"]
   output: "workspace/reports/CONTENT_AUDIT_<日付>.md ＋ .csv"
 

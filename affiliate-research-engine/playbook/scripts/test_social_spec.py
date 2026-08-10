@@ -431,6 +431,27 @@ check("utmの`?`を問いかけと数えない（2026-08-10に誤爆）",
 
 check("参考投稿の記録がある", not sg.market_reference_gate(spec),
       " / ".join(sg.market_reference_gate(spec)))
+check("外部観測の未記録が0件",
+      len((__import__("yaml").safe_load(
+          (ROOT / spec["market_reference"]["file"]).read_text(
+              encoding="utf-8")) or {}).get("references") or []) >= 6)
+
+# 形の比較。**同じ記事を割っただけのA/B案を作らない**
+_rows = [s for _, s in inv.all_stock(spec)]
+check("Threadsが1投稿型2本・2投稿型3本",
+      not sg.format_mix_gate(spec, _rows),
+      " / ".join(sg.format_mix_gate(spec, _rows)))
+for _s in _rows:
+    check(f"{_s['stock_id']}: 投稿後に比べる欄がある",
+          set(_s.get("metrics") or {}) ==
+          set(spec["threads"]["metrics"]["fields"]))
+    check(f"{_s['stock_id']}: 数値がまだ入っていない",
+          all(v is None for v in (_s.get("metrics") or {}).values()))
+check("役割の無い絵文字が在庫に残っていない",
+      not [w for _s in _rows for w in (_s.get("tone_warnings") or [])
+           if "役割の無い絵文字" in w],
+      " / ".join(w for _s in _rows for w in (_s.get("tone_warnings") or [])
+                 if "役割の無い絵文字" in w))
 
 # 引用された世間の言い方を、書き手の主張として照合しない
 q, was = sc.strip_attribution(

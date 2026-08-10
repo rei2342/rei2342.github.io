@@ -170,6 +170,14 @@ def main():
             if twarn and ex:
                 stock["template_exception_reason"] = ex
             stock["inferences"] = infer
+            stock["threads_format"] = (d.get("threads_format", "")
+                                       if platform == "threads" else "")
+            stock["artifact_used"] = d.get("artifact_used", "")
+            # 実投稿のあとに形を比べるための欄。**生成時は空で持つ。**
+            # 欄が無いと、投稿してから作ることになって取り逃す
+            stock["metrics"] = {k: None for k in
+                                spec["threads"]["metrics"]["fields"]}
+            stock["metrics_note"] = spec["threads"]["metrics"]["filled_by"]
             stock["tone_warnings"] = sg.tone_warnings(spec, platform, parts,
                                                       recent)
             stock["weighted_len"] = (sg.weighted_len(spec, parts[0])

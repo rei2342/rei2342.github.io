@@ -7,7 +7,7 @@ article_url: https://sakura-eigo.com/toeic-listening-325-to-improvement/
 text: 'リスニングが伸びないと、教材を増やしたくなりますよね。
 
 
-  その前に、音声を1つだけ設問なしで聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります🎧
+  その前に、音声を1つだけ設問なしで聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります💭
 
 
   確認の順番はこちら
@@ -17,7 +17,7 @@ thread_parts:
 - 'リスニングが伸びないと、教材を増やしたくなりますよね。
 
 
-  その前に、音声を1つだけ設問なしで聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります🎧
+  その前に、音声を1つだけ設問なしで聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります💭
 
 
   確認の順番はこちら
@@ -60,20 +60,20 @@ rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: 289ef532bad93d7e
+content_hash: 7c963bac1d401939
 generator_version: social-v1
 material:
   search_intent: TOEICのリスニングだけが伸びない。聞き流しを続けていいのかを知りたい
   core_answer: 聞き流しを増やす前に、音が拾えていないのか、拾えても設問まで残らないのかを切り分ける
   one_check: 音声を1つ聞いたあと、設問を見ずに内容を1文で言えるかを試す
   unique_artifact: 止まっている場所を切り分ける3つの確認項目と、最初の2週間の組み方
-created_at: 2026-08-10T09:08:34+0900
+created_at: 2026-08-10T09:50:15+0900
 history:
-- at: 2026-08-10T09:08:34+0900
+- at: 2026-08-10T09:50:15+0900
   state: generated
-- at: 2026-08-10T09:08:35+0900
+- at: 2026-08-10T09:50:15+0900
   state: gated
-- at: 2026-08-10T09:08:35+0900
+- at: 2026-08-10T09:50:15+0900
   state: awaiting_approval
 prior_history:
 - at: 2026-08-10T09:05:21+0900
@@ -88,13 +88,27 @@ prior_history:
   state: gated
 - at: 2026-08-10T09:07:53+0900
   state: awaiting_approval
+- at: 2026-08-10T09:08:34+0900
+  state: generated
+- at: 2026-08-10T09:08:35+0900
+  state: gated
+- at: 2026-08-10T09:08:35+0900
+  state: awaiting_approval
 post_type: small_experiment
 post_type_reason: 記事に「音声を1つ聞いて、設問を見ずに内容を1文で言えるか試す」という、 その場で1回できる操作がある。読者が今日試せる形が中心
 template_ids: []
 template_warnings: []
 inferences: []
-tone_warnings:
-- 1投稿目に役割の無い絵文字 🎧
+threads_format: ''
+artifact_used: 止まっている場所を切り分ける3つの確認項目
+metrics:
+  views: null
+  replies: null
+  reposts: null
+  profile_visits: null
+  link_clicks: null
+metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
+tone_warnings: []
 weighted_len: 206
 claim_counts:
   supported: 0

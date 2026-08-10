@@ -39,6 +39,13 @@ def load_spec():
     return yaml.safe_load(SPEC.read_text(encoding="utf-8"))
 
 
+def dump_stamp():
+    """控えがいつのものか。**「最新本文」と言い切らないため。**"""
+    f = ROOT / "workspace/claims/posts/521.txt"
+    return datetime.fromtimestamp(f.stat().st_mtime, JST).strftime(
+        "%Y-%m-%d %H:%M") if f.exists() else "不明"
+
+
 # ── 手元のデータを読む ──────────────────────────────
 def published_ids(spec):
     """公開記事IDの正本。SCOPE.md の「公開記事（全体）」行から取る。"""
@@ -104,6 +111,58 @@ def site_audit(spec):
     return out
 
 
+# 週次点検（wp_audit.audit）のうち、**手元で走らせられるぶんだけ**。
+# featured_media・カテゴリ・アイキャッチのファイル名は WordPress API が要る
+# 採点に使うもの。**再現したら、それは生きている指摘**
+LOCAL_WEEKLY = [
+    ("料金があるのに基準日がない", lambda h, t: qr.price_without_basedate(t)),
+    ("根拠を超える断定", lambda h, t: qr.hype_words(t)),
+    ("制度・年齢条件の話があるのに確認日も出典もない",
+     lambda h, t: qr.institutional_without_source(t)),
+    ("案件を紹介しているのに、合わない人も注意点も書いていない",
+     lambda h, t: qr.missing_caveat(h, t)),
+    ("さくら個人の実現しない予定がある", lambda h, t: qr.personal_plan(t)),
+    ("制度の断定に根拠が足りない", lambda h, t: qr.time_sensitive_fact(t)),
+]
+# **採点に使わないもの。** 誤検知が多いので、人が見る一覧にだけ出す。
+#  - 体験表現 … サービス説明の「無料体験」を台帳 unknown として拾う
+#  - 台帳に無い主張 … 内部リンクの記事タイトル（「TOEIC 600点で…」）を拾う
+ADVISORY_WEEKLY = [
+    ("体験表現の確認が必要", lambda h, t: qr.experience_claims(t)[:3]),
+    ("実体験台帳に無い主張", lambda h, t: qr.fact_claims(t)),
+]
+# 手元では判定できないもの。**「無し」と書かない。**
+WEEKLY_NEEDS_WP = ["内部メモが公開されている", "アイキャッチ未設定",
+                   "アイキャッチのファイル名に日本語が入っている",
+                   "カテゴリが未分類", "アフィリンクが0本", "PR表記なし",
+                   "本文の文字数"]
+
+
+def weekly_recheck(pid):
+    """最新の控えで週次点検を回し直す。**旧指摘の再現だけを見る。**
+
+    再現しないことは「直った」の証明ではない。控えが古い可能性も、
+    HTMLでしか出ない指摘の可能性もある。だから結果は3値で返す。
+    """
+    h = ROOT / "workspace/claims/posts" / f"{pid}.html"
+    t = ROOT / "workspace/claims/posts" / f"{pid}.txt"
+    if not h.exists() or not t.exists():
+        return None
+    html = h.read_text(encoding="utf-8")
+    text = t.read_text(encoding="utf-8")
+    out = {}
+    for name, fn in LOCAL_WEEKLY + ADVISORY_WEEKLY:
+        try:
+            hit = fn(html, text)
+        except Exception as e:                      # noqa: BLE001
+            out[name] = ("判定不能", f"検査が落ちた: {e}", False)
+            continue
+        scored = name in [n for n, _ in LOCAL_WEEKLY]
+        out[name] = (("再現", str(hit)[:60], scored) if hit
+                     else ("再現せず", "", scored))
+    return out
+
+
 def body(pid):
     f = ROOT / "workspace/claims/posts" / f"{pid}.txt"
     if not f.exists():
@@ -124,9 +183,16 @@ def terms(t):
     return {w for w in TERM.findall(t) if w not in STOP}
 
 
-def fact_risk(spec, pid, txt, led, sa, sa_date="不明"):
-    """事実リスク。**手元で判定できるものだけ**を挙げる。"""
+def fact_risk(spec, pid, txt, led, sa, sa_date="不明", weekly=None):
+    """事実リスク。**手元で判定できるものだけ**を挙げる。
+
+    週次点検を最新の控えで回し直した結果を**こちらの権威にする。**
+    AUDIT.md の控えではなく、いま再現するかどうかで決める。
+    """
     out = []
+    for name, (verdict, detail, scored) in (weekly or {}).items():
+        if verdict == "再現" and scored:
+            out.append(f"週次点検を回し直して再現: {name}")
     if led and led.get("blockers") not in ("0", "", None):
         out.append(f"生成ブロッカーが{led['blockers']}件残っている")
     if qr.price_without_basedate(txt):
@@ -150,7 +216,7 @@ def fact_risk(spec, pid, txt, led, sa, sa_date="不明"):
         # 直したあとの記事を「まだ壊れている」と並べたら、
         # 直す順番がまるごと狂う（実際に22本がそうなった）
         if out:
-            out.append(f"週次点検の指摘（{sa_date}時点）: {sa}")
+            out.append(f"（控えの旧指摘・{sa_date}時点）: {sa}")
         else:
             stale_note = (f"週次点検（{sa_date}）は「{sa}」と言っているが、"
                           "**いまの本文では再現しない**。"
@@ -415,8 +481,9 @@ def main():
         anchors, cta_issues = cta_check(spec, pid, txt, led)
         has_art, art_why = artifact_ok(led, txt)
         sib, topic = siblings(pid, led, led_all, topics)
+        wk = weekly_recheck(pid)
         risks, stale_note = fact_risk(spec, pid, txt, led, sa.get(pid),
-                                      sa.get("_date", "不明"))
+                                      sa.get("_date", "不明"), wk)
         days, stale_why = staleness(txt)
         g = pc.get(pid, {})
         f = {
@@ -447,19 +514,25 @@ def main():
         }
         f["score"] = score(spec, f)
         f["bucket"], f["bucket_why"] = bucket(f)
+        # **調査の進み具合は分類とは別の軸。**
+        # SERP・公式・GSC・CTA実績を取るまで improvement_not_needed にしない
+        f["assessment_status"] = "local_only"
+        f["weekly"] = wk
         f["gains"] = gains(f)
         f["losses"] = losses(f, led or {})
         rows.append(f)
 
     rows.sort(key=lambda r: (-r["score"], r["id"]))
-    write(spec, rows, missing, ids, pc)
+    write(spec, rows, missing, ids, pc, sa, sa.get("_date", "不明"))
 
 
-def write(spec, rows, missing, ids, pc):
+def write(spec, rows, missing, ids, pc, sa=None, sa_date="不明"):
+    sa = sa or {}
     stamp = datetime.now(JST).strftime("%Y-%m-%d")
     out = ROOT / spec["paths"]["reports"] / f"CONTENT_AUDIT_{stamp}.md"
     out.parent.mkdir(parents=True, exist_ok=True)
-    names = {b["id"]: b["name"] for b in spec["initial_audit"]["buckets"]}
+    B = {b["id"]: b for b in spec["initial_audit"]["buckets"]}
+    names = {i: f"`{b['key']}`（{b['name']}）" for i, b in B.items()}
     by = defaultdict(list)
     for r in rows:
         by[r["bucket"]].append(r)
@@ -481,7 +554,7 @@ def write(spec, rows, missing, ids, pc):
 
     # **この監査でいちばん大きい発見。** 先に書く
     stale = [r for r in rows if r["stale_finding"]]
-    if stale:
+    if False:
         L.append(f"> **先に読むところ。** 週次点検の控え "
                  f"(`{spec['paths']['site_audit']}`) は"
                  f"「要修正22本」と言っているが、そのうち **{len(stale)}本は、"
@@ -494,11 +567,73 @@ def write(spec, rows, missing, ids, pc):
                  f"それまで、この{len(stale)}本を「直った」と断定しない。\n\n")
 
     # **0本の分類は、理由を書く。** 空欄のままだと見落としに見える
-    L.append("**1（改善不要）の読み方**: これは「手元のデータでは指摘が"
-             "見つからない」という意味で、**完成という意味ではない**。"
-             "SERPと公式一次情報を取ると、"
-             "`market_gap_present` と `official_source_match` で"
-             "分類が動く。ここを最終判断にしない。\n\n")
+    st = defaultdict(int)
+    for r in rows:
+        st[r["assessment_status"]] += 1
+    # ── stale_audit_finding の隔離と、新旧の対応 ──────
+    if stale:
+        L.append(f"## `stale_audit_finding`（{len(stale)}本・隔離）\n\n"
+                 f"週次点検の控え (`{spec['paths']['site_audit']}`・"
+                 f"{sa_date}) は「要修正22本」と言っている。"
+                 f"そのうち **{len(stale)}本は、手元の最新の控えで"
+                 f"同じ指摘が再現しない。**\n\n"
+                 "**修正済みとは断定していない。** 理由は3つ。\n\n"
+                 f"1. 本文の控えは {dump_stamp()} 取得。"
+                 "そのあとにWordPress側が変わっている可能性がある\n"
+                 f"2. 週次点検のうち手元で回せたのは"
+                 f"{len(LOCAL_WEEKLY)}項目（採点）＋"
+                 f"{len(ADVISORY_WEEKLY)}項目（参考）。"
+                 f"WordPress API が要る{len(WEEKLY_NEEDS_WP)}項目"
+                 f"（{'・'.join(WEEKLY_NEEDS_WP[:3])} ほか）は"
+                 "**判定していない**\n"
+                 "3. 再現しないことは、直った証明ではない\n\n"
+                 "だから採点から外し、ここへ隔離した。"
+                 "**やること: 最新本文で週次点検を回し直す。**\n\n")
+
+        # 新旧の対応表。**旧指摘ごとに、いまどうなっているか**
+        L.append("### 新旧の対応表\n\n"
+                 "| ID | 旧指摘（" + sa_date + "） | 最新の控えでの再現 "
+                 "| 判定に使ったもの |\n|---|---|---|---|\n")
+        for r in sorted(stale, key=lambda x: x["id"]):
+            old = sa.get(r["id"], "")
+            w = r["weekly"] or {}
+            hits = [k for k, (v, _, sc_) in w.items() if v == "再現" and sc_]
+            # 旧指摘の文言に、再現した検査名が含まれるかで対応づける
+            same = [k for k in hits if k[:8] in old]
+            verdict = ("**再現**: " + "・".join(same) if same
+                       else "**再現せず**")
+            L.append(f"| {r['id']} | {old[:46]} | {verdict} "
+                     f"| 本文の控え（{dump_stamp()}）＋ "
+                     f"quality_rules {len(LOCAL_WEEKLY)}項目 |\n")
+
+        # 旧指摘には無いが、いま出ているもの
+        L.append("\n### 旧指摘に無いが、いま出ているもの\n\n"
+                 "| ID | 検査 | 中身 |\n|---|---|---|\n")
+        n_new = 0
+        for r in sorted(rows, key=lambda x: x["id"]):
+            old = sa.get(r["id"], "")
+            for k, (v, d, sc_) in (r["weekly"] or {}).items():
+                if v == "再現" and k[:8] not in old:
+                    L.append(f"| {r['id']} | {k} | {d[:60]} |\n")
+                    n_new += 1
+        if not n_new:
+            L.append("| — | — | なし |\n")
+        L.append("\n**この表は採点に入れていない。** "
+                 "`実体験台帳に無い主張` は内部リンクの記事タイトル"
+                 "（「TOEIC 600点で止まっているとき…」）を拾う誤検知が"
+                 "混ざる。人が見て、本物だけを次の点検へ送る。\n\n")
+
+    L.append("## 調査の進み具合（分類とは別の軸）\n\n"
+             "| 状態 | 件数 | 意味 |\n|---|---|---|\n")
+    for a in spec["initial_audit"]["assessment_status"]:
+        L.append(f"| `{a['key']}` | {st.get(a['key'], 0)} "
+                 f"| {a['means']} |\n")
+    L.append("\n**`improvement_not_needed` は0本。** "
+             "SERP・公式一次情報・GSC・CTA実績の4つを取るまで、"
+             "この状態を付けない。**取れなかったものを0として扱わない。**\n\n"
+             "分類1の名前は `no_local_issue_detected`。"
+             "「手元のデータでは指摘が見つからない」であって、"
+             "**完成という意味ではない**。\n\n")
     if not by.get(3):
         L.append("**3（部分再構成）が0本の理由**: 節を足す・書き直す指摘は、"
                  "いま全部が「再現しない週次点検の控え」から来ていた。"

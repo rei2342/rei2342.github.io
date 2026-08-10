@@ -405,6 +405,47 @@ def market_reference_gate(spec):
     return warn
 
 
+def format_mix_gate(spec, stock_rows):
+    """Threadsの1投稿型と2投稿型が、決めた本数と役割で並んでいるか。
+
+    **同じ記事を割っただけのA/B案を作らない。** 形を比べるのであって、
+    同じ文の見え方を比べるのではない。だから
+    1投稿型と2投稿型で、使う固有の成果物が重ならないことも見る。
+    """
+    fm = spec["threads"].get("format_mix")
+    if not fm:
+        return []
+    th = [s for s in stock_rows if s["platform"] == "threads"]
+    if not th:
+        return []
+    bad = []
+    got = {"single": 0, "two_part": 0}
+    arts = {"single": set(), "two_part": set()}
+    for s in th:
+        f = s.get("threads_format") or (
+            "single" if len(s["thread_parts"]) == 1 else "two_part")
+        got[f] = got.get(f, 0) + 1
+        if s.get("artifact_used"):
+            arts.setdefault(f, set()).add(s["artifact_used"])
+    for f in ("single", "two_part"):
+        if fm.get(f) is not None and got.get(f, 0) != fm[f]:
+            bad.append(f"{f} が{got.get(f, 0)}本（{fm[f]}本にする）")
+    if fm.get("artifact_must_differ"):
+        both = arts["single"] & arts["two_part"]
+        if both:
+            bad.append("1投稿型と2投稿型が同じ成果物を使っている: "
+                       + "・".join(sorted(both)))
+    # 形が違うだけで中身が同じものが無いか
+    for a in th:
+        for b in th:
+            if a["stock_id"] >= b["stock_id"]:
+                continue
+            if a["article_id"] == b["article_id"]:
+                bad.append(f"同じ記事で2案ある: {a['stock_id']} と "
+                           f"{b['stock_id']}（割っただけのA/Bにしない）")
+    return bad
+
+
 def tone_warnings(spec, platform, parts, recent=()):
     """温度の警告をまとめる。**落とさない。** 人が見て判断する。"""
     same = [r for r in recent if r.get("platform") == platform]

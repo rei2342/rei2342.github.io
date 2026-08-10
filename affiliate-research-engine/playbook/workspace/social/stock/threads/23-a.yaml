@@ -10,7 +10,7 @@ text: 'ワーホリの貯金を調べると、大きな総額がひとつ出て�
   その金額は、たいてい誰かの条件で出たものです。国、滞在期間、語学学校に行くかどうかで必要額は変わるので、そのまま自分の数字にしなくて大丈夫です。
 
 
-  自分の条件で出すときは、3つに分けます。
+  ワーホリの貯金を自分の条件で出すときは、3つに分けます。
 
 
   ・出発までに払う額。航空券・ビザ・保険・語学学校の初期費用
@@ -30,10 +30,8 @@ thread_parts:
 - 'ワーホリの貯金を調べると、大きな総額がひとつ出てきて、見るのが少し重くなります。
 
 
-  その金額は、たいてい誰かの条件で出たものです。国、滞在期間、語学学校に行くかどうかで必要額は変わるので、そのまま自分の数字にしなくて大丈夫です。
-
-
-  自分の条件で出すときは、3つに分けます。
+  その金額は、たいてい誰かの条件で出たものです。国、滞在期間、語学学校に行くかどうかで必要額は変わるので、そのまま自分の数字にしなくて大丈夫です。'
+- 'ワーホリの貯金を自分の条件で出すときは、3つに分けます。
 
 
   ・出発までに払う額。航空券・ビザ・保険・語学学校の初期費用
@@ -86,20 +84,20 @@ rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: 62666385b8a0c0c1
+content_hash: 04f8a4669b64c222
 generator_version: social-v1
 material:
   search_intent: ワーキングホリデーに必要な貯金額を、自分の条件で知りたい
   core_answer: まとめ記事の総額はそのまま使えない。自分の条件で3つに分けて出し直す
   one_check: 見ている記事が、どの国・どの期間・語学学校ありなしのどれを前提にしているかを確かめる
   unique_artifact: 必要額を3つの箱に分ける出し方と、ビザの残高証明が目標額とは別だという話
-created_at: 2026-08-10T09:08:39+0900
+created_at: 2026-08-10T09:50:16+0900
 history:
-- at: 2026-08-10T09:08:39+0900
+- at: 2026-08-10T09:50:16+0900
   state: generated
-- at: 2026-08-10T09:08:39+0900
+- at: 2026-08-10T09:50:16+0900
   state: gated
-- at: 2026-08-10T09:08:39+0900
+- at: 2026-08-10T09:50:16+0900
   state: awaiting_approval
 prior_history:
 - at: 2026-08-10T09:05:22+0900
@@ -114,17 +112,32 @@ prior_history:
   state: gated
 - at: 2026-08-10T09:07:54+0900
   state: awaiting_approval
+- at: 2026-08-10T09:08:39+0900
+  state: generated
+- at: 2026-08-10T09:08:39+0900
+  state: gated
+- at: 2026-08-10T09:08:39+0900
+  state: awaiting_approval
 post_type: checklist
 post_type_reason: 記事が「3つの箱」と「相談前に書き出す条件」を並べている。 読者が埋める枠を渡す形が合う
 template_ids: []
 template_warnings: []
 inferences: []
+threads_format: two_part
+artifact_used: 必要額を3つの箱に分ける出し方
+metrics:
+  views: null
+  replies: null
+  reposts: null
+  profile_visits: null
+  link_clicks: null
+metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
 tone_warnings: []
 weighted_len: null
 claim_counts:
-  supported: 5
+  supported: 6
   unsupported: 0
-  unjudged: 3
+  unjudged: 2
   needs_human_review: 1
   total: 9
 needs_human_review:

@@ -240,6 +240,23 @@ threads:
       2投稿に割ると、受け止めと一覧が離れて温度が落ちる。
       ただし CLAUDE.md の実測（2連・リンクは2投稿目）とは反対の形なので、
       投稿を始めたら表示と遷移を比べ直す
+  # **どちらの形も残す。** 片方に決め打ちすると比べられない
+  format_mix:
+    single: 2                 # 5記事のうち2記事は1投稿完結
+    two_part: 3               # 残り3記事は2投稿構成
+    rule: >
+      **同じ記事を、内容を変えずに割っただけのA/B案にしない。**
+      形を比べるのであって、同じ文の見え方を比べるのではない。
+      1投稿型と2投稿型では、記事から使う固有の成果物を別のものにする
+    artifact_must_differ: true
+  # 実投稿のあとに形を比べるための欄。**生成時は空で持つ**
+  metrics:
+    fields: [views, replies, reposts, profile_visits, link_clicks]
+    filled_by: "投稿後に人が入れる。APIで取れるものは取れた分だけ"
+    compare: >
+      1投稿型と2投稿型を、同じ欄で並べる。
+      比べるのは link_clicks / views と replies / views の2つ。
+      **views の大小だけで形を決めない**
   part1:
     must:
       - "読者の状況を具体的に置く"
@@ -408,7 +425,8 @@ tone:
 
 # ── 参考にした投稿の記録 ────────────────────────────
 market_reference:
-  required_fields: [url, observed_on, structure_taken, not_taken]
+  required_fields: [url, account, observed_on, reactions_at_observation,
+                    structure_taken, not_taken, applied_to_sakura, not_copied]
   rule: >
     参考投稿の文章はコピーしない。採るのは構造・改行・語尾・絵文字の役割だけ。
     採らなかった表現も残す（あとで「なぜ真似していないか」を追えるように）
