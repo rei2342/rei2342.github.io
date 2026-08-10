@@ -282,12 +282,30 @@ def sns_block():
         if why:
             fail("sns.threads.user", why)
         views, vwhy = threads_views_yesterday()
+        if user.get("followers") == 0:
+            need_human(
+                "THREADS_FOLLOWERS_ZERO",
+                "APIが返したフォロワー0が本当かを確かめる"
+                "（表示は積み上がっているので、仕様で0が返っている疑いがある）",
+                "Threadsアプリ → プロフィール（@sakura_eigo30）のフォロワー数",
+                ["画面のフォロワー数を見る",
+                 "0でなければ、snapshotのthreads.followersは信用しない"
+                 "（followers_countの取り方を直す）",
+                 "0であれば、そのまま measured 0 でよい"],
+                "画面に出ている整数",
+                "画面の数字とsnapshotのthreads.followersが一致すること")
         out["threads"] = {
             "posts_yesterday": metric(posts_yesterday("threads"), "measured",
                                       "social_inventory", "在庫の投稿履歴から実測"),
-            "followers": (metric(user["followers"], "measured", tsrc)
-                          if "followers" in user
-                          else unavailable(tsrc, why or "followers_count が返らない")),
+            # **APIが0を返したら0と書く。** ただし0は疑わしいので印を付ける。
+            # 表示が積み上がっているのにフォロワー0は、
+            # 期間指定なしの followers_count が0で返る仕様の可能性がある
+            "followers": (metric(
+                user["followers"], "measured", tsrc,
+                "画面で一度確かめる（APIが0を返した。期間指定なしの仕様かもしれない）"
+                if user["followers"] == 0 else "")
+                if "followers" in user
+                else unavailable(tsrc, why or "followers_count が返らない")),
             "views": (metric(views, "measured", "threads_insights",
                              "昨日出した投稿の表示数の合計")
                       if views is not None
