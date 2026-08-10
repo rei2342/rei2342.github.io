@@ -146,9 +146,19 @@ POST_URL = re.compile(r"https?://(?:www\.)?threads\.(?:net|com)/[^\s]+")
 
 
 def post_id_from_url(url):
-    """Threadsの投稿URLの末尾（/post/<コード>）を投稿IDとして使う。"""
+    """Threadsの投稿URLからIDを取る。**種類も一緒に返す。**
+
+    共有リンク（/share/<コード>）と投稿URL（/post/<コード>）は別物。
+    共有リンクはリダイレクト先が本体なので、これを投稿IDだと言い切らない。
+    戻り値は (コード, 種類)。取れなければ ("", "")。
+    """
     m = re.search(r"/post/([A-Za-z0-9_\-]+)", url)
-    return m.group(1) if m else ""
+    if m:
+        return m.group(1), "post_code"
+    m = re.search(r"/share/([A-Za-z0-9_\-]+)", url)
+    if m:
+        return m.group(1), "share_code"
+    return "", ""
 
 
 def mark_posted(spec, sid, posted_id, posted_url="", reply_url=""):
@@ -178,22 +188,29 @@ def mark_posted(spec, sid, posted_id, posted_url="", reply_url=""):
     if posted_url and posted_url == reply_url:
         print("親投稿と返信のURLが同じ。貼り間違いの可能性がある")
         sys.exit(1)
-    posted_id = posted_id or post_id_from_url(posted_url)
+    pid, kind = post_id_from_url(posted_url)
+    posted_id = posted_id or pid
     if not posted_id:
         print("投稿IDが決まらない。--posted-id を渡すか、"
-              "/post/<コード> を含むURLを渡す")
+              "/post/<コード> か /share/<コード> を含むURLを渡す")
         sys.exit(1)
-    reply_id = post_id_from_url(reply_url)
+    reply_id, reply_kind = post_id_from_url(reply_url)
+    # **共有リンクは投稿URLそのものではない。** 記録では言い分ける
+    canon = "取得済み" if kind == "post_code" else "未取得"
 
     if s["state"] == "approved":
         inv.transition(spec, s, "scheduled", scheduled_at=inv.now())
     inv.transition(spec, s, "posted", posted_at=inv.now(), posted_id=posted_id,
-                   posted_url=posted_url or None, reply_id=reply_id or None,
-                   reply_url=reply_url or None)
+                   posted_url=posted_url or None, posted_id_kind=kind or None,
+                   reply_id=reply_id or None, reply_url=reply_url or None,
+                   reply_id_kind=reply_kind or None,
+                   canonical_post_url=canon,
+                   reply_attached_verified="未確認")
     inv.save(spec, s)
     inv.append_history(spec, s["platform"], {
         "stock_id": sid, "article_id": s["article_id"],
         "posted_id": posted_id, "posted_url": posted_url,
+        "posted_id_kind": kind, "reply_id_kind": reply_kind,
         "reply_id": reply_id, "reply_url": reply_url,
         "posted_at": s["posted_at"],
         "text": s["text"], "content_hash": s["content_hash"],

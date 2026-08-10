@@ -339,8 +339,10 @@ check("approved か posted のどちらかしか無い",
 # 投稿に失敗したのに予約済みで残っていると、次の実行で二重に出る
 check("scheduled で止まっているものが無い",
       not [s for s in _live if s["state"] == "scheduled"])
+# 実投稿テストで出したのは、記事546の1組（X 1件 + Threads 1件）だけ
 _posted = [s for s in _live if s["state"] == "posted"]
-check("実投稿テストで出したのは1件だけ", len(_posted) == 1,
+check("実投稿テストで出したのは記事546の1組だけ",
+      sorted(s["stock_id"] for s in _posted) == ["THREADS-546-b", "X-546-b"],
       " / ".join(s["stock_id"] for s in _posted))
 for s in _posted:
     check(f"{s['stock_id']}: 投稿IDと投稿時刻が入っている",
@@ -350,8 +352,26 @@ for s in _posted:
              if r.get("stock_id") == s["stock_id"] and r.get("result") == "ok"]
     check(f"{s['stock_id']}: 履歴に成功が1本だけ残っている", len(_hist) == 1,
           f"{len(_hist)}本")
-    check(f"{s['stock_id']}: 名指しで選んだ記録が残っている",
-          _hist and _hist[-1].get("selected_by") == "stock_id")
+    # **どうやって出したかを残す。** APIか手貼りかで、あとの読み方が変わる
+    _how = _hist[-1].get("how") if _hist else ""
+    if s["platform"] == "x":
+        check(f"{s['stock_id']}: 名指しで選んだ記録が残っている",
+              _hist and _hist[-1].get("selected_by") == "stock_id")
+    else:
+        check(f"{s['stock_id']}: 手で貼った記録になっている",
+              _how == "手で貼った", _how)
+        check(f"{s['stock_id']}: 親投稿と返信のURLが両方ある",
+              bool(s.get("posted_url")) and bool(s.get("reply_url")))
+        check(f"{s['stock_id']}: 親と返信のURLが別",
+              s.get("posted_url") != s.get("reply_url"))
+        # 共有リンクは投稿URLそのものではない。**取れていない側を0扱いしない**
+        check(f"{s['stock_id']}: IDの種類を言い分けている",
+              s.get("posted_id_kind") in ("post_code", "share_code"),
+              str(s.get("posted_id_kind")))
+        if s.get("posted_id_kind") == "share_code":
+            check(f"{s['stock_id']}: 投稿URLが未取得だと書いてある",
+                  s.get("canonical_post_url") == "未取得",
+                  str(s.get("canonical_post_url")))
 # 取り消しは履歴に残っていること。**黙って戻さない**
 revoked = [s for _, s in rows if s.get("revoked_reason")]
 check("承認の取り消しに理由が残っている", len(revoked) >= 3,
@@ -649,24 +669,32 @@ _LABEL = re.compile(r"【\s*\d+\s*投稿目\s*】|===")
 check("本文に投稿ラベルが混ざっていない",
       not [p for p in _th["thread_parts"] if _LABEL.search(p)])
 
+# 投稿済みでない Threads 在庫で「貼る本文の表示」を試す
+_TH_TARGET = "THREADS-526-b"
+_th2 = [x for _, x in inv.all_stock(spec) if x["stock_id"] == _TH_TARGET][0]
 _r2 = subprocess.run(
     [sys.executable, str(ROOT / "scripts/social_post.py"),
-     "--platform", "threads", "--stock-id", "THREADS-546-b"],
+     "--platform", "threads", "--stock-id", _TH_TARGET],
     capture_output=True, text=True, cwd=str(ROOT))
 check("Threadsは貼る本文を出すだけで投稿しない",
       _r2.returncode == 0 and "create_tweet" not in _r2.stdout,
       _r2.stderr[-200:])
-for _i, _p in enumerate(_th["thread_parts"], 1):
+for _i, _p in enumerate(_th2["thread_parts"], 1):
     check(f"貼る本文{_i}が全文出る", _p.strip() in _r2.stdout)
-check("貼る順（新規／返信）が出る",
-      "新規投稿" in _r2.stdout and "への返信" in _r2.stdout)
+check("貼る順（新規）が出る", "新規投稿" in _r2.stdout)
+check("投稿済みのThreads在庫は貼る本文を出さない",
+      sp.pick_by_id(spec, "threads", "THREADS-546-b")[0] is None)
 check("出力にラベルを混ぜていない", not _LABEL.search(_r2.stdout))
 
 check("Threads投稿URLから投稿IDを取れる",
-      sp.post_id_from_url(
-          "https://www.threads.com/@sakura_eigo30/post/DAbc-1_2") == "DAbc-1_2")
-check("投稿URLでないものは投稿IDにしない",
-      not sp.post_id_from_url("https://www.threads.com/@sakura_eigo30"))
+      sp.post_id_from_url("https://www.threads.com/@sakura_eigo30/post/DAbc-1_2")
+      == ("DAbc-1_2", "post_code"))
+check("共有リンクは share_code として区別する",
+      sp.post_id_from_url("https://www.threads.com/share/Gb3pbY9x2/")
+      == ("Gb3pbY9x2", "share_code"))
+check("どちらでもないURLからIDを作らない",
+      sp.post_id_from_url("https://www.threads.com/@sakura_eigo30")
+      == ("", ""))
 check("記録に親投稿と返信の両方を受ける",
       "--reply-url" in _src and "--posted-url" in _src)
 _mp = (ROOT / "scripts/social_post.py").read_text(encoding="utf-8")

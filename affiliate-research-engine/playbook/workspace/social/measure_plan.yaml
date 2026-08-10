@@ -31,14 +31,19 @@ items:
     article_id: 546
     format: two_part        # 1投稿目は新規、2投稿目は1投稿目への返信
     url_in_part: 2          # 記事URLは2投稿目だけ
-    posted_id: 未取得       # 手で貼ったあとに入れる
-    posted_url: 未取得      # 親投稿
-    reply_url: 未取得       # 返信（2投稿目）
-    posted_at: 未取得
+    posted_id: Gb3pbY9x2          # 共有リンクのコード。**投稿URLのコードではない**
+    posted_id_kind: share_code
+    posted_url: https://www.threads.com/share/Gb3pbY9x2/     # 親投稿
+    reply_id: EbjWJllwT
+    reply_id_kind: share_code
+    reply_url: https://www.threads.com/share/EbjWJllwT/      # 返信（2投稿目）
+    canonical_post_url: 未取得    # /post/<コード> 形式はまだ取れていない
+    reply_attached_verified: 未確認  # 返信が親にぶら下がったかは画面で見る
+    posted_at: "2026-08-10T15:34:02+0900"
     utm_content: threads_546_b
     pinned: false
     # 親と返信で数字が別々に出る。**足さずに、分けて記録する**
     per_post: [親投稿, 返信]
     observations:
-      - {at: 投稿から24時間後, elapsed_hours: 24, status: 未取得}
-      - {at: 投稿から48時間後, elapsed_hours: 48, status: 未取得}
+      - {at: "2026-08-11T15:34+0900", elapsed_hours: 24, status: 未取得}
+      - {at: "2026-08-12T15:34+0900", elapsed_hours: 48, status: 未取得}
