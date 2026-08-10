@@ -151,12 +151,86 @@ def _months(start, end):
     return (int(m2.group(1)) - int(m1.group(1))) * 12 + int(m2.group(2)) - int(m1.group(2)) + 1
 
 
-def experience_claims(text):
+# ── CTAアンカーと内部リンクのアンカーを、本文の主張から分ける ──
+# CTAの「無料」「7日間」は cta_claim_gate と cta_claims.csv の担当。
+# 内部リンクの「TOEIC 600点」は**リンク先の記事タイトル**であって、
+# さくら自身の事実ではない。どちらも本文の一人称検査から外す。
+# 外すかわりに、内部リンクは internal_link_gate で別に検査する。
+CTA_ANCHOR_RE = re.compile(
+    r"<a[^>]+href=\"[^\"]*(?:af\.moshimo\.com|px\.a8\.net|a8\.net)"
+    r"[^\"]*\"[^>]*>.*?</a>|^\s*(?:\[p\]\s*)?→\s*.+$",
+    re.S | re.M)
+INTERNAL_ANCHOR_RE = re.compile(
+    r"<a[^>]+href=\"[^\"]*sakura-eigo\.com[^\"]*\"[^>]*>(.*?)</a>", re.S)
+
+
+def mask_link_anchors(text_or_html):
+    """CTAと内部リンクのアンカー文を伏せる。**本文の検査から外すため。**
+
+    消すのではなく空白へ置き換える。前後の文脈がずれないようにする。
+    """
+    def blank(m):
+        return " " * max(1, len(m.group(0)) // 8)
+    out = CTA_ANCHOR_RE.sub(blank, text_or_html)
+    out = INTERNAL_ANCHOR_RE.sub(blank, out)
+    return out
+
+
+def internal_link_gate(html, check_http=False):
+    """内部リンクを別に検査する。**アンカー文の数字は本文の主張ではない。**
+
+    見るのは4つ。
+      ・リンク先が HTTP 200
+      ・アンカー文とリンク先のタイトルが対応している
+      ・リンク先が公開記事
+      ・noindex ではない
+
+    `check_http=False` のときはURLの形だけ見て、通信の要る3つは
+    `未検査` として返す。**0件と未検査を混ぜない。**
+    """
+    out = []
+    for m in re.finditer(r"<a[^>]+href=\"([^\"]*sakura-eigo\.com[^\"]*)\""
+                         r"[^>]*>(.*?)</a>", html, re.S):
+        url, anchor = m.group(1), strip_tags(m.group(2)).strip()
+        rec = {"url": url, "anchor": anchor[:60],
+               "http": "未検査", "title_match": "未検査",
+               "published": "未検査", "noindex": "未検査"}
+        if not url.startswith("https://sakura-eigo.com/"):
+            rec["http"] = "NG（URLの形が不正）"
+        if check_http:
+            try:
+                import requests
+                r = requests.get(url, timeout=20,
+                                 headers={"User-Agent": "Mozilla/5.0"},
+                                 verify=False)
+                rec["http"] = r.status_code
+                body = r.text
+                rec["noindex"] = "あり" if re.search(
+                    r"<meta[^>]+noindex", body, re.I) else "なし"
+                t = re.search(r"<title>(.*?)</title>", body, re.S)
+                title = strip_tags(t.group(1)) if t else ""
+                # アンカー文の先頭8字がタイトルに含まれるかで対応を見る
+                key = anchor[:8]
+                rec["title_match"] = "対応" if key and key in title \
+                    else f"不一致（title: {title[:40]}）"
+                rec["published"] = "公開" if r.status_code == 200 else "不明"
+            except Exception as e:                      # noqa: BLE001
+                rec["http"] = f"取得できない（{type(e).__name__}）"
+        out.append(rec)
+    return out
+
+
+def experience_claims(text, html=None):
     """体験表現の使い方が台帳と合っているかを見る。問題を文字列で返す。
 
     自動修正はしない。監査一覧に出して、人が判断する。
     """
     ledger = load_experience()
+    # **CTAアンカーの「無料体験」を本文の体験表現として数えない。**
+    # そこは cta_claim_gate と cta_claims.csv の担当（2026-08-10）
+    # マスクはタグが要るので、HTMLをもらえたときだけ効く
+    if html:
+        text = strip_tags(mask_link_anchors(html))
     issues = []
     for name in SERVICE_NAMES:
         for m in re.finditer(re.escape(name), text):
@@ -215,12 +289,17 @@ FACT_CLAIM_RE = re.compile(
     r"|([0-9]+)\s*時間[^。]{0,8}?(?:勉強|学習|やった)")
 
 
-def fact_claims(text):
+def fact_claims(text, html=None):
     """一人称の具体的な主張を拾い、台帳に根拠があるかを返す。
 
     台帳が空なら「未登録」として全部返す。自動修正はしない。
     """
     facts = load_facts()
+    # **内部リンクのアンカー文にある点数・金額・期間は、リンク先の
+    # 記事タイトルであって、さくら自身の事実ではない。**
+    # 外すかわりに internal_link_gate で別に検査する（2026-08-10）
+    if html:
+        text = strip_tags(mask_link_anchors(html))
     values = " ".join((f.get("value") or "") + (f.get("claim") or "") for f in facts)
     out = []
     for m in FACT_CLAIM_RE.finditer(text):
@@ -575,6 +654,36 @@ def _blocks_with_marks(html):
     return out
 
 
+# ── 市場表現の引用か、第三者との実際の会話か ──────────
+# 「『早い』と言われる」は世間の言い方の紹介。
+# 「私は『向いてない』と言われた」は実際の会話。
+# **引用符を一律に除外しない。** 主語・発言者・体験の文脈で分ける。
+#
+# 市場表現の合図（どれかが要る）
+#   ・受け手が読者一般か不特定（一人称の受け手が無い）
+#   ・述語が習慣・伝聞の形（言われている／言われる／と聞く／見かける）
+#   ・「よく」「たいてい」「ことが多い」のような頻度の語
+MARKET_VOICE = re.compile(
+    r"と(?:よく)?(?:言われ(?:て(?:いる|いま[すし])|る|ます)"
+    r"|聞[くき]|いう言い方|いう言葉|いわれ(?:て(?:いる|います)|る))"
+    r"|という言い方|という言葉|と見かけ|を見かけ")
+# 一人称の受け手。**これがあれば実際の会話として扱う**
+SPOKEN_TO_ME = re.compile(
+    r"(?:私|自分|僕|うち)(?:は|に|が|も)[^。]{0,30}?と(?:言われ|指摘され|"
+    r"教えて|返ってき|褒められ|すすめられ)"
+    r"|(?:講師|先生|友人|同僚|上司|担当|カウンセラー|スタッフ)"
+    r"(?:に|から)[^。]{0,20}?と(?:言われ|指摘され|教えて)")
+
+
+def is_market_voice(sent):
+    """世間の言い方の紹介か。**実際の会話なら False。**"""
+    if SPOKEN_TO_ME.search(sent):
+        return False                      # 発言者か受け手が特定されている
+    if SELF_RE.search(sent) and re.search(r"と言われた|と指摘された", sent):
+        return False                      # 一人称＋過去の被伝達
+    return bool(MARKET_VOICE.search(sent))
+
+
 def unverified_self_facts(html):
     """verified な fact ID の裏付けが無い、さくら固有の事実を返す。
 
@@ -593,6 +702,11 @@ def unverified_self_facts(html):
                 continue
             m = pat.search(sent)
             if not m:
+                continue
+            # 世間の言い方の紹介は、第三者から言われた言葉ではない。
+            # 「『早い』と言われる」で 526 が止まっていた（2026-08-10）
+            if name in ("第三者から言われた言葉", "実際の発言・会話") \
+                    and is_market_voice(sent):
                 continue
             good = ids & ok_ids
             if good:

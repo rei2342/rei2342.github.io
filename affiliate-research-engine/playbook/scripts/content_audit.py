@@ -128,8 +128,8 @@ LOCAL_WEEKLY = [
 #  - 体験表現 … サービス説明の「無料体験」を台帳 unknown として拾う
 #  - 台帳に無い主張 … 内部リンクの記事タイトル（「TOEIC 600点で…」）を拾う
 ADVISORY_WEEKLY = [
-    ("体験表現の確認が必要", lambda h, t: qr.experience_claims(t)[:3]),
-    ("実体験台帳に無い主張", lambda h, t: qr.fact_claims(t)),
+    ("体験表現の確認が必要", lambda h, t: qr.experience_claims(t, h)[:3]),
+    ("実体験台帳に無い主張", lambda h, t: qr.fact_claims(t, h)),
 ]
 # 手元では判定できないもの。**「無し」と書かない。**
 WEEKLY_NEEDS_WP = ["内部メモが公開されている", "アイキャッチ未設定",

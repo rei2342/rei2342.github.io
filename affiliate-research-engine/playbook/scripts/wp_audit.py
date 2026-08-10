@@ -142,11 +142,11 @@ def audit(post):
         issues.append(f"制度の断定に根拠が足りない: {tsf}")
 
     # 台帳と食い違う体験表現。自動修正はせず、監査一覧に出す
-    for e in _q.experience_claims(text)[:3]:
+    for e in _q.experience_claims(text, body)[:3]:
         issues.append(f"体験表現の確認が必要: {e}")
 
     # 一人称の具体的な主張が、事実台帳に無い
-    fc = _q.fact_claims(text)
+    fc = _q.fact_claims(text, body)
     if fc:
         issues.append(f"実体験台帳に無い主張: {'・'.join(fc[:3])}"
                       + (f" ほか{len(fc)-3}件" if len(fc) > 3 else ""))

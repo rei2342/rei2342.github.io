@@ -198,6 +198,222 @@ def generate(ids, dry):
         print("**投稿していない。在庫を作っただけ。**")
 
 
+# ── 記事の取得と反映（2026-08-10 追加）──────────────────
+# **ローカルの控えを反映の土台にしない。**
+# workspace/claims/posts/310.raw.html は 2026-08-09 13:58 のパッチより
+# 古く、直したはずの旧断定が2件残っていた。これを土台にすると、
+# 直した内容を巻き戻して公開することになる。
+# だから反映の直前に、**そのとき公開されている本文を取り直す。**
+LIVE_DIR = ROOT / "workspace/claims/live"
+BACKUP_DIR = ROOT / "workspace/backups"
+PATCH_DIR = ROOT / "workspace/social/patches"
+
+KEEP_FIELDS = ["id", "date", "date_gmt", "modified", "modified_gmt", "slug",
+               "status", "type", "link", "author", "featured_media",
+               "categories", "tags"]
+
+
+def _get_post(pid):
+    import requests
+    r = requests.get(f"{WP}/posts/{pid}", auth=AUTH,
+                     params={"context": "edit"}, headers=UA,
+                     verify=False, timeout=60)
+    if r.status_code != 200:
+        return None, f"HTTP {r.status_code}"
+    return r.json(), None
+
+
+def _git_push(paths, message):
+    """Actions の中から控えを残す。**ローカルでは呼ばれない。**"""
+    import subprocess
+    if not os.environ.get("GITHUB_ACTIONS"):
+        print("  （ローカル実行なのでコミットしない）")
+        return
+    subprocess.run(["git", "config", "user.name", "github-actions[bot]"],
+                   check=False)
+    subprocess.run(["git", "config", "user.email",
+                    "github-actions[bot]@users.noreply.github.com"],
+                   check=False)
+    subprocess.run(["git", "add", *[str(p) for p in paths]], check=False)
+    r = subprocess.run(["git", "diff", "--cached", "--quiet"])
+    if r.returncode == 0:
+        print("  （差分なし）")
+        return
+    subprocess.run(["git", "commit", "-m", message], check=False)
+    subprocess.run(["git", "push"], check=False)
+
+
+def article_fetch(ids, dry=True):
+    """**いま公開されている本文**を取り直して控える。書き込みはしない。"""
+    import json
+    LIVE_DIR.mkdir(parents=True, exist_ok=True)
+    for pid in ids:
+        d, err = _get_post(pid)
+        if err:
+            print(f"[{pid}] 取得できない: {err}")
+            continue
+        raw = d["content"]["raw"]
+        (LIVE_DIR / f"{pid}.html").write_text(raw, encoding="utf-8")
+        meta = {k: d.get(k) for k in KEEP_FIELDS}
+        meta["title"] = d["title"]["raw"]
+        from datetime import datetime, timedelta, timezone
+        meta["fetched_at"] = datetime.now(
+            timezone(timedelta(hours=9))).isoformat(timespec="seconds")
+        meta["chars"] = len(re.sub(r"<[^>]+>", "", raw))
+        (LIVE_DIR / f"{pid}.json").write_text(
+            json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
+        print(f"[{pid}] {meta['status']} / {meta['chars']}字 / "
+              f"modified {meta['modified_gmt']} / slug {meta['slug']}")
+    _git_push([LIVE_DIR], "公開中の本文を取り直す（反映の土台にする）")
+
+
+def article_apply(ids, dry=True):
+    """**取り直した本文へ**、指定した置換だけを当てて反映する。
+
+    やること
+      1. 公開中の本文を取り直す
+      2. 期待した文字列がすべて在ることを確かめる（1つでも無ければ止める）
+      3. 完全バックアップを保存する
+      4. 置換して、ゲートを回す
+      5. content だけ送る（title/slug/status/date/author は送らない）
+      6. 送ったあと取り直して、入っているか確かめる
+    """
+    import json
+    import yaml as _y
+    import requests
+    sys.path.insert(0, str(Path(__file__).parent))
+    import quality_rules as qr
+
+    from datetime import datetime, timedelta, timezone
+    stamp = datetime.now(timezone(timedelta(hours=9))).strftime(
+        "%Y-%m-%d_%H%M")
+    bdir = BACKUP_DIR / stamp
+    bdir.mkdir(parents=True, exist_ok=True)
+    applied, held = [], []
+
+    for pid in ids:
+        pf = PATCH_DIR / f"apply_{pid}.yaml"
+        if not pf.exists():
+            print(f"[{pid}] 置換指示が無い（{pf.name}）。触らない")
+            held.append((pid, "置換指示が無い"))
+            continue
+        spec = _y.safe_load(pf.read_text(encoding="utf-8"))
+
+        d, err = _get_post(pid)
+        if err:
+            print(f"[{pid}] 取得できない: {err}")
+            held.append((pid, err))
+            continue
+        before = d["content"]["raw"]
+
+        # **完全バックアップ。** 記事オブジェクトごと残す
+        (bdir / f"{pid}.json").write_text(
+            json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
+        (bdir / f"{pid}.before.html").write_text(before, encoding="utf-8")
+
+        # 変えてはいけないものを控える
+        fixed = {k: d.get(k) for k in
+                 ("slug", "link", "date", "date_gmt", "status", "author")}
+
+        ok = True
+        for g in spec.get("guards", {}).get("must_contain", []):
+            if g not in before:
+                print(f"[{pid}] 期待した文字列が無い: {g[:44]}")
+                ok = False
+        for g in spec.get("guards", {}).get("must_not_contain", []):
+            if g in before:
+                print(f"[{pid}] 在ってはいけない文字列がある: {g[:44]}")
+                ok = False
+        if not ok:
+            held.append((pid, "本文が想定と違う。触らない"))
+            continue
+
+        after = before
+        for i, rep in enumerate(spec["replacements"], 1):
+            find, to = rep["find"], rep.get("replace", "")
+            n = after.count(find)
+            want = rep.get("count", 1)
+            if n != want:
+                print(f"[{pid}] 置換{i}: {n}件（{want}件のはず）"
+                      f" — {find[:40]}")
+                ok = False
+                break
+            after = after.replace(find, to)
+        if not ok:
+            held.append((pid, "置換が想定どおりに当たらない"))
+            continue
+
+        # 反映後の検査。**指示された5つを0件にする**
+        gates = {
+            "fact_gate(unverified_self_facts)": qr.unverified_self_facts(after),
+            "official_gate(official_spec_without_source)":
+                qr.official_spec_without_source(after),
+            "cta_gate(cta_claim_gate)": qr.cta_claim_gate(after),
+            "cta_gate(cta_box_text_gate)": qr.cta_box_text_gate(after),
+            "institution_country_gate": qr.institution_country_gate(after),
+            "price_without_basedate":
+                qr.price_without_basedate(qr.strip_tags(after)),
+            "hype_words": qr.hype_words(qr.strip_tags(after)),
+            "personal_plan": qr.personal_plan(qr.strip_tags(after)),
+            "experience_claims":
+                qr.experience_claims(qr.strip_tags(after), after)[:3],
+            "fact_claims": qr.fact_claims(qr.strip_tags(after), after),
+            "missing_caveat": qr.missing_caveat(after, qr.strip_tags(after)),
+        }
+        ng = {k: v for k, v in gates.items() if v}
+        for k, v in gates.items():
+            print(f"  {'NG' if v else 'OK'} {k}"
+                  + (f" … {str(v)[:80]}" if v else ""))
+        if ng:
+            print(f"[{pid}] ゲートNG {len(ng)}件。**反映しない**")
+            held.append((pid, f"ゲートNG: {' / '.join(ng)}"))
+            continue
+
+        h2 = len(re.findall(r"<h2", after))
+        if not 4 <= h2 <= 7:
+            print(f"[{pid}] H2が{h2}本（4〜7の範囲外）。反映しない")
+            held.append((pid, f"H2が{h2}本"))
+            continue
+
+        (bdir / f"{pid}.after.html").write_text(after, encoding="utf-8")
+        chars = len(re.sub(r"<[^>]+>", "", after))
+        print(f"[{pid}] 検査OK / H2 {h2}本 / {chars}字 / "
+              f"CTA {after.count('af.moshimo.com') + after.count('px.a8.net')}")
+
+        if dry:
+            print(f"[{pid}] DRY RUN。送っていない")
+            applied.append((pid, "dry"))
+            continue
+
+        r = requests.post(f"{WP}/posts/{pid}", auth=AUTH,
+                          json={"content": after},   # content だけ
+                          headers=UA, verify=False, timeout=60)
+        if r.status_code not in (200, 201):
+            print(f"[{pid}] 反映失敗 HTTP {r.status_code}")
+            held.append((pid, f"HTTP {r.status_code}"))
+            continue
+
+        # 送ったあと取り直して、変えてはいけないものが変わっていないか見る
+        d2, err2 = _get_post(pid)
+        if err2:
+            print(f"[{pid}] 反映後の確認ができない: {err2}")
+            applied.append((pid, "反映したが未確認"))
+            continue
+        moved = {k: (fixed[k], d2.get(k)) for k in fixed
+                 if fixed[k] != d2.get(k)}
+        got = d2["content"]["raw"]
+        print(f"[{pid}] 反映した / modified {d2.get('modified_gmt')} / "
+              f"本文一致 {got.strip() == after.strip()}")
+        if moved:
+            print(f"[{pid}] ⚠ 変わってはいけない項目が変わった: {moved}")
+        applied.append((pid, "反映"))
+
+    print(f"\n反映 {len(applied)}件 / 保留 {len(held)}件")
+    for pid, why in held:
+        print(f"  保留 {pid}: {why}")
+    _git_push([BACKUP_DIR], f"反映前のバックアップ（{stamp}）")
+
+
 def run(arg, dry=True):
     cmd, _, rest = arg.partition(":")
     ids = [x.strip() for x in rest.split(",") if x.strip()]
@@ -207,6 +423,10 @@ def run(arg, dry=True):
         article_patch(ids, dry)
     elif cmd == "generate":
         generate(ids, dry)
+    elif cmd == "article-fetch":
+        article_fetch(ids, dry)
+    elif cmd == "article-apply":
+        article_apply(ids, dry)
     elif cmd == "market":
         # 市場調査の取得。**記事もWordPressも触らない**ので dry は見ない
         import market_research
