@@ -1,0 +1,243 @@
+# さくら 記事・市場調査 共通仕様（唯一の正本）
+#
+# **このファイルだけを変更する。**
+# 記事生成・改稿・監査のスクリプトは、ここを読んで動く。
+# ワークフローやスクリプトへ、判定基準・重み・ゲート名を直接書かない。
+#
+# SNS側の正本は config/social/sakura-social-v1.yaml。
+# 文章の温度はSNSと同じものを引き継ぐが、記事は**情報探索を邪魔しない**。
+
+version: 1.0.0
+status: pilot            # 最初の監査を人が承認するまで pilot
+updated: 2026-08-10
+scope: >
+  SNSで生まれた関心を、記事の中で納得・比較・行動へつなげる。
+  検索上位を模倣せず、上位記事を読んでも解消できない判断を特定して、
+  さくらの記事固有の成果物として補う
+
+# ── 原則 ────────────────────────────────────────────
+principles:
+  - "検索順位だけを正解にしない"
+  - "上位記事・公式一次情報・検索候補・読者の質問・GSC/GA4・CTA実績を、
+     **別のデータとして持つ**。混ぜて1つの結論にしない"
+  - "他社の文章・見出し・比較表をコピーしない。
+     採るのは検索意図・比較軸・情報の順番・未回答の疑問だけ"
+  - "未使用サービスをレビューしない。
+     「公式情報による整理」と「確認済み体験」を**表示上も分ける**"
+  - "verified fact ID が無い体験・感想・成果・会話・期間・金額は生成しない"
+  - "変更箇所だけを提案する。記事全体を理由なく作り直さない"
+  - "公開反映の前に、人が差分・出典・CTAを承認する"
+
+# ── 記事ごとの調査フロー（この順で動かす）────────────
+research_flow:
+  - id: 1
+    step: "主検索語と検索意図を1つに固定する"
+  - id: 2
+    step: "検索結果の上位10件を取得する"
+    needs_network: true
+  - id: 3
+    step: "公式一次情報を別枠で取得する"
+    needs_network: true
+  - id: 4
+    step: "上位記事の共通項と差分を構造化する"
+  - id: 5
+    step: "読者がもう一度検索しそうな未回答項目を抽出する"
+  - id: 6
+    step: "さくらの記事にしかない成果物を1つ設計する"
+  - id: 7
+    step: "CTAの役割を「誰が・どの判断の後に押すか」で決める"
+  - id: 8
+    step: "改善案を作り、事実・出典・重複・カニバリ・導線を検査する"
+  - id: 9
+    step: "**人の承認後だけ** WordPressへ反映する"
+  - id: 10
+    step: "反映前後の GSC・GA4・CTAクリックを28日単位で比べる"
+
+# ── 集める市場データ（**別々に持つ**）────────────────
+market_data:
+  serp:
+    needs_network: true
+    fields: [url, rank, title, updated_shown, article_type, lead_answer,
+             headings, comparison_axes, unique_elements, cta_position,
+             cta_program, cta_pitch, missing]
+    article_type: [比較, レビュー, 料金, 手順, 体験, FAQ]
+    rule: "本文・見出し・比較表は保存しない。**構造と欠落だけ**を残す"
+  official:
+    needs_network: true
+    fields: [url, fetched_at, quote, service, plan, country, period,
+             price, free_period, count, conditions, exclusions,
+             valid_until, recheck_on]
+    rule: "原文抜粋は出典の確認用。本文へそのまま貼らない"
+  own:
+    gsc: [query, page, impressions, clicks, ctr, position]
+    ga4: [landing, engagement, scroll, affiliate_click]
+    cta: [program, position, anchor, clicks]
+    internal_links: [inbound, outbound, distance_to_hub]
+
+# ── 記事ごとに出すもの ──────────────────────────────
+analysis_output:
+  fields:
+    keep: "現在のまま残す箇所"
+    fix: "事実・古さ・分かりにくさを直す箇所"
+    add: "市場に不足し、自サイトが追加価値を出せる箇所"
+    remove: "重複・未確認・検索意図から外れる箇所"
+    merge: "カニバリする記事との統合候補"
+    link: "追加する内部リンク"
+    cta: "0/1/2本、案件、位置、理由"
+    evidence: "各主張の出典と確認日"
+    confidence: "high / medium / low"
+    human_decision: "人が決める項目"
+  rule: >
+    keep が空の提案は疑う。全部を fix にするのは、
+    読んでいないか、作り直したいだけのことが多い
+
+# ── 独自価値（最低1つ。文字数は価値に数えない）───────
+unique_value:
+  min_per_article: 1
+  word_count_is_not_value: true
+  kinds:
+    - id: fillable_table
+      name: "読者が記入できる比較表"
+    - id: swappable_estimate
+      name: "条件を入れ替えられる試算"
+    - id: fit_branch
+      name: "向いている／向いていないの分岐"
+    - id: pre_signup_questions
+      name: "申し込み前の質問集"
+    - id: cancel_procedure
+      name: "解約・契約・無料期間の確認手順"
+    - id: condition_matrix
+      name: "公式条件の対象対応表"
+    - id: failure_diagnosis
+      name: "失敗箇所を切り分ける診断"
+    - id: verified_experience
+      name: "verified fact ID に基づく一次体験と証拠"
+      needs_fact_id: true
+
+# ── 文章の温度（SNSの market-in voice を引き継ぐ）─────
+voice:
+  inherits: "config/social/sakura-social-v1.yaml の persona.warm_order"
+  article_specific:
+    - "導入で、読者の迷いを**具体的に1回だけ**代弁する"
+    - "「正解はこれ」ではなく「ここを分けると決めやすい」"
+    - "命令より、選択肢と確認手順を渡す"
+    - "女性らしさを絵文字や幼い語尾で作らない"
+    - "**本文に絵文字は原則使わない**（SNSと違うのはここ）"
+    - "CTA直前だけ、読者がどの条件に当てはまったら進むかを明示する"
+  do_not_block_search: >
+    温度を上げるために、答えへ着くまでの行数を増やさない。
+    代弁は1回。そのあとは判断材料へ進む
+
+# ── CTA判定 ─────────────────────────────────────────
+cta:
+  count_rules:
+    - n: 0
+      when: "読者の次の行動が自己確認で完結する"
+    - n: 1
+      when: "主検索意図と1案件が直結する"
+    - n: 2
+      when: "読者条件が明確に二分され、案件の役割が重ならない"
+  forbidden:
+    - "同じ役割の案件を並べる"
+    - "「おすすめ」「最適」「一番」を、比較根拠も verified 体験も無しに使う"
+  ledger_match: >
+    CTAアンカーの料金・無料・回数・期間は、workspace/cta_claims.csv と
+    必ず照合する。台帳に無い条件をアンカーへ書かない
+  role_must_be_explained: "誰が・どの判断の後に押すかを本文に書く"
+
+# ── 改善の優先度（この加重で並べる）──────────────────
+priority:
+  weights:
+    fact_risk: 30
+    weak_ctr_despite_impressions: 20
+    monetization_mismatch: 20
+    unanswered_intent: 15
+    cannibalization: 10
+    stale_price_or_rule: 5
+  zero_impression_rule: >
+    表示0の記事は、順位改善より先に
+    インデックス・内部リンク・検索需要・記事の役割を確認する。
+    **順位対策から入らない**
+
+# ── 公開ゲート（すべて満たすまで反映しない）──────────
+publish_gates:
+  - id: official_source_match
+    why: "公式の料金・条件が、出典URLと確認日つきで一致していること"
+  - id: country_plan_condition_pairing
+    why: "国・プラン・条件が対で書かれていること（片方だけにしない）"
+  - id: verified_experience_only
+    why: "体験は verified fact ID があるものだけ"
+  - id: no_thin_affiliate
+    why: "公式の説明をまとめてCTAを置いただけになっていないこと"
+  - id: market_gap_present
+    why: "上位が答えていない項目に触れていること"
+  - id: unique_artifact_present
+    why: "この記事にしかない成果物が1つ以上あること"
+  - id: search_intent_answered_above_fold
+    why: "主検索意図の答えが冒頭で返っていること"
+  - id: title_matches_body
+    why: "タイトルが本文の中身と一致していること"
+  - id: cta_role_explained
+    why: "CTAの役割が本文で説明されていること"
+  - id: affiliate_claim_ledger_match
+    why: "CTAの条件が cta_claims 台帳と一致していること"
+  - id: no_cannibalization_without_plan
+    why: "同じ意図の記事があるなら、統合か住み分けの方針があること"
+  - id: internal_links_valid
+    why: "内部リンクが生きていること"
+  - id: canonical_self
+    why: "canonical が自己参照であること"
+  - id: noindex_absent
+    why: "noindex が付いていないこと"
+  - id: human_approved
+    why: "人が差分・出典・CTAを承認していること"
+
+# ── 禁止 ────────────────────────────────────────────
+forbidden:
+  - "上位10記事の見出しを混ぜて新記事を作る"
+  - "競合の比較表を言い換える"
+  - "公式サイトの説明だけをまとめてCTAを置く"
+  - "未使用なのにレビュー・体験・使用感を書く"
+  - "検索語の微差ごとに量産する"
+  - "日付だけ更新する"
+  - "文字数を増やすための一般論"
+  - "SNSで反応した表現を、根拠なく本文の事実へ昇格する"
+
+# ── 定期運用 ────────────────────────────────────────
+cadence:
+  weekly: ["公式料金", "無料期間", "リンク切れ", "CTA台帳"]
+  monthly: ["GSC/GA4/CTA", "SERP差分", "上位記事と下位記事の比較"]
+  quarterly: ["カニバリ", "カテゴリ", "ハブ構造", "案件構成"]
+  after_major_change: ["7日", "28日", "90日"]
+
+# ── 最初の監査（**自動改稿しない。一覧を作るだけ**）───
+initial_audit:
+  rule: "公開記事すべてを自動改稿しない。まず一覧を作り、人が承認してから着手する"
+  buckets:
+    - id: 1
+      name: "改善不要"
+    - id: 2
+      name: "軽微修正"
+      examples: ["タイトル", "導入", "CTA", "出典更新"]
+    - id: 3
+      name: "部分再構成"
+      examples: ["不足セクション", "比較表", "成果物"]
+    - id: 4
+      name: "全面再構成"
+    - id: 5
+      name: "統合／非公開候補"
+  must_state_per_article: ["なぜ直すか", "直すと何が良くなるか", "何を失うか"]
+  output: "workspace/reports/CONTENT_AUDIT_<日付>.md ＋ .csv"
+
+# ── 置き場 ──────────────────────────────────────────
+paths:
+  posts: "workspace/claims/posts"          # 公開本文のローカル控え
+  scope: "workspace/claims/SCOPE.md"       # 公開記事IDの正本
+  ledger: "workspace/claims/QUALITY_LEDGER.md"
+  gsc_page_check: "workspace/gsc/PAGE_CHECK.md"
+  site_audit: "workspace/site/AUDIT.md"
+  cta_claims: "workspace/cta_claims.csv"
+  facts: "workspace/experience_facts.csv"
+  reports: "workspace/reports"
+  serp: "workspace/market/serp"            # Actions でだけ書く
+  official: "workspace/market/official"    # Actions でだけ書く
