@@ -431,6 +431,7 @@ def run(arg, dry=True):
         # 市場調査の取得。**記事もWordPressも触らない**ので dry は見ない
         import market_research
         market_research.main(rest or "all")
+        _git_push([ROOT / "workspace/market"], "市場調査の控えを取得")
     else:
         print(f"知らないコマンド: {cmd}")
         sys.exit(1)
