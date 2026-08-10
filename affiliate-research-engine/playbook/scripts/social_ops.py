@@ -307,6 +307,38 @@ def link_check(ids, dry=True):
                   f"← {label[:40]}")
         # 内部リンク
         rec["internal"] = qr.internal_link_gate(html, check_http=True)
+        # **moshimo が全部404だった。** クライアント側の問題か、
+        # リンクそのものが死んでいるのかを切り分ける
+        probes = {
+            "moshimo_root": "https://af.moshimo.com/",
+            "a8_root": "https://px.a8.net/",
+        }
+        rec["probe"] = {}
+        for name, u in probes.items():
+            try:
+                r = requests.get(u, headers=UA, timeout=30, verify=False)
+                rec["probe"][name] = r.status_code
+            except Exception as e:                      # noqa: BLE001
+                rec["probe"][name] = f"NG {type(e).__name__}"
+        # Referer を付けて同じCTAをもう一度
+        for row in rec["cta"]:
+            if "moshimo" not in row["href"]:
+                continue
+            try:
+                r = requests.get(row["href"], timeout=40, verify=False,
+                                 allow_redirects=True,
+                                 headers={**UA,
+                                          "Referer": "https://sakura-eigo.com/",
+                                          "Accept": "text/html,*/*"})
+                row["status_with_referer"] = r.status_code
+                row["final_with_referer"] = r.url[:120]
+            except Exception as e:                      # noqa: BLE001
+                row["status_with_referer"] = f"NG {type(e).__name__}"
+        print(f"[{pid}] probe {rec['probe']}")
+        for row in rec["cta"]:
+            if "status_with_referer" in row:
+                print(f"[{pid}] Referer付き {row['status_with_referer']} "
+                      f"{row.get('final_with_referer','')[:60]}")
         for x in rec["internal"]:
             print(f"[{pid}] 内部 {x['http']} noindex={x['noindex']} "
                   f"{x['title_match']} ← {x['anchor'][:30]}")
