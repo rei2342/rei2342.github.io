@@ -332,9 +332,25 @@ rows = inv.all_stock(spec)
 # 実投稿テストに出した。**残りは approved のまま動かさない。**
 _live = [s for _, s in rows if s["state"] != "stale"]
 check("退役を除いた在庫が10件", len(_live) == 10, str(len(_live)))
-check("approved か posted のどちらかしか無い",
-      all(s["state"] in ("approved", "posted") for s in _live),
+# 記事23・521・526を改修したので、対応する6件は退役して作り直した。
+# **作り直した版は awaiting_approval で止まっていること**（自動承認しない）
+check("生きている在庫は approved / awaiting_approval / posted だけ",
+      all(s["state"] in ("approved", "awaiting_approval", "posted")
+          for s in _live),
       str(sorted({s["state"] for s in _live})))
+_wait = [s for s in _live if s["state"] == "awaiting_approval"]
+check("作り直した版が承認待ちで止まっている", len(_wait) == 6,
+      " / ".join(s["stock_id"] for s in _wait))
+for s in _wait:
+    check(f"{s['stock_id']}: 投稿IDが入っていない", not s.get("posted_id"))
+    check(f"{s['stock_id']}: 承認日時が入っていない", not s.get("approved_at"))
+# 退役した側は消さずに、旧本文と旧 modified を持っている
+for _p, s in rows:
+    if s.get("stale_reason") != "article_modified_after_generation":
+        continue
+    check(f"{s['stock_id']}: 旧本文を残している", bool(s.get("superseded_text")))
+    check(f"{s['stock_id']}: 旧 modified を残している",
+          bool(s.get("article_modified_gmt_at_generation")))
 # **scheduled のまま止まっているものが無い。**
 # 投稿に失敗したのに予約済みで残っていると、次の実行で二重に出る
 check("scheduled で止まっているものが無い",
@@ -525,7 +541,7 @@ _before = _fingerprint()
 # 名指しで1件だけ選ぶ
 # **投稿済みでない在庫で試す。** X-546-b は 2026-08-10 の実投稿テストで
 # posted になったので、名指しの対象としては approved の別件を使う
-_TARGET = "X-526-b"
+_TARGET = "X-310-b"
 _s, _why = sp.pick_by_id(spec, "x", _TARGET)
 check("名指しした在庫だけを選ぶ", _s is not None and _s["stock_id"] == _TARGET,
       _why)
@@ -670,7 +686,7 @@ check("本文に投稿ラベルが混ざっていない",
       not [p for p in _th["thread_parts"] if _LABEL.search(p)])
 
 # 投稿済みでない Threads 在庫で「貼る本文の表示」を試す
-_TH_TARGET = "THREADS-526-b"
+_TH_TARGET = "THREADS-310-b"
 _th2 = [x for _, x in inv.all_stock(spec) if x["stock_id"] == _TH_TARGET][0]
 _r2 = subprocess.run(
     [sys.executable, str(ROOT / "scripts/social_post.py"),

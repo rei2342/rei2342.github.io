@@ -23,7 +23,7 @@ thread_parts:
   必要額を3つの箱に分ける計算手順は、記事で確認できます。
 
   https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=x'
-state: approved
+state: stale
 gate_results:
 - id: article_published
   ok: true
@@ -77,6 +77,8 @@ history:
   state: awaiting_approval
 - at: 2026-08-10T14:12:45+0900
   state: approved
+- at: 2026-08-10T16:06:44+0900
+  state: stale
 prior_history:
 - at: 2026-08-09T23:04:09+0900
   state: generated
@@ -185,3 +187,27 @@ claim_counts:
   needs_human_review: 0
   total: 4
 needs_human_review: []
+stale_reason: article_modified_after_generation
+staled_at: 2026-08-10T16:06:44+0900
+superseded_text: 'ワーホリの費用は、検索で出てきた総額をそのまま自分の目標にしなくて大丈夫です。
+
+
+  まず見るのは、国・期間・語学学校の有無。条件を分けると、自分用の金額に直しやすくなります📝
+
+
+  必要額を3つの箱に分ける計算手順は、記事で確認できます。
+
+  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=x'
+superseded_thread_parts:
+- 'ワーホリの費用は、検索で出てきた総額をそのまま自分の目標にしなくて大丈夫です。
+
+
+  まず見るのは、国・期間・語学学校の有無。条件を分けると、自分用の金額に直しやすくなります📝
+
+
+  必要額を3つの箱に分ける計算手順は、記事で確認できます。
+
+  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=x'
+generated_at: 2026-08-10T14:11:59+0900
+article_modified_gmt_at_generation: '2026-08-09T11:17:13'
+article_modified_gmt_now: '2026-08-10T07:04:12'
