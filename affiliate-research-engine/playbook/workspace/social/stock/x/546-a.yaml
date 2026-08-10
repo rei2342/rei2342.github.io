@@ -23,7 +23,7 @@ thread_parts:
   続け方を考える前の整理はこちら
 
   https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x'
-state: awaiting_approval
+state: stale
 gate_results:
 - id: article_published
   ok: true
@@ -75,6 +75,8 @@ history:
   state: gated
 - at: 2026-08-10T11:09:45+0900
   state: awaiting_approval
+- at: 2026-08-10T13:25:00+0900
+  state: stale
 prior_history:
 - at: 2026-08-09T23:04:09+0900
   state: generated
@@ -145,3 +147,27 @@ claim_counts:
 needs_human_review:
 - text: ここを分けるだけで、次に見直す場所が変わります🌿
   why: 内容語が2語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る
+stale_reason: article_modified_after_generation
+staled_at: 2026-08-10T13:25:00+0900
+superseded_text: 'オンライン英会話が続かなかったとき、意志の弱さだけを責めなくて大丈夫です。
+
+
+  授業中に止まったのか、予約の前で止まったのか。ここを分けるだけで、次に見直す場所が変わります🌿
+
+
+  続け方を考える前の整理はこちら
+
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x'
+superseded_thread_parts:
+- 'オンライン英会話が続かなかったとき、意志の弱さだけを責めなくて大丈夫です。
+
+
+  授業中に止まったのか、予約の前で止まったのか。ここを分けるだけで、次に見直す場所が変わります🌿
+
+
+  続け方を考える前の整理はこちら
+
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x'
+generated_at: 2026-08-10T11:09:45+0900
+article_modified_gmt_at_generation: '2026-08-09T11:09:18'
+article_modified_gmt_now: '2026-08-10T02:47:26'

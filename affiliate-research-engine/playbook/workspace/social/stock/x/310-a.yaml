@@ -23,7 +23,7 @@ thread_parts:
   選ぶ前の確認項目はこちら
 
   https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=x'
-state: awaiting_approval
+state: stale
 gate_results:
 - id: article_published
   ok: true
@@ -75,6 +75,8 @@ history:
   state: gated
 - at: 2026-08-10T11:09:46+0900
   state: awaiting_approval
+- at: 2026-08-10T13:25:01+0900
+  state: stale
 prior_history:
 - at: 2026-08-10T09:05:22+0900
   state: generated
@@ -129,3 +131,27 @@ claim_counts:
   needs_human_review: 0
   total: 3
 needs_human_review: []
+stale_reason: article_modified_after_generation
+staled_at: 2026-08-10T13:25:01+0900
+superseded_text: '安い英語アプリほど、どれを選べばいいか迷うことがあります。
+
+
+  無料期間中は、機能より先に「予定した日に無理なく開けたか」を見てみると、生活との相性が分かりやすいです🌿
+
+
+  選ぶ前の確認項目はこちら
+
+  https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=x'
+superseded_thread_parts:
+- '安い英語アプリほど、どれを選べばいいか迷うことがあります。
+
+
+  無料期間中は、機能より先に「予定した日に無理なく開けたか」を見てみると、生活との相性が分かりやすいです🌿
+
+
+  選ぶ前の確認項目はこちら
+
+  https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=x'
+generated_at: 2026-08-10T11:09:46+0900
+article_modified_gmt_at_generation: '2026-08-09T13:58:10'
+article_modified_gmt_now: '2026-08-10T02:47:30'

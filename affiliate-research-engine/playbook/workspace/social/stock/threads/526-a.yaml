@@ -39,7 +39,7 @@ thread_parts:
   比較表を見るときは「この数字は何を測っている？」を一度だけ確認してみてください📝
 
   https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
-state: awaiting_approval
+state: stale
 gate_results:
 - id: article_published
   ok: true
@@ -91,6 +91,8 @@ history:
   state: gated
 - at: 2026-08-10T11:09:45+0900
   state: awaiting_approval
+- at: 2026-08-10T13:25:01+0900
+  state: stale
 prior_history:
 - at: 2026-08-09T23:04:09+0900
   state: generated
@@ -159,3 +161,43 @@ claim_counts:
 needs_human_review:
 - text: 上達の速さまでは、その割り算だけでは分かりません。
   why: 内容語が1語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る
+stale_reason: article_modified_after_generation
+staled_at: 2026-08-10T13:25:01+0900
+superseded_text: '「現地に行けば早く伸びる」と聞くと、留学の総額も正当化したくなります。
+
+
+  でも、ここは2つに分けて見たいところです。
+
+
+  ・英語に触れる時間がどれくらい増えるか
+
+  ・その時間でどれくらい上達するか
+
+
+  総額を授業時間で割ると分かるのは、1時間あたりの費用。上達の速さまでは、その割り算だけでは分かりません。
+
+
+  比較表を見るときは「この数字は何を測っている？」を一度だけ確認してみてください📝
+
+  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
+superseded_thread_parts:
+- '「現地に行けば早く伸びる」と聞くと、留学の総額も正当化したくなります。
+
+
+  でも、ここは2つに分けて見たいところです。
+
+
+  ・英語に触れる時間がどれくらい増えるか
+
+  ・その時間でどれくらい上達するか
+
+
+  総額を授業時間で割ると分かるのは、1時間あたりの費用。上達の速さまでは、その割り算だけでは分かりません。
+
+
+  比較表を見るときは「この数字は何を測っている？」を一度だけ確認してみてください📝
+
+  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
+generated_at: 2026-08-10T11:09:45+0900
+article_modified_gmt_at_generation: '2026-08-09T13:00:03'
+article_modified_gmt_now: '2026-08-10T02:47:32'

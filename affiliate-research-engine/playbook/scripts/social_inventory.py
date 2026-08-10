@@ -46,8 +46,9 @@ def stock_path(spec, platform, article_id, variant="a"):
             / f"{article_id}-{variant}.yaml")
 
 
-def new_stock(spec, platform, article, parts, material, gate_results):
-    sid = f"{platform.upper()}-{article['id']}-a"
+def new_stock(spec, platform, article, parts, material, gate_results,
+              variant="a"):
+    sid = f"{platform.upper()}-{article['id']}-{variant}"
     return {
         "stock_id": sid,
         "platform": platform,
@@ -142,6 +143,28 @@ def already_posted(spec, stock):
     key = idempotency_key(stock)
     return any(r.get("idempotency_key") == key
                for r in read_history(spec, stock["platform"]))
+
+
+def live_article(article_id):
+    """**公開画面から取り直した本文**を生成元にする。
+
+    ローカルの控え（workspace/claims/posts）は古いことがある。
+    実際に 310 で、直したはずの旧断定が控えだけに残っていた。
+    ここは `article-fetch` が WordPress から取ってきたものだけを読む。
+    """
+    d = ROOT / "workspace/claims/live"
+    h, j = d / f"{article_id}.html", d / f"{article_id}.json"
+    if not h.exists() or not j.exists():
+        return None
+    meta = json.loads(j.read_text(encoding="utf-8"))
+    html = h.read_text(encoding="utf-8")
+    body = re.sub(r"<[^>]+>", "\n", html)
+    return {"id": str(article_id), "title": meta["title"],
+            "url": meta["link"], "status": meta["status"],
+            "modified_gmt": meta["modified_gmt"],
+            "fetched_at": meta.get("fetched_at"),
+            "html": html,
+            "body": re.sub(r"\n{3,}", "\n\n", body).strip()}
 
 
 def local_article(article_id, posts_dir=None):

@@ -47,7 +47,7 @@ thread_parts:
   アプリ内の記録だけでは分からないことは、別に1行だけ残しておく。あとで比較するとき、かなり楽になります📝
 
   https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=threads'
-state: awaiting_approval
+state: stale
 gate_results:
 - id: article_published
   ok: true
@@ -99,6 +99,8 @@ history:
   state: gated
 - at: 2026-08-10T11:09:46+0900
   state: awaiting_approval
+- at: 2026-08-10T13:25:01+0900
+  state: stale
 prior_history:
 - at: 2026-08-10T09:05:22+0900
   state: generated
@@ -154,3 +156,51 @@ claim_counts:
   needs_human_review: 0
   total: 9
 needs_human_review: []
+stale_reason: article_modified_after_generation
+staled_at: 2026-08-10T13:25:01+0900
+superseded_text: '無料や低価格の英語アプリ、機能を比べるほど迷ってしまうことがあります。
+
+
+  そんなときは「高機能か」より、「自分の生活の中で無理なく開けたか」を先に見てみると分かりやすいです🌿
+
+
+  無料期間中にメモするのは、この4つだけ。
+
+
+  ・使う予定だった日
+
+  ・実際に開けた日
+
+  ・準備にかかった時間
+
+  ・解約期限と次回の請求日
+
+
+  アプリ内の記録だけでは分からないことは、別に1行だけ残しておく。あとで比較するとき、かなり楽になります📝
+
+  https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=threads'
+superseded_thread_parts:
+- '無料や低価格の英語アプリ、機能を比べるほど迷ってしまうことがあります。
+
+
+  そんなときは「高機能か」より、「自分の生活の中で無理なく開けたか」を先に見てみると分かりやすいです🌿
+
+
+  無料期間中にメモするのは、この4つだけ。
+
+
+  ・使う予定だった日
+
+  ・実際に開けた日
+
+  ・準備にかかった時間
+
+  ・解約期限と次回の請求日
+
+
+  アプリ内の記録だけでは分からないことは、別に1行だけ残しておく。あとで比較するとき、かなり楽になります📝
+
+  https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=threads'
+generated_at: 2026-08-10T11:09:46+0900
+article_modified_gmt_at_generation: '2026-08-09T13:58:10'
+article_modified_gmt_now: '2026-08-10T02:47:30'

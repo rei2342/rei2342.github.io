@@ -105,6 +105,9 @@ def main():
     ap.add_argument("--source", choices=["wp", "local"], default="wp")
     ap.add_argument("--drafts", default="")
     ap.add_argument("--platforms", default="x,threads")
+    ap.add_argument("--variant", default="a", help="在庫の変種（既定 a）")
+    ap.add_argument("--source-live", action="store_true",
+                    help="workspace/claims/live の取り直した本文を使う")
     a = ap.parse_args()
 
     spec = ss.load_spec()
@@ -114,7 +117,8 @@ def main():
 
     made, blocked = [], []
     for pid in [x.strip() for x in a.articles.split(",") if x.strip()]:
-        article = (fetch_article(pid) if a.source == "wp"
+        article = (inv.live_article(pid) if a.source_live
+                   else fetch_article(pid) if a.source == "wp"
                    else inv.local_article(pid))
         if not article:
             print(f"[{pid}] 記事を取得できない。飛ばす")
@@ -139,22 +143,27 @@ def main():
             other = texts.get("threads" if platform == "x" else "x", "")
             hist = inv.read_history(spec, platform,
                                     spec["duplicate"]["window_days"])
+            # **退役した在庫と比べない。** stale/rejected/archived は
+            # 出さないものなので、重複の相手にならない
+            RETIRED = ("stale", "rejected", "archived")
             hist += [{"text": s["text"], "stock_id": s["stock_id"]}
                      for _, s in inv.all_stock(spec, platform)
-                     if s["article_id"] != int(pid)]
+                     if s["article_id"] != int(pid)
+                     and s["state"] not in RETIRED]
             # **同じ記事の古い在庫を「直近の投稿」に数えない。**
             # 作り直すたびに自分と比べて、型も絵文字も重複扱いになる
             recent = [s for _, s in inv.all_stock(spec, platform)
-                      if s["article_id"] != int(pid)]
+                      if s["article_id"] != int(pid)
+                      and s["state"] not in RETIRED]
             res = sg.run_gates(spec, platform, parts, article,
                                history=hist, other_text=other,
                                inferences=infer)
             tids, twarn = sg.template_gate(spec, parts, recent)
             stock = inv.new_stock(spec, platform, article, parts,
-                                  material, res)
+                                  material, res, variant=a.variant)
             # **作り直しで前の履歴を消さない。**
             # 承認を取り消した記録が消えると、なぜ戻したのかを追えなくなる
-            old_p = inv.stock_path(spec, platform, pid, "a")
+            old_p = inv.stock_path(spec, platform, pid, a.variant)
             if old_p.exists():
                 old = inv.load(old_p)
                 stock["prior_history"] = ((old.get("prior_history") or [])

@@ -311,7 +311,8 @@ lifecycle:
   transitions:
     generated: [gated]
     gated: [awaiting_approval, rejected]
-    awaiting_approval: [approved, rejected]
+    # 記事が改稿されたら、承認待ちのまま stale へ戻す（2026-08-10）
+    awaiting_approval: [approved, rejected, stale]
     # **承認は取り消せる。** 仕様が変わったら、投稿前に承認待ちへ戻す
     approved: [scheduled, stale, rejected, awaiting_approval]
     scheduled: [posted, stale, rejected]

@@ -47,7 +47,7 @@ thread_parts:
   最後に閉じたのは、授業中でしたか。それとも予約の前でしたか？
 
   https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads'
-state: awaiting_approval
+state: stale
 gate_results:
 - id: article_published
   ok: true
@@ -99,6 +99,8 @@ history:
   state: gated
 - at: 2026-08-10T11:09:45+0900
   state: awaiting_approval
+- at: 2026-08-10T13:25:00+0900
+  state: stale
 prior_history:
 - at: 2026-08-10T09:05:22+0900
   state: generated
@@ -157,3 +159,51 @@ claim_counts:
 needs_human_review:
 - text: オンライン英会話を予約の前で閉じていたなら、足すより先に、やめられるものを探します。
   why: 内容語が2語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る
+stale_reason: article_modified_after_generation
+staled_at: 2026-08-10T13:25:00+0900
+superseded_text: 'オンライン英会話が続かなかったとき、まず自分の意志を疑ってしまいます。
+
+
+  でも、思い出したいのは「やめた瞬間がどこだったか」のほうです。授業の途中で閉じたのか、予約の画面で閉じたのか。同じ「続かない」でも、次に見る場所は別になります。
+
+
+  オンライン英会話を予約の前で閉じていたなら、足すより先に、やめられるものを探します。
+
+
+  ・毎回のレッスン予約
+
+  ・講師を毎回選ぶこと
+
+  ・まとめて時間を取ること
+
+
+  そのうえで、思い立ってから話し始めるまでの操作を1つずつ数えます。予約前で止まる場合は、選択肢の数だけでなく、話し始めるまでに判断する回数も減らせるか確認します。
+
+
+  最後に閉じたのは、授業中でしたか。それとも予約の前でしたか？
+
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads'
+superseded_thread_parts:
+- 'オンライン英会話が続かなかったとき、まず自分の意志を疑ってしまいます。
+
+
+  でも、思い出したいのは「やめた瞬間がどこだったか」のほうです。授業の途中で閉じたのか、予約の画面で閉じたのか。同じ「続かない」でも、次に見る場所は別になります。'
+- 'オンライン英会話を予約の前で閉じていたなら、足すより先に、やめられるものを探します。
+
+
+  ・毎回のレッスン予約
+
+  ・講師を毎回選ぶこと
+
+  ・まとめて時間を取ること
+
+
+  そのうえで、思い立ってから話し始めるまでの操作を1つずつ数えます。予約前で止まる場合は、選択肢の数だけでなく、話し始めるまでに判断する回数も減らせるか確認します。
+
+
+  最後に閉じたのは、授業中でしたか。それとも予約の前でしたか？
+
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads'
+generated_at: 2026-08-10T11:09:45+0900
+article_modified_gmt_at_generation: '2026-08-09T11:09:18'
+article_modified_gmt_now: '2026-08-10T02:47:26'

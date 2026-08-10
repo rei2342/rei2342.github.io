@@ -43,10 +43,12 @@ def main():
                     help="承認を取り消して awaiting_approval へ戻す")
     ap.add_argument("--reason", default="")
     ap.add_argument("--stale-check", action="store_true")
+    ap.add_argument("--stale", default="",
+                    help="記事の改稿で古くなった在庫を stale へ戻す")
     a = ap.parse_args()
     spec = ss.load_spec()
 
-    if a.list or not (a.approve or a.reject or a.revoke
+    if a.list or not (a.approve or a.reject or a.revoke or a.stale
                       or a.stale_check):
         rows = inv.all_stock(spec)
         print(f"在庫 {len(rows)}件\n")
@@ -76,7 +78,7 @@ def main():
         print(f"stale へ戻した: {len(moved)}件 " + " ".join(moved))
         return
 
-    sid = a.approve or a.reject or a.revoke
+    sid = a.approve or a.reject or a.revoke or a.stale
     hit = [(p, s) for p, s in inv.all_stock(spec) if s["stock_id"] == sid]
     if not hit:
         print(f"見つからない: {sid}")
@@ -87,6 +89,20 @@ def main():
             print("ゲートに落ちている在庫は承認できない")
             sys.exit(1)
         inv.transition(spec, s, "approved", approved_at=inv.now())
+    elif a.stale:
+        # 記事が改稿されたので、この在庫は最新本文に対応していない。
+        # **消さない。** 旧本文・生成日時・旧 modified_gmt を残したまま退役させる
+        import social_generate as gen
+        art = inv.live_article(s["article_id"])
+        inv.transition(
+            spec, s, "stale",
+            stale_reason="article_modified_after_generation",
+            staled_at=inv.now(),
+            superseded_text=s["text"],
+            superseded_thread_parts=list(s["thread_parts"]),
+            generated_at=s.get("created_at"),
+            article_modified_gmt_at_generation=s.get("article_modified_gmt"),
+            article_modified_gmt_now=(art or {}).get("modified_gmt"))
     elif a.revoke:
         # 承認を取り消す。**消さずに履歴へ残す。**
         # いつ・なぜ戻したかが追えないと、同じ文がまた承認される
