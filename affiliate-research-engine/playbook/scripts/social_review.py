@@ -201,9 +201,13 @@ def main():
                      f"unjudged {cc['unjudged']} / "
                      f"needs_human_review {cc['needs_human_review']}"
                      f"（全{cc['total']}）\n")
-            for r in claims:
-                if r["verdict"] == "needs_human_review":
-                    L.append(f"\n> 人が見る: {r['text']}\n")
+            nhr = [r for r in claims if r["verdict"] == "needs_human_review"]
+            if nhr:
+                L.append(f"\n**人が見る（{len(nhr)}件）。"
+                         f"通過扱いにしていない。**\n\n"
+                         "| 対象の文 | 理由 |\n|---|---|\n")
+                for r in nhr:
+                    L.append(f"| {r['text']} | {r['why']} |\n")
             L.append(f"\n<details><summary>命題の照合"
                      f"（{len(claims)}件中 落ち {len(bad)}件）</summary>\n\n")
             L.append(sc.fmt(claims))

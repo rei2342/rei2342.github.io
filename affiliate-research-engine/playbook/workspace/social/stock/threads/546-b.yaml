@@ -7,10 +7,10 @@ article_url: https://sakura-eigo.com/online-english-lessons-90-days-success/
 text: 'オンライン英会話が続かなかったとき、意志の弱さだけを責めなくて大丈夫です。
 
 
-  分かれ道は、最後に閉じたのがレッスンの最中だったか、予約の画面だったか。ここで見直すものが変わります。まずどちらだったかだけ思い出してみると、進みやすいです。
+  先に確かめたいのは、最後に止まったのがレッスン中だったか、予約する前だったか。どちらかによって、次に見直す場所が変わります。
 
 
-  レッスンの最中に閉じていた場合に見直すのは、この3つです。
+  レッスン中に止まった場合に見直すのは、この3つです。
 
 
   ・教材のレベル。直近3回で、知らない単語が1文に何個あったか
@@ -20,18 +20,18 @@ text: 'オンライン英会話が続かなかったとき、意志の弱さだ�
   ・講師との相性。同じ講師だったか、毎回違ったか
 
 
-  予約の画面で閉じていた場合は、見るところが変わります。話し始めるまでに指を何回動かしているかを、1回だけ数えるところから。
+  予約する前に止まった場合は、見るところが変わります。話し始めるまでに指を何回動かしているかを、1回だけ数えるところから。
 
 
-  思い出せたのは、どちらの場面でしたか？
+  止まったのは、どちらの場面でしたか？
 
   https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads'
 thread_parts:
 - 'オンライン英会話が続かなかったとき、意志の弱さだけを責めなくて大丈夫です。
 
 
-  分かれ道は、最後に閉じたのがレッスンの最中だったか、予約の画面だったか。ここで見直すものが変わります。まずどちらだったかだけ思い出してみると、進みやすいです。'
-- 'レッスンの最中に閉じていた場合に見直すのは、この3つです。
+  先に確かめたいのは、最後に止まったのがレッスン中だったか、予約する前だったか。どちらかによって、次に見直す場所が変わります。'
+- 'レッスン中に止まった場合に見直すのは、この3つです。
 
 
   ・教材のレベル。直近3回で、知らない単語が1文に何個あったか
@@ -41,10 +41,10 @@ thread_parts:
   ・講師との相性。同じ講師だったか、毎回違ったか
 
 
-  予約の画面で閉じていた場合は、見るところが変わります。話し始めるまでに指を何回動かしているかを、1回だけ数えるところから。
+  予約する前に止まった場合は、見るところが変わります。話し始めるまでに指を何回動かしているかを、1回だけ数えるところから。
 
 
-  思い出せたのは、どちらの場面でしたか？
+  止まったのは、どちらの場面でしたか？
 
   https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads'
 state: awaiting_approval
@@ -84,20 +84,20 @@ rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: 513f1916fbd96d08
+content_hash: 16c6622c6310e2bc
 generator_version: social-v1
 material:
   search_intent: オンライン英会話が続かない理由と、続ける方法を知りたい
   core_answer: やめた瞬間が授業中だったか予約の前だったかで、見直すものが変わる
   one_check: 最後にアプリを閉じた場面が、レッスン中だったか予約の画面だったかを思い出す
   unique_artifact: 授業中で止まった場合の3項目と、予約の前で止まった場合の手数の数え方
-created_at: 2026-08-10T13:30:55+0900
+created_at: 2026-08-10T13:47:46+0900
 history:
-- at: 2026-08-10T13:30:55+0900
+- at: 2026-08-10T13:47:46+0900
   state: generated
-- at: 2026-08-10T13:30:55+0900
+- at: 2026-08-10T13:47:46+0900
   state: gated
-- at: 2026-08-10T13:30:55+0900
+- at: 2026-08-10T13:47:46+0900
   state: awaiting_approval
 prior_history:
 - at: 2026-08-10T13:27:08+0900
@@ -105,6 +105,18 @@ prior_history:
 - at: 2026-08-10T13:27:08+0900
   state: gated
 - at: 2026-08-10T13:27:08+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:30:55+0900
+  state: generated
+- at: 2026-08-10T13:30:55+0900
+  state: gated
+- at: 2026-08-10T13:30:55+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:45:18+0900
+  state: generated
+- at: 2026-08-10T13:45:18+0900
+  state: gated
+- at: 2026-08-10T13:45:18+0900
   state: awaiting_approval
 post_type: direct_answer
 post_type_reason: 「続かないのは意志が弱いからか」という1つの問いに対して、記事は 「やめた瞬間がどちらだったかで見る場所が変わる」と1文で答えている。 改稿でその答えが冒頭の分岐になり、直接回答の形がより強くなった
@@ -115,6 +127,7 @@ template_warnings: []
 inferences: []
 threads_format: two_part
 artifact_used: 授業中／予約前の分岐ごとの見直し項目
+opener_type: short_reassurance
 metrics:
   posted_at: null
   observed_at: null
@@ -131,13 +144,13 @@ metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分
 tone_warnings: []
 weighted_len: null
 claim_counts:
-  supported: 6
+  supported: 5
   unsupported: 0
-  unjudged: 2
+  unjudged: 3
   needs_human_review: 2
   total: 10
 needs_human_review:
-- text: ここで見直すものが変わります。
-  why: 内容語が1語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る
-- text: 予約の画面で閉じていた場合は、見るところが変わります。
+- text: どちらかによって、次に見直す場所が変わります。
   why: 内容語が2語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る
+- text: 予約する前に止まった場合は、見るところが変わります。
+  why: 内容語が1語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る

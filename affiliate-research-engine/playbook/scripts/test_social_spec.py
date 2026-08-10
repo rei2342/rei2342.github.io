@@ -328,18 +328,20 @@ check("決められた順なら posted まで行ける", st["state"] == "posted"
 
 # ── 5. 実際の在庫 ────────────────────────────────────
 rows = inv.all_stock(spec)
-# 2026-08-10 マーケットイン改訂で、承認済み3件も awaiting_approval へ戻した。
-# **10件すべてが承認待ち。** 人が4観点（冷たさ・媚び・不自然な女性語・
-# 事実逸脱）で見るまで、承認も投稿もしない
+# 2026-08-10 の人手確認で3件が承認された。**投稿はまだしない。**
+APPROVED_OK = {"X-521-a", "X-526-b", "THREADS-526-b"}
 bad_state = [s["stock_id"] for _, s in rows
-             if s["state"] in ("approved", "scheduled", "posted")]
-check("承認済みが1件も無い（改訂で取り消した）", not bad_state,
-      " ".join(bad_state))
+             if s["state"] in ("approved", "scheduled", "posted")
+             and s["stock_id"] not in APPROVED_OK]
+check("承認済みは人が選んだ3件だけ", not bad_state, " ".join(bad_state))
 check("投稿済み・予約済みが無い",
       not [s for _, s in rows if s["state"] in ("scheduled", "posted")])
-check("10件すべてが awaiting_approval",
-      sum(1 for _, s in rows if s["state"] == "awaiting_approval") == 10,
-      str(sum(1 for _, s in rows if s["state"] == "awaiting_approval")))
+_live = [s for _, s in rows if s["state"] != "stale"]
+check("退役を除いた在庫が10件", len(_live) == 10, str(len(_live)))
+check("承認3件・承認待ち7件",
+      sum(1 for s in _live if s["state"] == "approved") == 3
+      and sum(1 for s in _live if s["state"] == "awaiting_approval") == 7,
+      str({s["state"]: 1 for s in _live}))
 # 取り消しは履歴に残っていること。**黙って戻さない**
 revoked = [s for _, s in rows if s.get("revoked_reason")]
 check("承認の取り消しに理由が残っている", len(revoked) == 3,

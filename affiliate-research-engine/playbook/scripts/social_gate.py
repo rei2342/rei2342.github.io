@@ -381,6 +381,99 @@ def conversation_mix(spec, platform, parts, recent=()):
     return []
 
 
+def _paras(text):
+    return [x.strip() for x in URL.sub("", text).split("\n") if x.strip()]
+
+
+def opener_type(spec, text, declared=None):
+    """導入がどの型か。
+
+    **書き手が宣言した型を優先する。** 正規表現の推測だけに頼ると、
+    「型を使い分ける」という判断そのものが機械任せになる。
+    宣言が無いときだけ推測する。
+    """
+    if declared:
+        return declared
+    first = (_paras(text) or [""])[0]
+    if re.search(r"でしょうか|ますか$|ますか。", first):
+        return "direct_answer"
+    if re.search(r"と(?:聞く|言われ|いう言い方)|と考えがち|と思いがち", first):
+        return "misreading"
+    if re.search(r"^(?:結論|先に言うと)|だけです。$|それだけです", first):
+        return "conclusion_first"
+    if re.search(r"大丈夫です|安心|しなくていい|責めなくて", first):
+        return "short_reassurance"
+    return "reader_scene"
+
+
+def variety_check(spec, rows):
+    """**5件の窓で偏りを見る。** 1件ずつでは分からない。
+
+    温かさの作り方が1つに寄ると、5件並べたときに同じ顔になる。
+    落とさずに警告で出す。
+    """
+    v = spec.get("variety")
+    if not v:
+        return [], {}
+    win = [r for r in rows][-v["window"]:]
+    conf = {c["id"]: c for c in v["checks"]}
+    counts, warn = {}, []
+
+    n = 0
+    for r in win:
+        first = (_paras(r["text"]) or [""])[0]
+        if re.search(conf["emotion_guess_open"]["re"], first):
+            n += 1
+    counts["emotion_guess_open"] = n
+    if n > conf["emotion_guess_open"]["max"]:
+        warn.append(f"感情を推測する導入が{n}件"
+                    f"（{conf['emotion_guess_open']['max']}件まで）")
+
+    n = 0
+    for r in win:
+        ps = _paras(r["text"])
+        if len(ps) >= 2 and ps[1].startswith("でも"):
+            n += 1
+    counts["demo_second_para"] = n
+    if n > conf["demo_second_para"]["max"]:
+        warn.append(f"2段落目を「でも」で始めるのが{n}件"
+                    f"（{conf['demo_second_para']['max']}件まで）")
+
+    n = 0
+    for r in win:
+        ps = _paras(r["text"])
+        if ps and re.search(conf["kochira_before_cta"]["re"], ps[-1]):
+            n += 1
+    counts["kochira_before_cta"] = n
+    if n > conf["kochira_before_cta"]["max"]:
+        warn.append(f"CTA直前の「こちら」が{n}件"
+                    f"（{conf['kochira_before_cta']['max']}件まで）")
+
+    types = [opener_type(spec, r["text"], r.get("opener_type")) for r in win]
+    counts["opener_types"] = types
+    run = mx = 1
+    for a, b in zip(types, types[1:]):
+        run = run + 1 if a == b else 1
+        mx = max(mx, run)
+    counts["same_opener_run"] = mx
+    if mx > conf["same_opener_run"]["max_run"]:
+        warn.append(f"同じ導入構造が{mx}件続いている"
+                    f"（{conf['same_opener_run']['max_run']}件まで）")
+
+    from collections import Counter
+    closers = Counter()
+    for r in win:
+        ps = _paras(r["text"])
+        if ps:
+            closers[re.sub(r"[^ぁ-んァ-ヶ一-龥？?]", "", ps[-1])[-6:]] += 1
+    counts["closers"] = dict(closers)
+    for k, c in closers.items():
+        if c > conf["same_closer"]["max"]:
+            warn.append(f"同じ締め方「…{k}」が{c}件"
+                        f"（{conf['same_closer']['max']}件まで）")
+    return warn, counts
+
+
 def market_reference_gate(spec):
     """参考にした投稿を記録しているか。**文章は採らない。構造だけ採る。**
 

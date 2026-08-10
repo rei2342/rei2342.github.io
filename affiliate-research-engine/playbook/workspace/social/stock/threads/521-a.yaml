@@ -4,13 +4,13 @@ article_id: 521
 article_modified_gmt: '2026-08-09T11:10:13'
 article_title: TOEICリスニングが止まっているとき、聞き流しを続ける前に確認する3つのこと
 article_url: https://sakura-eigo.com/toeic-listening-325-to-improvement/
-text: 'TOEICのリスニングだけ止まっている気がすると、教材を増やしたくなります。
+text: 'TOEICのリスニングは、教材の数より、どこで止まっているかで次が変わります。
 
 
-  でも、増やす前に見たいのは「どこで止まっているか」のほうです。音が拾えていないのか、拾えても設問まで残らないのか。今日1回、音声を1つだけ設問を見ずに聞いて、内容を1文で言えるか試してみると分かりやすいです。
+  音が拾えていないのか、拾えても設問まで残らないのか。今日1回、音声を1つだけ設問を見ずに聞いて、内容を1文で言えるか試してみると分かりやすいです。
 
 
-  TOEICのリスニングが止まる場所は、3つに分けて確かめられます。
+  TOEICのリスニングが伸びないときは、まず3つの角度から確かめられます。
 
 
   ・流し終わったあとに内容を1文で言えるか
@@ -27,11 +27,11 @@ text: 'TOEICのリスニングだけ止まっている気がすると、教材�
 
   https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads'
 thread_parts:
-- 'TOEICのリスニングだけ止まっている気がすると、教材を増やしたくなります。
+- 'TOEICのリスニングは、教材の数より、どこで止まっているかで次が変わります。
 
 
-  でも、増やす前に見たいのは「どこで止まっているか」のほうです。音が拾えていないのか、拾えても設問まで残らないのか。今日1回、音声を1つだけ設問を見ずに聞いて、内容を1文で言えるか試してみると分かりやすいです。'
-- 'TOEICのリスニングが止まる場所は、3つに分けて確かめられます。
+  音が拾えていないのか、拾えても設問まで残らないのか。今日1回、音声を1つだけ設問を見ずに聞いて、内容を1文で言えるか試してみると分かりやすいです。'
+- 'TOEICのリスニングが伸びないときは、まず3つの角度から確かめられます。
 
 
   ・流し終わったあとに内容を1文で言えるか
@@ -78,26 +78,26 @@ gate_results:
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: XとThreadsの近さ 0.14（0.85未満にする）
+  detail: XとThreadsの近さ 0.13（0.85未満にする）
 approved_at: null
 rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: 4ab828a2b6b60f22
+content_hash: 464d5105192ca599
 generator_version: social-v1
 material:
   search_intent: TOEICのリスニングだけが伸びない。聞き流しを続けていいのかを知りたい
   core_answer: 聞き流しを増やす前に、音が拾えていないのか、拾えても設問まで残らないのかを切り分ける
   one_check: 音声を1つ聞いたあと、設問を見ずに内容を1文で言えるかを試す
   unique_artifact: 止まっている場所を切り分ける3つの確認項目と、最初の2週間の組み方
-created_at: 2026-08-10T11:09:45+0900
+created_at: 2026-08-10T13:47:45+0900
 history:
-- at: 2026-08-10T11:09:45+0900
+- at: 2026-08-10T13:47:45+0900
   state: generated
-- at: 2026-08-10T11:09:45+0900
+- at: 2026-08-10T13:47:45+0900
   state: gated
-- at: 2026-08-10T11:09:45+0900
+- at: 2026-08-10T13:47:45+0900
   state: awaiting_approval
 prior_history:
 - at: 2026-08-10T09:05:21+0900
@@ -124,13 +124,27 @@ prior_history:
   state: gated
 - at: 2026-08-10T09:50:15+0900
   state: awaiting_approval
+- at: 2026-08-10T11:09:45+0900
+  state: generated
+- at: 2026-08-10T11:09:45+0900
+  state: gated
+- at: 2026-08-10T11:09:45+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:45:17+0900
+  state: generated
+- at: 2026-08-10T13:45:17+0900
+  state: gated
+- at: 2026-08-10T13:45:17+0900
+  state: awaiting_approval
 post_type: small_experiment
 post_type_reason: 記事に「音声を1つ聞いて、設問を見ずに内容を1文で言えるか試す」という、 その場で1回できる操作がある。読者が今日試せる形が中心
-template_ids: []
+template_ids:
+- topic_open
 template_warnings: []
 inferences: []
 threads_format: two_part
 artifact_used: 止まっている場所を切り分ける3つの確認項目
+opener_type: conclusion_first
 metrics:
   posted_at: null
   observed_at: null

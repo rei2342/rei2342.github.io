@@ -49,7 +49,7 @@ thread_parts:
   いま埋められそうなのは、第1カードのどこまでですか？
 
   https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
-state: awaiting_approval
+state: approved
 gate_results:
 - id: article_published
   ok: true
@@ -81,7 +81,7 @@ gate_results:
 - id: cross_platform_gate
   ok: true
   detail: XとThreadsの近さ 0.10（0.85未満にする）
-approved_at: null
+approved_at: 2026-08-10T13:43:42+0900
 rejected_reason: null
 scheduled_at: null
 posted_at: null
@@ -101,6 +101,8 @@ history:
   state: gated
 - at: 2026-08-10T13:30:56+0900
   state: awaiting_approval
+- at: 2026-08-10T13:43:42+0900
+  state: approved
 prior_history:
 - at: 2026-08-10T13:27:09+0900
   state: generated

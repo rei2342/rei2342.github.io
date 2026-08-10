@@ -23,7 +23,7 @@ thread_parts:
   確認の順番はこちら
 
   https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x'
-state: awaiting_approval
+state: approved
 gate_results:
 - id: article_published
   ok: true
@@ -55,7 +55,7 @@ gate_results:
 - id: cross_platform_gate
   ok: true
   detail: もう片方がまだ無い
-approved_at: null
+approved_at: 2026-08-10T13:43:41+0900
 rejected_reason: null
 scheduled_at: null
 posted_at: null
@@ -75,6 +75,8 @@ history:
   state: gated
 - at: 2026-08-10T11:09:45+0900
   state: awaiting_approval
+- at: 2026-08-10T13:43:41+0900
+  state: approved
 prior_history:
 - at: 2026-08-10T09:05:21+0900
   state: generated

@@ -140,7 +140,18 @@ def main():
             if platform not in plats or not raw:
                 continue
             parts = attach_url(spec, platform, raw, article)
-            other = texts.get("threads" if platform == "x" else "x", "")
+            other_plat = "threads" if platform == "x" else "x"
+            other = texts.get(other_plat, "")
+            if not other:
+                # **片方だけ作り直すときも、もう片方と比べる。**
+                # 空のまま通すと cross_platform_gate が効かない
+                op = inv.stock_path(spec, other_plat, pid, a.variant)
+                if not op.exists():
+                    op = inv.stock_path(spec, other_plat, pid, "a")
+                if op.exists():
+                    o = inv.load(op)
+                    if o["state"] not in ("stale", "rejected", "archived"):
+                        other = o["text"]
             hist = inv.read_history(spec, platform,
                                     spec["duplicate"]["window_days"])
             # **退役した在庫と比べない。** stale/rejected/archived は
@@ -182,6 +193,9 @@ def main():
             stock["threads_format"] = (d.get("threads_format", "")
                                        if platform == "threads" else "")
             stock["artifact_used"] = d.get("artifact_used", "")
+            # **導入の型は書き手が宣言する。** 推測に任せない
+            key = "opener_type_x" if platform == "x" else "opener_type_threads"
+            stock["opener_type"] = d.get(key) or d.get("opener_type") or ""
             # 実投稿のあとに形を比べるための欄。**生成時は空で持つ。**
             # 欄が無いと、投稿してから作ることになって取り逃す
             stock["metrics"] = {k: None for k in

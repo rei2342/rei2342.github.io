@@ -38,7 +38,13 @@ persona:
     - "「まずここだけ見ておくと安心」のように、範囲を狭めて渡す"
     - "正解を言い渡さず、一緒に整理する距離感"
     - "1投稿に一度まで、自然な本音・相づち・余白を使ってよい"
-  # 温めるときの順番。**この順で書く**
+  # 温めるときに**使える要素**。2026-08-10に「必須の順番」から変更した。
+  # 毎回この順で書くと、全部が同じ形になって温かさが型になる。
+  # **どれを使うか、いくつ使うかは投稿ごとに選ぶ。**
+  warm_order_is_optional: true
+  warmth_rule: >
+    温かさは、毎回読者の感情を推測することで作らない。
+    言葉の柔らかさ・余白・具体的な手順・責めない表現で作る
   warm_order:
     - "読者の小さな迷いを代弁する"
     - "その迷いを否定せず受け止める"
@@ -137,6 +143,10 @@ style:
       "😌": "安心・やわらかい締め"
       "🌸": "ブランド署名"
     signature: {emoji: "🌸", every_n_posts: 10, max_per_n: 2}
+    optional: "0〜1個でよい。**無理に付けない**"
+    order_check: >
+      🌿 と 📝 が投稿順で近いところに続かないよう、
+      **並び順でも確認する**（同じ絵文字の3連続だけを見ない）
     forbidden:
       - "文頭に毎回置く"
       - "連続して2つ並べる"
@@ -400,6 +410,46 @@ claims:
     must_be_hedged: true
     must_declare: "drafts の inferences に、文と根拠を書く"
 
+# ── 導入の型（使い分ける。1つに寄せない）──────────────
+openers:
+  types:
+    - {id: reader_scene, name: "読者の具体的な場面"}
+    - {id: direct_answer, name: "疑問への直接回答"}
+    - {id: misreading, name: "よくある読み違い"}
+    - {id: conclusion_first, name: "結論の先出し"}
+    - {id: short_reassurance, name: "安心させる短い言葉"}
+  rule: "5つを使い分ける。**感情の推測だけで入らない**"
+
+# ── 5件単位の偏り検査（2026-08-10 追加）────────────────
+# 温かさの作り方が1つに寄ると、5件並べたときに同じ顔になる。
+# **1件ずつでは分からないので、5件の窓で見る。**
+variety:
+  window: 5
+  checks:
+    - id: emotion_guess_open
+      name: "感情を推測する導入"
+      re: '^[^。\n]{0,40}(でしょうか|ますよね|と考えがち|と思いがち|不安になり|迷ってしまう|疑ってしまう|したくなり|感じている)'
+      max: 2
+    - id: demo_second_para
+      name: "2段落目を「でも」で始める"
+      scope: second_paragraph
+      re: "^でも"
+      max: 2
+    - id: kochira_before_cta
+      name: "CTA直前の「こちら」"
+      re: 'こちら\s*$'
+      scope: last_text_line
+      max: 2
+    - id: same_opener_run
+      name: "同じ導入構造の連続"
+      max_run: 2
+    - id: same_closer
+      name: "同じ締め方"
+      max: 2
+  rule: >
+    **落とさない。警告として出す。** 5件のうち上限を超えたら、
+    どれか1件を別の型へ振り替える
+
 # ── 温度と会話の検査 ────────────────────────────────
 tone:
   cold_tone:
@@ -423,6 +473,11 @@ tone:
     # 同じ語尾が3文続くと、全部が同じ高さになる
     endings: ["ます", "です", "ました", "ません", "でした"]
     max_run: 2
+  needs_human_review:
+    treat_as_pass: false
+    rule: >
+      **通過扱いにしない。** 承認画面に、対象の文と理由を必ず表示する。
+      件数だけを出して本文を隠さない
   conversation_mix:
     platform: threads
     window: 5

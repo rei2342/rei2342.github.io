@@ -7,7 +7,7 @@ article_url: https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%
 text: 'ワーホリの費用を調べると、大きな総額が出てきて不安になりますよね。
 
 
-  でも、その数字が自分に当てはまるとは限りません。国・期間・語学学校の有無だけ、先に見ておくと安心です📝
+  でも、その数字が自分に当てはまるとは限りません。まずは国・期間・語学学校の有無から見ておくと安心です📝
 
 
   自分用の金額に直す手順はこちら
@@ -17,7 +17,7 @@ thread_parts:
 - 'ワーホリの費用を調べると、大きな総額が出てきて不安になりますよね。
 
 
-  でも、その数字が自分に当てはまるとは限りません。国・期間・語学学校の有無だけ、先に見ておくと安心です📝
+  でも、その数字が自分に当てはまるとは限りません。まずは国・期間・語学学校の有無から見ておくと安心です📝
 
 
   自分用の金額に直す手順はこちら
@@ -54,26 +54,26 @@ gate_results:
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: もう片方がまだ無い
+  detail: XとThreadsの近さ 0.07（0.85未満にする）
 approved_at: null
 rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: e9c076b88681af18
+content_hash: 109c2f72d70e1ab1
 generator_version: social-v1
 material:
   search_intent: ワーキングホリデーに必要な貯金額を、自分の条件で知りたい
   core_answer: まとめ記事の総額はそのまま使えない。自分の条件で3つに分けて出し直す
   one_check: 見ている記事が、どの国・どの期間・語学学校ありなしのどれを前提にしているかを確かめる
   unique_artifact: 必要額を3つの箱に分ける出し方と、ビザの残高証明が目標額とは別だという話
-created_at: 2026-08-10T11:09:45+0900
+created_at: 2026-08-10T13:47:45+0900
 history:
-- at: 2026-08-10T11:09:45+0900
+- at: 2026-08-10T13:47:45+0900
   state: generated
-- at: 2026-08-10T11:09:45+0900
+- at: 2026-08-10T13:47:45+0900
   state: gated
-- at: 2026-08-10T11:09:45+0900
+- at: 2026-08-10T13:47:45+0900
   state: awaiting_approval
 prior_history:
 - at: 2026-08-09T23:04:09+0900
@@ -111,6 +111,24 @@ prior_history:
   state: gated
 - at: 2026-08-10T09:50:16+0900
   state: awaiting_approval
+- at: 2026-08-10T11:09:45+0900
+  state: generated
+- at: 2026-08-10T11:09:45+0900
+  state: gated
+- at: 2026-08-10T11:09:45+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:45:17+0900
+  state: generated
+- at: 2026-08-10T13:45:17+0900
+  state: gated
+- at: 2026-08-10T13:45:17+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:45:38+0900
+  state: generated
+- at: 2026-08-10T13:45:38+0900
+  state: gated
+- at: 2026-08-10T13:45:38+0900
+  state: awaiting_approval
 revoked_reason: マーケットイン仕様（2026-08-10）で本文と検査が変わったため、投稿前に承認をやり直す
 post_type: checklist
 post_type_reason: 記事が「3つの箱」と「相談前に書き出す条件」を並べている。 読者が埋める枠を渡す形が合う
@@ -119,6 +137,7 @@ template_warnings: []
 inferences: []
 threads_format: ''
 artifact_used: 必要額を3つの箱に分ける出し方
+opener_type: reader_scene
 metrics:
   posted_at: null
   observed_at: null
