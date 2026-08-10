@@ -31,6 +31,19 @@
     **句点は使ってよい。細切れ改行と強制の「↓」は廃止**
   - **Threadsに投稿用トークンは無い。** 手で貼ってから
     `social_post.py --mark-posted <stock_id> --posted-id <ID>` で記録する
+  - **投稿するものは名指しで選べる**（2026-08-10に追加）。
+    `social_post.py --platform x --stock-id X-546-b [--approve]` ／
+    `x-poster.yml` の workflow_dispatch にも `stock_id` の入口がある。
+    **手動テストで「他をrevokeして1件に絞る」やり方は使わない**（他の在庫の
+    承認状態を壊すため）。名指しは他の在庫を1件も書き換えない。
+    - 名指し無しの「最古の approved を自動選択」は**定期実行（cron）専用**
+    - approved以外・stock_idが無い・platform違いは、すべて投稿前に止まる
+    - `--approve` が無ければ表示だけ。送る直前に
+      stock_id・URL・文字数・本文全文・本文ハッシュを出し、
+      **表示した本文とAPIへ渡す本文のハッシュが違えば送らない**
+      （表示後にファイルが書き換わっていないかもディスクから読み直して見る）
+    - **API が失敗したら approved のまま。** 投稿していないのに状態を進めない。
+      posted へ動かすのは投稿が通ったあとだけ
   - 廃止したもの: `threads-note-cannon.yml` / `threads-builder.yml` /
     `x-promo.yml` / `scripts/threads_builder.py` / `scripts/x_promo.py`
   - **2026-08-10 マーケットイン改訂。** 事実は安全でも説明調だと読まれないので、

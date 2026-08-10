@@ -471,6 +471,117 @@ for _, st in inv.all_stock(spec):
     check(f"{st['stock_id']}: 温度の検査を記録している",
           "tone_warnings" in st)
 
+# ── 12. 投稿対象の名指し（--stock-id）─────────────────
+# 2026-08-10 に追加。**他の在庫を revoke せずに1件だけ試せること**を守る。
+# ここで守るのは「選び方」と「止まり方」で、実投稿はしない（--approve を付けない）
+import hashlib as _hl
+import social_post as sp
+
+
+def _fingerprint():
+    """全在庫の中身。1バイトでも変わったら分かるようにしておく。"""
+    return {s["stock_id"]: _hl.sha256(
+        p.read_bytes()).hexdigest() for p, s in inv.all_stock(spec)}
+
+
+_before = _fingerprint()
+
+# 名指しで1件だけ選ぶ
+_s, _why = sp.pick_by_id(spec, "x", "X-546-b")
+check("名指しした在庫だけを選ぶ", _s is not None and _s["stock_id"] == "X-546-b",
+      _why)
+check("名指しは最古の承認済みを選ばない",
+      _s is not None and _s["stock_id"] != "X-23-a")
+
+# 無い stock_id
+_s2, _why2 = sp.pick_by_id(spec, "x", "X-9999-z")
+check("stock_id が無ければ止まる", _s2 is None and "無い" in _why2, _why2)
+
+# platform 違い
+_s3, _why3 = sp.pick_by_id(spec, "x", "THREADS-546-b")
+check("platform が違えば止まる", _s3 is None and "threads" in _why3, _why3)
+
+# approved 以外
+_s4, _why4 = sp.pick_by_id(spec, "x", "X-546-a")   # stale
+check("approved 以外なら止まる", _s4 is None and "stale" in _why4, _why4)
+
+# 表示した本文と送る本文のハッシュ
+_txt = _s["text"]
+check("同じ本文なら同じハッシュ", sp.text_hash(_txt) == sp.text_hash(_txt))
+check("1文字でも違えば別のハッシュ",
+      sp.text_hash(_txt) != sp.text_hash(_txt + "。"))
+
+# 表示した本文と送る本文が違えば止まる
+_h = sp.text_hash(_txt)
+check("表示と送信が同じなら通る", sp.verify_unchanged(spec, _s, _h, _txt)[0],
+      sp.verify_unchanged(spec, _s, _h, _txt)[1])
+check("送る本文が1文字でも違えば止まる",
+      not sp.verify_unchanged(spec, _s, _h, _txt + "。")[0])
+check("表示したハッシュが違えば止まる",
+      not sp.verify_unchanged(spec, _s, "0" * 64, _txt)[0])
+_tamper = dict(_s, text=_txt + "追記")
+check("表示後に在庫ファイルが書き換わったら止まる",
+      not sp.verify_unchanged(spec, _tamper, sp.text_hash(_tamper["text"]),
+                              _tamper["text"])[0])
+check("本文と content_hash が合わなければ止まる",
+      not sp.verify_unchanged(spec, dict(_s, content_hash="deadbeef"),
+                              _h, _txt)[0])
+
+# --approve が無ければプレビューだけ。**1件も状態が動かない**
+_run = subprocess.run(
+    [sys.executable, str(ROOT / "scripts/social_post.py"),
+     "--platform", "x", "--stock-id", "X-546-b"],
+    capture_output=True, text=True, cwd=str(ROOT))
+check("--approve が無ければプレビューで終わる",
+      _run.returncode == 0 and "投稿していない" in _run.stdout,
+      _run.stdout[-200:] + _run.stderr[-200:])
+check("プレビューに本文が全文出る", _txt.strip() in _run.stdout)
+
+# 止まる側も subprocess で見る（終了コード1で、投稿へ進まない）
+for _sid, _label in [("X-9999-z", "存在しない"), ("THREADS-546-b", "媒体違い"),
+                     ("X-546-a", "approved以外")]:
+    _r = subprocess.run(
+        [sys.executable, str(ROOT / "scripts/social_post.py"),
+         "--platform", "x", "--stock-id", _sid, "--approve"],
+        capture_output=True, text=True, cwd=str(ROOT))
+    check(f"{_label}の stock_id は --approve でも投稿しない",
+          _r.returncode == 1 and "投稿しない" in _r.stdout,
+          _r.stdout[-200:] + _r.stderr[-200:])
+
+check("名指しの実行で他の在庫が1件も変わらない", _fingerprint() == _before,
+      " / ".join(k for k, v in _fingerprint().items()
+                 if _before.get(k) != v))
+
+# API が失敗したら approved のまま。**投稿していないのに状態を動かさない**
+# （実際に API を叩けないので、順序と失敗時の分岐をソースで見る）
+_src = (ROOT / "scripts/social_post.py").read_text(encoding="utf-8")
+_src = _src[_src.index("def main("):]     # mark_posted（手貼り記録）とは分ける
+_i_post = _src.index("pid = post_to_x(")
+_i_sched = _src.index('inv.transition(spec, s, "scheduled", scheduled_at')
+check("API を呼ぶ前に scheduled へ進めない", _i_post < _i_sched)
+_err = _src[_src.index("except Exception as e:"):_i_sched]
+check("API 失敗時に stale へ落とさない（approved のまま）",
+      "stale" not in _err, _err[:120])
+check("API 失敗を履歴に残す", '"result": "error"' in _err)
+check("成功したときだけ posted へ動かす",
+      _src.index('inv.transition(spec, s, "posted"') > _i_post)
+
+# 定期運用の自動選択は残っている（cron 用）
+_ready = sorted([s for _, s in inv.all_stock(spec, "x")
+                 if s["state"] == "approved"],
+                key=lambda y: y["approved_at"] or "")
+check("最古の承認済みを選ぶ経路は残してある", bool(_ready),
+      _ready[0]["stock_id"] if _ready else "")
+
+# ワークフロー側にも stock_id の入口がある
+_wf = (REPO / ".github/workflows/x-poster.yml").read_text(encoding="utf-8")
+check("workflow_dispatch に stock_id がある", "stock_id:" in _wf)
+check("workflow が --stock-id を渡す", "--stock-id" in _wf)
+check("定期実行では stock_id が空（自動選択のまま）",
+      'if [ -n "$STOCK_ID" ]' in _wf)
+check("在庫の書き戻し先が main に固定されていない",
+      "HEAD:main" not in _wf, "在庫は作業ブランチにしか無い")
+
 print()
 if fails:
     print(f"失敗 {len(fails)}件")

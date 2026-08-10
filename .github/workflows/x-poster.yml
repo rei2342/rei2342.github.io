@@ -14,6 +14,11 @@ on:
         description: '実際に投稿する（外すと出す予定を表示するだけ）'
         type: boolean
         default: false
+      stock_id:
+        description: '投稿する在庫を名指しする（例 X-546-b）。空なら最古の承認済みを自動で選ぶ'
+        type: string
+        required: false
+        default: ''
 
 jobs:
   post:
@@ -35,13 +40,20 @@ jobs:
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
           APPROVE: ${{ inputs.approve }}
+          STOCK_ID: ${{ inputs.stock_id }}
         run: |
           cd affiliate-research-engine/playbook
-          if [ "$APPROVE" = "true" ]; then
-            python scripts/social_post.py --platform x --approve
-          else
-            python scripts/social_post.py --platform x
+          # **在庫の指定は引数で渡す。** 定期実行では空なので、
+          # これまでどおり最古の承認済みが選ばれる
+          ARGS="--platform x"
+          if [ -n "$STOCK_ID" ]; then
+            ARGS="$ARGS --stock-id $STOCK_ID"
           fi
+          if [ "$APPROVE" = "true" ]; then
+            ARGS="$ARGS --approve"
+          fi
+          echo "実行: python scripts/social_post.py $ARGS"
+          python scripts/social_post.py $ARGS
       - name: Commit
         if: always()
         run: |
@@ -50,5 +62,7 @@ jobs:
           git add affiliate-research-engine/playbook/workspace/social/ || true
           git diff --staged --quiet && exit 0
           git commit -m "chore: social post state $(date -u +%Y-%m-%dT%H:%MZ)"
-          git pull --rebase origin main || true
-          git push origin HEAD:main || true
+          # **走ったブランチへ戻す。** 在庫は作業ブランチにしか無いので、
+          # main へ押し込むとブランチ全体が main に入ってしまう
+          git pull --rebase origin "$GITHUB_REF_NAME" || true
+          git push origin "HEAD:$GITHUB_REF_NAME" || true
