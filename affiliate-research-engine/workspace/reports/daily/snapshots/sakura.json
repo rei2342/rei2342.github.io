@@ -2,7 +2,7 @@
  "schema_version": "site-daily-snapshot/1",
  "site": "sakura",
  "site_name": "sakura-eigo.com",
- "generated_at": "2026-08-10T17:19:09+09:00",
+ "generated_at": "2026-08-10T17:20:19+09:00",
  "stale_after_hours": 24,
  "value_status": {
   "measured": "実測できた。0 は「測って0だった」",
@@ -11,114 +11,114 @@
  },
  "articles": {
   "published_total": {
-   "value": null,
-   "status": "unavailable",
+   "value": 53,
+   "status": "measured",
    "source": "wordpress",
-   "observed_at": "2026-08-10T17:19:08+09:00",
-   "note": "取得に失敗: HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))"
+   "observed_at": "2026-08-10T17:20:16+09:00",
+   "note": ""
   },
   "published_yesterday": {
-   "value": null,
-   "status": "unavailable",
+   "value": 3,
+   "status": "measured",
    "source": "wordpress",
-   "observed_at": "2026-08-10T17:19:09+09:00",
-   "note": "取得に失敗: HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish&after=2026-08-09T00%3A00%3A00&before=2026-08-09T23%3A59%3A59 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))"
+   "observed_at": "2026-08-10T17:20:16+09:00",
+   "note": "2026-08-09（JST）に公開されたもの"
   },
   "updated_yesterday": {
-   "value": null,
-   "status": "unavailable",
+   "value": 46,
+   "status": "measured",
    "source": "wordpress",
-   "observed_at": "2026-08-10T17:19:09+09:00",
-   "note": "取得に失敗: HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish&modified_after=2026-08-09T00%3A00%3A00&modified_before=2026-08-09T23%3A59%3A59 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))"
+   "observed_at": "2026-08-10T17:20:17+09:00",
+   "note": "2026-08-09（JST）に更新されたもの"
   },
   "drafts": {
    "value": null,
    "status": "unavailable",
    "source": "wordpress",
-   "observed_at": "2026-08-10T17:19:09+09:00",
-   "note": "WP_APP_PASSWORD が無い。下書き・予約は認証しないと数えられない"
+   "observed_at": "2026-08-10T17:20:18+09:00",
+   "note": "取得に失敗: HTTP 400 ({'status': 'draft'})"
   },
   "scheduled": {
    "value": null,
    "status": "unavailable",
    "source": "wordpress",
-   "observed_at": "2026-08-10T17:19:09+09:00",
-   "note": "WP_APP_PASSWORD が無い。下書き・予約は認証しないと数えられない"
+   "observed_at": "2026-08-10T17:20:19+09:00",
+   "note": "取得に失敗: HTTP 400 ({'status': 'future'})"
   }
  },
  "sns": {
   "x": {
    "posts_yesterday": {
-    "value": 0,
-    "status": "measured",
+    "value": null,
+    "status": "unavailable",
     "source": "social_inventory",
-    "observed_at": "2026-08-10T17:19:09+09:00",
-    "note": "在庫の投稿履歴から実測"
+    "observed_at": "2026-08-10T17:20:19+09:00",
+    "note": "取得に失敗: No module named 'yaml'"
    },
    "followers": {
     "value": null,
     "status": "unavailable",
-    "source": "x_api",
-    "observed_at": "2026-08-10T17:19:09+09:00",
-    "note": "読み取り用のAPIを持っていない（投稿用トークンのみ）"
+    "source": "social_inventory",
+    "observed_at": "2026-08-10T17:20:19+09:00",
+    "note": "取得に失敗: No module named 'yaml'"
    },
    "views": {
     "value": null,
     "status": "unavailable",
-    "source": "x_api",
-    "observed_at": "2026-08-10T17:19:09+09:00",
-    "note": "読み取り用のAPIを持っていない。画面からの手入力待ち"
+    "source": "social_inventory",
+    "observed_at": "2026-08-10T17:20:19+09:00",
+    "note": "取得に失敗: No module named 'yaml'"
    },
    "profile_visits": {
     "value": null,
     "status": "unavailable",
-    "source": "x_api",
-    "observed_at": "2026-08-10T17:19:09+09:00",
-    "note": "同上"
+    "source": "social_inventory",
+    "observed_at": "2026-08-10T17:20:19+09:00",
+    "note": "取得に失敗: No module named 'yaml'"
    },
    "link_clicks": {
     "value": null,
     "status": "unavailable",
-    "source": "x_api",
-    "observed_at": "2026-08-10T17:19:09+09:00",
-    "note": "同上"
+    "source": "social_inventory",
+    "observed_at": "2026-08-10T17:20:19+09:00",
+    "note": "取得に失敗: No module named 'yaml'"
    }
   },
   "threads": {
    "posts_yesterday": {
-    "value": 0,
-    "status": "measured",
-    "source": "social_inventory",
-    "observed_at": "2026-08-10T17:19:09+09:00",
-    "note": "在庫の投稿履歴から実測"
+    "value": null,
+    "status": "unavailable",
+    "source": "threads_api",
+    "observed_at": "2026-08-10T17:20:19+09:00",
+    "note": "取得に失敗: No module named 'yaml'"
    },
    "followers": {
     "value": null,
     "status": "unavailable",
     "source": "threads_api",
-    "observed_at": "2026-08-10T17:19:09+09:00",
-    "note": "THREADS_ACCESS_TOKEN が無い"
+    "observed_at": "2026-08-10T17:20:19+09:00",
+    "note": "取得に失敗: No module named 'yaml'"
    },
    "views": {
     "value": null,
-    "status": "measuring",
-    "source": "threads_insights",
-    "observed_at": "2026-08-10T17:19:09+09:00",
-    "note": "2026-08-09 に出した投稿が無い"
+    "status": "unavailable",
+    "source": "threads_api",
+    "observed_at": "2026-08-10T17:20:19+09:00",
+    "note": "取得に失敗: No module named 'yaml'"
    },
    "profile_visits": {
     "value": null,
     "status": "unavailable",
     "source": "threads_api",
-    "observed_at": "2026-08-10T17:19:09+09:00",
-    "note": "アカウント単位のプロフィール表示は未取得。画面からの手入力待ち"
+    "observed_at": "2026-08-10T17:20:19+09:00",
+    "note": "取得に失敗: No module named 'yaml'"
    },
    "link_clicks": {
     "value": null,
     "status": "unavailable",
     "source": "threads_api",
-    "observed_at": "2026-08-10T17:19:09+09:00",
-    "note": "Threads APIにリンククリックの指標が無い。GA4側で見る"
+    "observed_at": "2026-08-10T17:20:19+09:00",
+    "note": "取得に失敗: No module named 'yaml'"
    }
   }
  },
@@ -127,42 +127,42 @@
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-10T17:19:09+09:00",
+   "observed_at": "2026-08-10T17:20:19+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   },
   "affiliate_clicks": {
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-10T17:19:09+09:00",
+   "observed_at": "2026-08-10T17:20:19+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   },
   "conversions_pending": {
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-10T17:19:09+09:00",
+   "observed_at": "2026-08-10T17:20:19+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   },
   "conversions_confirmed": {
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-10T17:19:09+09:00",
+   "observed_at": "2026-08-10T17:20:19+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   },
   "revenue_pending": {
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-10T17:19:09+09:00",
+   "observed_at": "2026-08-10T17:20:19+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   },
   "revenue_confirmed": {
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-10T17:19:09+09:00",
+   "observed_at": "2026-08-10T17:20:19+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   }
  },
@@ -208,29 +208,24 @@
  },
  "collection_errors": [
   {
-   "block": "articles.published_total",
-   "reason": "HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))",
-   "at": "2026-08-10T17:19:08+09:00"
+   "block": "articles.drafts",
+   "reason": "HTTP 400 ({'status': 'draft'})",
+   "at": "2026-08-10T17:20:18+09:00"
   },
   {
-   "block": "articles.published_yesterday",
-   "reason": "HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish&after=2026-08-09T00%3A00%3A00&before=2026-08-09T23%3A59%3A59 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forb",
-   "at": "2026-08-10T17:19:09+09:00"
+   "block": "articles.scheduled",
+   "reason": "HTTP 400 ({'status': 'future'})",
+   "at": "2026-08-10T17:20:19+09:00"
   },
   {
-   "block": "articles.updated_yesterday",
-   "reason": "HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish&modified_after=2026-08-09T00%3A00%3A00&modified_before=2026-08-09T23%3A59%3A59 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connectio",
-   "at": "2026-08-10T17:19:09+09:00"
+   "block": "sns.x",
+   "reason": "No module named 'yaml'",
+   "at": "2026-08-10T17:20:19+09:00"
   },
   {
-   "block": "articles.drafts/scheduled",
-   "reason": "WP_APP_PASSWORD が無い。下書き・予約は認証しないと数えられない",
-   "at": "2026-08-10T17:19:09+09:00"
-  },
-  {
-   "block": "sns.threads.user",
-   "reason": "THREADS_ACCESS_TOKEN が無い",
-   "at": "2026-08-10T17:19:09+09:00"
+   "block": "sns.threads",
+   "reason": "No module named 'yaml'",
+   "at": "2026-08-10T17:20:19+09:00"
   }
  ],
  "human_actions": [
