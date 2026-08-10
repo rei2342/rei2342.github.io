@@ -70,8 +70,8 @@ jobs:
           # 生成物は使い捨てではないので、衝突しても諦めず自分の版を採用して押し込む。
           # rebase 中の -X theirs は「今リベース中のコミット（＝今回の生成物）」を優先する。
           for i in 1 2 3 4 5; do
-            git fetch origin main || true
-            if git rebase -X theirs origin/main && git push origin HEAD:main; then
+            git fetch origin "${{ github.ref_name }}" || true
+            if git rebase -X theirs "origin/${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}"; then
               echo "push 成功"; exit 0
             fi
             git rebase --abort || true
