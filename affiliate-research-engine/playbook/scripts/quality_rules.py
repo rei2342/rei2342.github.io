@@ -191,7 +191,10 @@ def internal_link_gate(html, check_http=False):
     out = []
     for m in re.finditer(r"<a[^>]+href=\"([^\"]*sakura-eigo\.com[^\"]*)\""
                          r"[^>]*>(.*?)</a>", html, re.S):
-        url, anchor = m.group(1), strip_tags(m.group(2)).strip()
+        # **実体参照を戻してから叩く。** &#038; のまま要求すると404になる
+        import html as _html
+        url = _html.unescape(m.group(1))
+        anchor = strip_tags(m.group(2)).strip()
         rec = {"url": url, "anchor": anchor[:60],
                "http": "未検査", "title_match": "未検査",
                "published": "未検査", "noindex": "未検査"}

@@ -288,7 +288,12 @@ def link_check(ids, dry=True):
         rec = {"cta": [], "internal": []}
         # CTA（アフィリのリンク）
         for m in re.finditer(r'<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>', html, re.S):
-            url, label = m.group(1), re.sub(r"<[^>]+>", "", m.group(2)).strip()
+            # **HTMLの実体参照を戻してから叩く。**
+            # WordPress は & を &#038; で保存する。そのまま要求すると
+            # クエリが壊れて moshimo が404を返す（2026-08-10に誤検知した）
+            import html as _html
+            url = _html.unescape(m.group(1))
+            label = re.sub(r"<[^>]+>", "", m.group(2)).strip()
             if not re.search(r"af\.moshimo\.com|px\.a8\.net", url):
                 continue
             if url.startswith("//"):
