@@ -12,7 +12,7 @@ text: 'オンライン英会話が続かなかったとき、「意志が弱い�
 
   レッスン中／予約前に分けた確認項目は、記事で読めます。
 
-  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x'
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x_546_b'
 thread_parts:
 - 'オンライン英会話が続かなかったとき、「意志が弱いのかな」と考えがちです。
 
@@ -22,7 +22,7 @@ thread_parts:
 
   レッスン中／予約前に分けた確認項目は、記事で読めます。
 
-  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x'
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x_546_b'
 state: approved
 gate_results:
 - id: article_published
@@ -60,7 +60,7 @@ rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: a3f1159c5785fa29
+content_hash: 8d1ee78a8cd594f7
 generator_version: social-v1
 material:
   search_intent: オンライン英会話が続かない理由と、続ける方法を知りたい
@@ -77,6 +77,9 @@ history:
   state: awaiting_approval
 - at: 2026-08-10T14:12:46+0900
   state: approved
+- at: 2026-08-10T14:57:40+0900
+  state: approved
+  note: 'URL差し替え: utm_sourceだけでは同じ媒体・同じ記事の別投稿と区別できない。utm_contentで在庫まで追う'
 prior_history:
 - at: 2026-08-10T13:27:08+0900
   state: generated
@@ -151,3 +154,9 @@ claim_counts:
   needs_human_review: 0
   total: 4
 needs_human_review: []
+prior_links:
+- at: 2026-08-10T14:57:40+0900
+  old_url: https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x
+  new_url: https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x_546_b
+  old_content_hash: a3f1159c5785fa29
+  reason: utm_sourceだけでは同じ媒体・同じ記事の別投稿と区別できない。utm_contentで在庫まで追う

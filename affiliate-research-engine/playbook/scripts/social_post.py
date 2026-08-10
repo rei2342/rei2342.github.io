@@ -66,6 +66,30 @@ def pick_by_id(spec, platform, stock_id):
     return s, ""
 
 
+def check_url_live(text):
+    """**本文に入っているURLを実際に叩く。** 200でなければ投稿しない。
+
+    utm を足したときに、リダイレクトやクエリの取り違えで
+    404 になっていないかを、送る前に見る。
+    戻り値は (送ってよいか, 表示する行)。
+    """
+    import requests
+    out, ok_all = [], True
+    for u in sg.URL.findall(text):
+        try:
+            r = requests.get(u, timeout=20, allow_redirects=True,
+                             headers={"User-Agent": "sakura-social-check"})
+            ok = r.status_code == 200
+            out.append(f"  {r.status_code} {u}"
+                       + (f"  → {r.url}" if r.url != u else ""))
+        except Exception as e:
+            ok, out = False, out + [f"  取得できない {u}（{e}）"]
+        ok_all = ok_all and ok
+    if not out:
+        return False, "  URLが無い"
+    return ok_all, "\n".join(out)
+
+
 def verify_unchanged(spec, s, shown_hash, sent_text):
     """**表示したものと、これから送るものが同じか。**
 
@@ -208,6 +232,22 @@ def main():
     # ── 送る直前の表示と、その本文の固定 ─────────────────
     shown_hash = show_before_post(s, a.platform, spec)
     sent_text = s["text"]
+
+    # 送る本文のURLが実際に開けるか（utm を足したあとの取り違えを見る）
+    ok, lines = check_url_live(sent_text)
+    print("URLの応答:\n" + lines)
+    if not ok:
+        print("\n投稿しない: URLが200で返らない")
+        sys.exit(1)
+
+    # Xの数え方で上限を超えていないか（送る本文そのもので数え直す）
+    if a.platform == "x":
+        w = sg.weighted_len(spec, sent_text)
+        lim = spec["x"]["weighted"]["hard_limit"]
+        print(f"X加重: {w} / {lim}")
+        if w > lim:
+            print(f"\n投稿しない: X加重が上限を超えている（{w} > {lim}）")
+            sys.exit(1)
 
     ok, why = verify_unchanged(spec, s, shown_hash, sent_text)
     if not ok:

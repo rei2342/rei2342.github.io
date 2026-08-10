@@ -566,6 +566,57 @@ check("API 失敗を履歴に残す", '"result": "error"' in _err)
 check("成功したときだけ posted へ動かす",
       _src.index('inv.transition(spec, s, "posted"') > _i_post)
 
+# URLの差し替えは、クエリだけ。**本文には触らせない**（2026-08-10）
+import copy as _cp
+import social_retag as sr
+
+_base = "https://sakura-eigo.com/online-english-lessons-90-days-success/"
+_okurl = _base + "?utm_source=x&utm_medium=social&utm_content=x_546_b"
+_r, _w = sr.retag(spec, _cp.deepcopy(_s), _okurl, "テスト")
+check("URLのクエリを差し替えられる", _r is not None and _okurl in _r["text"], _w)
+check("差し替えでURL以外が変わらない",
+      _r is not None and
+      [sg.URL.sub("<URL>", p) for p in _r["thread_parts"]] ==
+      [sg.URL.sub("<URL>", p) for p in _s["thread_parts"]])
+check("差し替えで content_hash を取り直す",
+      _r is not None and _r["content_hash"] == inv.content_hash(_r["thread_parts"])
+      and _r["content_hash"] != _s["content_hash"])
+check("差し替えても state は approved のまま",
+      _r is not None and _r["state"] == "approved")
+check("差し替えの記録（旧URL・旧ハッシュ・理由）を残す",
+      _r is not None and _r["prior_links"][-1]["old_content_hash"]
+      == _s["content_hash"] and _r["prior_links"][-1]["reason"] == "テスト")
+check("別の記事URLへは差し替えられない",
+      sr.retag(spec, _cp.deepcopy(_s),
+               "https://sakura-eigo.com/other/?utm_source=x", "x")[0] is None)
+check("utm_source が消えるURLへは差し替えられない",
+      sr.retag(spec, _cp.deepcopy(_s), _base + "?utm_medium=social", "x")[0]
+      is None)
+check("approved 以外は差し替えない",
+      sr.retag(spec, dict(_cp.deepcopy(_s), state="stale"), _okurl, "x")[0]
+      is None)
+
+# 送る直前に見るもの: URLが200・X加重が上限以下
+check("送る前にURLを実際に叩く", "def check_url_live" in
+      (ROOT / "scripts/social_post.py").read_text(encoding="utf-8"))
+_i_url = _src.index("check_url_live(sent_text)")
+check("URLの確認は投稿より前", _i_url < _i_post)
+check("X加重の再計算も投稿より前",
+      _src.index("sg.weighted_len(spec, sent_text)") < _i_post)
+
+# 実際に出す2件が、今の本文で上限内か
+for _sid in ("X-546-b",):
+    _st = [x for _, x in inv.all_stock(spec) if x["stock_id"] == _sid][0]
+    _w2 = sg.weighted_len(spec, _st["text"])
+    check(f"{_sid}: X加重が上限以下", _w2 <= spec["x"]["weighted"]["hard_limit"],
+          f"{_w2} / {spec['x']['weighted']['hard_limit']}")
+for _sid in ("X-546-b", "THREADS-546-b"):
+    _st = [x for _, x in inv.all_stock(spec) if x["stock_id"] == _sid][0]
+    check(f"{_sid}: utm_content で在庫まで追える",
+          "utm_content=" in _st["text"] and "utm_campaign=" in _st["text"])
+    check(f"{_sid}: 本文と content_hash が合っている",
+          inv.content_hash(_st["thread_parts"]) == _st["content_hash"])
+
 # 定期運用の自動選択は残っている（cron 用）
 _ready = sorted([s for _, s in inv.all_stock(spec, "x")
                  if s["state"] == "approved"],
