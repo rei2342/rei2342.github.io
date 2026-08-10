@@ -135,6 +135,41 @@ check("参照画像に優先順位がある",
 check("人物の割合が固定の数値になっていない",
       "balance_is_not_a_quota" in spec["appearance_policy"])
 
+# 参照画像の使い分けが、プロンプトへそのまま入るか
+ref = spec["reference_assets"]
+check("参照の指示文がある（人物あり・なしの2種）",
+      set(ref.get("directive", {})) == {"with_person", "without_person"})
+check("顔が521から離れたら不合格、と書いてある",
+      "521" in ref.get("reject_rule", ""))
+for pid, out in py_out.items():
+    art = next(a for a in doc["articles"] if str(a["post_id"]) == pid)
+    check(f"記事{pid}: プロンプトにREFERENCESがある", "REFERENCES:" in out)
+    if art["with_person"]:
+        check(f"記事{pid}: 521が顔の最優先参照と書いてある",
+              "521 as the primary identity reference" in out)
+        check(f"記事{pid}: 273は髪と桜だけ", "273 only for" in out)
+        check(f"記事{pid}: 297は塗りと光だけ", "297 only for" in out)
+        check(f"記事{pid}: 297の顔・目・パーカーを引き継がない",
+              "Do not copy its face" in out and "pink hoodie" in out)
+    else:
+        check(f"記事{pid}: 人物なしと明記", "No person appears" in out)
+        check(f"記事{pid}: 人物なしなのに521を参照していない",
+              "521" not in out.split("REFERENCES:")[1])
+
+# 承認された人物の割り当てどおりか。ここを変えたら気づけるようにする
+APPROVED = {"993": False, "995": False, "997": True,
+            "999": True, "1001": True, "1003": False}
+for a in doc["articles"]:
+    pid = str(a["post_id"])
+    check(f"記事{pid}: 人物の有無が承認どおり",
+          a["with_person"] is APPROVED[pid],
+          f"承認={APPROVED[pid]} 実際={a['with_person']}")
+check("人物あり3・なし3",
+      sum(1 for a in doc["articles"] if a["with_person"]) == 3)
+
+# AI6本の試験運用が終わって正式仕様になった
+check("仕様が承認済み", spec["status"] == "approved")
+
 # 記事側
 for a in doc["articles"]:
     pid = a["post_id"]
@@ -156,6 +191,51 @@ for a in doc["articles"]:
           not re.search(r'"[^"]{2,}"|written|text saying', a["scene"], re.I))
     check(f"記事{pid}: ファイル名が半角英数とハイフン",
           bool(re.fullmatch(r"[a-z0-9\-]+\.jpg", a["filename"])), a["filename"])
+
+# ── 4. 20本の差し替え設計 ────────────────────────────
+NEXT20 = ROOT / "config/eyecatch/articles-next20.yaml"
+if NEXT20.exists():
+    n20 = es.load_articles(NEXT20)
+    arts = n20["articles"]
+    check("20本そろっている", len(arts) == 20, str(len(arts)))
+    ids = [a["post_id"] for a in arts]
+    check("20本に重複が無い", len(set(ids)) == 20)
+    with_p = sum(1 for a in arts if a["with_person"])
+    check("人物ありが7〜9枚に収まっている", 7 <= with_p <= 9, f"{with_p}枚")
+    # 場面の使い回しを機械で見る。**同じ机を繰り返さない**
+    for key in ("scene", "uniqueness_reason", "camera_distance"):
+        vals = [" ".join(str(a[key]).split()) for a in arts]
+        dup = {v for v in vals if vals.count(v) > 1}
+        check(f"20本の {key} が全部違う", not dup, " / ".join(dup)[:80])
+    files = [a["filename"] for a in arts]
+    check("完成ファイル名が重複していない", len(set(files)) == 20)
+    b1 = [a for a in arts if a["batch"] == 1]
+    check("batch_1 が10本", len(b1) == 10, str(len(b1)))
+    check("546・526・521 が batch_1", {546, 526, 521}
+          <= {a["post_id"] for a in b1})
+    for a in arts:
+        pid = a["post_id"]
+        check(f"記事{pid}: person_reason がある",
+              bool(a.get("person_reason", "").strip()))
+        check(f"記事{pid}: uniqueness_reason がある",
+              bool(a.get("uniqueness_reason", "").strip()))
+        check(f"記事{pid}: 今の featured_media を控えてある",
+              isinstance(a.get("current_featured_media"), int))
+        check(f"記事{pid}: 画像内文言に数字が入っていない",
+              not re.search(r"[0-9０-９]", a["lead_text"] + a["sub_text"]),
+              a["lead_text"] + a["sub_text"])
+        for line in a["lead_text"].split("\n"):
+            check(f"記事{pid}: リード1行が14字以内", len(line) <= 14, line)
+        check(f"記事{pid}: 補助が18字以内", len(a["sub_text"]) <= 18,
+              a["sub_text"])
+        check(f"記事{pid}: 場面に読める文字を描かせていない",
+              not re.search(r'"[^"]{2,}"|written|text saying', a["scene"],
+                            re.I))
+        check(f"記事{pid}: ファイル名が半角英数とハイフン",
+              bool(re.fullmatch(r"[a-z0-9\-]+\.jpg", a["filename"])),
+              a["filename"])
+        check(f"記事{pid}: 差し色のカテゴリが仕様にある",
+              a["category"] in spec["category_colors"], a["category"])
 
 print()
 if fails:

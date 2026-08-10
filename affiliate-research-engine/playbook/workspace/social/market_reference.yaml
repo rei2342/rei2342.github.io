@@ -1,0 +1,283 @@
+# 参考にした投稿の記録
+#
+# **本文を保存・転載しない。** 残すのは構造と観察結果だけ。
+# 採るのは構造・改行・語尾・絵文字の役割。採らなかった表現も残す。
+#
+# 検査: scripts/social_gate.py の market_reference_gate()
+# 必須項目: url / account / observed_on / reactions_at_observation /
+#           structure_taken / not_taken / applied_to_sakura / not_copied
+
+meta:
+  observed_by: "運用者（人）"
+  recorded_on: "2026-08-10"
+  fetch_note: >
+    **ツールからは取得できない。** x.com と threads.com は
+    このコンテナの egress で遮断されている（about.fb.com も同じ）。
+    Xの3件は 2026-08-10 に人が公開画面を見て数字を入れた。
+    Threadsの2件は**まだ未取得**。**0を入れていない。**
+  reaction_source_x: "公開X画面を人が確認（2026-08-10）"
+  approximate_note: >
+    Xの表示は概数で丸められる（35万・2.4万など）。
+    丸められている値には `approximate: true` を付けた。
+    **丸め値を厳密な数として比較に使わない**
+
+# ── 観測から何が言えるか（**効果の証明として扱わない**）──
+interpretation:
+  x_like_rate: >
+    同一アカウントの観測2件では、未完成の本音を含む投稿のいいね率が
+    高かった。ただし投稿時期、固定状態、表示経路、経過時間が異なるため、
+    因果や3倍の効果とは判定しない。市場仮説として保持し、
+    さくら自身の実投稿で検証する。
+  status: 市場仮説
+  verify_with: "さくら自身の実投稿（在庫の metrics 欄）"
+  do_not: >
+    **反応率を効果の証明として使わない。** 条件が一致していない観測値であり、
+    仕様や本文の根拠にしない
+
+# ── 反応率を比べるために保存する項目 ────────────────
+# 条件をそろえないと比べられない。**欄を先に作っておく**
+reaction_fields:
+  required:
+    - posted_at
+    - observed_at
+    - elapsed_hours
+    - pinned
+    - followers_at_observation
+    - views
+    - likes
+    - replies
+    - reposts
+    - link_clicks
+    - profile_visits
+  rule: >
+    **未取得は `未取得` と書く。0を入れない。**
+    posted_at・elapsed_hours・pinned・followers_at_observation が
+    欠けている観測は、率の比較に使わない
+
+references:
+  # ── X ──────────────────────────────────────────────
+  - url: "https://x.com/NanaoSakurada/status/2043269972705878481"
+    account: "七緒@50歳から英語教員"
+    platform: x
+    observed_on: "2026-08-10"
+    reactions_at_observation:
+      status: 取得済み
+      source: "公開X画面を人が確認"
+      observed_on: "2026-08-10"
+      posted_at: 未取得
+      observed_at: "2026-08-10"
+      elapsed_hours: 未取得
+      pinned: false
+      followers_at_observation: 未取得
+      comparable: "**不可**（posted_at・elapsed_hours・フォロワー数が未取得）"
+      fields:
+        views: {value: 350000, approximate: true}
+        likes: {value: 24000, approximate: true}
+        reposts: {value: 147, approximate: false}
+        replies: {value: 176, approximate: false}
+        link_clicks: 未取得
+        profile_visits: 未取得
+      ratios:
+        likes_per_view: "約6.9%（概数どうしの割り算。目安）"
+        replies_per_view: "約0.05%"
+      read: >
+        **桁が違う。** アカウントも投稿時期も違うので、比較の対象にしない
+    observation: >
+      短い本音。緊張を開示している。応援できる余白がある。
+      説明やノウハウを詰めずに会話を生んでいる
+    structure_taken:
+      - "1投稿に主張を1つも置かない回があってよい。状態の開示だけで成立する"
+      - "文が短い。1文＝1つのことで、説明を足さずに切る"
+      - "読み手が『がんばって』と言える余白を最後に残す"
+    not_taken:
+      - "職業・年齢・経歴の開示そのもの（さくらは台帳に verified が無い）"
+      - "本人の予定や心境をそのまま真似ること"
+    applied_to_sakura: >
+      **状態の開示は読者側に置き換える。** さくら本人の緊張は書けないので、
+      「ここ、迷いやすいところです」のように**読者の迷いの代弁**へ移す。
+      余白の作り方（最後に言い切らない）だけを採る
+    not_copied: "本文・言い回し・語順。ファイルに本文を保存していない"
+
+  - url: "https://x.com/eigo_miyu/status/1956247270464348573"
+    account: "英語オタクMiyu"
+    platform: x
+    observed_on: "2026-08-10"
+    pinned: true
+    reactions_at_observation:
+      status: 取得済み
+      source: "公開X画面を人が確認"
+      observed_on: "2026-08-10"
+      posted_at: 未取得
+      observed_at: "2026-08-10"
+      elapsed_hours: 未取得
+      pinned: true
+      followers_at_observation: 未取得
+      comparable: "**不可**（固定投稿で表示経路が違い、経過時間も未取得）"
+      fields:
+        views: {value: 55000, approximate: true}
+        likes: {value: 224, approximate: false}
+        reposts: {value: 5, approximate: false}
+        replies: {value: 2, approximate: false}
+        link_clicks: 未取得
+        profile_visits: 未取得
+      ratios:
+        likes_per_view: "約0.41%"
+        replies_per_view: "約0.004%"
+      read: >
+        **固定投稿。** プロフィール訪問者の分が加算され続けるので、
+        views を他の投稿と並べない（CLAUDE.md の Threads 固定投稿と同じ扱い）
+    observation: >
+      苦労への理解を先に置く。完成された先生口調ではなく、
+      読者と近い距離から話している
+    structure_taken:
+      - "**受け止めを先、情報を後**にする順番"
+      - "先生の位置から降りる。断定で始めない"
+    not_taken:
+      - "自分の学習経験を根拠にした共感（さくらは fact ID が無い）"
+      - "「わかります」のような相づちだけの共感"
+    applied_to_sakura: >
+      仕様の `warm_order` の①②（代弁 → 受け止め）がここから来ている。
+      ただし受け止めは**記事が支持する範囲**に留める。
+      「意志の弱さだけを責めなくて大丈夫です」は記事の主張の言い換えなので使える
+    not_copied: "本文・言い回し。`empathy_without_evidence` ゲートで再発を止めている"
+
+  - url: "https://x.com/eigo_miyu/status/2086422240653082961"
+    account: "英語オタクMiyu（学習記録）"
+    platform: x
+    observed_on: "2026-08-10"
+    reactions_at_observation:
+      status: 取得済み
+      source: "公開X画面を人が確認"
+      observed_on: "2026-08-10"
+      posted_at: 未取得
+      observed_at: "2026-08-10"
+      elapsed_hours: 未取得
+      pinned: false
+      followers_at_observation: 未取得
+      comparable: "**不可**（posted_at・elapsed_hours・フォロワー数が未取得）"
+      fields:
+        views: {value: 2235, approximate: false}
+        likes: {value: 30, approximate: false}
+        reposts: 未取得
+        replies: {value: 2, approximate: false}
+        link_clicks: 未取得
+        profile_visits: 未取得
+      ratios:
+        likes_per_view: "約1.34%"
+        replies_per_view: "約0.09%"
+      read: >
+        **同じアカウントの固定でない投稿。** reposts は**未取得**（0ではない）
+    observation: >
+      「耐えの時期ですね...」のような未完成の本音。短い段落。
+      説明しすぎない余白
+    structure_taken:
+      - "段落が短い。2〜3行で切って、続きを説明しない"
+      - "言い切らない語尾を1投稿に1回だけ混ぜる"
+    not_taken:
+      - "学習記録そのもの（継続日数・回数は台帳に無いので書けない）"
+      - "「...」の多用。曖昧さの演出にすると読みにくい"
+    applied_to_sakura: >
+      `voice_avoid` の「全文が同じ高さになる」を、
+      `sentence_height` ゲート（同じ語尾3文連続で警告）として実装した。
+      未完成さは**語尾の高さを変えること**で作り、内容を曖昧にしない
+    not_copied: "本文・「耐えの時期ですね」を含む言い回し"
+
+  # ── Threads ────────────────────────────────────────
+  - url: "https://www.threads.com/@miho_eigo_career/post/DaVRVL2iprF/"
+    account: "@miho_eigo_career"
+    platform: threads
+    observed_on: "2026-08-10"
+    reactions_at_observation:
+      status: 未取得
+      why: >
+        threads.com が egress で遮断されている。人の観測でも数値は
+        まだ共有されていない。**0を入れない**
+      fields: {views: 未取得, likes: 未取得, replies: 未取得, reposts: 未取得}
+    observation: >
+      参考書選びの段階を扱っている。「〜なんだよね」という会話の入口。
+      読者が自分事化しやすい具体的な場面
+    structure_taken:
+      - "**入口を会話文にする。** 説明文で始めない"
+      - "抽象論ではなく『どの段階にいるか』の場面から入る"
+      - "読者が自分の状況に当てはめられる具体を1つ置く"
+    not_taken:
+      - "「〜なんだよね」というタメ口の語尾"
+      - "参考書の固有名を挙げた良し悪しの判定（未使用のものは評価できない）"
+    applied_to_sakura: >
+      会話の入口は採るが、**語尾は敬体のまま**にする。
+      さくらは「〜なんだよね」を使わない（`voice_avoid` の
+      「女性らしさを『だよね』の量で表現する」に当たる）。
+      代わりに `warm_openers` の「ここ、迷いやすいところです。」で入る
+    not_copied: "本文・場面設定・語尾"
+
+  - url: "https://www.threads.com/@akiko_one_step_english"
+    account: "@akiko_one_step_english（50・60代女性向け英語コーチ・投稿群）"
+    platform: threads
+    observed_on: "2026-08-10"
+    scope: "個別投稿ではなくアカウントの投稿群を通して観測"
+    reactions_at_observation:
+      status: 未取得
+      why: >
+        threads.com が egress で遮断されている。
+        投稿群なので、そもそも1件の数値には対応しない。**0を入れない**
+      fields: {views: 未取得, likes: 未取得, replies: 未取得, reposts: 未取得}
+    observation: >
+      一覧型。場面別の具体性。柔らかい呼びかけ。
+      ただし「こっそり教えます」「習慣化の鬼」のような強い煽りがある
+    structure_taken:
+      - "**一覧型**。保存できる形にして、項目を場面で分ける"
+      - "項目が「やること」ではなく「その場面でどうなるか」で書かれている"
+      - "呼びかけがやわらかい（命令形にしない）"
+    not_taken:
+      - "「こっそり教えます」（限定感の演出。煽り）"
+      - "「習慣化の鬼」（人物のラベリング。強い断定）"
+      - "「〜な人だけ見て」型の選別フック（仕様の style.avoid に既にある）"
+    applied_to_sakura: >
+      一覧型は Threads の3要素目（保存できる一覧・手順）として採用済み。
+      煽りの側は**採らないものとして仕様へ書いた**
+      （`style.avoid` の「定型フックの連発」、`tone.cold_tone`）。
+      呼びかけは「〜してください」ではなく「〜してみると分かりやすいです」にする
+    not_copied: "本文・項目の文言・キャッチコピー"
+
+  # ── プラットフォーム公式 ────────────────────────────
+  - url: "https://about.fb.com/news/2024/10/find-your-community-with-new-threads-educational-insights/"
+    account: "Meta（Threads公式ニュースルーム）"
+    platform: threads_official
+    observed_on: "2026-08-10"
+    reactions_at_observation:
+      status: 該当なし
+      why: "公式の告知記事。反応数を見る対象ではない"
+    fetch_status:
+      status: 取得不能
+      why: >
+        about.fb.com はこのコンテナの egress で遮断されている。
+        **原文を読めていない。** 以下は運用者から共有された観測であって、
+        ツールが一次情報として確認したものではない
+      how_to_complete: >
+        Actions（外向き通信あり）で取得して、原文抜粋と取得日時を
+        workspace/market/official/ へ保存する
+    observation: >
+      会話を生む投稿が推薦されやすく、返信が閲覧の大きな部分を占める、
+      という趣旨（運用者の共有による）
+    structure_taken:
+      - "投稿単体で完結させたうえで、**最後に答えやすい問いを置く**"
+      - "問いは毎回にしない（返信を強要すると会話にならない）"
+    not_taken:
+      - "「保存してね」「コメントして」のような明示的な行動要求"
+    applied_to_sakura: >
+      `tone.conversation_mix` ゲートにした。Threadsの直近5本のうち
+      問いかけが0本なら警告、5本すべてでも警告（1〜4本に収める）。
+      **原文を確認できていないので、数値の主張は仕様に書いていない**
+    not_copied: "原文。そもそも読めていない"
+
+# ── 月次の見直し ────────────────────────────────────
+review:
+  cadence: "毎月。上位5件と下位5件を並べ、差が構造なのか題材なのかを見る"
+  next_due: "2026-09-10"
+  rule: >
+    数字が良かった投稿の**文章**を持ち帰らない。
+    採るのは構造・改行・語尾・絵文字の役割だけで、正本の該当箇所を直す
+  todo:
+    - "Threads 2件の反応数を観測者が手で入れる（いま `未取得`。0ではない）"
+    - "英語オタクMiyu・学習記録の reposts を入れる（`未取得`）"
+    - "about.fb.com を Actions で取得して、原文抜粋と取得日時を残す"

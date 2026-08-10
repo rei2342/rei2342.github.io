@@ -1,0 +1,1072 @@
+package: sakura-eyecatch-next20-generation-package
+batch: next-20
+label: 文字カード型20本の差し替え
+spec_file: sakura-v1.yaml
+spec_status: approved
+generated_at: 2026-08-09 19:37:39 JST
+master:
+  size:
+  - 1920
+  - 1080
+  aspect_ratio: '16:9'
+  has_text: false
+  format: png
+  filename_pattern: masters/<post_id>.png
+text_safe_area:
+  side: left
+  box:
+  - 0
+  - 0
+  - 960
+  - 1080
+  rule: Japanese text is composited here later, so leave it quiet and uncluttered
+subject_anchor: centre to right
+blog_export:
+  size:
+  - 1200
+  - 675
+  aspect_ratio: '16:9'
+  text_overlay: true
+  format: jpeg
+  quality: 88
+  max_bytes: 307200
+  filename_pattern: eyecatch-{slug}.jpg
+  filename_charset: 半角英数とハイフンのみ。日本語・空白・全角記号・アンダースコアは使わない
+note_export:
+  size:
+  - 1200
+  - 628
+  aspect_ratio: 1.91:1
+  crop: center-right anchored
+  text_overlay: false
+  format: jpeg
+  quality: 88
+always_append: 'No letters, no words, no numbers, no logos, no watermarks.
+
+  Do not render any interface text, application logo, brand name, score, price, date, duration, or numerical
+  label.
+
+  Keep the entire left half visually quiet and uncluttered for later Japanese typography.
+
+  Do not depict Sakura using a service unless that usage is verified.'
+references:
+- slot: face_and_age
+  post_id: 521
+  media_id: 523
+  file: references/521.jpg
+  take: 顔立ち・年齢感・目の大きさの抑え方・肌の塗り
+  do_not_take: まとめ髪・電車の場面・画面に焼かれた文字
+- slot: hair_and_sakura
+  post_id: 273
+  media_id: 464
+  file: references/273.jpg
+  take: 下ろした長い髪の量感と流れ・桜のヘアクリップの位置と大きさ・人物を右へ置く構図
+  do_not_take: 顔の角度（伏せすぎ）
+- slot: style_light_texture
+  post_id: 297
+  media_id: 554
+  file: references/297.jpg
+  take: 水彩の粒立ち・夜のやわらかい光・紙の質感・にじみの強さ
+  do_not_take: ピンクのパーカー（旧ちびキャラの衣装）・顔の目の大きさ
+reference_priority:
+- face_and_age
+- hair_and_sakura
+- style_light_texture
+reject_rule: 人物の顔が521から離れていたら不合格にする。作り直す。 297の顔・大きな目・ちび頭身・ピンクのパーカーは引き継がない
+previews: []
+count: 20
+with_person_count: 9
+without_person_count: 11
+post_ids:
+- 546
+- 526
+- 521
+- 304
+- 301
+- 294
+- 235
+- 149
+- 137
+- 23
+- 310
+- 292
+- 283
+- 282
+- 281
+- 150
+- 117
+- 33
+- 32
+- 28
+batch_1:
+- &id001
+  post_id: 546
+  batch: 1
+  slug: online-english-lessons-90-days-success
+  title: オンライン英会話が続かないのは、話し始めるまでの手数が多いから
+  search_intent: オンライン英会話が続かない。自分の意志が弱いのかを知りたい
+  role: 共感・入口
+  category: 英会話サービス比較
+  prompt_file: prompts/546.md
+  with_person: true
+  person_reason: やめた瞬間は「授業中」ではなく「予約の前」だという記事。 止まる一瞬は姿勢でしか出ない。物だけでは伝わらない
+  uniqueness_reason: 20本で唯一の洗面所。鏡越しに写す構図もここだけ。 机・ノート・PCが1つも出ない
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  camera_distance: waist-up, seen partly through a bathroom mirror
+  expression: eyes lowered toward the basin, mouth closed, a small pause rather than distress
+  pose: standing at the right of the washbasin, one earphone raised halfway to her ear and stopped there,
+    the other hand resting on the basin edge
+  props:
+  - a bathroom mirror
+  - a single earphone
+  - a plain tumbler
+  - a folded towel
+  background: a small washroom at night, a dark hallway visible behind her
+  palette: cool white tile and warm bulb light, low saturation, the mint accent only on the towel
+  scene: A small washroom late at night. Sakura stands at the right, seen partly in the mirror above the
+    basin. She has raised one earphone halfway to her ear and stopped, eyes lowered. A plain tumbler and
+    a folded towel sit on the basin. Behind her the hallway is dark and the rest of the flat is already
+    quiet.
+  master_file: masters/546.png
+  blog_output: eyecatch-online-eikaiwa-fewer-steps.jpg
+  note_output: eyecatch-online-eikaiwa-fewer-steps-note.jpg
+  alt: オンライン英会話をやめてしまうのが授業中ではなく予約の前だと分かる、夜の洗面所で手が止まっている様子
+  lead_text: '予約の前で
+
+    閉じてしまう'
+  sub_text: 手数のほうを先に減らす
+  status: awaiting_generation
+  current_featured_media: 989
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-546-20260809.png
+  pre_card_media_id: 552
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id002
+  post_id: 526
+  batch: 1
+  slug: fast-verify-cost-time-travel
+  title: 「現地が一番早い」を費用と時間で確かめる｜1時間あたりで並べる
+  search_intent: 留学と国内学習のどちらが早いのかを、同じ物差しで比べたい
+  role: 費用・比較
+  category: 留学エージェント・費用
+  prompt_file: prompts/526.md
+  with_person: false
+  person_reason: 同じ単位に置き直して比べる記事。比べる対象そのものを見せるほうが早い。 人物を置くと、どれを勧めているかの印象が付く
+  uniqueness_reason: 20本で唯一の砂時計の列。時間の量だけで比較を表し、 表・グラフ・カードをいっさい使わない
+  references:
+  - references/297.jpg
+  camera_distance: eye level, raking along a shelf
+  expression: none. no person appears
+  pose: no person. six objects in a single row, seen from the side
+  props:
+  - six small plain hourglasses of different sizes
+  - a bare wooden shelf
+  background: a window shelf in the morning, long soft shadows on a pale wall
+  palette: pale wood and white wall with warm morning light, low saturation, the lavender accent only
+    on one hourglass frame
+  scene: Six small plain hourglasses stand in a single row on a bare wooden shelf by a window, each a
+    different size and each holding a different amount of sand. Morning light comes from the side and
+    lays long soft shadows across the pale wall behind them. Nothing else is on the shelf.
+  master_file: masters/526.png
+  blog_output: eyecatch-cost-time-same-unit.jpg
+  note_output: eyecatch-cost-time-same-unit-note.jpg
+  alt: 留学と国内学習の早さを同じ単位に置き直して比べることを、大きさの違う砂時計の列で表した画像
+  lead_text: '「早い」を
+
+    そろえて比べる'
+  sub_text: 同じ単位に置き直す
+  status: awaiting_generation
+  current_featured_media: 988
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-526-20260809.png
+  pre_card_media_id: 527
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id003
+  post_id: 521
+  batch: 1
+  slug: toeic-listening-325-to-improvement
+  title: TOEICリスニングが止まっているとき、聞き流しを続ける前に確認する3つのこと
+  search_intent: TOEICのリスニングが伸びない。聞き流しを続けていいのかを知りたい
+  role: スコアの見方・切り分け
+  category: TOEIC・スコア
+  prompt_file: prompts/521.md
+  with_person: false
+  person_reason: どこで止まっているかを切り分ける記事。音が拾えないのか残らないのかは 表情では見えない。場所と道具で示すほうが正確
+  uniqueness_reason: 20本で唯一の電車の中。人物を出さず、置き去りのイヤホンだけで 「聞き流しが続いている状態」を表す
+  references:
+  - references/297.jpg
+  camera_distance: close and low, beside the window rail
+  expression: none. no person appears
+  pose: no person. one earphone left hanging on the rail
+  props:
+  - a single earphone hooked over a window rail
+  - a folded coat on the seat edge
+  background: inside a commuter train in the morning, the view outside blurred by motion
+  palette: cool grey interior with pale morning light through the window, low saturation, the coral accent
+    only on the coat lining
+  scene: Inside a commuter train in the morning. One earphone hangs from the rail by the window, its cord
+    swaying. The view outside is blurred by the train's motion. A folded coat rests on the edge of the
+    seat. No passenger is in frame.
+  master_file: masters/521.png
+  blog_output: eyecatch-toeic-listening-where-stuck.jpg
+  note_output: eyecatch-toeic-listening-where-stuck-note.jpg
+  alt: TOEICリスニングが止まっているときに聞き流しを続ける前の確認を表した、朝の電車で手すりに掛かったイヤホン
+  lead_text: '聞き流しを
+
+    続ける前に'
+  sub_text: 止まる場所を切り分ける
+  status: awaiting_generation
+  current_featured_media: 987
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-521-20260809.png
+  pre_card_media_id: 523
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id004
+  post_id: 304
+  batch: 1
+  slug: toeic-600-plateau-breakthrough-study
+  title: TOEIC 600点で止まっているとき、勉強法を変える前に確認する4つのこと
+  search_intent: TOEICが同じ点数で止まっている。勉強法を変えるべきかを知りたい
+  role: スコアの見方・確認項目
+  category: TOEIC・スコア
+  prompt_file: prompts/304.md
+  with_person: false
+  person_reason: 内訳を分解して見る記事。分け方そのものが主題なので、 分かれた紙だけで足りる
+  uniqueness_reason: 20本で唯一、折り目だけで4つに分かれた紙。書き込みも図もない。 朝の食卓を横から低く写すのもここだけ
+  references:
+  - references/297.jpg
+  camera_distance: close and low, across the table surface
+  expression: none. no person appears
+  pose: no person. one folded sheet opened flat, a pen laid across it
+  props:
+  - a sheet of paper opened flat with crease lines dividing it in four
+  - a pen
+  - a small tea cup with steam
+  background: a breakfast table in the morning, light from a window to the side
+  palette: pale morning light on white paper and light wood, low saturation, the coral accent only on
+    the tea cup rim
+  scene: A breakfast table in the morning, seen low and close across the surface. A sheet of paper has
+    been folded and opened flat again, its crease lines dividing the blank page into four. A pen lies
+    across one crease. A small tea cup stands beside it with steam rising. Light comes from a window to
+    the side.
+  master_file: masters/304.png
+  blog_output: eyecatch-toeic-600-plateau-check.jpg
+  note_output: eyecatch-toeic-600-plateau-check-note.jpg
+  alt: TOEICが止まっているときに勉強法を変える前へ内訳を分けて見ることを表した、折り目で4つに分かれた紙
+  lead_text: '勉強法を
+
+    変える前に'
+  sub_text: 内訳を分けて見る
+  status: awaiting_generation
+  current_featured_media: 985
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-304-20260809.png
+  pre_card_media_id: 308
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id005
+  post_id: 301
+  batch: 1
+  slug: free-study-abroad-agent-bias
+  title: 無料エージェントに勧められたまま契約する前に、自分の判断を取り戻す
+  search_intent: 無料の留学エージェントに勧められた1校を、その場で決めていいのかを知りたい
+  role: 判断基準（迷い）
+  category: 留学エージェント・費用
+  prompt_file: prompts/301.md
+  with_person: true
+  person_reason: その場で断れるかどうかが主題。差し出されたものを受け取らない、という 動作は人物でしか描けない
+  uniqueness_reason: 20本で唯一の肩越しの構図と、向かいから差し出される他人の手。 対面のやり取りを描くのはここだけ
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  camera_distance: over the shoulder, from behind Sakura
+  expression: eyes lowered toward the papers, lips closed, holding back rather than refusing
+  pose: seated at a counter seen from behind, both hands kept on her lap, leaning back very slightly instead
+    of reaching out
+  props:
+  - a stack of blank papers held out by another person's hands
+  - a counter
+  - a glass of water
+  background: a bright consultation counter in the daytime, softly blurred
+  palette: bright neutral daylight, cream and pale grey, low saturation, the lavender accent only on her
+    scarf
+  scene: A bright consultation counter in the daytime, seen over Sakura's shoulder from behind. Another
+    person's hands hold out a stack of blank papers across the counter. Sakura keeps both hands on her
+    lap and leans back very slightly, not taking them. A glass of water stands to one side. The far side
+    of the room is softly blurred.
+  master_file: masters/301.png
+  blog_output: eyecatch-free-agent-take-back-decision.jpg
+  note_output: eyecatch-free-agent-take-back-decision-note.jpg
+  alt: 無料の留学エージェントに勧められた書類をその場で受け取らずに持ち帰ろうとしている様子
+  lead_text: '勧められた
+
+    その場で'
+  sub_text: 持ち帰る言い方を決める
+  status: awaiting_generation
+  current_featured_media: 984
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-301-20260809.png
+  pre_card_media_id: 553
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id006
+  post_id: 294
+  batch: 1
+  slug: study-abroad-decision-deadline
+  title: 留学の比較が終わらないときに、決め方のほうを先に決める手順
+  search_intent: 留学先の比較が終わらない。どう決めればいいのかを知りたい
+  role: 比較・選び方（迷い）
+  category: 留学エージェント・費用
+  prompt_file: prompts/294.md
+  with_person: true
+  person_reason: 比較そのものが先延ばしになっている、という記事。 止まっているのが本人だと分かる必要がある
+  uniqueness_reason: 20本で唯一、部屋の中で人物を小さく置いた引きの構図。 壁のカレンダーへ手を伸ばす動作もここだけ
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  camera_distance: wide, the person small in the room
+  expression: eyes on the calendar, brows slightly drawn, mouth closed
+  pose: standing up from the sofa at the right and reaching toward a wall calendar, a closed laptop left
+    behind on the seat
+  props:
+  - a wall calendar with no writing on it
+  - a closed laptop on the sofa
+  - a floor lamp
+  background: a living room late at night, one lamp lit, the rest of the room in soft shadow
+  palette: deep warm shadow with one pool of lamp light, low saturation, the lavender accent only on the
+    sofa cushion
+  scene: A living room late at night, seen wide so the figure is small. Sakura has risen from the sofa
+    at the right and is reaching toward a blank wall calendar, about to mark one square. Her laptop lies
+    closed on the seat behind her. A single floor lamp lights that corner and the rest of the room falls
+    into soft shadow.
+  master_file: masters/294.png
+  blog_output: eyecatch-study-abroad-decide-how.jpg
+  note_output: eyecatch-study-abroad-decide-how-note.jpg
+  alt: 留学の比較が終わらないときに決め方を先に決めることを表した、深夜にカレンダーへ手を伸ばす様子
+  lead_text: '比べ終わらない
+
+    なら決め方から'
+  sub_text: 締切を自分の側へ置く
+  status: awaiting_generation
+  current_featured_media: 983
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-294-20260809.png
+  pre_card_media_id: 555
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id007
+  post_id: 235
+  batch: 1
+  slug: '%e3%80%8c%e3%82%bb%e3%83%96%e5%b3%b6%e7%95%99%e5%ad%a6-1%e3%83%b6%e6%9c%88-%e4%bd%93%e9%a8%93%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e8%b2%bb%e7%94%a8%e3%83%bb%e3%82%b9%e3%82%b1%e3%82%b8%e3%83%a5'
+  title: 帰国後も動き続ける仕組みを、セブ1ヶ月で作れるかを見分ける
+  search_intent: セブ島留学1ヶ月で本当に変わるのかを知りたい
+  role: 比較・選び方
+  category: フィリピン・セブ留学
+  prompt_file: prompts/235.md
+  with_person: false
+  person_reason: 学校選びの基準を「現地の快適さ」から「帰った翌週」へ置き換える記事。 主題は帰国後の予定表で、人物は要らない
+  uniqueness_reason: 20本で唯一のスーツケース。まだ開けていない荷物の上に空白の予定表を 置くのもここだけ
+  references:
+  - references/297.jpg
+  camera_distance: top-down over the suitcase lid
+  expression: none. no person appears
+  pose: no person. a planner resting on a closed suitcase, seen from above
+  props:
+  - a closed suitcase still tagged
+  - a blank weekly planner
+  - a pair of sandals
+  background: a living room floor in the early evening, warm light from the side
+  palette: warm evening light on a pale floor, cream paper, low saturation, the turquoise accent only
+    on the luggage tag
+  scene: A living room floor in the early evening. A suitcase lies closed and still tagged from the flight,
+    not yet opened. A blank weekly planner rests on top of it, its grid empty. A pair of sandals sits
+    beside the case. Warm light comes in low from the side.
+  master_file: masters/235.png
+  blog_output: eyecatch-cebu-one-month-after-return.jpg
+  note_output: eyecatch-cebu-one-month-after-return-note.jpg
+  alt: セブ島留学から帰った翌週も動き続けられるかを表した、まだ開けていないスーツケースの上の空白の予定表
+  lead_text: '帰った翌週から
+
+    動くかどうか'
+  sub_text: 学校を選ぶ前に見る
+  status: awaiting_generation
+  current_featured_media: 978
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-235-20260809.png
+  pre_card_media_id: 562
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id008
+  post_id: 149
+  batch: 1
+  slug: '%e3%80%8c%e3%82%ab%e3%83%8a%e3%83%80-%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%bb%e7%94%a8-2024%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6150%e4%b8%87%e3%83%bb250%e4%b8%87%e3%81%ae%e8%a6%8b%e7%a9%8d'
+  title: カナダ ワーホリの費用は3つの箱で出す｜まとめ記事に載らない項目
+  search_intent: カナダのワーキングホリデーにいくらかかるかを、自分で計算したい
+  role: 費用・条件
+  category: 海外留学・ワーホリ
+  prompt_file: prompts/149.md
+  with_person: false
+  person_reason: 出発日までに確定するものと、しないものを分ける記事。 分ける作業に表情は要らない
+  uniqueness_reason: 20本で唯一の冬支度。床すれすれの低いアングルもここだけで、 寒い行き先であることを小物だけで示す
+  references:
+  - references/297.jpg
+  camera_distance: very low, almost at floor level
+  expression: none. no person appears
+  pose: no person. winter gear placed on the entryway floor
+  props:
+  - a pair of thick winter boots
+  - a folded down jacket
+  - wool gloves
+  - one empty paper box with its lid open
+  background: a small entryway in the early morning, low light from the door glass
+  palette: cool morning light on grey concrete and cream wool, low saturation, the sky-blue accent only
+    on the glove cuff
+  scene: A small entryway in the early morning, seen from almost floor level. Thick winter boots stand
+    ready, a down jacket is folded beside them with wool gloves on top. One empty paper box sits with
+    its lid open, waiting to be filled. Low light comes through the glass of the front door.
+  master_file: masters/149.png
+  blog_output: eyecatch-canada-working-holiday-three-boxes.jpg
+  note_output: eyecatch-canada-working-holiday-three-boxes-note.jpg
+  alt: カナダのワーキングホリデー費用を3つに分けて出すことを表した、玄関に並べた冬支度と空の箱
+  lead_text: '載っていない
+
+    項目を足す'
+  sub_text: 箱に分けて出し直す
+  status: awaiting_generation
+  current_featured_media: 976
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-149-20260809.png
+  pre_card_media_id: 566
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id009
+  post_id: 137
+  batch: 1
+  slug: '%e3%80%8c%e8%8b%b1%e8%aa%9e%e3%82%b3%e3%83%bc%e3%83%81%e3%83%b3%e3%82%b0-3%e3%83%b6%e6%9c%88-%e5%8a%b9%e6%9e%9c-%e4%bd%93%e9%a8%93%e8%ab%87%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b6toeic155%e7%82%b9'
+  title: 卒業当日の155点は、コーチが消えた4ヶ月目には残らない。15万円を払う前に見るべき1つの数字
+  search_intent: 英語コーチングの体験談を、どう読めばいいのかを知りたい
+  role: 判断基準
+  category: 英語コーチング
+  prompt_file: prompts/137.md
+  with_person: false
+  person_reason: 「コーチが隣に居なくなったあと」が主題。居なくなったことを見せるので、 人物を1人でも置くと意味が反転する
+  uniqueness_reason: 20本で唯一の面談室と、空いたままの椅子。 「居ない」ことを主題にした画像はここだけ
+  references:
+  - references/297.jpg
+  camera_distance: eye level, wide across the table
+  expression: none. no person appears
+  pose: no person. two chairs face each other, one pushed back and empty
+  props:
+  - two plain chairs facing each other
+  - a bare table
+  - a closed door at the back
+  background: a small meeting room in the afternoon, light from one window
+  palette: pale afternoon light on cream walls and light wood, low saturation, the apricot accent only
+    on one chair cushion
+  scene: A small meeting room in the afternoon. Two plain chairs face each other across a bare table.
+    One chair is pushed back and left empty, the other still tucked in. Light comes from a single window
+    and falls across the empty tabletop. The door at the back is closed.
+  master_file: masters/137.png
+  blog_output: eyecatch-english-coaching-after-graduation-slope.jpg
+  note_output: eyecatch-english-coaching-after-graduation-slope-note.jpg
+  alt: 英語コーチングの卒業後に何が残るかを見ることを表した、片方の椅子が空いたままの面談室
+  lead_text: '卒業したあとに
+
+    残るものは'
+  sub_text: 到達点より傾きを見る
+  status: awaiting_generation
+  current_featured_media: 975
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-137-20260809.png
+  pre_card_media_id: 145
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id010
+  post_id: 23
+  batch: 1
+  slug: '%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6'
+  title: ワーホリの貯金はいくら必要か｜200万を自分の数字に組み替える
+  search_intent: ワーキングホリデーに必要な貯金額を、自分の条件で知りたい
+  role: 費用・条件
+  category: 海外留学・ワーホリ
+  prompt_file: prompts/23.md
+  with_person: false
+  person_reason: 総額を3つに割り直す記事。割り方そのものが主題なので、 分かれた入れ物を見せるほうが早い
+  uniqueness_reason: 20本で唯一の封筒と貯金箱。台所のテーブルを真上から写すのもここだけ
+  references:
+  - references/297.jpg
+  camera_distance: top-down over a kitchen table
+  expression: none. no person appears
+  pose: no person. three envelopes laid side by side, seen from directly above
+  props:
+  - three plain envelopes of different sizes, flaps open
+  - a small ceramic coin bank
+  - a pencil
+  background: a kitchen table at night under a warm ceiling lamp
+  palette: warm lamp light on pale wood, cream paper, low saturation, the sky-blue accent only on the
+    coin bank
+  scene: A kitchen table at night seen from directly above. Three plain envelopes of different sizes lie
+    side by side with their flaps open and nothing inside. A small ceramic coin bank sits beside them
+    with a pencil resting against it. Warm light from a ceiling lamp falls across the pale wood.
+  master_file: masters/23.png
+  blog_output: eyecatch-working-holiday-savings-split.jpg
+  note_output: eyecatch-working-holiday-savings-split-note.jpg
+  alt: ワーキングホリデーの貯金額を用途ごとに3つへ分けて出し直すことを表した、台所のテーブルの封筒
+  lead_text: 'まとめ記事の
+
+    総額を分ける'
+  sub_text: 自分の条件で出し直す
+  status: awaiting_generation
+  current_featured_media: 970
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-23-20260809.png
+  pre_card_media_id: 26
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+batch_2:
+- &id011
+  post_id: 310
+  batch: 2
+  slug: cheap-english-learning-apps-free
+  title: 無料・低価格の英語アプリで足りる人と、足りない人の分かれ目
+  search_intent: 無料や低価格の英語アプリだけで足りるのかを知りたい
+  role: 比較
+  category: 英会話サービス比較
+  prompt_file: prompts/310.md
+  with_person: false
+  person_reason: 入る量の違いが主題。人物を置くと、どちらが正しいかの印象が付く。 器の大きさだけで足りる
+  uniqueness_reason: 20本で唯一の素焼きの植木鉢と縁側。画面もアプリも1つも描かず、 容量の差だけで比較を表す
+  references:
+  - references/297.jpg
+  camera_distance: close, from slightly above, on the veranda floor
+  expression: none. no person appears
+  pose: no person. two pots of very different sizes side by side
+  props:
+  - two empty terracotta pots, one small and shallow, one large and deep
+  - dry soil
+  background: a sunlit wooden veranda in the late morning
+  palette: warm sunlight on weathered wood and terracotta, low saturation, the mint accent only on a small
+    leaf at the edge
+  scene: A sunlit wooden veranda in the late morning. Two empty terracotta pots stand side by side, one
+    small and shallow, the other large and deep. Both hold only dry soil. Sunlight falls across the weathered
+    boards and throws their shadows to one side.
+  master_file: masters/310.png
+  blog_output: eyecatch-free-apps-enough-or-not.jpg
+  note_output: eyecatch-free-apps-enough-or-not-note.jpg
+  alt: 無料の英語アプリで足りる人と足りない人の分かれ目を、大きさの違う空の植木鉢で表した画像
+  lead_text: '足りる人と
+
+    足りない人'
+  sub_text: 分かれ目を先に見る
+  status: awaiting_generation
+  current_featured_media: 986
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-310-20260809.png
+  pre_card_media_id: 311
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id012
+  post_id: 292
+  batch: 2
+  slug: english-self-study-procrastination-30s
+  title: 英語の独学が3日で止まる人が、教材を買う前に確認する3つのこと
+  search_intent: 英語の独学が続かない。教材を買い直すべきかを知りたい
+  role: 共感・入口
+  category: 英語学習法
+  prompt_file: prompts/292.md
+  with_person: true
+  person_reason: 教材を買う手前で止まる記事。 買う直前のためらいは、伸ばしかけた手でしか出ない
+  uniqueness_reason: 20本で唯一の書店の棚の前。空のかごを提げたまま手が止まる場面もここだけ
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  camera_distance: waist-up, three-quarter from the side
+  expression: eyes on the shelf, lips closed, weighing rather than deciding
+  pose: standing at the right facing a shelf, one hand raised toward a spine but stopped just before touching
+    it, an empty basket on the other arm
+  props:
+  - a bookshop shelf
+  - an empty shopping basket
+  - unmarked book spines
+  background: a bookshop aisle in the daytime, the far shelves softly blurred
+  palette: even indoor light on warm paper tones, low saturation, the sakura-pink accent only on the basket
+    handle
+  scene: A bookshop aisle in the daytime. Sakura stands at the right facing a shelf with one hand raised
+    toward a spine, stopped just before touching it. An empty basket hangs from her other arm. The spines
+    carry no readable marks and the far shelves are softly blurred.
+  master_file: masters/292.png
+  blog_output: eyecatch-self-study-before-buying.jpg
+  note_output: eyecatch-self-study-before-buying-note.jpg
+  alt: 英語の独学が続かない人が教材を買う前に確認することを表した、書店の棚の前で手が止まっている様子
+  lead_text: '教材を買う前に
+
+    確かめること'
+  sub_text: 抜けた条件を数える
+  status: awaiting_generation
+  current_featured_media: 982
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-292-20260809.png
+  pre_card_media_id: 472
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id013
+  post_id: 283
+  batch: 2
+  slug: cebu-beginner-mistakes-design
+  title: セブ島留学に初心者で行く前に｜事前学習が続かないときに見るところ
+  search_intent: セブ島留学に初心者で行く前に何を準備すればいいのかを知りたい
+  role: 手順・確認項目
+  category: フィリピン・セブ留学
+  prompt_file: prompts/283.md
+  with_person: false
+  person_reason: 出発前にやることを並べる記事。手順が主題で、 人物を置くと現地での体験談に見えてしまう
+  uniqueness_reason: 20本で唯一の屋外の物干し場と、南国の強い日差し。 屋外の生活感を使うのはここだけ
+  references:
+  - references/297.jpg
+  camera_distance: waist height, a little wide, outdoors
+  expression: none. no person appears
+  pose: no person. shirts hanging on a line, a chair beside it
+  props:
+  - thin shirts on a washing line
+  - a straw hat on a chair
+  - a closed thin booklet
+  background: an outdoor drying area in strong tropical morning sun
+  palette: bright tropical sun with hard clean shadows kept soft by watercolour, white cloth and pale
+    green, low saturation, the turquoise accent only on the hat band
+  scene: An outdoor drying area in strong tropical morning sun. Several thin shirts hang on a washing
+    line and move a little in the breeze. A straw hat rests on a chair in the foreground with a closed
+    thin booklet beside it. The light is bright and the shadows are clean.
+  master_file: masters/283.png
+  blog_output: eyecatch-cebu-beginner-prep-check.jpg
+  note_output: eyecatch-cebu-beginner-prep-check-note.jpg
+  alt: セブ島留学の前に事前学習が続かないときの確認を表した、南国の日差しの中の物干しと帽子
+  lead_text: '事前学習が
+
+    続かないとき'
+  sub_text: 見るところを決める
+  status: awaiting_generation
+  current_featured_media: 981
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-283-20260809.png
+  pre_card_media_id: 468
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id014
+  post_id: 282
+  batch: 2
+  slug: working-holiday-english-anxiety
+  title: TOEIC400点台でワーホリに行く前に、点数の外側で確認する3つのこと
+  search_intent: TOEIC400点台でワーキングホリデーに行って大丈夫かを知りたい
+  role: 共感・入口
+  category: 海外留学・ワーホリ
+  prompt_file: prompts/282.md
+  with_person: true
+  person_reason: 点数では測れない不安を扱う記事。 不安は数字でも小物でもなく、立ち止まっている姿勢で出る
+  uniqueness_reason: 20本で唯一の屋外階段の踊り場。手すりに肘をついて遠くを見る姿勢も ここだけ
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  camera_distance: waist-up from the side, slightly below eye level
+  expression: looking out into the distance, eyes not lowered but unfocused, lips closed
+  pose: standing at the right on a stair landing, both forearms resting on the handrail, weight on one
+    leg
+  props:
+  - a metal handrail
+  - a light coat
+  - distant rooftops
+  background: an outdoor staircase landing at dusk, rooftops and sky behind
+  palette: dusk blue and warm horizon light, low saturation, the sky-blue accent only on her coat collar
+  scene: An outdoor staircase landing at dusk. Sakura stands at the right with both forearms resting on
+    the metal handrail, looking out toward distant rooftops rather than down at anything. Her light coat
+    moves a little in the wind. The sky behind her still holds warm light near the horizon.
+  master_file: masters/282.png
+  blog_output: eyecatch-toeic-400-working-holiday-check.jpg
+  note_output: eyecatch-toeic-400-working-holiday-check-note.jpg
+  alt: TOEICの点数の外側で確認することを表した、夕暮れの外階段で遠くを見ている様子
+  lead_text: '点数の外側で
+
+    確かめること'
+  sub_text: 話した量のほうを見る
+  status: awaiting_generation
+  current_featured_media: 980
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-282-20260809.png
+  pre_card_media_id: 467
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id015
+  post_id: 281
+  batch: 2
+  slug: philippines-english-study-after-return
+  title: 帰国後の半年で消える英語を、「効果なし」と呼ぶ前に確認したい3つの数字
+  search_intent: 留学で伸びた英語が帰国後に消えるのを防ぎたい
+  role: 判断基準
+  category: フィリピン・セブ留学
+  prompt_file: prompts/281.md
+  with_person: false
+  person_reason: 使わないまま時間が経つ、という記事。 経った時間は表情では出ない。触っていない物のほうが正確に出る
+  uniqueness_reason: 20本で唯一、埃と外し忘れた荷札で「時間が経った」ことを示す。 廊下の壁を使うのもここだけ
+  references:
+  - references/297.jpg
+  camera_distance: close, eye level along the wall hooks
+  expression: none. no person appears
+  pose: no person. a bag left hanging, untouched
+  props:
+  - a travel bag still carrying its flight tag
+  - a small cloth pouch of foreign coins
+  - wall hooks
+  background: a hallway wall in the late afternoon, dust visible in the slanting light
+  palette: warm slanting afternoon light with visible dust, faded cream and grey, low saturation, the
+    turquoise accent only on the flight tag
+  scene: A hallway wall in the late afternoon. A travel bag hangs from a hook, its flight tag still attached
+    and never removed. A small cloth pouch of foreign coins hangs beside it. A thin film of dust has settled
+    on the top of the bag and shows in the slanting light. Nothing has been moved for a long time.
+  master_file: masters/281.png
+  blog_output: eyecatch-after-return-english-fade.jpg
+  note_output: eyecatch-after-return-english-fade-note.jpg
+  alt: 留学で伸びた英語が帰国後に消えていくことを表した、荷札を付けたまま掛けっぱなしの鞄
+  lead_text: '帰ってからの
+
+    半年で消える'
+  sub_text: 出口を先に決める
+  status: awaiting_generation
+  current_featured_media: 979
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-281-20260809.png
+  pre_card_media_id: 466
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id016
+  post_id: 150
+  batch: 2
+  slug: '%e3%80%8c%e8%8b%b1%e8%aa%9e-%e5%8b%89%e5%bc%b7%e6%b3%95-30%e4%bb%a3-%e3%81%8b%e3%82%89%e3%80%8d%e3%81%a7%e4%b8%a6%e3%81%b6%e4%b8%ad%e5%ad%a6%e6%96%87%e6%b3%95%e3%82%84%e3%82%8a%e7%9b%b4'
+  title: 「続けるコツ」に書かれない90日の採点者が、私が英語で失敗した本当の理由だった
+  search_intent: 英語の勉強が続かない。どうすれば戻れるのかを知りたい
+  role: 共感・入口
+  category: 英語学習法
+  prompt_file: prompts/150.md
+  with_person: true
+  person_reason: できなかった日をどう扱うか、という記事。 家事の途中で止まる立ち姿は、物では代わりにならない
+  uniqueness_reason: 20本で唯一、立ったまま家事の途中で止まっている。 台所のカウンターに寄りかかる姿勢もここだけ
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  camera_distance: waist-up, slightly to the side
+  expression: eyes lowered, no tension in the face, the pause of a long day
+  pose: standing at the right leaning back against a kitchen counter, one empty plate still held in one
+    hand, the other arm across her waist
+  props:
+  - one empty plate
+  - a kitchen counter
+  - a dish rack
+  background: a kitchen at night, the next room already dark
+  palette: warm under-cabinet light against a dark room, low saturation, the sakura-pink accent only on
+    her apron tie
+  scene: A kitchen at night. Sakura stands at the right leaning back against the counter, one empty plate
+    still in her hand and her other arm across her waist. Her eyes are lowered. A dish rack sits behind
+    her and the next room is already dark. Only the light under the cabinets is on.
+  master_file: masters/150.png
+  blog_output: eyecatch-study-habit-missed-day.jpg
+  note_output: eyecatch-study-habit-missed-day-note.jpg
+  alt: 英語の勉強ができなかった日をどう扱うかを表した、夜の台所で家事の途中に立ち止まっている様子
+  lead_text: 'できなかった日を
+
+    どう扱うか'
+  sub_text: 採点者を外に置く
+  status: awaiting_generation
+  current_featured_media: 977
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-150-20260809.png
+  pre_card_media_id: 565
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id017
+  post_id: 117
+  batch: 2
+  slug: '%e3%80%8c%e8%8b%b1%e8%aa%9e-%e3%82%bc%e3%83%ad%e3%81%8b%e3%82%89-%e7%a4%be%e4%bc%9a%e4%ba%ba-%e3%81%a9%e3%81%ae%e3%81%8f%e3%82%89%e3%81%84%e3%80%8d%e3%81%ab%e4%b8%a6%e3%81%b61000%e6%99%82%e9%96%93'
+  title: 1000時間の目盛りより、2時間目が来るかどうかで決まる
+  search_intent: 英語をゼロから始めるのに何時間かかるのかを知りたい
+  role: 共感・入口
+  category: 英語学習法
+  prompt_file: prompts/117.md
+  with_person: true
+  person_reason: 「まだ立ち上がっていない」ことが主題。 次の1回が来るかどうかは、立てずにいる姿勢でしか出ない
+  uniqueness_reason: 20本で唯一の屋外のベンチ。屋外で人物を小さく置く引きの構図もここだけ
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  camera_distance: wide, the person small on a park bench
+  expression: eyes lowered toward the ground, calm, not yet ready to stand
+  pose: seated at the right end of a bench with her bag beside her, hands together in her lap, not standing
+    up
+  props:
+  - a park bench
+  - a shoulder bag
+  - a half-finished bottle
+  background: a park in the early evening, distant street lamps just coming on
+  palette: early evening blue with the first warm lamps, low saturation, the sakura-pink accent only on
+    her bag strap
+  scene: A park in the early evening, seen wide so the figure is small. Sakura sits at the right end of
+    a bench with her bag beside her and her hands together in her lap, not yet standing up. A half-finished
+    bottle rests by her foot. Distant street lamps are just coming on behind the trees.
+  master_file: masters/117.png
+  blog_output: eyecatch-english-hours-second-session.jpg
+  note_output: eyecatch-english-hours-second-session-note.jpg
+  alt: 英語学習であと何時間かより次の一回が来るかどうかを表した、夕方のベンチでまだ立ち上がらずにいる様子
+  lead_text: 'あと何時間より
+
+    次が来るか'
+  sub_text: 出口を先に付ける
+  status: awaiting_generation
+  current_featured_media: 974
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-117-20260809.png
+  pre_card_media_id: 569
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id018
+  post_id: 33
+  batch: 2
+  slug: '%e3%80%8c%e3%83%93%e3%82%b8%e3%83%8d%e3%82%b9%e8%8b%b1%e8%aa%9e-%e5%8b%89%e5%bc%b7%e6%b3%95-%e7%a4%be%e4%bc%9a%e4%ba%ba%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b%e5%ae%9a%e5%9e%8b%e8%a1%a8%e7%8f%be%e3%82%92'
+  title: 付箋50枚より、週3回の納期確認10パターン。仕事の電話で口が動くまで
+  search_intent: 仕事の英語の電話で言葉が出ない。何を覚えればいいのかを知りたい
+  role: 学習中の具体的な場面
+  category: 英語学習法
+  prompt_file: prompts/33.md
+  with_person: true
+  person_reason: 受話器を取ったまま固まる、という場面から始まる記事。 その数秒は人物の姿勢でしか出ない
+  uniqueness_reason: 20本で唯一の職場と受話器。仕事中の場面を描くのはここだけで、 画面はいっさい映さない
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  camera_distance: waist-up, three-quarter from the front and side
+  expression: lips slightly parted as if a word did not come, eyes fixed on nothing in particular
+  pose: seated at the right holding a desk phone handset to her ear, the other hand stopped flat on the
+    edge of the desk
+  props:
+  - a desk phone handset
+  - a stack of plain documents
+  - a pen holder
+  background: a daytime office, other desks softly blurred behind her
+  palette: flat daytime office light, pale grey and cream, low saturation, the sakura-pink accent only
+    on her blouse collar
+  scene: A daytime office. Sakura sits at the right holding a desk phone handset to her ear, her other
+    hand stopped flat on the edge of the desk. Her lips are slightly parted as if a word did not arrive.
+    A stack of plain documents and a pen holder sit near her. The rest of the office is softly blurred
+    and no screen is switched on.
+  master_file: masters/33.png
+  blog_output: eyecatch-work-english-phone-patterns.jpg
+  note_output: eyecatch-work-english-phone-patterns-note.jpg
+  alt: 仕事の英語の電話で言葉が出ない数秒を表した、受話器を持ったまま手が止まっている様子
+  lead_text: '電話で
+
+    口が動くまで'
+  sub_text: 頻度順に場面を並べる
+  status: awaiting_generation
+  current_featured_media: 973
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-33-20260809.png
+  pre_card_media_id: 581
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id019
+  post_id: 32
+  batch: 2
+  slug: '%e3%80%8ctoeic-500%e7%82%b9-%e3%81%8b%e3%82%89-%e4%b8%8a%e3%81%92%e3%82%8b-%e6%96%b9%e6%b3%95%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b%e5%8f%82%e8%80%83%e6%9b%b8%e3%81%a8200%e6%99%82%e9%96%93%e3%82%92'
+  title: TOEIC500点から上げる勉強法｜最初に確認したい4つのこと
+  search_intent: TOEIC500点から上げる勉強法を知りたい
+  role: スコアの見方・確認項目
+  category: TOEIC・スコア
+  prompt_file: prompts/32.md
+  with_person: false
+  person_reason: 「成績票の裏を開いたことがあるか」から始まる記事。 開いていない封筒そのものが問いになる
+  uniqueness_reason: 20本で唯一の靴箱の上と、まだ開けていない封筒。 郵便物を受け取ったままの状態を描くのはここだけ
+  references:
+  - references/297.jpg
+  camera_distance: close, eye level on the shoe cabinet top
+  expression: none. no person appears
+  pose: no person. one unopened envelope lying face down
+  props:
+  - one plain envelope, unopened and face down
+  - a key
+  - a small potted plant
+  background: the top of a shoe cabinet by the door in the early evening
+  palette: low evening light on pale wood, cream paper, low saturation, the coral accent only on the key
+    fob
+  scene: The top of a shoe cabinet by the front door in the early evening. One plain envelope lies face
+    down where it was set after coming in, still unopened. A key rests beside it and a small potted plant
+    stands at the back. Low light falls across the pale wood.
+  master_file: masters/32.png
+  blog_output: eyecatch-toeic-500-first-four-checks.jpg
+  note_output: eyecatch-toeic-500-first-four-checks-note.jpg
+  alt: TOEICの成績票の裏を開いて弱点を言葉にすることを表した、玄関に置かれたままの未開封の封筒
+  lead_text: '成績票の裏を
+
+    開いたことが'
+  sub_text: 弱点を言葉にできるか
+  status: awaiting_generation
+  current_featured_media: 972
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-32-20260809.png
+  pre_card_media_id: 576
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+- &id020
+  post_id: 28
+  batch: 2
+  slug: '%e3%80%8c%e8%8b%b1%e4%bc%9a%e8%a9%b1-%e4%b8%8a%e9%81%94-%e3%81%97%e3%81%aa%e3%81%84-%e7%90%86%e7%94%b1%e3%80%8d%e3%81%a7%e5%87%ba%e3%82%8b8%e5%80%8b%e3%81%ae%e3%83%aa%e3%82%b9%e3%83%88%e3%82%92'
+  title: 「英会話 上達 しない 理由」で出る8個のリストを全部潰しても話せない、その全部を生んでいる1つの根
+  search_intent: 英会話が上達しない理由を調べても、話せるようにならない
+  role: 共感・入口
+  category: 英語学習法
+  prompt_file: prompts/28.md
+  with_person: true
+  person_reason: 予約画面を開いたまま眠った夜の記事。 手が止まる一瞬は、寝そべった姿勢でしか出ない
+  uniqueness_reason: 20本で唯一の寝床と、枕のすぐ上から見下ろす寄り。 横になったままの姿勢はここだけ
+  references:
+  - references/521.jpg
+  - references/273.jpg
+  - references/297.jpg
+  camera_distance: close, from just above the pillow
+  expression: eyes half lowered, cheek against the pillow, tired rather than sad
+  pose: lying on her side, one arm stretched toward a dark phone on the bedside, fingers stopped just
+    short of it
+  props:
+  - a dark phone screen face down on the bedside
+  - a duvet
+  - a pillow
+  background: a bedroom at night, only a faint light from the corridor
+  palette: deep blue night shadow with a thin warm line of corridor light, low saturation, the sakura-pink
+    accent only on the pillowcase edge
+  scene: A bedroom at night, seen from just above the pillow. Sakura lies on her side with her cheek against
+    the pillow, one arm stretched toward a phone lying face down on the bedside table. Her fingers stop
+    just short of it. Only a faint line of light comes from the corridor.
+  master_file: masters/28.png
+  blog_output: eyecatch-eikaiwa-friction-not-reasons.jpg
+  note_output: eyecatch-eikaiwa-friction-not-reasons-note.jpg
+  alt: 英会話が上達しない理由を集めても手が動かないことを表した、夜の寝床でスマホへ伸ばした手が止まっている様子
+  lead_text: '理由を集めても
+
+    手が動かない'
+  sub_text: 摩擦のほうを削る
+  status: awaiting_generation
+  current_featured_media: 971
+  current_media_url: https://sakura-eigo.com/wp-content/uploads/2026/08/eyecatch-28-20260809.png
+  pre_card_media_id: 582
+  verify_after_replace:
+  - featured_media が新しいメディアIDになっている
+  - alt が設定されている
+  - ファイル名が半角英数とハイフンだけ
+  - 記事ページのOGP画像が新しい画像を指している
+  - サムネイルで読める
+  - 旧メディアが消えていない（戻せる）
+items:
+- *id001
+- *id002
+- *id003
+- *id004
+- *id005
+- *id006
+- *id007
+- *id008
+- *id009
+- *id010
+- *id011
+- *id012
+- *id013
+- *id014
+- *id015
+- *id016
+- *id017
+- *id018
+- *id019
+- *id020

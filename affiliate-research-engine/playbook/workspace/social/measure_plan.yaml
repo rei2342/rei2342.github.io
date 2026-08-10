@@ -1,0 +1,107 @@
+# 実投稿テストの計測予定（2026-08-10）
+#
+# **未取得と 0 を分ける。**
+#   未取得 … 画面に出ていない／APIが返さない／その指標が無い。`未取得` と書く
+#   0      … **画面にその欄があり、そこに 0 と表示されている。** 0 と書く
+# 混ぜると「反応が無かった」と「見ていない」が区別できなくなる。
+# 迷ったら `未取得`。0 は、画面で 0 を見たときだけ書く。
+#
+# 見る場所（役割が違うので混ぜない）:
+#   views / likes / replies / reposts / profile_visits → 各SNSの画面
+#   link_clicks                                        → GA4（utm_content で在庫を特定）
+#   followers_at_observation                           → プロフィール画面
+
+campaign: social_pilot_20260810
+
+# ── 各回で記録する項目（24時間値と48時間値は上書きせず別々に持つ）──
+# platform側で取れるもの: views likes replies reposts profile_visits link_clicks
+# GA4側で取れるもの:      landing_sessions（着地セッション）key_events/cta_clicks
+# **XとThreadsで取れる指標が違う。比べるのは両方で取れたものだけ。**
+fields:
+  - posted_at
+  - observed_at
+  - elapsed_hours
+  - pinned
+  - followers_at_observation
+  - views
+  - likes
+  - replies
+  - reposts
+  - profile_visits
+  - link_clicks              # platform側
+  - ga4_landing_sessions     # GA4の着地セッション（utm_contentで特定）
+  - ga4_key_events           # GA4のキーイベント or CTAクリック
+comparable_metrics_note: >
+  両方の画面で同じ定義で取れるのは views / likes / replies / reposts と
+  GA4側の landing_sessions。profile_visits と link_clicks は
+  media によって定義も取得可否も違うので、**そろわないうちは比較に使わない**。
+one_pair_only: >
+  今あるのは記事546の1組だけ。**ここから一般則は出さない。**
+  「Xのほうが強い」「2投稿型が効く」のような結論は、
+  組がもっと増えるまで書かない。
+
+items:
+  - stock_id: X-546-b
+    platform: x
+    article_id: 546
+    posted_id: "2086693958860841429"
+    posted_url: https://x.com/sakura_eigo30/status/2086693958860841429
+    posted_at: "2026-08-10T14:59:43+0900"
+    utm_content: x_546_b
+    pinned: false          # 固定していない。固定すると比較に使えなくなる
+    observations:
+      - {elapsed_hours: 24, scheduled_at: "2026-08-11T14:59+0900", observed_at: 未取得,
+         pinned: false, followers_at_observation: 未取得,
+         views: 未取得, likes: 未取得, replies: 未取得, reposts: 未取得,
+         profile_visits: 未取得, link_clicks: 未取得,
+         ga4_landing_sessions: 未取得, ga4_key_events: 未取得}
+      - {elapsed_hours: 48, scheduled_at: "2026-08-12T14:59+0900", observed_at: 未取得,
+         pinned: false, followers_at_observation: 未取得,
+         views: 未取得, likes: 未取得, replies: 未取得, reposts: 未取得,
+         profile_visits: 未取得, link_clicks: 未取得,
+         ga4_landing_sessions: 未取得, ga4_key_events: 未取得}
+
+  - stock_id: THREADS-546-b
+    platform: threads
+    article_id: 546
+    format: two_part        # 1投稿目は新規、2投稿目は1投稿目への返信
+    url_in_part: 2          # 記事URLは2投稿目だけ
+    posted_id: Gb3pbY9x2          # 共有リンクのコード。**投稿URLのコードではない**
+    posted_id_kind: share_code
+    posted_url: https://www.threads.com/share/Gb3pbY9x2/     # 親投稿
+    reply_id: EbjWJllwT
+    reply_id_kind: share_code
+    reply_url: https://www.threads.com/share/EbjWJllwT/      # 返信（2投稿目）
+    canonical_post_url: 未取得    # /post/<コード> 形式はまだ取れていない
+    # 画面で確認した（2026-08-10 15:44頃）。1/2・2/2 の表示と縦線でつながっている
+    reply_attached_verified: 確認済み
+    ogp_card: 表示された          # 画像・タイトルとも出た。日本語ファイル名の問題は無い
+
+    # ── 投稿10分後に画面で見えたもの（**参考。24時間後の値ではない**）──
+    # 数字が出ていない欄は Threads が0のとき非表示にするため。0として記録する
+    # 表示数・プロフィールのアクセスはインサイト画面でないと出ないので 未取得
+    reference_at_10min:
+      observed_at: "2026-08-10T15:44+0900"
+      parent: {likes: 0, replies: 1, reposts: 0, views: 未取得}
+      reply:  {likes: 0, replies: 0, reposts: 0, views: 未取得}
+      profile_visits: 未取得
+      link_clicks: 未取得
+      followers_at_observation: 未取得
+      # **親の replies:1 は自分の2投稿目。** 読者の反応として数えない
+      note: parent.replies は自己返信1件を含む
+    posted_at: "2026-08-10T15:34:02+0900"
+    utm_content: threads_546_b
+    pinned: false
+    # 親と返信で数字が別々に出る。**足さずに、分けて記録する**
+    per_post: [親投稿, 返信]
+    observations:
+      - {elapsed_hours: 24, scheduled_at: "2026-08-11T15:34+0900", observed_at: 未取得,
+         pinned: false, followers_at_observation: 未取得,
+         views: 未取得, likes: 未取得, replies: 未取得, reposts: 未取得,
+         profile_visits: 未取得, link_clicks: 未取得,
+         ga4_landing_sessions: 未取得, ga4_key_events: 未取得}
+      - {elapsed_hours: 48, scheduled_at: "2026-08-12T15:34+0900", observed_at: 未取得,
+         pinned: false, followers_at_observation: 未取得,
+         views: 未取得, likes: 未取得, replies: 未取得, reposts: 未取得,
+         profile_visits: 未取得, link_clicks: 未取得,
+         ga4_landing_sessions: 未取得, ga4_key_events: 未取得}

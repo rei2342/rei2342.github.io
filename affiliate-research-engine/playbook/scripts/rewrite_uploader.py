@@ -31,8 +31,12 @@ WP_PASS = os.environ.get("WP_APP_PASSWORD", "")
 DRY_RUN = os.environ.get("DRY_RUN", "true").lower() == "true"
 
 SRC = Path("affiliate-research-engine/playbook/workspace/rewrites")
-TARGET_IDS = [
-    int(x) for x in os.environ.get("TARGET_IDS", "").replace(" ", "").split(",") if x
+RAW_TARGETS = os.environ.get("TARGET_IDS", "").strip()
+# 開発環境から sakura-eigo.com へ出られないので、**Actions から回す口**を借りる。
+# `ops:<コマンド>` を渡すと scripts/social_ops.py がそのまま受け取る。
+IS_OPS = RAW_TARGETS.startswith("ops:")
+TARGET_IDS = [] if IS_OPS else [
+    int(x) for x in RAW_TARGETS.replace(" ", "").split(",") if x
 ]
 
 
@@ -65,6 +69,10 @@ def update_post(post_id, content):
 
 
 def main():
+    if IS_OPS:
+        import social_ops
+        social_ops.run(RAW_TARGETS[4:], DRY_RUN)
+        return
     if not TARGET_IDS:
         print("TARGET_IDS が空。対象を指定してください。")
         sys.exit(1)

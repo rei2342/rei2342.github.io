@@ -1,0 +1,234 @@
+stock_id: THREADS-23-a
+platform: threads
+article_id: 23
+article_modified_gmt: '2026-08-09T11:17:13'
+article_title: ワーホリの貯金はいくら必要か｜200万を自分の数字に組み替える
+article_url: https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/
+text: 'ワーホリの貯金を調べると、大きな総額がひとつ出てきます。そこで困るのは、自分にも同じ金額が必要なのか分からないことです。
+
+
+  その金額は、たいてい誰かの条件で計算されています。国、滞在期間、語学学校に行くかどうかで必要額は変わるので、そのまま自分の数字にしなくて大丈夫です。
+
+
+  ワーホリの貯金を自分の条件で出すときは、3つに分けます。
+
+
+  ・出発までに払う額。航空券・ビザ・保険・語学学校の初期費用
+
+  ・収入が始まるまでの生活費。現地の1ヶ月の生活費 × 想定月数
+
+  ・日本で止まらない支出。返済・保険・サブスク × 滞在月数
+
+
+  2番目の月数は1つに決めず、最短と最長の2通りで置いてみます。どこまで余裕を持たせるかを決める材料になります。
+
+
+  数字を置けなかった欄が、次に確認するところです🌿
+
+  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=threads'
+thread_parts:
+- 'ワーホリの貯金を調べると、大きな総額がひとつ出てきます。そこで困るのは、自分にも同じ金額が必要なのか分からないことです。
+
+
+  その金額は、たいてい誰かの条件で計算されています。国、滞在期間、語学学校に行くかどうかで必要額は変わるので、そのまま自分の数字にしなくて大丈夫です。'
+- 'ワーホリの貯金を自分の条件で出すときは、3つに分けます。
+
+
+  ・出発までに払う額。航空券・ビザ・保険・語学学校の初期費用
+
+  ・収入が始まるまでの生活費。現地の1ヶ月の生活費 × 想定月数
+
+  ・日本で止まらない支出。返済・保険・サブスク × 滞在月数
+
+
+  2番目の月数は1つに決めず、最短と最長の2通りで置いてみます。どこまで余裕を持たせるかを決める材料になります。
+
+
+  数字を置けなかった欄が、次に確認するところです🌿
+
+  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=threads'
+state: stale
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: empathy_without_evidence
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: XとThreadsの近さ 0.08（0.85未満にする）
+approved_at: 2026-08-10T14:06:21+0900
+rejected_reason: null
+scheduled_at: null
+posted_at: null
+posted_id: null
+content_hash: fde62309a2c63a27
+generator_version: social-v1
+material:
+  search_intent: ワーキングホリデーに必要な貯金額を、自分の条件で知りたい
+  core_answer: まとめ記事の総額はそのまま使えない。自分の条件で3つに分けて出し直す
+  one_check: 見ている記事が、どの国・どの期間・語学学校ありなしのどれを前提にしているかを確かめる
+  unique_artifact: 必要額を3つの箱に分ける出し方と、ビザの残高証明が目標額とは別だという話
+created_at: 2026-08-10T14:04:58+0900
+history:
+- at: 2026-08-10T14:04:58+0900
+  state: generated
+- at: 2026-08-10T14:04:58+0900
+  state: gated
+- at: 2026-08-10T14:04:58+0900
+  state: awaiting_approval
+- at: 2026-08-10T14:06:21+0900
+  state: approved
+- at: 2026-08-10T16:06:44+0900
+  state: stale
+prior_history:
+- at: 2026-08-10T09:05:22+0900
+  state: generated
+- at: 2026-08-10T09:05:22+0900
+  state: gated
+- at: 2026-08-10T09:05:22+0900
+  state: awaiting_approval
+- at: 2026-08-10T09:07:54+0900
+  state: generated
+- at: 2026-08-10T09:07:54+0900
+  state: gated
+- at: 2026-08-10T09:07:54+0900
+  state: awaiting_approval
+- at: 2026-08-10T09:08:39+0900
+  state: generated
+- at: 2026-08-10T09:08:39+0900
+  state: gated
+- at: 2026-08-10T09:08:39+0900
+  state: awaiting_approval
+- at: 2026-08-10T09:50:16+0900
+  state: generated
+- at: 2026-08-10T09:50:16+0900
+  state: gated
+- at: 2026-08-10T09:50:16+0900
+  state: awaiting_approval
+- at: 2026-08-10T11:09:45+0900
+  state: generated
+- at: 2026-08-10T11:09:45+0900
+  state: gated
+- at: 2026-08-10T11:09:45+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:45:17+0900
+  state: generated
+- at: 2026-08-10T13:45:17+0900
+  state: gated
+- at: 2026-08-10T13:45:17+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:45:38+0900
+  state: generated
+- at: 2026-08-10T13:45:38+0900
+  state: gated
+- at: 2026-08-10T13:45:38+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:47:45+0900
+  state: generated
+- at: 2026-08-10T13:47:45+0900
+  state: gated
+- at: 2026-08-10T13:47:45+0900
+  state: awaiting_approval
+post_type: checklist
+post_type_reason: 記事が「3つの箱」と「相談前に書き出す条件」を並べている。 読者が埋める枠を渡す形が合う
+template_ids: []
+template_warnings: []
+inferences: []
+threads_format: two_part
+artifact_used: 必要額を3つの箱に分ける出し方
+opener_type: reader_scene
+metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
+  views: null
+  likes: null
+  replies: null
+  reposts: null
+  link_clicks: null
+  profile_visits: null
+metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
+tone_warnings: []
+weighted_len: null
+claim_counts:
+  supported: 7
+  unsupported: 0
+  unjudged: 3
+  needs_human_review: 1
+  total: 11
+needs_human_review:
+- text: 国、滞在期間、語学学校に行くかどうかで必要額は変わるので、そのまま自分の数字にしなくて大丈夫です。
+  why: 記事と肯定・否定が逆に見える。文単位の判定なので人が見る
+stale_reason: article_modified_after_generation
+staled_at: 2026-08-10T16:06:44+0900
+superseded_text: 'ワーホリの貯金を調べると、大きな総額がひとつ出てきます。そこで困るのは、自分にも同じ金額が必要なのか分からないことです。
+
+
+  その金額は、たいてい誰かの条件で計算されています。国、滞在期間、語学学校に行くかどうかで必要額は変わるので、そのまま自分の数字にしなくて大丈夫です。
+
+
+  ワーホリの貯金を自分の条件で出すときは、3つに分けます。
+
+
+  ・出発までに払う額。航空券・ビザ・保険・語学学校の初期費用
+
+  ・収入が始まるまでの生活費。現地の1ヶ月の生活費 × 想定月数
+
+  ・日本で止まらない支出。返済・保険・サブスク × 滞在月数
+
+
+  2番目の月数は1つに決めず、最短と最長の2通りで置いてみます。どこまで余裕を持たせるかを決める材料になります。
+
+
+  数字を置けなかった欄が、次に確認するところです🌿
+
+  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=threads'
+superseded_thread_parts:
+- 'ワーホリの貯金を調べると、大きな総額がひとつ出てきます。そこで困るのは、自分にも同じ金額が必要なのか分からないことです。
+
+
+  その金額は、たいてい誰かの条件で計算されています。国、滞在期間、語学学校に行くかどうかで必要額は変わるので、そのまま自分の数字にしなくて大丈夫です。'
+- 'ワーホリの貯金を自分の条件で出すときは、3つに分けます。
+
+
+  ・出発までに払う額。航空券・ビザ・保険・語学学校の初期費用
+
+  ・収入が始まるまでの生活費。現地の1ヶ月の生活費 × 想定月数
+
+  ・日本で止まらない支出。返済・保険・サブスク × 滞在月数
+
+
+  2番目の月数は1つに決めず、最短と最長の2通りで置いてみます。どこまで余裕を持たせるかを決める材料になります。
+
+
+  数字を置けなかった欄が、次に確認するところです🌿
+
+  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=threads'
+generated_at: 2026-08-10T14:04:58+0900
+article_modified_gmt_at_generation: '2026-08-09T11:17:13'
+article_modified_gmt_now: '2026-08-10T07:04:12'

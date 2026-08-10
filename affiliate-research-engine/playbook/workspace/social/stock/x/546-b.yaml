@@ -1,0 +1,166 @@
+stock_id: X-546-b
+platform: x
+article_id: 546
+article_modified_gmt: '2026-08-10T02:47:26'
+article_title: オンライン英会話が続かないのは、話し始めるまでの手数が多いから
+article_url: https://sakura-eigo.com/online-english-lessons-90-days-success/
+text: 'オンライン英会話が続かなかったとき、「意志が弱いのかな」と考えがちです。
+
+
+  先に見たいのは、止まったのがレッスン中か、予約する前か。ここが分かると、次に見直す場所を選びやすくなります。
+
+
+  レッスン中／予約前に分けた確認項目は、記事で読めます。
+
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x_546_b'
+thread_parts:
+- 'オンライン英会話が続かなかったとき、「意志が弱いのかな」と考えがちです。
+
+
+  先に見たいのは、止まったのがレッスン中か、予約する前か。ここが分かると、次に見直す場所を選びやすくなります。
+
+
+  レッスン中／予約前に分けた確認項目は、記事で読めます。
+
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x_546_b'
+state: posted
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: empathy_without_evidence
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: XとThreadsの近さ 0.15（0.85未満にする）
+approved_at: 2026-08-10T14:12:46+0900
+rejected_reason: null
+scheduled_at: 2026-08-10T14:59:43+0900
+posted_at: 2026-08-10T14:59:43+0900
+posted_id: '2086693958860841429'
+content_hash: 8d1ee78a8cd594f7
+generator_version: social-v1
+material:
+  search_intent: オンライン英会話が続かない理由と、続ける方法を知りたい
+  core_answer: やめた瞬間が授業中だったか予約の前だったかで、見直すものが変わる
+  one_check: 最後にアプリを閉じた場面が、レッスン中だったか予約の画面だったかを思い出す
+  unique_artifact: 授業中で止まった場合の3項目と、予約の前で止まった場合の手数の数え方
+created_at: 2026-08-10T14:12:00+0900
+history:
+- at: 2026-08-10T14:12:00+0900
+  state: generated
+- at: 2026-08-10T14:12:00+0900
+  state: gated
+- at: 2026-08-10T14:12:00+0900
+  state: awaiting_approval
+- at: 2026-08-10T14:12:46+0900
+  state: approved
+- at: 2026-08-10T14:57:40+0900
+  state: approved
+  note: 'URL差し替え: utm_sourceだけでは同じ媒体・同じ記事の別投稿と区別できない。utm_contentで在庫まで追う'
+- at: 2026-08-10T14:59:43+0900
+  state: scheduled
+- at: 2026-08-10T14:59:43+0900
+  state: posted
+prior_history:
+- at: 2026-08-10T13:27:08+0900
+  state: generated
+- at: 2026-08-10T13:27:08+0900
+  state: gated
+- at: 2026-08-10T13:27:08+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:30:55+0900
+  state: generated
+- at: 2026-08-10T13:30:55+0900
+  state: gated
+- at: 2026-08-10T13:30:55+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:45:18+0900
+  state: generated
+- at: 2026-08-10T13:45:18+0900
+  state: gated
+- at: 2026-08-10T13:45:18+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:47:46+0900
+  state: generated
+- at: 2026-08-10T13:47:46+0900
+  state: gated
+- at: 2026-08-10T13:47:46+0900
+  state: awaiting_approval
+- at: 2026-08-10T14:02:19+0900
+  state: generated
+- at: 2026-08-10T14:02:19+0900
+  state: gated
+- at: 2026-08-10T14:02:19+0900
+  state: awaiting_approval
+- at: 2026-08-10T14:04:57+0900
+  state: generated
+- at: 2026-08-10T14:04:57+0900
+  state: gated
+- at: 2026-08-10T14:04:57+0900
+  state: awaiting_approval
+- at: 2026-08-10T14:06:22+0900
+  state: approved
+- at: 2026-08-10T14:11:59+0900
+  state: awaiting_approval
+revoked_reason: Xの締めの重複を解消するため
+post_type: direct_answer
+post_type_reason: 「続かないのは意志が弱いからか」という1つの問いに対して、記事は 「やめた瞬間がどちらだったかで見る場所が変わる」と1文で答えている。 改稿でその答えが冒頭の分岐になり、直接回答の形がより強くなった
+template_ids:
+- condition_open
+- toki
+template_warnings: []
+inferences: []
+threads_format: ''
+artifact_used: 授業中／予約前の分岐ごとの見直し項目
+opener_type: misreading
+metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
+  views: null
+  likes: null
+  replies: null
+  reposts: null
+  link_clicks: null
+  profile_visits: null
+metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
+tone_warnings: []
+weighted_len: 262
+claim_counts:
+  supported: 1
+  unsupported: 0
+  unjudged: 3
+  needs_human_review: 0
+  total: 4
+needs_human_review: []
+prior_links:
+- at: 2026-08-10T14:57:40+0900
+  old_url: https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x
+  new_url: https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x_546_b
+  old_content_hash: a3f1159c5785fa29
+  reason: utm_sourceだけでは同じ媒体・同じ記事の別投稿と区別できない。utm_contentで在庫まで追う

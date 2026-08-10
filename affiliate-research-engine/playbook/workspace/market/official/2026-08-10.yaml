@@ -1,0 +1,44 @@
+fetched_at: 2026-08-10T11:34:37+0900
+scope: 対象記事が本文で扱っている案件だけ
+rule: 取れなかった項目は None。**0として扱わない**
+programs:
+  nativecamp:
+    status: 取得
+    url: https://nativecamp.net/
+    fetched_at: 2026-08-10T11:34:32+0900
+    recheck_on: '2026-08-17'
+    price: 6,480
+    free_period: '7'
+    count: 回数無制限
+    quote: ' 「25分のレッスンでは物足りない」「時間がある 時にはもっとレッスンを受けたい」といった方も 料金を気にすることなく、何度でもレッスンを受 講することができます。'
+  nativecamp_ryugaku:
+    status: 取得できない（HTTP 404）
+    url: https://nativecamp.net/ryugaku
+    fetched_at: 2026-08-10T11:34:32+0900
+  phil_navi:
+    status: 取得
+    url: https://philippines-university.jp/
+    fetched_at: 2026-08-10T11:34:34+0900
+    recheck_on: '2026-08-17'
+    price: null
+    free_period: null
+    count: null
+    quote: ' 02 安心の料金設定と、 必要に応じた柔軟サポート 語学留学は無料でご利用いただけ、大学進学サポートは有料ですが、料金・内容を事前にご説明し、安心してご利用いただけます。'
+  speek:
+    status: 取得
+    url: https://www.speek.jp/
+    fetched_at: 2026-08-10T11:34:36+0900
+    recheck_on: '2026-08-17'
+    price: null
+    free_period: null
+    count: null
+    quote: null
+  sptr:
+    status: 取得
+    url: https://sptr.jp/
+    fetched_at: 2026-08-10T11:34:37+0900
+    recheck_on: '2026-08-17'
+    price: 9,980
+    free_period: '7'
+    count: '8'
+    quote: スパトレ|授業満足度96%効果抜群のオンライン英会話 --> ログイン 7日間無料トライアル実施中！ プランを選んではじめる 私を 変えられるのは、 私だけ。

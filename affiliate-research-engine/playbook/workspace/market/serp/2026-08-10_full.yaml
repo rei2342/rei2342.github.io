@@ -1,0 +1,173 @@
+fetched_at: 2026-08-10T11:34:37+0900
+order_field: observed_order
+order_is_not_rank: 取得順であって掲載順位ではない
+conditions:
+  locale: ja-JP
+  country: JP
+  devices:
+  - mobile
+  - desktop
+  result_types_separated:
+  - organic
+  - ad
+  - video
+  - shopping
+  - featured_snippet
+  - people_also_ask
+  - other
+rules:
+- 自然検索が10件未満でも、取れた件数のまま完了する
+- 本文が取れないとき、検索スニペットで補完しない
+- 同一ドメインの重複は消さず別に記録する
+note: 他社の本文は保存していない。構造だけ
+articles:
+  '546':
+    query: オンライン英会話 続かない 理由
+    intent: オンライン英会話が続かない理由と、続ける方法を知りたい
+    by_device:
+      mobile:
+        meta:
+          query: オンライン英会話 続かない 理由
+          locale: ja-JP
+          country: JP
+          device: mobile
+          provider: null
+          fetched_at: 2026-08-10T11:34:31+0900
+          status: 取得不能
+          why: SERPAPI_KEY も BING_SEARCH_KEY も無い。**Googleを直接取得しない**（規約と安定性）。鍵をSecretsへ入れてから回す
+        counts:
+          organic: 0
+          ad: 0
+          video: 0
+          shopping: 0
+          featured_snippet: 0
+          people_also_ask: 0
+          other: 0
+        organic_count: 0
+        padded_to_ten: false
+        same_domain_duplicates: {}
+        results: []
+        pages: []
+      desktop:
+        meta:
+          query: オンライン英会話 続かない 理由
+          locale: ja-JP
+          country: JP
+          device: desktop
+          provider: null
+          fetched_at: 2026-08-10T11:34:31+0900
+          status: 取得不能
+          why: SERPAPI_KEY も BING_SEARCH_KEY も無い。**Googleを直接取得しない**（規約と安定性）。鍵をSecretsへ入れてから回す
+        counts:
+          organic: 0
+          ad: 0
+          video: 0
+          shopping: 0
+          featured_snippet: 0
+          people_also_ask: 0
+          other: 0
+        organic_count: 0
+        padded_to_ten: false
+        same_domain_duplicates: {}
+        results: []
+        pages: []
+  '310':
+    query: 英語アプリ 無料 だけで足りる 有料 違い
+    intent: 無料の英語アプリだけで足りるのか、課金する意味があるのかを知りたい
+    by_device:
+      mobile:
+        meta:
+          query: 英語アプリ 無料 だけで足りる 有料 違い
+          locale: ja-JP
+          country: JP
+          device: mobile
+          provider: null
+          fetched_at: 2026-08-10T11:34:31+0900
+          status: 取得不能
+          why: SERPAPI_KEY も BING_SEARCH_KEY も無い。**Googleを直接取得しない**（規約と安定性）。鍵をSecretsへ入れてから回す
+        counts:
+          organic: 0
+          ad: 0
+          video: 0
+          shopping: 0
+          featured_snippet: 0
+          people_also_ask: 0
+          other: 0
+        organic_count: 0
+        padded_to_ten: false
+        same_domain_duplicates: {}
+        results: []
+        pages: []
+      desktop:
+        meta:
+          query: 英語アプリ 無料 だけで足りる 有料 違い
+          locale: ja-JP
+          country: JP
+          device: desktop
+          provider: null
+          fetched_at: 2026-08-10T11:34:31+0900
+          status: 取得不能
+          why: SERPAPI_KEY も BING_SEARCH_KEY も無い。**Googleを直接取得しない**（規約と安定性）。鍵をSecretsへ入れてから回す
+        counts:
+          organic: 0
+          ad: 0
+          video: 0
+          shopping: 0
+          featured_snippet: 0
+          people_also_ask: 0
+          other: 0
+        organic_count: 0
+        padded_to_ten: false
+        same_domain_duplicates: {}
+        results: []
+        pages: []
+  '526':
+    query: セブ島留学 費用 1ヶ月 時間 効果
+    intent: セブ島留学1ヶ月の費用と、それで本当に伸びるのかを知りたい
+    by_device:
+      mobile:
+        meta:
+          query: セブ島留学 費用 1ヶ月 時間 効果
+          locale: ja-JP
+          country: JP
+          device: mobile
+          provider: null
+          fetched_at: 2026-08-10T11:34:31+0900
+          status: 取得不能
+          why: SERPAPI_KEY も BING_SEARCH_KEY も無い。**Googleを直接取得しない**（規約と安定性）。鍵をSecretsへ入れてから回す
+        counts:
+          organic: 0
+          ad: 0
+          video: 0
+          shopping: 0
+          featured_snippet: 0
+          people_also_ask: 0
+          other: 0
+        organic_count: 0
+        padded_to_ten: false
+        same_domain_duplicates: {}
+        results: []
+        pages: []
+      desktop:
+        meta:
+          query: セブ島留学 費用 1ヶ月 時間 効果
+          locale: ja-JP
+          country: JP
+          device: desktop
+          provider: null
+          fetched_at: 2026-08-10T11:34:31+0900
+          status: 取得不能
+          why: SERPAPI_KEY も BING_SEARCH_KEY も無い。**Googleを直接取得しない**（規約と安定性）。鍵をSecretsへ入れてから回す
+        counts:
+          organic: 0
+          ad: 0
+          video: 0
+          shopping: 0
+          featured_snippet: 0
+          people_also_ask: 0
+          other: 0
+        organic_count: 0
+        padded_to_ten: false
+        same_domain_duplicates: {}
+        results: []
+        pages: []

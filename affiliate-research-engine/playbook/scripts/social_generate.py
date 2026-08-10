@@ -1,0 +1,239 @@
+#!/usr/bin/env python3
+"""
+social_generate.py
+公開中の記事から、X と Threads の投稿文を**別々の素材で**作って在庫へ入れる。
+
+  # Actions で（記事を取り直して生成する）
+  python social_generate.py --articles 521,546 --source wp
+
+  # 手元で（ローカルの記事ダンプ＋用意した下書きを使う）
+  python social_generate.py --articles 521 --source local \
+      --drafts workspace/social/drafts/trial5.yaml
+
+**投稿はしない。** 作るのは在庫だけで、state は awaiting_approval で止まる。
+ゲートに落ちたら rejected にして理由を残す。作り直しも即投稿もしない。
+"""
+import argparse
+import json
+import os
+import re
+import sys
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).parent))
+import social_spec as ss
+import social_gate as sg
+import social_inventory as inv
+import social_claims as sc
+
+WP_BASE = "https://sakura-eigo.com/wp-json/wp/v2"
+WP_USER = "rei.00pt2342@gmail.com"
+
+
+def fetch_article(pid):
+    """**公開中の最新本文**を取り直す。下書きなら None を返す。"""
+    import requests
+    import urllib3
+    urllib3.disable_warnings()
+    r = requests.get(f"{WP_BASE}/posts/{pid}",
+                     auth=(WP_USER, os.environ.get("WP_APP_PASSWORD", "")),
+                     params={"_fields": "id,title,content,link,status,"
+                                        "modified_gmt"},
+                     headers={"User-Agent": "Mozilla/5.0"},
+                     verify=False, timeout=40)
+    if r.status_code != 200:
+        return None
+    d = r.json()
+    sys.path.insert(0, str(Path(__file__).parent))
+    import affiliate_inserter as ai
+    body = re.sub(r"<[^>]+>", "\n", ai.strip_box(d["content"]["rendered"]))
+    return {"id": str(d["id"]),
+            "title": re.sub(r"<[^>]+>", "", d["title"]["rendered"]),
+            "url": d["link"], "status": d["status"],
+            "modified_gmt": d.get("modified_gmt"),
+            "body": re.sub(r"\n{3,}", "\n\n", body).strip()}
+
+
+def ask(prompt, model="claude-opus-4-8", max_tokens=1200):
+    import anthropic
+    ai = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    msg = ai.messages.create(model=model, max_tokens=max_tokens,
+                             messages=[{"role": "user", "content": prompt}])
+    return msg.content[0].text.strip()
+
+
+def generate_api(spec, article):
+    """記事 → 素材4つ → X本文 / Threads本文。**素材の段階で分ける。**"""
+    out = ask(ss.extraction_prompt(spec, article))
+    material = {k: ss.section(k.upper(), out)
+                for k in spec["extraction"]["fields"]}
+    x_text = ask(ss.x_prompt(spec, article, material))
+    th = ask(ss.threads_prompt(spec, article, material))
+    parts = [ss.section("PART1", th), ss.section("PART2", th)]
+    return material, [x_text.strip()], [p for p in parts if p.strip()]
+
+
+def generate_file(spec, article, drafts):
+    """用意した下書きを使う。ゲートと在庫の作り方は API と同じ。"""
+    d = drafts["articles"][str(article["id"])]
+    x = d["x"].strip()
+    # 導線の一言は本文と分けて持つ。URLはこのあと attach_url が付ける。
+    # 「〜はこちら」だけの行を作らないため、同じ塊にしない
+    if d.get("x_tail"):
+        x += "\n\n" + d["x_tail"].strip()
+    return d, d["material"], [x], [p.strip() for p in d["threads"]]
+
+
+def generate_api2(spec, article):
+    material, x, th = generate_api(spec, article)
+    return {}, material, x, th
+
+
+def attach_url(spec, platform, parts, article):
+    url = ss.with_utm(spec, article["url"], platform)
+    parts = list(parts)
+    parts[-1] = parts[-1].rstrip() + "\n" + url
+    return parts
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--articles", required=True, help="記事ID（カンマ区切り）")
+    ap.add_argument("--source", choices=["wp", "local"], default="wp")
+    ap.add_argument("--drafts", default="")
+    ap.add_argument("--platforms", default="x,threads")
+    ap.add_argument("--variant", default="a", help="在庫の変種（既定 a）")
+    ap.add_argument("--source-live", action="store_true",
+                    help="workspace/claims/live の取り直した本文を使う")
+    a = ap.parse_args()
+
+    spec = ss.load_spec()
+    drafts = (yaml.safe_load(Path(a.drafts).read_text(encoding="utf-8"))
+              if a.drafts else None)
+    plats = [p.strip() for p in a.platforms.split(",") if p.strip()]
+
+    made, blocked = [], []
+    for pid in [x.strip() for x in a.articles.split(",") if x.strip()]:
+        article = (inv.live_article(pid) if a.source_live
+                   else fetch_article(pid) if a.source == "wp"
+                   else inv.local_article(pid))
+        if not article:
+            print(f"[{pid}] 記事を取得できない。飛ばす")
+            continue
+        if article.get("status") != "publish":
+            # 下書きのうちは作らない。開けないURLの在庫を残さない
+            print(f"[{pid}] {article['status']} なので作らない")
+            continue
+
+        if a.source == "local" and drafts:
+            d, material, x_parts, th_parts = generate_file(spec, article,
+                                                           drafts)
+        else:
+            d, material, x_parts, th_parts = generate_api2(spec, article)
+        infer = d.get("inferences", [])
+
+        texts = {}
+        for platform, raw in (("x", x_parts), ("threads", th_parts)):
+            if platform not in plats or not raw:
+                continue
+            parts = attach_url(spec, platform, raw, article)
+            other_plat = "threads" if platform == "x" else "x"
+            other = texts.get(other_plat, "")
+            if not other:
+                # **片方だけ作り直すときも、もう片方と比べる。**
+                # 空のまま通すと cross_platform_gate が効かない
+                op = inv.stock_path(spec, other_plat, pid, a.variant)
+                if not op.exists():
+                    op = inv.stock_path(spec, other_plat, pid, "a")
+                if op.exists():
+                    o = inv.load(op)
+                    if o["state"] not in ("stale", "rejected", "archived"):
+                        other = o["text"]
+            hist = inv.read_history(spec, platform,
+                                    spec["duplicate"]["window_days"])
+            # **退役した在庫と比べない。** stale/rejected/archived は
+            # 出さないものなので、重複の相手にならない
+            RETIRED = ("stale", "rejected", "archived")
+            hist += [{"text": s["text"], "stock_id": s["stock_id"]}
+                     for _, s in inv.all_stock(spec, platform)
+                     if s["article_id"] != int(pid)
+                     and s["state"] not in RETIRED]
+            # **同じ記事の古い在庫を「直近の投稿」に数えない。**
+            # 作り直すたびに自分と比べて、型も絵文字も重複扱いになる
+            recent = [s for _, s in inv.all_stock(spec, platform)
+                      if s["article_id"] != int(pid)
+                      and s["state"] not in RETIRED]
+            res = sg.run_gates(spec, platform, parts, article,
+                               history=hist, other_text=other,
+                               inferences=infer)
+            tids, twarn = sg.template_gate(spec, parts, recent)
+            stock = inv.new_stock(spec, platform, article, parts,
+                                  material, res, variant=a.variant)
+            # **作り直しで前の履歴を消さない。**
+            # 承認を取り消した記録が消えると、なぜ戻したのかを追えなくなる
+            old_p = inv.stock_path(spec, platform, pid, a.variant)
+            if old_p.exists():
+                old = inv.load(old_p)
+                stock["prior_history"] = ((old.get("prior_history") or [])
+                                          + (old.get("history") or []))
+                if old.get("revoked_reason"):
+                    stock["revoked_reason"] = old["revoked_reason"]
+            stock["post_type"] = d.get("post_type", "")
+            stock["post_type_reason"] = " ".join(
+                d.get("post_type_reason", "").split())
+            stock["template_ids"] = tids
+            stock["template_warnings"] = twarn
+            ex = (d.get("template_exception") or {}).get(platform)
+            if twarn and ex:
+                stock["template_exception_reason"] = ex
+            stock["inferences"] = infer
+            stock["threads_format"] = (d.get("threads_format", "")
+                                       if platform == "threads" else "")
+            stock["artifact_used"] = d.get("artifact_used", "")
+            # **導入の型は書き手が宣言する。** 推測に任せない
+            key = "opener_type_x" if platform == "x" else "opener_type_threads"
+            stock["opener_type"] = d.get(key) or d.get("opener_type") or ""
+            # 実投稿のあとに形を比べるための欄。**生成時は空で持つ。**
+            # 欄が無いと、投稿してから作ることになって取り逃す
+            stock["metrics"] = {k: None for k in
+                                spec["threads"]["metrics"]["fields"]}
+            stock["metrics_note"] = spec["threads"]["metrics"]["filled_by"]
+            stock["tone_warnings"] = sg.tone_warnings(spec, platform, parts,
+                                                      recent)
+            stock["weighted_len"] = (sg.weighted_len(spec, parts[0])
+                                     if platform == "x" else None)
+            rows = sc.check(spec, parts, article, infer)
+            stock["claim_counts"] = sc.counts(rows)
+            # 人が見る必要のある短文は、本文をそのまま残す
+            stock["needs_human_review"] = [
+                {"text": r["text"], "why": r["why"]}
+                for r in rows if r["verdict"] == "needs_human_review"]
+            if sg.passed(res):
+                inv.transition(spec, stock, "gated")
+                inv.transition(spec, stock, "awaiting_approval")
+                made.append(stock["stock_id"])
+            else:
+                inv.transition(spec, stock, "gated")
+                inv.transition(spec, stock, "rejected",
+                               rejected_reason="; ".join(
+                                   f"{g}: {d}" for g, ok, d in res if not ok))
+                blocked.append(stock["stock_id"])
+            texts[platform] = stock["text"]
+            p = inv.save(spec, stock)
+            print(f"[{pid}] {platform}: {stock['state']} → {p.name}")
+            for line in sg.fmt(res).split("\n"):
+                if line.startswith("NG"):
+                    print("      " + line)
+            for w in (sg.style_warnings(spec, parts) + twarn
+                      + stock["tone_warnings"]):
+                print("      警告 " + w)
+
+    print(f"\n承認待ち {len(made)} / ゲートで止めた {len(blocked)}")
+    print("**投稿はしていない。**")
+
+
+if __name__ == "__main__":
+    main()

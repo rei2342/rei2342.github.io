@@ -1,0 +1,218 @@
+stock_id: THREADS-546-b
+platform: threads
+article_id: 546
+article_modified_gmt: '2026-08-10T02:47:26'
+article_title: オンライン英会話が続かないのは、話し始めるまでの手数が多いから
+article_url: https://sakura-eigo.com/online-english-lessons-90-days-success/
+text: 'オンライン英会話が続かなかったとき、意志の弱さだけを責めなくて大丈夫です。
+
+
+  先に確かめたいのは、最後に止まったのがレッスン中だったか、予約する前だったか。どちらかによって、次に見直す場所が変わります。
+
+
+  レッスン中に止まった場合に見直すのは、この3つです。
+
+
+  ・教材のレベル。直近3回で、知らない単語が1文に何個あったか
+
+  ・レッスンの型。フリートークだったか、教材ありだったか
+
+  ・講師との相性。同じ講師だったか、毎回違ったか
+
+
+  予約する前に止まった場合は、見るところが変わります。話し始めるまでに指を何回動かしているかを、1回だけ数えるところから。
+
+
+  止まったのは、どちらの場面でしたか？
+
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=threads_546_b'
+thread_parts:
+- 'オンライン英会話が続かなかったとき、意志の弱さだけを責めなくて大丈夫です。
+
+
+  先に確かめたいのは、最後に止まったのがレッスン中だったか、予約する前だったか。どちらかによって、次に見直す場所が変わります。'
+- 'レッスン中に止まった場合に見直すのは、この3つです。
+
+
+  ・教材のレベル。直近3回で、知らない単語が1文に何個あったか
+
+  ・レッスンの型。フリートークだったか、教材ありだったか
+
+  ・講師との相性。同じ講師だったか、毎回違ったか
+
+
+  予約する前に止まった場合は、見るところが変わります。話し始めるまでに指を何回動かしているかを、1回だけ数えるところから。
+
+
+  止まったのは、どちらの場面でしたか？
+
+  https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=threads_546_b'
+state: posted
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: empathy_without_evidence
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: XとThreadsの近さ 0.15（0.85未満にする）
+approved_at: 2026-08-10T14:06:22+0900
+rejected_reason: null
+scheduled_at: 2026-08-10T15:34:02+0900
+posted_at: 2026-08-10T15:34:02+0900
+posted_id: Gb3pbY9x2
+content_hash: 8519fbe3f72a5278
+generator_version: social-v1
+material:
+  search_intent: オンライン英会話が続かない理由と、続ける方法を知りたい
+  core_answer: やめた瞬間が授業中だったか予約の前だったかで、見直すものが変わる
+  one_check: 最後にアプリを閉じた場面が、レッスン中だったか予約の画面だったかを思い出す
+  unique_artifact: 授業中で止まった場合の3項目と、予約の前で止まった場合の手数の数え方
+created_at: 2026-08-10T14:04:58+0900
+history:
+- at: 2026-08-10T14:04:58+0900
+  state: generated
+- at: 2026-08-10T14:04:58+0900
+  state: gated
+- at: 2026-08-10T14:04:58+0900
+  state: awaiting_approval
+- at: 2026-08-10T14:06:22+0900
+  state: approved
+- at: 2026-08-10T14:57:46+0900
+  state: approved
+  note: 'URL差し替え: utm_sourceだけでは同じ媒体・同じ記事の別投稿と区別できない。utm_contentで在庫まで追う'
+- at: 2026-08-10T15:34:02+0900
+  state: scheduled
+- at: 2026-08-10T15:34:02+0900
+  state: posted
+- at: 2026-08-10T15:44:53+0900
+  state: posted
+  note: '画面で確認: 返信が親にぶら下がっている（1/2・2/2）／OGPカード表示'
+- at: 2026-08-10T15:51:08+0900
+  state: posted
+  note: 投稿記録の項目を確定（share URLを正式な記録・canonicalは未取得）
+prior_history:
+- at: 2026-08-10T13:27:08+0900
+  state: generated
+- at: 2026-08-10T13:27:08+0900
+  state: gated
+- at: 2026-08-10T13:27:08+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:30:55+0900
+  state: generated
+- at: 2026-08-10T13:30:55+0900
+  state: gated
+- at: 2026-08-10T13:30:55+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:45:18+0900
+  state: generated
+- at: 2026-08-10T13:45:18+0900
+  state: gated
+- at: 2026-08-10T13:45:18+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:47:46+0900
+  state: generated
+- at: 2026-08-10T13:47:46+0900
+  state: gated
+- at: 2026-08-10T13:47:46+0900
+  state: awaiting_approval
+post_type: direct_answer
+post_type_reason: 「続かないのは意志が弱いからか」という1つの問いに対して、記事は 「やめた瞬間がどちらだったかで見る場所が変わる」と1文で答えている。 改稿でその答えが冒頭の分岐になり、直接回答の形がより強くなった
+template_ids:
+- condition_open
+- toki
+template_warnings: []
+inferences: []
+threads_format: two_part
+artifact_used: 授業中／予約前の分岐ごとの見直し項目
+opener_type: short_reassurance
+metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
+  views: null
+  likes: null
+  replies: null
+  reposts: null
+  link_clicks: null
+  profile_visits: null
+metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
+tone_warnings: []
+weighted_len: null
+claim_counts:
+  supported: 5
+  unsupported: 0
+  unjudged: 3
+  needs_human_review: 2
+  total: 10
+needs_human_review:
+- text: どちらかによって、次に見直す場所が変わります。
+  why: 内容語が2語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る
+- text: 予約する前に止まった場合は、見るところが変わります。
+  why: 内容語が1語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る
+prior_links:
+- at: 2026-08-10T14:57:46+0900
+  old_url: https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads
+  new_url: https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=threads_546_b
+  old_content_hash: 16c6622c6310e2bc
+  reason: utm_sourceだけでは同じ媒体・同じ記事の別投稿と区別できない。utm_contentで在庫まで追う
+posted_url: https://www.threads.com/share/Gb3pbY9x2/
+posted_id_kind: share_code
+reply_id: EbjWJllwT
+reply_url: https://www.threads.com/share/EbjWJllwT/
+reply_id_kind: share_code
+canonical_post_url: 未取得
+reply_attached_verified: 確認済み
+ogp_card: 表示された
+thread_root_url: https://www.threads.com/share/Gb3pbY9x2/
+thread_reply_urls:
+- https://www.threads.com/share/EbjWJllwT/
+canonical_url: 未取得
+canonical_url_reason: もらったのは共有リンク(/share/)。投稿URL(/post/)は未取得
+record_of_truth: share_url
+post_ids:
+  root:
+    id: Gb3pbY9x2
+    kind: share_code
+    url: https://www.threads.com/share/Gb3pbY9x2/
+  reply:
+    id: EbjWJllwT
+    kind: share_code
+    url: https://www.threads.com/share/EbjWJllwT/
+  api_media_id: 未取得
+post_structure: 2投稿構成（1投稿目=新規 / 2投稿目=1投稿目への返信）
+parts_count: 2
+utm_campaign: social_pilot_20260810
+utm_content: threads_546_b
+comparison_group:
+  id: pilot_546
+  members:
+  - X-546-b
+  - THREADS-546-b
+  article_id: 546
+  note: 同じ記事・同じ日。媒体差を見るための組。1組だけなので一般則は出さない

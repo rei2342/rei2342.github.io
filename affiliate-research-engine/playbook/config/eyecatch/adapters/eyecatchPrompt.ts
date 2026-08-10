@@ -52,7 +52,8 @@ export function buildPrompt(
   const comp = spec.composition;
   const neg = spec.negative_prompt;
   const colors = spec.category_colors;
-  const accent = colors[category] ?? colors._default;
+  // 記事ごとの category があればそちらを使う
+  const accent = colors[article.category ?? category] ?? colors._default;
   const [w, h] = spec.master_size;
   const box = comp.text_safe_area.box;
   const fixed = c.fixed;
@@ -111,10 +112,24 @@ export function buildPrompt(
       bullets([
         person,
         `camera: ${article.camera_distance}`,
+        "expression: " + squash(article.expression),
+        "pose: " + squash(article.pose),
+        "props: " + article.props.join(", "),
+        "background: " + article.background,
+        "colour: " + squash(article.palette),
         `accent colour: ${accent.name} (${accent.hex}), ` +
           `used on one small object only`,
         "scene: " + squash(article.scene),
+        "what makes this image different from the others: " +
+          squash(article.uniqueness_reason),
       ]),
+  );
+
+  // 参照画像の使い分け。3枚を均等に混ぜない
+  const ref = spec.reference_assets.directive;
+  parts.push(
+    "REFERENCES:\n" +
+      (article.with_person ? ref.with_person : ref.without_person).trim(),
   );
 
   parts.push(
@@ -131,7 +146,9 @@ export function buildOverlayPlan(
   category: string,
 ) {
   const t = spec.text_overlay;
-  const accent = spec.category_colors[category] ?? spec.category_colors._default;
+  const accent =
+    spec.category_colors[article.category ?? category] ??
+    spec.category_colors._default;
   return {
     size: spec.blog_export.size,
     lead: { text: article.lead_text, ...t.lead },

@@ -1,0 +1,227 @@
+stock_id: THREADS-521-a
+platform: threads
+article_id: 521
+article_modified_gmt: '2026-08-09T11:10:13'
+article_title: TOEICリスニングが止まっているとき、聞き流しを続ける前に確認する3つのこと
+article_url: https://sakura-eigo.com/toeic-listening-325-to-improvement/
+text: 'TOEICのリスニングは、教材の数より、どこで止まっているかで次が変わります。
+
+
+  音が拾えていないのか、拾えても設問まで残らないのか。今日1回、音声を1つだけ設問を見ずに聞いて、内容を1文で言えるか試してみると分かりやすいです。
+
+
+  TOEICのリスニングが伸びないときは、まず3つの角度から確かめられます。
+
+
+  ・流し終わったあとに内容を1文で言えるか
+
+  ・意味が一拍遅れる感覚があるか
+
+  ・自分の音を録って、お手本と比べられるか
+
+
+  言えるのに設問で迷うなら、音そのものとは別の場所も見る余地があります。記録するものを再生時間から「言えた回数」に変えておくと、あとで見返しやすくなります🌿
+
+
+  3つのうち、いちばん自信がないのはどれですか？
+
+  https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads'
+thread_parts:
+- 'TOEICのリスニングは、教材の数より、どこで止まっているかで次が変わります。
+
+
+  音が拾えていないのか、拾えても設問まで残らないのか。今日1回、音声を1つだけ設問を見ずに聞いて、内容を1文で言えるか試してみると分かりやすいです。'
+- 'TOEICのリスニングが伸びないときは、まず3つの角度から確かめられます。
+
+
+  ・流し終わったあとに内容を1文で言えるか
+
+  ・意味が一拍遅れる感覚があるか
+
+  ・自分の音を録って、お手本と比べられるか
+
+
+  言えるのに設問で迷うなら、音そのものとは別の場所も見る余地があります。記録するものを再生時間から「言えた回数」に変えておくと、あとで見返しやすくなります🌿
+
+
+  3つのうち、いちばん自信がないのはどれですか？
+
+  https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads'
+state: stale
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: empathy_without_evidence
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: XとThreadsの近さ 0.12（0.85未満にする）
+approved_at: 2026-08-10T14:06:22+0900
+rejected_reason: null
+scheduled_at: null
+posted_at: null
+posted_id: null
+content_hash: 464d5105192ca599
+generator_version: social-v1
+material:
+  search_intent: TOEICのリスニングだけが伸びない。聞き流しを続けていいのかを知りたい
+  core_answer: 聞き流しを増やす前に、音が拾えていないのか、拾えても設問まで残らないのかを切り分ける
+  one_check: 音声を1つ聞いたあと、設問を見ずに内容を1文で言えるかを試す
+  unique_artifact: 止まっている場所を切り分ける3つの確認項目と、最初の2週間の組み方
+created_at: 2026-08-10T14:04:58+0900
+history:
+- at: 2026-08-10T14:04:58+0900
+  state: generated
+- at: 2026-08-10T14:04:58+0900
+  state: gated
+- at: 2026-08-10T14:04:58+0900
+  state: awaiting_approval
+- at: 2026-08-10T14:06:22+0900
+  state: approved
+- at: 2026-08-10T16:06:44+0900
+  state: stale
+prior_history:
+- at: 2026-08-10T09:05:21+0900
+  state: generated
+- at: 2026-08-10T09:05:21+0900
+  state: gated
+- at: 2026-08-10T09:05:21+0900
+  state: awaiting_approval
+- at: 2026-08-10T09:07:54+0900
+  state: generated
+- at: 2026-08-10T09:07:54+0900
+  state: gated
+- at: 2026-08-10T09:07:54+0900
+  state: awaiting_approval
+- at: 2026-08-10T09:08:36+0900
+  state: generated
+- at: 2026-08-10T09:08:37+0900
+  state: gated
+- at: 2026-08-10T09:08:37+0900
+  state: awaiting_approval
+- at: 2026-08-10T09:50:15+0900
+  state: generated
+- at: 2026-08-10T09:50:15+0900
+  state: gated
+- at: 2026-08-10T09:50:15+0900
+  state: awaiting_approval
+- at: 2026-08-10T11:09:45+0900
+  state: generated
+- at: 2026-08-10T11:09:45+0900
+  state: gated
+- at: 2026-08-10T11:09:45+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:45:17+0900
+  state: generated
+- at: 2026-08-10T13:45:17+0900
+  state: gated
+- at: 2026-08-10T13:45:17+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:47:45+0900
+  state: generated
+- at: 2026-08-10T13:47:45+0900
+  state: gated
+- at: 2026-08-10T13:47:45+0900
+  state: awaiting_approval
+post_type: small_experiment
+post_type_reason: 記事に「音声を1つ聞いて、設問を見ずに内容を1文で言えるか試す」という、 その場で1回できる操作がある。読者が今日試せる形が中心
+template_ids:
+- topic_open
+template_warnings: []
+inferences: []
+threads_format: two_part
+artifact_used: 止まっている場所を切り分ける3つの確認項目
+opener_type: conclusion_first
+metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
+  views: null
+  likes: null
+  replies: null
+  reposts: null
+  link_clicks: null
+  profile_visits: null
+metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
+tone_warnings: []
+weighted_len: null
+claim_counts:
+  supported: 5
+  unsupported: 0
+  unjudged: 4
+  needs_human_review: 0
+  total: 9
+needs_human_review: []
+stale_reason: article_modified_after_generation
+staled_at: 2026-08-10T16:06:44+0900
+superseded_text: 'TOEICのリスニングは、教材の数より、どこで止まっているかで次が変わります。
+
+
+  音が拾えていないのか、拾えても設問まで残らないのか。今日1回、音声を1つだけ設問を見ずに聞いて、内容を1文で言えるか試してみると分かりやすいです。
+
+
+  TOEICのリスニングが伸びないときは、まず3つの角度から確かめられます。
+
+
+  ・流し終わったあとに内容を1文で言えるか
+
+  ・意味が一拍遅れる感覚があるか
+
+  ・自分の音を録って、お手本と比べられるか
+
+
+  言えるのに設問で迷うなら、音そのものとは別の場所も見る余地があります。記録するものを再生時間から「言えた回数」に変えておくと、あとで見返しやすくなります🌿
+
+
+  3つのうち、いちばん自信がないのはどれですか？
+
+  https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads'
+superseded_thread_parts:
+- 'TOEICのリスニングは、教材の数より、どこで止まっているかで次が変わります。
+
+
+  音が拾えていないのか、拾えても設問まで残らないのか。今日1回、音声を1つだけ設問を見ずに聞いて、内容を1文で言えるか試してみると分かりやすいです。'
+- 'TOEICのリスニングが伸びないときは、まず3つの角度から確かめられます。
+
+
+  ・流し終わったあとに内容を1文で言えるか
+
+  ・意味が一拍遅れる感覚があるか
+
+  ・自分の音を録って、お手本と比べられるか
+
+
+  言えるのに設問で迷うなら、音そのものとは別の場所も見る余地があります。記録するものを再生時間から「言えた回数」に変えておくと、あとで見返しやすくなります🌿
+
+
+  3つのうち、いちばん自信がないのはどれですか？
+
+  https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads'
+generated_at: 2026-08-10T14:04:58+0900
+article_modified_gmt_at_generation: '2026-08-09T11:10:13'
+article_modified_gmt_now: '2026-08-10T07:04:19'

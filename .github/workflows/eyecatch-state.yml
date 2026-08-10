@@ -1,0 +1,46 @@
+name: アイキャッチの現状を持ち帰る
+
+# 差し替えの前に、今どのメディアが付いているかを控える。**書き換えない。**
+# 実行したブランチへそのまま戻す（main へは押し込まない）。
+
+on:
+  workflow_dispatch:
+    inputs:
+      posts:
+        description: '記事ID（カンマ区切り）'
+        required: true
+      label:
+        description: '出力ファイルの札'
+        required: false
+        default: 'next20'
+
+jobs:
+  state:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests pyyaml -q
+      - env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          POSTS: ${{ inputs.posts }}
+          LABEL: ${{ inputs.label }}
+        run: python affiliate-research-engine/playbook/scripts/eyecatch_state.py
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/seo/eyecatch/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: eyecatch state ${{ inputs.label }}"
+          for i in 1 2 3; do
+            git pull --rebase origin ${{ github.ref_name }} || true
+            if git push origin HEAD:${{ github.ref_name }}; then exit 0; fi
+            sleep $((i * 5))
+          done

@@ -1,0 +1,532 @@
+platform,stock_id,file,line,post_id,title,url,chars,state,scheduled_at,generator,template,link,cta,hashtag,image,image_file,same_article_count,hash,dup_exact,dup_near,text,verdict,why
+Threads,TH-FILE-2026-08-02-1,workspace/threads/2026-08-02.md,6,,セブ島に1ヶ月留学した27歳が、最初の1週間でやめた3つと、残した1つ,,226,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads-note-cannon.yml（claude -p）,.github/workflows/threads-note-cannon.yml の claude -p,,記事へ送る一言あり,なし,なし,,1,67fd6674,,,"35万円、120コマ、28日。セブ島留学で私は最初の3日で息切れしていた。8コマ⇒6コマに減らして復習に2時間回した。伸びなかったのは根性がないからじゃなかった。1ヶ月で全部やろうとする設計のせいだった。
+
+45000円を溶かした過去と同じ間違いを繰り返しかけて気づいた。教材を増やすことじゃなく、習ったことを口から出す回数。数を追うのをやめて、密度を上げたら記憶に残るようになった。
+
+27歳のいま動かないと30歳で後悔する。続きはnoteに書いた。",廃棄候補,書けない事実で、しかも記事の中身と別物
+Threads,TH-FILE-2026-08-04-1,workspace/threads/2026-08-04.md,6,,TOEICリスニングが325点で止まっていた私が、聞き流しをやめて2ヶ月で動かした勉強法,,317,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,なし,なし,なし,,3,475330b9,,,"聞き流しをやめたら
+L325が2ヶ月で動いた
+
+4万5000円のスクールで習ったことを
+独学で0円で実装したら↓
+===THREADS_2===
+325点、320点、330点
+2年間ここに留まっていた
+
+通勤40分の音声は
+右から左へ抜けるだけだった
+
+変えたこと
+
+・1文流れるたびに日本語で言い直す
+・訳さず語順のまま意味を置く
+・Part3/4は設問を先に読む
+・毎朝5文だけ、お手本と自分の声を比べる
+・朝10分のAI英会話
+
+話す練習を混ぜた朝から
+拾える単語が増えた
+
+耳が聞き取れていなかったのではなく
+脳の処理速度が追いついていなかった
+
+スコアシートをリスニングとリーディングに割って
+片方だけ止まっているか確認する",廃棄候補,出力が壊れている。直すより作り直すほうが早い
+Threads,TH-FILE-2026-08-04-2,workspace/threads/2026-08-04.md,37,,TOEICリスニングが325点で止まっていた私が、聞き流しをやめて2ヶ月で動かした勉強法,,244,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,なし,なし,なし,,3,178e7228,,,"325点、320点、330点
+2年間ここに留まっていた
+
+通勤40分の音声は
+右から左へ抜けるだけだった
+
+変えたこと
+
+・1文流れるたびに日本語で言い直す
+・訳さず語順のまま意味を置く
+・Part3/4は設問を先に読む
+・毎朝5文だけ、お手本と自分の声を比べる
+・朝10分のAI英会話
+
+話す練習を混ぜた朝から
+拾える単語が増えた
+
+耳が聞き取れていなかったのではなく
+脳の処理速度が追いついていなかった
+
+スコアシートをリスニングとリーディングに割って
+片方だけ止まっているか確認する",廃棄候補,書けない事実で、しかも記事の中身と別物
+Threads,TH-FILE-2026-08-04-3,workspace/threads/2026-08-04.md,62,,TOEICリスニングが325点で止まっていた私が、聞き流しをやめて2ヶ月で動かした勉強法,,49,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,https://sakura-eigo.com/?p=521&utm_source=threads,なし,なし,なし,,3,d41d8cd9,,,https://sakura-eigo.com/?p=521&utm_source=threads,要修正,押す理由が無い／記事と食い違う
+Threads,TH-FILE-2026-08-07-1,workspace/threads/2026-08-07.md,6,,英語の会議が3割しか聞き取れなかった私が、聞き取れないまま詰まらなくなった3つの準備,,100,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,なし,なし,なし,,4,68bc24de,TH-MEMO-584-1,,"3割、5割、また3割
+
+英語会議のあと、
+聞き取れた割合を数えると
+毎回ここを行ったり来たり
+
+27歳から5年逃げてきた英語だから
+全部だめだと思ってた
+
+でも数字にしたら
+1つ見えたことがある
+
+↓",廃棄候補,台帳に無い、さくら固有の過去を語っている
+Threads,TH-FILE-2026-08-07-2,workspace/threads/2026-08-07.md,22,,英語の会議が3割しか聞き取れなかった私が、聞き取れないまま詰まらなくなった3つの準備,,399,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,https://sakura-eigo.com/english-meeting-listening-preparation-tips/?utm_source=threads,なし,なし,なし,,4,e825cda7,TH-MEMO-584-2,,"私が詰まってたのは
+聞き取れないこと自体じゃなかった
+
+1文取りこぼすと
+そのあと何を聞かれてるか分からなくなって
+返事もできず黙ってしまう
+
+1文のせいで
+残り10分をまるごと失う
+
+逆に言えば
+その1文をあとで拾えたら
+その場で固まらずに済む
+
+だとしたら
+リスニング訓練より先に
+「詰まらない仕組み」を持つほうが早い
+
+会議前3分でやったのは3つ
+
+1つ、アジェンダと参加者名を声に出して読む
+初対面の名前を先に音で入れておくと
+会議中に耳が引っかかる
+
+2つ、数字と固有名詞を紙に書き出す
+営業事務は日付や金額を落とすと後が狂う
+拾う対象を絞ると
+その一点だけ網に残る
+
+3つ、自分が発言する可能性のある1文を英語
+
+https://sakura-eigo.com/english-meeting-listening-preparation-tips/?utm_source=threads",廃棄候補,出力が壊れている。直すより作り直すほうが早い
+Threads,TH-FILE-2026-08-08-1,workspace/threads/2026-08-08.md,6,,ChatGPTで英語は伸びると思っていた私が、AIに任せない3つを決めた話,,162,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,なし,なし,なし,,6,c7e0ad1f,TH-MEMO-641-1,,"4万5000円溶かした
+ChatGPTなら大丈夫だと思った
+
+無料、24時間、回数無制限
+
+この3つの数字に心つかまれて
+夜のスマホで英作文を直してもらって
+なんとなく賢くなった気になって
+3日で開かなくなった
+
+心当たりがあるなら
+やる気の問題じゃない
+
+AIに任せる場所と任せない場所を
+分けてないだけかもしれない
+
+↓",廃棄候補,台帳に無い、さくら固有の過去を語っている
+Threads,TH-FILE-2026-08-08-2,workspace/threads/2026-08-08.md,26,,ChatGPTで英語は伸びると思っていた私が、AIに任せない3つを決めた話,,230,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,記事へ送る一言あり,なし,なし,,6,287f3d8c,TH-MEMO-641-2,,"ChatGPTで英語が続かない理由は
+便利さと正しさを混同してるから
+
+やめたのはこれ
+
+・会話しっぱなしにする
+・発音をChatGPTに採点させる
+・自分で採点できないことまで頼る
+
+代わりにこうした
+
+直した英文だけじゃなく
+どこが、なぜ、正しい形の3点で説明してもらう
+
+1通のメール直すのに5分で
+自分の弱点が言葉になって残る
+
+それが明日の練習の的になる
+
+ChatGPTが得意なことと苦手なことを見分ける方法も
+記事に書いた
+
+（記事URLを貼る）",廃棄候補,出力が壊れている。直すより作り直すほうが早い
+Threads,TH-FILE-SAMPLE_2026-07-28-1,workspace/threads/SAMPLE_2026-07-28.md,10,,TOEIC 600点から伸びない社会人が、2年の停滞を抜けた勉強の作り直し方,,111,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,見本（人が作った）,（見本・生成物ではない）,,記事へ送る一言あり,なし,なし,,1,6169372e,,,"TOEIC、2年かけて595点が600点になっただけだった。
+参考書を2冊足したし、模試アプリも入れた。
+なのに止まってた原因が、勉強量じゃなかった。
+
+スコアシートを3枚並べて、やっと分かった。
+続きはnoteに書いた。",廃棄候補,書けない事実で、しかも記事の中身と別物
+Threads,TH-FILE-built_315-1,workspace/threads/built_315.md,3,315,セブ島に1ヶ月留学した27歳が、最初の1週間でやめた3つと、残した1つ,https://sakura-eigo.com/cebu-island-one-month-study-abroad/,67,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads_builder.py（手動ワークフロー）,scripts/threads_builder.py の RULES,,なし,なし,なし,,3,10f8f03c,,,"セブ島留学
+8コマ入れて水曜に潰れた
+
+口は動くのに
+夜に何も思い出せない
+
+授業を6コマに減らした
+浮いた時間でやったのはこれだけ↓",廃棄候補,書けない事実で、しかも記事の中身と別物
+Threads,TH-FILE-built_315-2,workspace/threads/built_315.md,16,315,セブ島に1ヶ月留学した27歳が、最初の1週間でやめた3つと、残した1つ,https://sakura-eigo.com/cebu-island-one-month-study-abroad/,168,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads_builder.py（手動ワークフロー）,scripts/threads_builder.py の RULES,,記事へ送る一言あり,なし,なし,,3,f78eb478,,,"・その日直された表現を選ぶ
+・声に出して10回
+・翌朝もう1回口に出す
+
+授業の直後90分でやる
+スマホは部屋に置いていく
+
+2週間目
+詰まらず出るフレーズが増えた
+
+単語アプリは閉じた
+増やすより手元を磨くほうが効いた
+
+日本でも同じ
+教材は増やさない
+
+学校選びは1日何コマかを見る
+8コマは多い
+
+コマ数の決め方はブログにまとめた",廃棄候補,書けない事実で、しかも記事の中身と別物
+Threads,TH-FILE-built_315-3,workspace/threads/built_315.md,41,315,セブ島に1ヶ月留学した27歳が、最初の1週間でやめた3つと、残した1つ,https://sakura-eigo.com/cebu-island-one-month-study-abroad/,89,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads_builder.py（手動ワークフロー）,scripts/threads_builder.py の RULES,https://sakura-eigo.com/cebu-island-one-month-study-abroad/?utm_source=threads,なし,なし,なし,,3,e1b812c1,TH-FILE-built_521-3 TH-FILE-built_526-3,,"https://sakura-eigo.com/cebu-island-one-month-study-abroad/?utm_source=threads
+
+句点の混入: 0個",要修正,完全に重複／押す理由が無い／記事と食い違う
+Threads,TH-FILE-built_521-1,workspace/threads/built_521.md,3,521,TOEICリスニングが325点で止まっていた私が、聞き流しをやめて2ヶ月で動かした勉強法,https://sakura-eigo.com/toeic-listening-325-to-improvement/,54,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads_builder.py（手動ワークフロー）,scripts/threads_builder.py の RULES,,なし,なし,なし,,5,3655801d,,,"TOEICリスニング
+325点で2年止まってた
+
+聞き流しをやめたら
+2ヶ月で動いた
+
+やったのはこれだけ↓",廃棄候補,書けない事実で、しかも記事の中身と別物
+Threads,TH-FILE-built_521-2,workspace/threads/built_521.md,15,521,TOEICリスニングが325点で止まっていた私が、聞き流しをやめて2ヶ月で動かした勉強法,https://sakura-eigo.com/toeic-listening-325-to-improvement/,191,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads_builder.py（手動ワークフロー）,scripts/threads_builder.py の RULES,,記事へ送る一言あり,なし,なし,,5,2e03bd82,,,"通勤の音声は
+BGMになってた
+
+だから変えた
+
+・1文流れたら止める
+・直後に日本語で言い直す
+・声に出せない文は理解できてない
+
+朝は10分だけ足した
+
+・お手本を1文聞く
+・同じ速さで真似る
+・録って聞き比べる
+・毎朝5文だけ
+
+覚えた単語を口に出すと
+リスニングでも一瞬で拾えた
+
+話すと聞く速さが上がる
+
+増やすより先に
+やめるものを紙に書く
+
+やめた2つはブログに書いた",要修正,記事と食い違う
+Threads,TH-FILE-built_521-3,workspace/threads/built_521.md,45,521,TOEICリスニングが325点で止まっていた私が、聞き流しをやめて2ヶ月で動かした勉強法,https://sakura-eigo.com/toeic-listening-325-to-improvement/,89,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads_builder.py（手動ワークフロー）,scripts/threads_builder.py の RULES,https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads,なし,なし,なし,,5,e1b812c1,TH-FILE-built_315-3 TH-FILE-built_526-3,,"https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads
+
+句点の混入: 0個",要修正,完全に重複／押す理由が無い／記事と食い違う
+Threads,TH-FILE-built_526-1,workspace/threads/built_526.md,3,526,現地に短期で行けば一番早い、を27歳の私が費用と時間で調べ直した,https://sakura-eigo.com/fast-verify-cost-time-travel/,91,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads_builder.py（手動ワークフロー）,scripts/threads_builder.py の RULES,,なし,なし,なし,,5,10c2a5cb,,,"英語やらなきゃ
+と言い続けて27歳になった
+
+同期に
+現地行くのが一番早い
+と言われた
+
+セブ島4週間を見積もったら
+32万円だった
+
+電卓の桁を確かめてから
+調べたことはこれだけ↓",廃棄候補,書けない事実で、しかも記事の中身と別物
+Threads,TH-FILE-built_526-2,workspace/threads/built_526.md,20,526,現地に短期で行けば一番早い、を27歳の私が費用と時間で調べ直した,https://sakura-eigo.com/fast-verify-cost-time-travel/,217,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads_builder.py（手動ワークフロー）,scripts/threads_builder.py の RULES,,記事へ送る一言あり,なし,なし,,5,2d3dcd5f,,,"セブ島4週間の授業
+数えたら約117時間
+
+英語を1段階上げる目安は
+約200時間
+
+4週間通っても
+6割弱にしか届かない
+
+私がやると決めた順番
+
+・日本でオンライン英会話を先に固める
+・その日出た表現を3つ選ぶ
+・声に出して10回
+・翌朝もう1回
+
+下地ができてから
+現地は仕上げに使う
+
+初級のうちに飛ぶと
+現地の時間を基礎の埋め合わせに使う
+
+学校選びは
+1日何コマかを見る
+
+行き先ごとの費用と年齢の条件は
+ブログにまとめた",廃棄候補,書けない事実で、しかも記事の中身と別物
+Threads,TH-FILE-built_526-3,workspace/threads/built_526.md,52,526,現地に短期で行けば一番早い、を27歳の私が費用と時間で調べ直した,https://sakura-eigo.com/fast-verify-cost-time-travel/,83,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads_builder.py（手動ワークフロー）,scripts/threads_builder.py の RULES,https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads,なし,なし,なし,,5,e1b812c1,TH-FILE-built_315-3 TH-FILE-built_521-3,,"https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads
+
+句点の混入: 0個",要修正,完全に重複／押す理由が無い／記事と食い違う
+Threads,TH-FILE-built_546-1,workspace/threads/built_546.md,3,546,オンライン英会話が3日で終わっていた私が、予約をやめて続いた90日,https://sakura-eigo.com/online-english-lessons-90-days-success/,71,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads_builder.py（手動ワークフロー）,scripts/threads_builder.py の RULES,,なし,なし,なし,,2,bd8051d1,TH-MEMO-547-1,,"オンライン英会話
+3日 4日 2日で終わった
+
+意志が弱いんだと思ってた
+でも毎回止まる場所は同じだった
+
+予約画面だ
+やめたら90日続いた↓",廃棄候補,書けない事実で、しかも記事の中身と別物
+Threads,TH-FILE-built_546-2,workspace/threads/built_546.md,16,546,オンライン英会話が3日で終わっていた私が、予約をやめて続いた90日,https://sakura-eigo.com/online-english-lessons-90-days-success/,305,下書き（未投稿・手で貼る前提）,なし（自動投稿の口が無い）,threads_builder.py（手動ワークフロー）,scripts/threads_builder.py の RULES,https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads,記事へ送る一言あり,なし,なし,,2,d76121b0,TH-MEMO-547-2,,"やめた3つ
+
+・毎回のレッスン予約
+・講師を毎回選ぶこと
+・夜に30分まとめて取ること
+
+代わりに固定したのは時刻じゃなく合図
+
+・歯みがきのあと5分だけ話す
+・アプリを開く 今すぐ押す 話す
+・5分で切り上げる
+
+思い立ってから話すまで3タップ
+2回目に開き直さなくていい
+
+最初の週は7日中5日できた
+
+続くかは講師の質じゃなく
+話し始めるまでの秒数で決まる
+
+やめた3つの中身はブログに書いた
+
+https://example.com/
+
+https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads",廃棄候補,出力が壊れている。直すより作り直すほうが早い
+Threads,TH-MEMO-547-1,WordPress 下書き 記事ID 547（【Threads用】メモ）,1,,オンライン英会話が3日で終わっていた私が、予約をやめて続いた90日,,71,WordPress下書き（メモ。公開しない）,なし,threads_builder.py（メモ更新モード）,scripts/threads_builder.py の RULES,,なし,なし,なし,,2,bd8051d1,TH-FILE-built_546-1,,"オンライン英会話
+3日 4日 2日で終わった
+
+意志が弱いんだと思ってた
+でも毎回止まる場所は同じだった
+
+予約画面だ
+やめたら90日続いた↓",廃棄候補,書けない事実で、しかも記事の中身と別物
+Threads,TH-MEMO-547-2,WordPress 下書き 記事ID 547（【Threads用】メモ）,2,,オンライン英会話が3日で終わっていた私が、予約をやめて続いた90日,,305,WordPress下書き（メモ。公開しない）,なし,threads_builder.py（メモ更新モード）,scripts/threads_builder.py の RULES,https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads,記事へ送る一言あり,なし,なし,,2,d76121b0,TH-FILE-built_546-2,,"やめた3つ
+
+・毎回のレッスン予約
+・講師を毎回選ぶこと
+・夜に30分まとめて取ること
+
+代わりに固定したのは時刻じゃなく合図
+
+・歯みがきのあと5分だけ話す
+・アプリを開く 今すぐ押す 話す
+・5分で切り上げる
+
+思い立ってから話すまで3タップ
+2回目に開き直さなくていい
+
+最初の週は7日中5日できた
+
+続くかは講師の質じゃなく
+話し始めるまでの秒数で決まる
+
+やめた3つの中身はブログに書いた
+
+https://example.com/
+
+https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads",廃棄候補,出力が壊れている。直すより作り直すほうが早い
+Threads,TH-MEMO-584-1,WordPress 下書き 記事ID 584（【Threads用】メモ）,1,,英語の会議が3割しか聞き取れなかった私が、聞き取れないまま詰まらなくなった3つの準備,,100,WordPress下書き（メモ。公開しない）,なし,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,なし,なし,なし,,4,68bc24de,TH-FILE-2026-08-07-1,,"3割、5割、また3割
+
+英語会議のあと、
+聞き取れた割合を数えると
+毎回ここを行ったり来たり
+
+27歳から5年逃げてきた英語だから
+全部だめだと思ってた
+
+でも数字にしたら
+1つ見えたことがある
+
+↓",廃棄候補,台帳に無い、さくら固有の過去を語っている
+Threads,TH-MEMO-584-2,WordPress 下書き 記事ID 584（【Threads用】メモ）,2,,英語の会議が3割しか聞き取れなかった私が、聞き取れないまま詰まらなくなった3つの準備,,399,WordPress下書き（メモ。公開しない）,なし,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,https://sakura-eigo.com/english-meeting-listening-preparation-tips/?utm_source=threads,なし,なし,なし,,4,e825cda7,TH-FILE-2026-08-07-2,,"私が詰まってたのは
+聞き取れないこと自体じゃなかった
+
+1文取りこぼすと
+そのあと何を聞かれてるか分からなくなって
+返事もできず黙ってしまう
+
+1文のせいで
+残り10分をまるごと失う
+
+逆に言えば
+その1文をあとで拾えたら
+その場で固まらずに済む
+
+だとしたら
+リスニング訓練より先に
+「詰まらない仕組み」を持つほうが早い
+
+会議前3分でやったのは3つ
+
+1つ、アジェンダと参加者名を声に出して読む
+初対面の名前を先に音で入れておくと
+会議中に耳が引っかかる
+
+2つ、数字と固有名詞を紙に書き出す
+営業事務は日付や金額を落とすと後が狂う
+拾う対象を絞ると
+その一点だけ網に残る
+
+3つ、自分が発言する可能性のある1文を英語
+
+https://sakura-eigo.com/english-meeting-listening-preparation-tips/?utm_source=threads",廃棄候補,出力が壊れている。直すより作り直すほうが早い
+Threads,TH-MEMO-618-1,WordPress 下書き 記事ID 618（【Threads用】メモ）,1,,TOEIC Part7が時間切れで終わらない社会人へ、残り10分の解く順番を変える,,67,WordPress下書き（メモ。公開しない）,なし,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,なし,なし,なし,,2,e0defeef,,,"4万5000円
+
+5年前、スクールにそれだけ払った
+
+進まなかった理由が英語力じゃないとわかってから
+27歳で再開した
+
+理由はこれ↓",廃棄候補,台帳に無い、さくら固有の過去を語っている
+Threads,TH-MEMO-618-2,WordPress 下書き 記事ID 618（【Threads用】メモ）,2,,TOEIC Part7が時間切れで終わらない社会人へ、残り10分の解く順番を変える,,281,WordPress下書き（メモ。公開しない）,なし,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,記事へ送る一言あり,なし,なし,,2,3b6a14f2,,,"4万5000円をドブに捨てたと思ってた
+
+5年間、何度も「やろう」と思った
+でも毎回、教科書を開いた瞬間に閉じてた
+
+開けない理由に気づかなかったから
+ずっと自分の英語力のせいだと思ってた
+
+でも先週、TOEICの模試を解いてみたら
+Part7で時間が足りなかった
+
+その瞬間わかった
+英語が読めないんじゃなくて
+解き方が間違ってたんだ
+
+全部の文を丁寧に読もうとして
+後半で時間が尽きてた
+
+5年間、何も変わらなかった理由
+それは勉強量じゃなくて順番だった
+
+30歳になる前に
+これだけ変えたら点が動くんじゃないか
+そう思って試し始めた
+
+（記事URLを貼る）",廃棄候補,出力が壊れている。直すより作り直すほうが早い
+Threads,TH-MEMO-640-1,WordPress 下書き 記事ID 640（【Threads用】メモ）,1,,ChatGPTで英語は伸びると思っていた私が、AIに任せない3つを決めた話,,66,WordPress下書き（メモ。公開しない）,なし,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,なし,なし,なし,,6,574bfb69,,,"4万5000円
+5年間
+0日
+
+スクール代をすべて溶かした
+何も残らなかった
+
+なぜ続かなかったのか
+やっと分かった
+
+理由はこれ↓",廃棄候補,台帳に無い、さくら固有の過去を語っている
+Threads,TH-MEMO-640-2,WordPress 下書き 記事ID 640（【Threads用】メモ）,2,,ChatGPTで英語は伸びると思っていた私が、AIに任せない3つを決めた話,,377,WordPress下書き（メモ。公開しない）,なし,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,記事へ送る一言あり,なし,なし,,6,012b0f96,,,"英語スクールが続かなかった理由は
+お金を払ったあとだった
+
+授業を受けてる最中は楽しい
+でも帰り道からスマホを開いて
+ChatGPTで英作文を直してもらう
+
+その時点で満足して
+次の授業まで何もしない
+
+添削されたとき「直してもらえた」と思ってたけど
+実際は「誰かが採点してくれた」だけだった
+
+自分で間違いを見つけられないなら
+誰かに見てもらい続けるしかない
+
+27歳のいま気づいたのは
+これ
+
+自分で採点できることと
+採点してもらう必要があることを分けること
+
+英作文の文法なら自分で納得できる
+だから ChatGPT で足りる
+
+でも発音が自然かどうかは
+自分では採点できない
+だからここは人に見てもらう
+
+お金の使い方が変わった
+
+スクール全部より
+この1つの見分け方が効いてる
+
+自分が何を見て選んだかは
+ブログに書いた
+
+（記事URLを貼る）",廃棄候補,出力が壊れている。直すより作り直すほうが早い
+Threads,TH-MEMO-641-1,WordPress 下書き 記事ID 641（【Threads用】メモ）,1,,ChatGPTで英語は伸びると思っていた私が、AIに任せない3つを決めた話,,162,WordPress下書き（メモ。公開しない）,なし,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,なし,なし,なし,,6,c7e0ad1f,TH-FILE-2026-08-08-1,,"4万5000円溶かした
+ChatGPTなら大丈夫だと思った
+
+無料、24時間、回数無制限
+
+この3つの数字に心つかまれて
+夜のスマホで英作文を直してもらって
+なんとなく賢くなった気になって
+3日で開かなくなった
+
+心当たりがあるなら
+やる気の問題じゃない
+
+AIに任せる場所と任せない場所を
+分けてないだけかもしれない
+
+↓",廃棄候補,台帳に無い、さくら固有の過去を語っている
+Threads,TH-MEMO-641-2,WordPress 下書き 記事ID 641（【Threads用】メモ）,2,,ChatGPTで英語は伸びると思っていた私が、AIに任せない3つを決めた話,,230,WordPress下書き（メモ。公開しない）,なし,daily-article-drafter.yml の Threads ステップ,.github/workflows/daily-article-drafter.yml L280-L410,,記事へ送る一言あり,なし,なし,,6,287f3d8c,TH-FILE-2026-08-08-2,,"ChatGPTで英語が続かない理由は
+便利さと正しさを混同してるから
+
+やめたのはこれ
+
+・会話しっぱなしにする
+・発音をChatGPTに採点させる
+・自分で採点できないことまで頼る
+
+代わりにこうした
+
+直した英文だけじゃなく
+どこが、なぜ、正しい形の3点で説明してもらう
+
+1通のメール直すのに5分で
+自分の弱点が言葉になって残る
+
+それが明日の練習の的になる
+
+ChatGPTが得意なことと苦手なことを見分ける方法も
+記事に書いた
+
+（記事URLを貼る）",廃棄候補,出力が壊れている。直すより作り直すほうが早い
+Threads,TH-LIVE-18444339586184919,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/DZbt6bNAUJp,74,投稿済み（表示5 いいね0 返信0）,2026-06-11T05:00:14+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,bb93cf2d,,,半年間、ビジネス英語のフレーズ集に付箋を八十枚貼った。 電話対応の書き出し、会議での  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い／句点の混入／未確認の一人称の事実。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-18117675028700512,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/DZdxp35gUx9,74,投稿済み（表示183 いいね0 返信1）,2026-06-12T00:11:25+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,d6684048,,,「留学 社会人 費用」で調べるたびに、相場表の前でタブを閉じてきた。 怖かったのは金  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い／句点の混入。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-17975808291025551,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/DZmtoUOFNpX,73,投稿済み（表示3 いいね0 返信1）,2026-06-15T11:29:25+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,a0c1bd16,,,留学エージェントの「無料の仕組み」を2年間読み続けて、ようやくわかったことがある。  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い／句点の混入。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-18088867898091764,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/DaKpLJ7lKrm,69,投稿済み（表示205 いいね1 返信1）,2026-06-29T10:23:08+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,8f61ffd7,,,遅くない、は本当のこと。でも「今すぐ動かなくていい理由」じゃないんだよな😣  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い／句点の混入。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-18174916138415744,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/DaOvwAcARaS,74,投稿済み（表示91 いいね1 返信1）,2026-07-01T00:37:33+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,a404ee85,,,丁寧な記事ほど「こんなにハンデがあるなら仕方ない」って材料が増えるから、読めば読むほ  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-18078170735653665,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/DaotrbHgXw_,64,投稿済み（表示486 いいね2 返信1）,2026-07-11T02:39:43+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,45e070e8,,,英語コーチングで次のアクションが止まってる理由わかった気がする🤔  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-18111118585968032,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/DbFMADtAXar,74,投稿済み（表示146 いいね0 返信1）,2026-07-22T04:03:24+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,6e3e60f3,,,「30歳でも遅くない」って読むたびに少し安心して、そのまま何も決めずにタブを閉じてき  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-18105422867516038,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/DbfgvJElHC7,74,投稿済み（表示1045 いいね9 返信1）,2026-08-01T09:24:51+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,b44ad235,,,TOEIC、2年間ずっと600点前後から動かなかった。 参考書も替えたし、アプリも入  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い／句点の混入／未確認の一人称の事実。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-18001853321994230,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/DbhqUnblI5v,63,投稿済み（表示47 いいね0 返信2）,2026-08-02T05:27:05+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,6bb3474c,,,「英語 アプリ 安い」で検索したことある人、正直に手挙げて🖐️  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-18383551465165148,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/Dbmo3XwFDme,74,投稿済み（表示52 いいね0 返信2）,2026-08-04T03:50:34+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,f5bffd52,,,セブ島留学 8コマ入れて水曜に潰れた 口は動くのに 夜に何も思い出せない 授業を6コ  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い／未確認の一人称の事実。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-17910886428265239,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/Dbo5ZqKgZdv,74,投稿済み（表示44 いいね0 返信2）,2026-08-05T00:53:32+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,6dbd008b,,,TOEICリスニング 325点で2年止まってた 聞き流しをやめたら 2ヶ月で動いた   ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い／未確認の一人称の事実。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-18106172534107318,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/DbqDax3FOhS,74,投稿済み（表示1338 いいね5 返信2）,2026-08-05T11:40:19+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,ba9c7255,,,英語やらなきゃ と言い続けて27歳になった 同期に 現地行くのが一番早いよ！って言わ  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い／未確認の一人称の事実。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+Threads,TH-LIVE-18115027400301542,workspace/threads_insights/history.jsonl,-,,（APIは記事IDを持たない）,https://www.threads.com/@sakura_eigo30/post/DbuWq8BgZJP,74,投稿済み（表示6 いいね0 返信1）,2026-08-07T03:45:30+0000,人が手で貼った（Threads自動投稿は未接続）,上のストックのどれかを手で貼ったもの,,,なし,なし,,13,9d749d72,,,3日、4日、2日 オンライン英会話に3回登録して 続いた日数がこれ レッスンが嫌だっ  ※Threads APIの本文は先頭のみ返る（全文ではない）,要修正（投稿済み・消すか残すかは別判断）,1行が長い／未確認の一人称の事実。**本文は冒頭しか取れていない**ので、消すかどうかは全文を見てから決める
+X,X-PROMO-521-1,workspace/x_promo/promo_521.md,5,521,TOEICリスニングが325点で止まっていた私が、聞き流しをやめて2ヶ月で動かした勉強法,https://sakura-eigo.com/toeic-listening-325-to-improvement/,68,下書き（DRY RUN の出力。投稿していない）,なし（x-promo.yml は手動実行のみ）,scripts/x_promo.py（claude-opus-4-8）,scripts/x_promo.py の RULES,,なし,なし,なし,,5,1a63761b,,,"325点から2年動かなかったリスニング
+
+通勤中の音声が
+ただのBGMになってた
+
+聞き流しをやめて足した一手で
+2ヶ月で動き出したよ🎧",廃棄候補,書けない事実で、しかも記事の中身と別物
+X,X-PROMO-521-2,workspace/x_promo/promo_521.md,17,521,TOEICリスニングが325点で止まっていた私が、聞き流しをやめて2ヶ月で動かした勉強法,https://sakura-eigo.com/toeic-listening-325-to-improvement/,86,下書き（DRY RUN の出力。投稿していない）,なし（x-promo.yml は手動実行のみ）,scripts/x_promo.py（claude-opus-4-8）,scripts/x_promo.py の RULES,"https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x
+
+1投稿目の文字数: 68",リンクのみ,なし,なし,,5,dc0e15f9,,,"https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x
+
+1投稿目の文字数: 68",要修正,記事と食い違う
+X,X-PROMO-526-1,workspace/x_promo/promo_526.md,5,526,現地に短期で行けば一番早い、を27歳の私が費用と時間で調べ直した,https://sakura-eigo.com/fast-verify-cost-time-travel/,94,下書き（DRY RUN の出力。投稿していない）,なし（x-promo.yml は手動実行のみ）,scripts/x_promo.py（claude-opus-4-8）,scripts/x_promo.py の RULES,,なし,なし,なし,,5,2a4000b1,,,"「短期で現地行けば一番早い」って言われて信じかけたけど
+
+セブ4週間の授業、数えたら117時間しかなかった
+
+1レベル上げるのに必要な時間の6割弱
+
+これで足りるのか、調べ直した記録です📝",廃棄候補,書けない事実で、しかも記事の中身と別物
+X,X-PROMO-526-2,workspace/x_promo/promo_526.md,17,526,現地に短期で行けば一番早い、を27歳の私が費用と時間で調べ直した,https://sakura-eigo.com/fast-verify-cost-time-travel/,80,下書き（DRY RUN の出力。投稿していない）,なし（x-promo.yml は手動実行のみ）,scripts/x_promo.py（claude-opus-4-8）,scripts/x_promo.py の RULES,"https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=x
+
+1投稿目の文字数: 94",リンクのみ,なし,なし,,5,bca82e4a,,,"https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=x
+
+1投稿目の文字数: 94",要修正,記事と食い違う
+X,X-LIVE-last,workspace/x_state.json,4,,（自動投稿は記事に紐付かない）,,60,投稿済み（**残っているのは直近1本だけ**）,2026-08-08T04:36:52.719045+00:00,.github/workflows/x-poster.yml（claude-haiku-4-5）,.github/workflows/x-poster.yml L110-L175 の prompt,,,なし,なし,,1,f730fbad,,,"現地1ヶ月より国内3ヶ月の方が安くて効果的かもって気づいた
+
+結局は「どこで」より「その後どう続けるか」が全部
+
+✨👂🌱",残せる（投稿済み）,引っかかる観点が無い

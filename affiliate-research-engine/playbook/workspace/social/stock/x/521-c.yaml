@@ -1,0 +1,118 @@
+stock_id: X-521-c
+platform: x
+article_id: 521
+article_modified_gmt: '2026-08-10T07:04:19'
+article_title: TOEICリスニングが止まっているとき、聞き流しを続ける前に確認する3つのこと
+article_url: https://sakura-eigo.com/toeic-listening-325-to-improvement/
+text: 'リスニングが伸びないと、教材を増やしたくなりますよね。
+
+
+  その前に、音声を1つだけ、設問を見ずに聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります💭
+
+
+  次に確認する場所を、記事で順番に整理しています。
+
+  https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x-521-c'
+thread_parts:
+- 'リスニングが伸びないと、教材を増やしたくなりますよね。
+
+
+  その前に、音声を1つだけ、設問を見ずに聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります💭
+
+
+  次に確認する場所を、記事で順番に整理しています。
+
+  https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x-521-c'
+state: awaiting_approval
+gate_results:
+- id: article_published
+  ok: true
+  detail: ''
+- id: fact_gate
+  ok: true
+  detail: ''
+- id: empathy_without_evidence
+  ok: true
+  detail: ''
+- id: broken_output
+  ok: true
+  detail: ''
+- id: style_gate
+  ok: true
+  detail: ''
+- id: length_gate
+  ok: true
+  detail: ''
+- id: link_gate
+  ok: true
+  detail: ''
+- id: subset_gate
+  ok: true
+  detail: ''
+- id: duplicate_gate
+  ok: true
+  detail: ''
+- id: cross_platform_gate
+  ok: true
+  detail: もう片方がまだ無い
+approved_at: null
+rejected_reason: null
+scheduled_at: null
+posted_at: null
+posted_id: null
+content_hash: 0afc066d0d90cdb0
+generator_version: social-v1
+material:
+  search_intent: TOEICのリスニングだけが伸びない。聞き流しを続けていいのかを知りたい
+  core_answer: 聞き流しを増やす前に、音が拾えていないのか、拾えても設問まで残らないのかを切り分ける
+  one_check: 音声を1つ聞いたあと、設問を見ずに内容を1文で言えるかを試す
+  unique_artifact: 止まっている場所を切り分ける3つの確認項目と、最初の2週間の組み方
+created_at: 2026-08-10T16:08:13+0900
+history:
+- at: 2026-08-10T16:08:13+0900
+  state: generated
+- at: 2026-08-10T16:08:13+0900
+  state: gated
+- at: 2026-08-10T16:08:13+0900
+  state: awaiting_approval
+- at: 2026-08-10T16:54:30+0900
+  state: awaiting_approval
+  note: 'URL差し替え: 投稿単位で識別できる形式へ統一（utm_content=stock_id小文字）'
+post_type: small_experiment
+post_type_reason: 記事に「音声を1つ聞いて、設問を見ずに内容を1文で言えるか試す」という、 その場で1回できる操作がある。読者が今日試せる形が中心
+template_ids: []
+template_warnings: []
+inferences: []
+threads_format: ''
+artifact_used: 止まっている場所を切り分ける3つの確認項目
+opener_type: reader_scene
+metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
+  views: null
+  likes: null
+  replies: null
+  reposts: null
+  link_clicks: null
+  profile_visits: null
+metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
+tone_warnings: []
+weighted_len: 240
+claim_counts:
+  supported: 1
+  unsupported: 0
+  unjudged: 2
+  needs_human_review: 1
+  total: 4
+needs_human_review:
+- text: リスニングが伸びないと、教材を増やしたくなりますよね。
+  why: 内容語が2語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る
+prior_links:
+- at: 2026-08-10T16:54:30+0900
+  old_url: https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x
+  new_url: https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x-521-c
+  old_content_hash: 586bde3c915659d5
+  reason: 投稿単位で識別できる形式へ統一（utm_content=stock_id小文字）

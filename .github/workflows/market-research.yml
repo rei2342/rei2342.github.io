@@ -1,0 +1,39 @@
+name: market-research
+
+# 市場調査のうち、外向きの通信が要るぶんを取りに行く。
+# **記事もWordPressも触らない。** 書くのは workspace/market/ の下だけ。
+#
+# 開発コンテナは外向きのHTTPが遮断されているので、ここでしか取れない。
+# このファイルが既定ブランチに入るまでは、rewrite-uploader.yml へ
+# TARGET_IDS=ops:market:272,149 を渡して同じことができる。
+
+on:
+  workflow_dispatch:
+    inputs:
+      articles:
+        description: "記事ID（カンマ区切り）。all で控えにある全部"
+        required: false
+        default: "all"
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests pyyaml
+      - name: 取得
+        working-directory: affiliate-research-engine/playbook
+        run: python scripts/market_research.py "${{ inputs.articles }}"
+      - name: 控えを残す
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/market
+          git diff --cached --quiet || git commit -m "市場調査の控えを取得（記事もWordPressも触っていない）"
+          git push

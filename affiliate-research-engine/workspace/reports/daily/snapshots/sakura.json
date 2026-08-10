@@ -1,0 +1,251 @@
+{
+ "schema_version": "site-daily-snapshot/1",
+ "site": "sakura",
+ "site_name": "sakura-eigo.com",
+ "generated_at": "2026-08-10T17:19:09+09:00",
+ "stale_after_hours": 24,
+ "value_status": {
+  "measured": "実測できた。0 は「測って0だった」",
+  "unavailable": "取得できない。value は null。0 にしない",
+  "measuring": "計測中。まだ値が確定していない。value は null"
+ },
+ "articles": {
+  "published_total": {
+   "value": null,
+   "status": "unavailable",
+   "source": "wordpress",
+   "observed_at": "2026-08-10T17:19:08+09:00",
+   "note": "取得に失敗: HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))"
+  },
+  "published_yesterday": {
+   "value": null,
+   "status": "unavailable",
+   "source": "wordpress",
+   "observed_at": "2026-08-10T17:19:09+09:00",
+   "note": "取得に失敗: HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish&after=2026-08-09T00%3A00%3A00&before=2026-08-09T23%3A59%3A59 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))"
+  },
+  "updated_yesterday": {
+   "value": null,
+   "status": "unavailable",
+   "source": "wordpress",
+   "observed_at": "2026-08-10T17:19:09+09:00",
+   "note": "取得に失敗: HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish&modified_after=2026-08-09T00%3A00%3A00&modified_before=2026-08-09T23%3A59%3A59 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))"
+  },
+  "drafts": {
+   "value": null,
+   "status": "unavailable",
+   "source": "wordpress",
+   "observed_at": "2026-08-10T17:19:09+09:00",
+   "note": "WP_APP_PASSWORD が無い。下書き・予約は認証しないと数えられない"
+  },
+  "scheduled": {
+   "value": null,
+   "status": "unavailable",
+   "source": "wordpress",
+   "observed_at": "2026-08-10T17:19:09+09:00",
+   "note": "WP_APP_PASSWORD が無い。下書き・予約は認証しないと数えられない"
+  }
+ },
+ "sns": {
+  "x": {
+   "posts_yesterday": {
+    "value": 0,
+    "status": "measured",
+    "source": "social_inventory",
+    "observed_at": "2026-08-10T17:19:09+09:00",
+    "note": "在庫の投稿履歴から実測"
+   },
+   "followers": {
+    "value": null,
+    "status": "unavailable",
+    "source": "x_api",
+    "observed_at": "2026-08-10T17:19:09+09:00",
+    "note": "読み取り用のAPIを持っていない（投稿用トークンのみ）"
+   },
+   "views": {
+    "value": null,
+    "status": "unavailable",
+    "source": "x_api",
+    "observed_at": "2026-08-10T17:19:09+09:00",
+    "note": "読み取り用のAPIを持っていない。画面からの手入力待ち"
+   },
+   "profile_visits": {
+    "value": null,
+    "status": "unavailable",
+    "source": "x_api",
+    "observed_at": "2026-08-10T17:19:09+09:00",
+    "note": "同上"
+   },
+   "link_clicks": {
+    "value": null,
+    "status": "unavailable",
+    "source": "x_api",
+    "observed_at": "2026-08-10T17:19:09+09:00",
+    "note": "同上"
+   }
+  },
+  "threads": {
+   "posts_yesterday": {
+    "value": 0,
+    "status": "measured",
+    "source": "social_inventory",
+    "observed_at": "2026-08-10T17:19:09+09:00",
+    "note": "在庫の投稿履歴から実測"
+   },
+   "followers": {
+    "value": null,
+    "status": "unavailable",
+    "source": "threads_api",
+    "observed_at": "2026-08-10T17:19:09+09:00",
+    "note": "THREADS_ACCESS_TOKEN が無い"
+   },
+   "views": {
+    "value": null,
+    "status": "measuring",
+    "source": "threads_insights",
+    "observed_at": "2026-08-10T17:19:09+09:00",
+    "note": "2026-08-09 に出した投稿が無い"
+   },
+   "profile_visits": {
+    "value": null,
+    "status": "unavailable",
+    "source": "threads_api",
+    "observed_at": "2026-08-10T17:19:09+09:00",
+    "note": "アカウント単位のプロフィール表示は未取得。画面からの手入力待ち"
+   },
+   "link_clicks": {
+    "value": null,
+    "status": "unavailable",
+    "source": "threads_api",
+    "observed_at": "2026-08-10T17:19:09+09:00",
+    "note": "Threads APIにリンククリックの指標が無い。GA4側で見る"
+   }
+  }
+ },
+ "revenue": {
+  "cta_clicks": {
+   "value": null,
+   "status": "unavailable",
+   "source": "asp_manual",
+   "observed_at": "2026-08-10T17:19:09+09:00",
+   "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
+  },
+  "affiliate_clicks": {
+   "value": null,
+   "status": "unavailable",
+   "source": "asp_manual",
+   "observed_at": "2026-08-10T17:19:09+09:00",
+   "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
+  },
+  "conversions_pending": {
+   "value": null,
+   "status": "unavailable",
+   "source": "asp_manual",
+   "observed_at": "2026-08-10T17:19:09+09:00",
+   "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
+  },
+  "conversions_confirmed": {
+   "value": null,
+   "status": "unavailable",
+   "source": "asp_manual",
+   "observed_at": "2026-08-10T17:19:09+09:00",
+   "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
+  },
+  "revenue_pending": {
+   "value": null,
+   "status": "unavailable",
+   "source": "asp_manual",
+   "observed_at": "2026-08-10T17:19:09+09:00",
+   "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
+  },
+  "revenue_confirmed": {
+   "value": null,
+   "status": "unavailable",
+   "source": "asp_manual",
+   "observed_at": "2026-08-10T17:19:09+09:00",
+   "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
+  }
+ },
+ "data_sources": {
+  "wordpress": {
+   "used_for": [
+    "articles"
+   ],
+   "auth": "アプリケーションパスワード（値は出さない）"
+  },
+  "social_inventory": {
+   "used_for": [
+    "sns.*.posts_yesterday"
+   ],
+   "auth": "不要（リポジトリ内の在庫ファイル）"
+  },
+  "threads_api": {
+   "used_for": [
+    "sns.threads.followers"
+   ],
+   "auth": "アクセストークン（値は出さない）"
+  },
+  "threads_insights": {
+   "used_for": [
+    "sns.threads.views"
+   ],
+   "auth": "不要（毎日の取得結果を読むだけ）"
+  },
+  "x_api": {
+   "used_for": [],
+   "auth": "投稿用のみ。読み取りは持っていない"
+  },
+  "asp_manual": {
+   "used_for": [
+    "revenue.*"
+   ],
+   "auth": "手入力"
+  },
+  "excluded": {
+   "google_search_console": "Ray側が直接取得しているので二重に持たない",
+   "google_analytics_4": "同上"
+  }
+ },
+ "collection_errors": [
+  {
+   "block": "articles.published_total",
+   "reason": "HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))",
+   "at": "2026-08-10T17:19:08+09:00"
+  },
+  {
+   "block": "articles.published_yesterday",
+   "reason": "HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish&after=2026-08-09T00%3A00%3A00&before=2026-08-09T23%3A59%3A59 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forb",
+   "at": "2026-08-10T17:19:09+09:00"
+  },
+  {
+   "block": "articles.updated_yesterday",
+   "reason": "HTTPSConnectionPool(host='sakura-eigo.com', port=443): Max retries exceeded with url: /wp-json/wp/v2/posts?per_page=1&_fields=id&status=publish&modified_after=2026-08-09T00%3A00%3A00&modified_before=2026-08-09T23%3A59%3A59 (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connectio",
+   "at": "2026-08-10T17:19:09+09:00"
+  },
+  {
+   "block": "articles.drafts/scheduled",
+   "reason": "WP_APP_PASSWORD が無い。下書き・予約は認証しないと数えられない",
+   "at": "2026-08-10T17:19:09+09:00"
+  },
+  {
+   "block": "sns.threads.user",
+   "reason": "THREADS_ACCESS_TOKEN が無い",
+   "at": "2026-08-10T17:19:09+09:00"
+  }
+ ],
+ "human_actions": [
+  {
+   "id": "REVENUE_LEDGER",
+   "purpose": "収益の実績を統合Dailyに載せる（いまは全項目 unavailable）",
+   "where": "A8.net / もしもアフィリエイト の管理画面 → レポート（日別）",
+   "steps": [
+    "前日分の日別レポートを開く",
+    "クリック数・発生件数・確定件数・発生報酬・確定報酬を控える",
+    "workspace/revenue/ledger.json を作り、{\"by_date\": {\"YYYY-MM-DD\": {\"affiliate_clicks\": 0, \"conversions_pending\": 0, \"conversions_confirmed\": 0, \"revenue_pending\": 0, \"revenue_confirmed\": 0}}} の形で書く",
+    "コミットすると翌日のsnapshotから measured になる"
+   ],
+   "inputs": "整数のみ（円は税込・整数）。0件の日は0を書く（未入力と区別するため）",
+   "done_when": "snapshot の revenue が unavailable から measured に変わること"
+  }
+ ]
+}

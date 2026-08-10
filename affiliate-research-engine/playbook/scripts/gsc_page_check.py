@@ -93,7 +93,13 @@ def main():
                  f"**クリック {int(tot['clk'])}** / "
                  f"**平均掲載順位 {avg:.1f}** / 検索語 {len(rows)}種\n")
         if not rows:
-            L.append("- **検索での表示が0件。** 捨てる評価は無い。全面改修してよい\n")
+            # **検索だけで「失うものが無い」と決めない。**
+            # 546は表示0だったが、入る内部リンクが7本あり、
+            # SNSからの流入もあった（2026-08-10）
+            L.append("- **検索での表示が0件。** ただしこれだけでは"
+                     "「失う評価が無い」と言えない。"
+                     "内部リンク・SNS流入・直接流入・CTAの役割を"
+                     "あわせて見る（reports/PERFORMANCE_*.md）\n")
             print(f"[{pid}] 表示0 / {title[:30]}")
             continue
         print(f"[{pid}] imp={int(tot['imp'])} clk={int(tot['clk'])} "

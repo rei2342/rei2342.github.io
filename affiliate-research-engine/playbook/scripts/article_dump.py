@@ -9,6 +9,10 @@ Actions 側で取ってリポジトリに置く。
 
   POSTS=310,304 python article_dump.py
 出力: workspace/claims/posts/<id>.html / <id>.txt
+
+**状態だけ見たいとき**は `POSTS=state:310,304` と書く。
+アイキャッチを差し替える前に「今どのメディアが付いているか」を控える用。
+本文のファイルは書かず、標準出力へ1行ずつ出すだけなのでリポジトリを汚さない。
 """
 import os
 import re
@@ -43,7 +47,33 @@ def raw_content(pid):
     return r.json()["content"]["raw"] if r.status_code == 200 else ""
 
 
+def state_only(ids):
+    """今の featured_media と画像URLを出すだけ。**何も書かない。**"""
+    print("post_id,status,modified_gmt,featured_media,media_url,alt")
+    for pid in ids:
+        r = requests.get(f"{WP}/posts/{pid}", auth=AUTH, headers=UA,
+                         params={"_fields": "id,status,featured_media,modified_gmt"},
+                         verify=False, timeout=45)
+        if r.status_code != 200:
+            print(f"{pid},取得できない,,,,")
+            continue
+        p = r.json()
+        url = alt = ""
+        if p.get("featured_media"):
+            m = requests.get(f"{WP}/media/{p['featured_media']}", auth=AUTH,
+                             headers=UA, verify=False, timeout=45,
+                             params={"_fields": "source_url,alt_text"})
+            if m.status_code == 200:
+                url = m.json().get("source_url", "")
+                alt = (m.json().get("alt_text") or "").replace(",", "、")
+        print(f"{pid},{p.get('status')},{p.get('modified_gmt')},"
+              f"{p.get('featured_media')},{url},{alt}")
+
+
 def main():
+    if IDS and IDS[0].startswith("state:"):
+        state_only([IDS[0].split(":", 1)[1]] + IDS[1:])
+        return
     OUT.mkdir(parents=True, exist_ok=True)
     want = set(IDS)
     for p in _wa.published():

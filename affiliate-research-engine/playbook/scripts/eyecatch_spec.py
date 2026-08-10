@@ -48,7 +48,8 @@ def build_prompt(spec, article, category):
     comp = spec["composition"]
     neg = spec["negative_prompt"]
     colors = spec["category_colors"]
-    accent = colors.get(category, colors["_default"])
+    # 記事に category があればそちらを使う。20本は記事ごとに違う
+    accent = colors.get(article.get("category", category), colors["_default"])
     w, h = spec["master_size"]
     box = comp["text_safe_area"]["box"]
 
@@ -101,10 +102,25 @@ def build_prompt(spec, article, category):
         + _bullets([
             person,
             f"camera: {article['camera_distance']}",
+            "expression: " + " ".join(article["expression"].split()),
+            "pose: " + " ".join(article["pose"].split()),
+            "props: " + ", ".join(article["props"]),
+            "background: " + article["background"],
+            "colour: " + " ".join(article["palette"].split()),
             f"accent colour: {accent['name']} ({accent['hex']}), "
             f"used on one small object only",
             "scene: " + " ".join(article["scene"].split()),
+            "what makes this image different from the others: "
+            + " ".join(article["uniqueness_reason"].split()),
         ]))
+
+    # 参照画像の使い分け。**3枚を均等に混ぜない**ので、
+    # どれから何を採るかを毎回そのまま渡す
+    ref = spec["reference_assets"]["directive"]
+    parts.append(
+        "REFERENCES:\n"
+        + (ref["with_person"] if article.get("with_person")
+           else ref["without_person"]).strip())
 
     parts.append(
         "DO NOT INCLUDE:\n" + _bullets(neg["forbidden_content"])
@@ -117,7 +133,7 @@ def build_overlay_plan(spec, article, category):
     """ブログ用の文字合成の指示（画像AIには渡さない）。"""
     t = spec["text_overlay"]
     accent = spec["category_colors"].get(
-        category, spec["category_colors"]["_default"])
+        article.get("category", category), spec["category_colors"]["_default"])
     return {
         "size": spec["blog_export"]["size"],
         "lead": {"text": article["lead_text"], **t["lead"]},
