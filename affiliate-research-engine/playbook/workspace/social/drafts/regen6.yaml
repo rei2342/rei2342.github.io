@@ -9,10 +9,11 @@
 
 articles:
   "546":
-    post_type: small_experiment
+    post_type: direct_answer
     post_type_reason: >
-      記事の冒頭に「最後にアプリを閉じた場面はどちらか」という
-      その場で1回できる切り分けが入った。読者が今日できる形が中心
+      「続かないのは意志が弱いからか」という1つの問いに対して、記事は
+      「やめた瞬間がどちらだったかで見る場所が変わる」と1文で答えている。
+      改稿でその答えが冒頭の分岐になり、直接回答の形がより強くなった
     threads_format: two_part
     artifact_used: "授業中／予約前の分岐ごとの見直し項目"
     material:

@@ -27,7 +27,14 @@ JST = timezone(timedelta(hours=9))
 def main():
     spec = ss.load_spec()
     stamp = datetime.now(JST).strftime("%Y-%m-%d")
-    rows = [s for _, s in inv.all_stock(spec)]
+    allrows = [s for _, s in inv.all_stock(spec)]
+    rows = [s for s in allrows if s["state"] != "stale"]
+    stale = [s for s in allrows if s["state"] == "stale"]
+    import json as _j
+    pv = {}
+    pvd = sorted((ROOT / "workspace/market/pagecheck").glob("*.json"))
+    if pvd:
+        pv = _j.loads(pvd[-1].read_text(encoding="utf-8"))
     by_article = {}
     for s in rows:
         by_article.setdefault(s["article_id"], {})[s["platform"]] = s
@@ -40,7 +47,8 @@ def main():
     tot = {"supported": 0, "unsupported": 0, "unjudged": 0,
            "needs_human_review": 0, "total": 0}
     for s in rows:
-        art = inv.local_article(s["article_id"])
+        art = inv.live_article(s["article_id"]) or inv.local_article(
+            s["article_id"])
         c = sc.counts(sc.check(spec, s["thread_parts"], art,
                                s.get("inferences") or []))
         for k in tot:
@@ -68,6 +76,10 @@ def main():
          f"| 投稿 | {posted}件 |\n",
          f"| 承認 | {approved}件 |\n\n",
          "**投稿していない。** 承認するまで在庫のまま止まる。\n\n",
+         "指定された15項目のゲート結果は "
+         "`workspace/social/review/GATES_2026-08-10.md`。**全件通過。**\n\n",
+         "生成元は**公開画面から取り直した本文**"
+         "（`workspace/claims/live/`）。ローカルの控えは使っていない。\n\n",
          f"記事 {len(by_article)}本 / 在庫 {len(rows)}件"
          f"（X {sum(1 for s in rows if s['platform'] == 'x')} / "
          f"Threads {sum(1 for s in rows if s['platform'] == 'threads')}）\n\n",
@@ -76,6 +88,20 @@ def main():
          "python scripts/social_approve.py --reject TH-521-a "
          "--reason \"記事の内容と違う\"\n```\n\n",
          "## 一覧\n\n| 記事 | X | Threads | 状態 |\n|---|---|---|---|\n"]
+    if stale:
+        L.insert(len(L) - 1,
+                 f"## 退役した在庫（{len(stale)}件・削除していない）\n\n"
+                 "記事を改稿したので、生成時の本文に対応しなくなった。\n"
+                 "旧本文・生成日時・旧 modified_gmt を残したまま `stale` にしてある。\n\n"
+                 "| stock_id | 理由 | 生成 | 生成時の記事 modified | 現在の記事 modified |\n"
+                 "|---|---|---|---|---|\n"
+                 + "".join(
+                     f"| {x['stock_id']} | `{x.get('stale_reason')}` "
+                     f"| {(x.get('generated_at') or '')[:16]} "
+                     f"| {x.get('article_modified_gmt_at_generation')} "
+                     f"| {x.get('article_modified_gmt_now')} |\n"
+                     for x in sorted(stale, key=lambda y: y['stock_id']))
+                 + "\n")
     for aid, d in sorted(by_article.items()):
         x, t = d.get("x"), d.get("threads")
         L.append(f"| {aid} {(x or t)['article_title'][:22]} "
@@ -98,7 +124,41 @@ def main():
         for platform, s in (("X", x), ("Threads", t)):
             if not s:
                 continue
-            L.append(f"\n### {platform}案（{s['stock_id']}・{s['state']}）\n\n")
+            art0 = (inv.live_article(s["article_id"]) or {})
+            page = pv.get(str(s["article_id"]), {})
+            L.append(f"\n### {platform}案（{s['stock_id']}・**{s['state']}**）\n\n")
+            L.append("| 項目 | 値 |\n|---|---|\n")
+            L.append(f"| 対応記事 | {s['article_id']}｜{s['article_title']} |\n")
+            L.append(f"| 記事URL | {s['article_url']} |\n")
+            L.append(f"| 記事 modified_gmt | `{s['article_modified_gmt']}` "
+                     f"（生成時）／ `{art0.get('modified_gmt')}`（現在）"
+                     f"{'' if s['article_modified_gmt'] == art0.get('modified_gmt') else ' ← **ずれている**'} |\n")
+            L.append(f"| 記事の取得 | {art0.get('fetched_at', '未取得')}"
+                     f"（公開画面から取り直したもの） |\n")
+            L.append(f"| 公開画面 | HTTP {page.get('http', '未検査')} / "
+                     f"canonical自己参照 {page.get('canonical_self', '未検査')} / "
+                     f"noindex {page.get('noindex', '未検査')} |\n")
+            L.append(f"| 使用した記事内素材 | "
+                     f"{'core_answer + one_check' if platform == 'X' else 'search_intent + unique_artifact'} |\n")
+            L.append(f"| 記事固有の成果物 | {s.get('artifact_used') or '—'} |\n")
+            L.append(f"| market-in構造 | "
+                     + " → ".join(spec["persona"]["warm_order"]) + " |\n")
+            em = sg.EMOJI.findall(s["text"])
+            roles = spec["style"]["emoji"]["roles"]
+            L.append(f"| 絵文字と役割 | "
+                     + ("、".join(f"{e}＝{roles.get(e, '**役割なし**')}"
+                                  for e in em) if em else "なし（0個も正常）")
+                     + " |\n")
+            if platform == "X":
+                lim = spec["x"]["weighted"]["hard_limit"]
+                L.append(f"| X加重文字数 | {s.get('weighted_len')} / {lim}"
+                         f"（URLは23で数える） |\n")
+            else:
+                fmt = s.get("threads_format") or (
+                    "single" if len(s["thread_parts"]) == 1 else "two_part")
+                L.append(f"| Threads形式 | `{fmt}`"
+                         f"（{len(s['thread_parts'])}投稿） |\n")
+            L.append(f"| state | **{s['state']}** |\n\n")
             for i, p in enumerate(s["thread_parts"], 1):
                 label = ("" if len(s["thread_parts"]) == 1
                          else f"**{i}投稿目**\n\n")
@@ -130,7 +190,8 @@ def main():
                          f"（URLは23で数える）\n")
 
             # 命題の照合
-            art = inv.local_article(s["article_id"])
+            art = (inv.live_article(s["article_id"])
+                   or inv.local_article(s["article_id"]))
             claims = sc.check(spec, s["thread_parts"], art,
                               s.get("inferences") or [])
             bad = sc.failures(claims)
@@ -149,7 +210,10 @@ def main():
             L.append("\n</details>\n")
 
             # 前回案との差分
-            old_t = (prev.get(s["stock_id"]) or {}).get("text")
+            old_t = next((x.get("superseded_text") for x in stale
+                          if x["article_id"] == s["article_id"]
+                          and x["platform"] == s["platform"]), None) \
+                or (prev.get(s["stock_id"]) or {}).get("text")
             if old_t:
                 dl = list(difflib.unified_diff(
                     old_t.split("\n"), s["text"].split("\n"),

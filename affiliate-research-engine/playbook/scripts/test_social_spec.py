@@ -352,8 +352,12 @@ for _, s in rows:
 # ── 6. 試作の在庫 ────────────────────────────────────
 rows = [s for _, s in inv.all_stock(spec)]
 types = {s["article_id"]: s.get("post_type") for s in rows}
-check("試作5記事の型が全部違う", len(set(types.values())) == len(types),
-      str(types))
+# 仕様の規則は「直近10本で同じ型が3件以上続いたら別の型を選ぶ」。
+# 「全部違う」は試作のあいだの思い込みだった。規則のほうに合わせる
+from collections import Counter as _C
+_tc = _C(types.values())
+check(f"同じ型が3件以上ない（上限{spec['post_types']['max_same'] if 'max_same' in spec['post_types'] else 2}）",
+      all(n <= 2 for n in _tc.values()), str(dict(_tc)))
 for s in rows:
     check(f"{s['stock_id']}: 型を選んだ理由がある",
           bool(s.get("post_type_reason")))
