@@ -38,7 +38,22 @@ items:
     reply_id_kind: share_code
     reply_url: https://www.threads.com/share/EbjWJllwT/      # 返信（2投稿目）
     canonical_post_url: 未取得    # /post/<コード> 形式はまだ取れていない
-    reply_attached_verified: 未確認  # 返信が親にぶら下がったかは画面で見る
+    # 画面で確認した（2026-08-10 15:44頃）。1/2・2/2 の表示と縦線でつながっている
+    reply_attached_verified: 確認済み
+    ogp_card: 表示された          # 画像・タイトルとも出た。日本語ファイル名の問題は無い
+
+    # ── 投稿10分後に画面で見えたもの（**参考。24時間後の値ではない**）──
+    # 数字が出ていない欄は Threads が0のとき非表示にするため。0として記録する
+    # 表示数・プロフィールのアクセスはインサイト画面でないと出ないので 未取得
+    reference_at_10min:
+      observed_at: "2026-08-10T15:44+0900"
+      parent: {likes: 0, replies: 1, reposts: 0, views: 未取得}
+      reply:  {likes: 0, replies: 0, reposts: 0, views: 未取得}
+      profile_visits: 未取得
+      link_clicks: 未取得
+      followers_at_observation: 未取得
+      # **親の replies:1 は自分の2投稿目。** 読者の反応として数えない
+      note: parent.replies は自己返信1件を含む
     posted_at: "2026-08-10T15:34:02+0900"
     utm_content: threads_546_b
     pinned: false

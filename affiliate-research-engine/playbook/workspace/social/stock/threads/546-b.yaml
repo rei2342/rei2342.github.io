@@ -108,6 +108,9 @@ history:
   state: scheduled
 - at: 2026-08-10T15:34:02+0900
   state: posted
+- at: 2026-08-10T15:44:53+0900
+  state: posted
+  note: '画面で確認: 返信が親にぶら下がっている（1/2・2/2）／OGPカード表示'
 prior_history:
 - at: 2026-08-10T13:27:08+0900
   state: generated
@@ -181,4 +184,5 @@ reply_id: EbjWJllwT
 reply_url: https://www.threads.com/share/EbjWJllwT/
 reply_id_kind: share_code
 canonical_post_url: 未取得
-reply_attached_verified: 未確認
+reply_attached_verified: 確認済み
+ogp_card: 表示された
