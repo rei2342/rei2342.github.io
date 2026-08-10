@@ -359,6 +359,65 @@ def link_check(ids, dry=True):
     _git_push([d], "CTAと内部リンクの着地先を確認")
 
 
+def page_verify(ids, dry=True):
+    """公開画面を見て、崩れていないかを確かめる。**書き込みはしない。**"""
+    import json
+    import requests
+    out = {}
+    for pid in ids:
+        meta = json.loads((LIVE_DIR / f"{pid}.json").read_text(encoding="utf-8"))
+        url = meta["link"]
+        rec = {"url": url, "expect_title": meta["title"]}
+        try:
+            r = requests.get(url, headers=UA, timeout=40, verify=False)
+        except Exception as e:                          # noqa: BLE001
+            rec["http"] = f"取得できない（{type(e).__name__}）"
+            out[str(pid)] = rec
+            continue
+        h = r.text
+        rec["http"] = r.status_code
+        rec["final_url"] = r.url
+        m = re.search(r'<link[^>]+rel="canonical"[^>]+href="([^"]+)"', h)
+        rec["canonical"] = m.group(1) if m else "無し"
+        rec["canonical_self"] = bool(m and m.group(1).rstrip("/")
+                                     == url.rstrip("/"))
+        rec["noindex"] = bool(re.search(r'<meta[^>]+content="[^"]*noindex', h))
+        t = re.search(r"<title>(.*?)</title>", h, re.S)
+        rec["title"] = re.sub(r"<[^>]+>", "", t.group(1)).strip() if t else ""
+        rec["title_ok"] = meta["title"][:14] in rec["title"]
+        # 文字化け（U+FFFD）と、生の実体参照の残り
+        rec["mojibake"] = h.count("\ufffd")
+        # 本文部分のタグ開閉
+        body = re.search(r'<div[^>]+class="[^"]*entry-content[^"]*"[^>]*>'
+                         r'(.*?)</div>\s*<(?:footer|div|aside)', h, re.S)
+        seg = body.group(1) if body else h
+        rec["tag_balance"] = {
+            tag: (len(re.findall(f"<{tag}[ >]", seg)),
+                  len(re.findall(f"</{tag}>", seg)))
+            for tag in ("p", "h2", "h3", "ul", "ol", "li", "a")}
+        rec["tag_ok"] = all(a == b for a, b in rec["tag_balance"].values())
+        # 横スクロールの原因になるもの
+        rec["tables"] = len(re.findall(r"<table", seg))
+        rec["pre"] = len(re.findall(r"<pre", seg))
+        rec["long_nowrap"] = len(re.findall(r"white-space:\s*nowrap", seg))
+        rec["cta"] = len(re.findall(r"af\.moshimo\.com|px\.a8\.net", seg))
+        out[str(pid)] = rec
+        print(f"[{pid}] HTTP {rec['http']} / canonical自己参照 "
+              f"{rec['canonical_self']} / noindex {rec['noindex']} / "
+              f"title一致 {rec['title_ok']} / 文字化け {rec['mojibake']} / "
+              f"タグ開閉 {rec['tag_ok']} / 表 {rec['tables']} / "
+              f"CTA {rec['cta']}")
+        if not rec["tag_ok"]:
+            print(f"      開閉が合わない: {rec['tag_balance']}")
+    d = ROOT / "workspace/market/pagecheck"
+    d.mkdir(parents=True, exist_ok=True)
+    from datetime import datetime, timedelta, timezone
+    st = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d_%H%M")
+    (d / f"{st}.json").write_text(json.dumps(out, ensure_ascii=False, indent=1),
+                                  encoding="utf-8")
+    _git_push([d], f"公開画面の検証（{st}）")
+
+
 def article_apply(ids, dry=True):
     """**取り直した本文へ**、指定した置換だけを当てて反映する。
 
@@ -517,6 +576,8 @@ def run(arg, dry=True):
         generate(ids, dry)
     elif cmd == "article-fetch":
         article_fetch(ids, dry)
+    elif cmd == "page-verify":
+        page_verify(ids, dry)
     elif cmd == "link-check":
         link_check(ids, dry)
     elif cmd == "article-apply":
