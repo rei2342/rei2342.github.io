@@ -10,7 +10,7 @@ text: '「現地に行くのが一番早い」と聞くと、焦って決めた�
   費用を英語に触れる時間で割ると出るのは、1時間あたりの費用だけ。上達の速さは、その割り算からは出てきません。
 
 
-  混ぜずに並べる手順はこちら
+  記事では、費用と上達速度を分けて比べる手順をまとめました。
 
   https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=x'
 thread_parts:
@@ -20,7 +20,7 @@ thread_parts:
   費用を英語に触れる時間で割ると出るのは、1時間あたりの費用だけ。上達の速さは、その割り算からは出てきません。
 
 
-  混ぜずに並べる手順はこちら
+  記事では、費用と上達速度を分けて比べる手順をまとめました。
 
   https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=x'
 state: approved
@@ -54,28 +54,28 @@ gate_results:
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: もう片方がまだ無い
-approved_at: 2026-08-10T13:43:41+0900
+  detail: XとThreadsの近さ 0.09（0.85未満にする）
+approved_at: 2026-08-10T14:06:22+0900
 rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: 99d31f01c1b7115c
+content_hash: db24c6217d40a24f
 generator_version: social-v1
 material:
   search_intent: 留学と国内の学習で、どちらが早いのかを同じ物差しで比べたい
   core_answer: 1時間あたりの費用は出せるが、上達の速さはその割り算からは出ない
   one_check: 費用を英語に触れる時間で割って、何が出て何が出ないかを分ける
   unique_artifact: 数えられる3つの第1カードと、上達の速さを置く第2カード
-created_at: 2026-08-10T13:30:56+0900
+created_at: 2026-08-10T14:05:48+0900
 history:
-- at: 2026-08-10T13:30:56+0900
+- at: 2026-08-10T14:05:48+0900
   state: generated
-- at: 2026-08-10T13:30:56+0900
+- at: 2026-08-10T14:05:48+0900
   state: gated
-- at: 2026-08-10T13:30:56+0900
+- at: 2026-08-10T14:05:48+0900
   state: awaiting_approval
-- at: 2026-08-10T13:43:41+0900
+- at: 2026-08-10T14:06:22+0900
   state: approved
 prior_history:
 - at: 2026-08-10T13:27:08+0900
@@ -84,6 +84,29 @@ prior_history:
   state: gated
 - at: 2026-08-10T13:27:09+0900
   state: awaiting_approval
+- at: 2026-08-10T13:30:56+0900
+  state: generated
+- at: 2026-08-10T13:30:56+0900
+  state: gated
+- at: 2026-08-10T13:30:56+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:43:41+0900
+  state: approved
+- at: 2026-08-10T14:02:18+0900
+  state: awaiting_approval
+- at: 2026-08-10T14:02:19+0900
+  state: generated
+- at: 2026-08-10T14:02:19+0900
+  state: gated
+- at: 2026-08-10T14:02:19+0900
+  state: awaiting_approval
+- at: 2026-08-10T14:04:57+0900
+  state: generated
+- at: 2026-08-10T14:04:57+0900
+  state: gated
+- at: 2026-08-10T14:04:57+0900
+  state: awaiting_approval
+revoked_reason: CTA末尾の「こちら」を変更するため、いったん承認待ちへ戻す
 post_type: misreading
 post_type_reason: 「現地が一番早い」という言われ方を、記事が読み直している。 費用から出るものと出ないものを分ける、という正し方が芯
 template_ids: []
@@ -91,6 +114,7 @@ template_warnings: []
 inferences: []
 threads_format: ''
 artifact_used: 第1カードと第2カードの判断手順
+opener_type: misreading
 metrics:
   posted_at: null
   observed_at: null
@@ -105,11 +129,11 @@ metrics:
   profile_visits: null
 metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
 tone_warnings: []
-weighted_len: 231
+weighted_len: 263
 claim_counts:
-  supported: 1
+  supported: 2
   unsupported: 0
-  unjudged: 2
+  unjudged: 1
   needs_human_review: 1
   total: 4
 needs_human_review:

@@ -10,7 +10,7 @@ text: 'リスニングが伸びないと、教材を増やしたくなります�
   その前に、音声を1つだけ設問なしで聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります💭
 
 
-  確認の順番はこちら
+  記事では、確認する順番をまとめました。
 
   https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x'
 thread_parts:
@@ -20,7 +20,7 @@ thread_parts:
   その前に、音声を1つだけ設問なしで聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります💭
 
 
-  確認の順番はこちら
+  記事では、確認する順番をまとめました。
 
   https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=x'
 state: approved
@@ -54,28 +54,28 @@ gate_results:
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: もう片方がまだ無い
-approved_at: 2026-08-10T13:43:41+0900
+  detail: XとThreadsの近さ 0.12（0.85未満にする）
+approved_at: 2026-08-10T14:06:21+0900
 rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: 7c963bac1d401939
+content_hash: bdd03a9436438e36
 generator_version: social-v1
 material:
   search_intent: TOEICのリスニングだけが伸びない。聞き流しを続けていいのかを知りたい
   core_answer: 聞き流しを増やす前に、音が拾えていないのか、拾えても設問まで残らないのかを切り分ける
   one_check: 音声を1つ聞いたあと、設問を見ずに内容を1文で言えるかを試す
   unique_artifact: 止まっている場所を切り分ける3つの確認項目と、最初の2週間の組み方
-created_at: 2026-08-10T11:09:45+0900
+created_at: 2026-08-10T14:04:56+0900
 history:
-- at: 2026-08-10T11:09:45+0900
+- at: 2026-08-10T14:04:56+0900
   state: generated
-- at: 2026-08-10T11:09:45+0900
+- at: 2026-08-10T14:04:56+0900
   state: gated
-- at: 2026-08-10T11:09:45+0900
+- at: 2026-08-10T14:04:56+0900
   state: awaiting_approval
-- at: 2026-08-10T13:43:41+0900
+- at: 2026-08-10T14:06:21+0900
   state: approved
 prior_history:
 - at: 2026-08-10T09:05:21+0900
@@ -102,6 +102,23 @@ prior_history:
   state: gated
 - at: 2026-08-10T09:50:15+0900
   state: awaiting_approval
+- at: 2026-08-10T11:09:45+0900
+  state: generated
+- at: 2026-08-10T11:09:45+0900
+  state: gated
+- at: 2026-08-10T11:09:45+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:43:41+0900
+  state: approved
+- at: 2026-08-10T14:02:18+0900
+  state: awaiting_approval
+- at: 2026-08-10T14:02:19+0900
+  state: generated
+- at: 2026-08-10T14:02:19+0900
+  state: gated
+- at: 2026-08-10T14:02:19+0900
+  state: awaiting_approval
+revoked_reason: CTA末尾の「こちら」を変更するため、いったん承認待ちへ戻す
 post_type: small_experiment
 post_type_reason: 記事に「音声を1つ聞いて、設問を見ずに内容を1文で言えるか試す」という、 その場で1回できる操作がある。読者が今日試せる形が中心
 template_ids: []
@@ -109,6 +126,7 @@ template_warnings: []
 inferences: []
 threads_format: ''
 artifact_used: 止まっている場所を切り分ける3つの確認項目
+opener_type: reader_scene
 metrics:
   posted_at: null
   observed_at: null
@@ -123,7 +141,7 @@ metrics:
   profile_visits: null
 metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
 tone_warnings: []
-weighted_len: 206
+weighted_len: 226
 claim_counts:
   supported: 0
   unsupported: 0

@@ -47,7 +47,7 @@ thread_parts:
   数字を置けなかった欄が、次に確認するところです🌿
 
   https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=threads'
-state: awaiting_approval
+state: approved
 gate_results:
 - id: article_published
   ok: true
@@ -78,8 +78,8 @@ gate_results:
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: XとThreadsの近さ 0.07（0.85未満にする）
-approved_at: null
+  detail: XとThreadsの近さ 0.08（0.85未満にする）
+approved_at: 2026-08-10T14:06:21+0900
 rejected_reason: null
 scheduled_at: null
 posted_at: null
@@ -91,14 +91,16 @@ material:
   core_answer: まとめ記事の総額はそのまま使えない。自分の条件で3つに分けて出し直す
   one_check: 見ている記事が、どの国・どの期間・語学学校ありなしのどれを前提にしているかを確かめる
   unique_artifact: 必要額を3つの箱に分ける出し方と、ビザの残高証明が目標額とは別だという話
-created_at: 2026-08-10T13:47:45+0900
+created_at: 2026-08-10T14:04:58+0900
 history:
-- at: 2026-08-10T13:47:45+0900
+- at: 2026-08-10T14:04:58+0900
   state: generated
-- at: 2026-08-10T13:47:45+0900
+- at: 2026-08-10T14:04:58+0900
   state: gated
-- at: 2026-08-10T13:47:45+0900
+- at: 2026-08-10T14:04:58+0900
   state: awaiting_approval
+- at: 2026-08-10T14:06:21+0900
+  state: approved
 prior_history:
 - at: 2026-08-10T09:05:22+0900
   state: generated
@@ -141,6 +143,12 @@ prior_history:
 - at: 2026-08-10T13:45:38+0900
   state: gated
 - at: 2026-08-10T13:45:38+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:47:45+0900
+  state: generated
+- at: 2026-08-10T13:47:45+0900
+  state: gated
+- at: 2026-08-10T13:47:45+0900
   state: awaiting_approval
 post_type: checklist
 post_type_reason: 記事が「3つの箱」と「相談前に書き出す条件」を並べている。 読者が埋める枠を渡す形が合う

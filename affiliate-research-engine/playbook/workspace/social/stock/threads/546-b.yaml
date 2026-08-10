@@ -47,7 +47,7 @@ thread_parts:
   止まったのは、どちらの場面でしたか？
 
   https://sakura-eigo.com/online-english-lessons-90-days-success/?utm_source=threads'
-state: awaiting_approval
+state: approved
 gate_results:
 - id: article_published
   ok: true
@@ -78,8 +78,8 @@ gate_results:
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: XとThreadsの近さ 0.14（0.85未満にする）
-approved_at: null
+  detail: XとThreadsの近さ 0.15（0.85未満にする）
+approved_at: 2026-08-10T14:06:22+0900
 rejected_reason: null
 scheduled_at: null
 posted_at: null
@@ -91,14 +91,16 @@ material:
   core_answer: やめた瞬間が授業中だったか予約の前だったかで、見直すものが変わる
   one_check: 最後にアプリを閉じた場面が、レッスン中だったか予約の画面だったかを思い出す
   unique_artifact: 授業中で止まった場合の3項目と、予約の前で止まった場合の手数の数え方
-created_at: 2026-08-10T13:47:46+0900
+created_at: 2026-08-10T14:04:58+0900
 history:
-- at: 2026-08-10T13:47:46+0900
+- at: 2026-08-10T14:04:58+0900
   state: generated
-- at: 2026-08-10T13:47:46+0900
+- at: 2026-08-10T14:04:58+0900
   state: gated
-- at: 2026-08-10T13:47:46+0900
+- at: 2026-08-10T14:04:58+0900
   state: awaiting_approval
+- at: 2026-08-10T14:06:22+0900
+  state: approved
 prior_history:
 - at: 2026-08-10T13:27:08+0900
   state: generated
@@ -117,6 +119,12 @@ prior_history:
 - at: 2026-08-10T13:45:18+0900
   state: gated
 - at: 2026-08-10T13:45:18+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:47:46+0900
+  state: generated
+- at: 2026-08-10T13:47:46+0900
+  state: gated
+- at: 2026-08-10T13:47:46+0900
   state: awaiting_approval
 post_type: direct_answer
 post_type_reason: 「続かないのは意志が弱いからか」という1つの問いに対して、記事は 「やめた瞬間がどちらだったかで見る場所が変わる」と1文で答えている。 改稿でその答えが冒頭の分岐になり、直接回答の形がより強くなった

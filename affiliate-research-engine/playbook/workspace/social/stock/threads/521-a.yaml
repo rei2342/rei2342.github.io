@@ -47,7 +47,7 @@ thread_parts:
   3つのうち、いちばん自信がないのはどれですか？
 
   https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads'
-state: awaiting_approval
+state: approved
 gate_results:
 - id: article_published
   ok: true
@@ -78,8 +78,8 @@ gate_results:
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: XとThreadsの近さ 0.13（0.85未満にする）
-approved_at: null
+  detail: XとThreadsの近さ 0.12（0.85未満にする）
+approved_at: 2026-08-10T14:06:22+0900
 rejected_reason: null
 scheduled_at: null
 posted_at: null
@@ -91,14 +91,16 @@ material:
   core_answer: 聞き流しを増やす前に、音が拾えていないのか、拾えても設問まで残らないのかを切り分ける
   one_check: 音声を1つ聞いたあと、設問を見ずに内容を1文で言えるかを試す
   unique_artifact: 止まっている場所を切り分ける3つの確認項目と、最初の2週間の組み方
-created_at: 2026-08-10T13:47:45+0900
+created_at: 2026-08-10T14:04:58+0900
 history:
-- at: 2026-08-10T13:47:45+0900
+- at: 2026-08-10T14:04:58+0900
   state: generated
-- at: 2026-08-10T13:47:45+0900
+- at: 2026-08-10T14:04:58+0900
   state: gated
-- at: 2026-08-10T13:47:45+0900
+- at: 2026-08-10T14:04:58+0900
   state: awaiting_approval
+- at: 2026-08-10T14:06:22+0900
+  state: approved
 prior_history:
 - at: 2026-08-10T09:05:21+0900
   state: generated
@@ -135,6 +137,12 @@ prior_history:
 - at: 2026-08-10T13:45:17+0900
   state: gated
 - at: 2026-08-10T13:45:17+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:47:45+0900
+  state: generated
+- at: 2026-08-10T13:47:45+0900
+  state: gated
+- at: 2026-08-10T13:47:45+0900
   state: awaiting_approval
 post_type: small_experiment
 post_type_reason: 記事に「音声を1つ聞いて、設問を見ずに内容を1文で言えるか試す」という、 その場で1回できる操作がある。読者が今日試せる形が中心

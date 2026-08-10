@@ -78,6 +78,31 @@ def sentences(text):
     return [s for s, _ in split(text)]
 
 
+def blocks(text):
+    """照合の単位。文だけでなく、**箇条書きのまとまり**も1つとして返す。
+
+    記事は「1日につきこの5行を作る」＋5項目、のように書く。
+    SNS側はそれを1文に畳むので、文単位や隣り合う2文だけで見ると
+    どこにも当たらない（310で実際に落ちた）。
+    リストは1つの塊なので、**見出しの1文＋その直後の連続する箇条書き**を
+    まとめた窓も作る。
+    """
+    rows = split(text)
+    out = []
+    i = 0
+    while i < len(rows):
+        if rows[i][1]:                       # 箇条書きの始まり
+            j = i
+            while j < len(rows) and rows[j][1]:
+                j += 1
+            lead = rows[i - 1][0] if i > 0 and not rows[i - 1][1] else ""
+            out.append(lead + "".join(r[0] for r in rows[i:j]))
+            i = j
+        else:
+            i += 1
+    return out
+
+
 def modality(spec, s, bullet=False):
     """directive → hedged → interrogative → assertive の順に決める。
 
@@ -136,7 +161,7 @@ def negated(s):
     return bool(re.search(r"ない|ません|ず[、。]", s))
 
 
-def best_match(spec, s, article_sents):
+def best_match(spec, s, article_sents, article_blocks=()):
     """記事側で、いちばん語が重なるところを探す。
 
     記事は1つの主張を2文に分けて書くことがある
@@ -149,7 +174,7 @@ def best_match(spec, s, article_sents):
     best, score = None, 0.0
     windows = list(article_sents) + [
         article_sents[i] + article_sents[i + 1]
-        for i in range(len(article_sents) - 1)]
+        for i in range(len(article_sents) - 1)] + list(article_blocks or [])
     for a in windows:
         at = terms(a)
         if not at:
@@ -195,6 +220,7 @@ def check(spec, parts, article, inferences=()):
     """
     c = spec["claims"]
     asents = sentences(article.get("body", ""))
+    ablocks = blocks(article.get("body", ""))
     declared = {re.sub(r"\s+", "", x["text"]) for x in inferences}
     out = []
     for p in parts:
@@ -207,7 +233,7 @@ def check(spec, parts, article, inferences=()):
             judged, quoted = strip_attribution(s)
             mod = modality(spec, judged, bullet)
             risky = is_risky(spec, judged)
-            a, ov = best_match(spec, judged, asents)
+            a, ov = best_match(spec, judged, asents, ablocks)
             st = terms(judged)
             row = {"text": s, "modality": mod, "risky": risky,
                    "matched": a, "overlap": round(ov, 2), "terms": len(st),

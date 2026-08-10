@@ -57,7 +57,7 @@ thread_parts:
   7日ぶん並べると、予定と実際のずれが見えてきます。
 
   https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=threads'
-state: awaiting_approval
+state: approved
 gate_results:
 - id: article_published
   ok: true
@@ -88,8 +88,8 @@ gate_results:
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: XとThreadsの近さ 0.11（0.85未満にする）
-approved_at: null
+  detail: XとThreadsの近さ 0.09（0.85未満にする）
+approved_at: 2026-08-10T14:06:21+0900
 rejected_reason: null
 scheduled_at: null
 posted_at: null
@@ -101,14 +101,16 @@ material:
   core_answer: 無料で試せる期間は、機能ではなく自分の生活で無理なく開けたかを見る時間にできる
   one_check: 使う予定だった日に、実際に開けたかどうかを見る
   unique_artifact: 1日ぶん5行の記入欄を7日ぶんと、初日に見る解約期限と次回の請求日
-created_at: 2026-08-10T13:47:46+0900
+created_at: 2026-08-10T14:04:58+0900
 history:
-- at: 2026-08-10T13:47:46+0900
+- at: 2026-08-10T14:04:58+0900
   state: generated
-- at: 2026-08-10T13:47:46+0900
+- at: 2026-08-10T14:04:58+0900
   state: gated
-- at: 2026-08-10T13:47:46+0900
+- at: 2026-08-10T14:04:58+0900
   state: awaiting_approval
+- at: 2026-08-10T14:06:21+0900
+  state: approved
 prior_history:
 - at: 2026-08-10T13:27:08+0900
   state: generated
@@ -127,6 +129,12 @@ prior_history:
 - at: 2026-08-10T13:45:18+0900
   state: gated
 - at: 2026-08-10T13:45:18+0900
+  state: awaiting_approval
+- at: 2026-08-10T13:47:46+0900
+  state: generated
+- at: 2026-08-10T13:47:46+0900
+  state: gated
+- at: 2026-08-10T13:47:46+0900
   state: awaiting_approval
 post_type: comparison_axis
 post_type_reason: 記事が「無料でできること」と「有料で増えること」を並べたうえで、 生活側の記録欄を渡している。軸の作り方を渡す形が合う

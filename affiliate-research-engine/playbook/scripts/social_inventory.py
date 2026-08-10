@@ -158,7 +158,16 @@ def live_article(article_id):
         return None
     meta = json.loads(j.read_text(encoding="utf-8"))
     html = h.read_text(encoding="utf-8")
-    body = re.sub(r"<[^>]+>", "\n", html)
+    # **タグの種類で変換を分ける。**
+    # 全部を改行にすると、<strong> が文の途中に入っているだけで
+    # 1文が3行に割れる。そのせいで照合の単位が壊れていた（310で落ちた）。
+    #  - <li>       → 「・」付きの行（箇条書きだと分かるように残す）
+    #  - ブロック要素 → 改行
+    #  - 装飾・リンク → 消すだけ（文を割らない）
+    body = re.sub(r"(?i)<li[^>]*>", "\n・", html)
+    body = re.sub(r"(?i)</?(?:p|div|h[1-6]|ul|ol|li|br|hr|table|tr|td|th|"
+                  r"blockquote|section)[^>]*>", "\n", body)
+    body = re.sub(r"<[^>]+>", "", body)
     return {"id": str(article_id), "title": meta["title"],
             "url": meta["link"], "status": meta["status"],
             "modified_gmt": meta["modified_gmt"],

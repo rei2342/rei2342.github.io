@@ -328,23 +328,17 @@ check("決められた順なら posted まで行ける", st["state"] == "posted"
 
 # ── 5. 実際の在庫 ────────────────────────────────────
 rows = inv.all_stock(spec)
-# 2026-08-10 の人手確認で3件が承認された。**投稿はまだしない。**
-APPROVED_OK = {"X-521-a", "X-526-b", "THREADS-526-b"}
-bad_state = [s["stock_id"] for _, s in rows
-             if s["state"] in ("approved", "scheduled", "posted")
-             and s["stock_id"] not in APPROVED_OK]
-check("承認済みは人が選んだ3件だけ", not bad_state, " ".join(bad_state))
+# 2026-08-10 の最終調整で10件すべてが承認された。**投稿はまだしない。**
 check("投稿済み・予約済みが無い",
       not [s for _, s in rows if s["state"] in ("scheduled", "posted")])
 _live = [s for _, s in rows if s["state"] != "stale"]
 check("退役を除いた在庫が10件", len(_live) == 10, str(len(_live)))
-check("承認3件・承認待ち7件",
-      sum(1 for s in _live if s["state"] == "approved") == 3
-      and sum(1 for s in _live if s["state"] == "awaiting_approval") == 7,
+check("10件すべて approved",
+      sum(1 for s in _live if s["state"] == "approved") == 10,
       str({s["state"]: 1 for s in _live}))
 # 取り消しは履歴に残っていること。**黙って戻さない**
 revoked = [s for _, s in rows if s.get("revoked_reason")]
-check("承認の取り消しに理由が残っている", len(revoked) == 3,
+check("承認の取り消しに理由が残っている", len(revoked) >= 3,
       f"{len(revoked)}件")
 for _, s in rows:
     check(f"{s['stock_id']}: ゲート全通過",

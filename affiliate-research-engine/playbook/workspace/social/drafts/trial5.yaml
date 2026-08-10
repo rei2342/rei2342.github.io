@@ -43,7 +43,7 @@ articles:
       リスニングが伸びないと、教材を増やしたくなりますよね。
 
       その前に、音声を1つだけ設問なしで聞いて、内容を1文で言えるか試してみる。次に見る場所を絞りやすくなります💭
-    x_tail: "確認の順番はこちら"
+    x_tail: "記事では、確認する順番をまとめました。"
     threads_format: two_part
     artifact_used: "止まっている場所を切り分ける3つの確認項目"
     threads:
@@ -135,7 +135,7 @@ articles:
 
   # ── 23 チェックリスト ────────────────────────────
   "23":
-    opener_type_x: reader_scene
+    opener_type_x: short_reassurance
     opener_type_threads: reader_scene
     post_type: checklist
     post_type_reason: >
@@ -148,10 +148,10 @@ articles:
       unique_artifact: "必要額を3つの箱に分ける出し方と、ビザの残高証明が目標額とは別だという話"
     # **指定された本文（逐語）**
     x: |
-      ワーホリの費用を調べると、大きな総額が出てきて不安になりますよね。
+      ワーホリの費用は、検索で出てきた総額をそのまま自分の目標にしなくて大丈夫です。
 
-      でも、その数字が自分に当てはまるとは限りません。まずは国・期間・語学学校の有無から見ておくと安心です📝
-    x_tail: "自分用の金額に直す手順はこちら"
+      まず見るのは、国・期間・語学学校の有無。条件を分けると、自分用の金額に直しやすくなります📝
+    x_tail: "記事では、必要額を3つの箱に分ける手順をまとめました。"
     threads_format: two_part
     artifact_used: "必要額を3つの箱に分ける出し方"
     threads:
