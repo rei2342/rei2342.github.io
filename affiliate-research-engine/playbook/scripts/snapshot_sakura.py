@@ -110,14 +110,28 @@ def wp_count(**params):
     r = requests.get(f"{WP}/posts", params=p, headers=UA, timeout=30,
                      auth=wp_auth(), verify=False)
     if r.status_code != 200:
-        raise RuntimeError(f"HTTP {r.status_code} ({params})")
+        hint = ""
+        if r.status_code == 400 and params.get("status") in ("draft", "future"):
+            # 非公開statusは認証必須。未認証だと401ではなく400で返る
+            hint = ("（非公開statusの取得は認証が必要です。"
+                    "WP_USER / WP_APP_PASSWORD を確認してください）")
+        raise RuntimeError(f"HTTP {r.status_code} ({params}){hint}")
     return int(r.headers.get("X-WP-Total", 0))
 
 
 def wp_auth():
-    """下書き・予約は認証が要る。**パスワードは値として出さない。**"""
+    """下書き・予約は認証が要る。**パスワードは値として出さない。**
+
+    ★ユーザー名を "sakura" で決め打ちしていたため認証が通っていなかった。
+      他のスクリプト（affiliate_inserter.py / brand_apply.py）は
+      rei.00pt2342@gmail.com を使っている。
+      認証が通らないと WordPress は status=draft / future を
+      HTTP 400 rest_invalid_param で返す（認証すれば200）。
+      401ではなく400で返るので、権限の問題だと気づきにくい。
+    """
     pw = os.environ.get("WP_APP_PASSWORD", "")
-    return ("sakura", pw) if pw else None
+    user = os.environ.get("WP_USER") or "rei.00pt2342@gmail.com"
+    return (user, pw) if pw else None
 
 
 def articles_block():

@@ -43,7 +43,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests google-auth -q
+        run: pip install -r affiliate-research-engine/playbook/requirements.txt -q
 
       # トークン切れで止めない。GA4だけでも出るほうがよい
       - name: Threadsの数字を取る
@@ -95,6 +95,7 @@ jobs:
         if: always()
         continue-on-error: true
         env:
+          WP_USER: ${{ secrets.WP_USER }}
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
           THREADS_ACCOUNTS: ${{ secrets.THREADS_ACCOUNTS }}
