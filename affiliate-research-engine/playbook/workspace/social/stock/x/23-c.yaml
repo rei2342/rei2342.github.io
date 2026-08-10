@@ -12,7 +12,7 @@ text: 'ワーホリの費用は、検索で出てきた総額をそのまま自�
 
   必要額を3つの箱に分ける計算手順は、記事で確認できます。
 
-  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=x'
+  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x-23-c'
 thread_parts:
 - 'ワーホリの費用は、検索で出てきた総額をそのまま自分の目標にしなくて大丈夫です。
 
@@ -22,7 +22,7 @@ thread_parts:
 
   必要額を3つの箱に分ける計算手順は、記事で確認できます。
 
-  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=x'
+  https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x-23-c'
 state: awaiting_approval
 gate_results:
 - id: article_published
@@ -60,7 +60,7 @@ rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: 6522806b7834ecd4
+content_hash: 57312a65fd181e28
 generator_version: social-v1
 material:
   search_intent: ワーキングホリデーに必要な貯金額を、自分の条件で知りたい
@@ -75,6 +75,9 @@ history:
   state: gated
 - at: 2026-08-10T16:08:13+0900
   state: awaiting_approval
+- at: 2026-08-10T16:54:29+0900
+  state: awaiting_approval
+  note: 'URL差し替え: 投稿単位で識別できる形式へ統一（utm_content=stock_id小文字）'
 post_type: checklist
 post_type_reason: 記事が「3つの箱」と「相談前に書き出す条件」を並べている。 読者が埋める枠を渡す形が合う
 template_ids:
@@ -106,3 +109,9 @@ claim_counts:
   needs_human_review: 0
   total: 4
 needs_human_review: []
+prior_links:
+- at: 2026-08-10T16:54:29+0900
+  old_url: https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=x
+  new_url: https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=x&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=x-23-c
+  old_content_hash: 6522806b7834ecd4
+  reason: 投稿単位で識別できる形式へ統一（utm_content=stock_id小文字）

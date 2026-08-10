@@ -1,0 +1,174 @@
+{
+ "schema": "site-daily-snapshot/1",
+ "site_key": "sakura",
+ "site_name": "sakura-eigo.com",
+ "track": "B",
+ "generated_at": "2026-08-10T16:56:05+09:00",
+ "unavailable_marker": "未取得",
+ "rules": [
+  "取れない値は 0 ではなく 未取得 と書く",
+  "0 は、画面や API がその欄に 0 を返したときだけ書く",
+  "24時間値と48時間値は上書きせず別々に持つ",
+  "1組の投稿から一般則を出さない"
+ ],
+ "articles": {
+  "source": "WordPress REST（article-fetch の控え）/ SCOPE.md",
+  "as_of": "2026-08-10T16:56:05+09:00",
+  "published_total": 49,
+  "published_total_as_of": "2026-08-09 11:51:09",
+  "fetched_recently": [
+   {
+    "id": 23,
+    "status": "publish",
+    "chars": 1993,
+    "modified_gmt": "2026-08-10T07:04:12",
+    "fetched_at": "2026-08-10T16:06:21+09:00"
+   },
+   {
+    "id": 149,
+    "status": "publish",
+    "chars": 2504,
+    "modified_gmt": "2026-08-10T07:04:15",
+    "fetched_at": "2026-08-10T16:06:22+09:00"
+   },
+   {
+    "id": 310,
+    "status": "publish",
+    "chars": 3462,
+    "modified_gmt": "2026-08-10T02:51:19",
+    "fetched_at": "2026-08-10T13:24:09+09:00"
+   },
+   {
+    "id": 521,
+    "status": "publish",
+    "chars": 2603,
+    "modified_gmt": "2026-08-10T07:04:19",
+    "fetched_at": "2026-08-10T16:06:23+09:00"
+   },
+   {
+    "id": 526,
+    "status": "publish",
+    "chars": 2761,
+    "modified_gmt": "2026-08-10T07:04:22",
+    "fetched_at": "2026-08-10T16:06:23+09:00"
+   },
+   {
+    "id": 546,
+    "status": "publish",
+    "chars": 3659,
+    "modified_gmt": "2026-08-10T02:47:26",
+    "fetched_at": "2026-08-10T13:24:08+09:00"
+   }
+  ]
+ },
+ "sns": {
+  "source": "workspace/social/stock（在庫ファイルそのもの）",
+  "as_of": "2026-08-10T16:56:05+09:00",
+  "inventory_total": 22,
+  "by_state": {
+   "stale": 12,
+   "awaiting_approval": 6,
+   "approved": 2,
+   "posted": 2
+  },
+  "awaiting_approval": 6,
+  "approved": 2,
+  "posted": 2,
+  "posts": [
+   {
+    "stock_id": "THREADS-546-b",
+    "platform": "threads",
+    "article_id": 546,
+    "posted_at": "2026-08-10T15:34:02+0900",
+    "posted_id": "Gb3pbY9x2",
+    "posted_url": "https://www.threads.com/share/Gb3pbY9x2/",
+    "reply_url": "https://www.threads.com/share/EbjWJllwT/",
+    "canonical_url": "未取得",
+    "utm_content": "threads_546_b",
+    "views": "未取得",
+    "likes": "未取得",
+    "replies": "未取得",
+    "reposts": "未取得",
+    "profile_visits": "未取得",
+    "link_clicks": "未取得",
+    "followers_at_observation": "未取得"
+   },
+   {
+    "stock_id": "X-546-b",
+    "platform": "x",
+    "article_id": 546,
+    "posted_at": "2026-08-10T14:59:43+0900",
+    "posted_id": "2086693958860841429",
+    "posted_url": "https://x.com/sakura_eigo30/status/2086693958860841429",
+    "reply_url": "未取得",
+    "canonical_url": "未取得",
+    "utm_content": "x_546_b",
+    "views": "未取得",
+    "likes": "未取得",
+    "replies": "未取得",
+    "reposts": "未取得",
+    "profile_visits": "未取得",
+    "link_clicks": "未取得",
+    "followers_at_observation": "未取得"
+   }
+  ]
+ },
+ "search_console": {
+  "source": "Search Console（workspace/gsc/LATEST.md）",
+  "as_of": "2026-08-08",
+  "period": "2026-07-09 〜 2026-08-06（28日間）",
+  "clicks": 0,
+  "impressions": 4,
+  "per_article": "未取得"
+ },
+ "analytics": {
+  "source": "GA4（workspace/ga4/LATEST.md・直近14日）",
+  "as_of": "2026-08-09",
+  "sessions": 16,
+  "users": 15,
+  "pageviews": 18,
+  "social_sessions": "未取得",
+  "cta_clicks": "未取得",
+  "key_events": "未取得"
+ },
+ "revenue": {
+  "source": "ASP管理画面（自動取得の口が無い）",
+  "as_of": "未取得",
+  "conversions": "未取得",
+  "revenue_jpy": "未取得",
+  "note": "ログイン取得はしない方針のため、入るとしたら手入力"
+ },
+ "pending_measurements": {
+  "source": "workspace/social/measure_plan.yaml",
+  "items": [
+   {
+    "stock_id": "X-546-b",
+    "elapsed_hours": 24,
+    "scheduled_at": "2026-08-11T14:59+0900",
+    "observed_at": "未取得",
+    "status": "未実施"
+   },
+   {
+    "stock_id": "X-546-b",
+    "elapsed_hours": 48,
+    "scheduled_at": "2026-08-12T14:59+0900",
+    "observed_at": "未取得",
+    "status": "未実施"
+   },
+   {
+    "stock_id": "THREADS-546-b",
+    "elapsed_hours": 24,
+    "scheduled_at": "2026-08-11T15:34+0900",
+    "observed_at": "未取得",
+    "status": "未実施"
+   },
+   {
+    "stock_id": "THREADS-546-b",
+    "elapsed_hours": 48,
+    "scheduled_at": "2026-08-12T15:34+0900",
+    "observed_at": "未取得",
+    "status": "未実施"
+   }
+  ]
+ }
+}

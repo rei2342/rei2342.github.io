@@ -34,8 +34,11 @@ import social_inventory as inv
 
 def retag(spec, stock, new_url, reason):
     """URLのクエリだけ差し替えた在庫を返す。戻り値は (在庫, 止める理由)。"""
-    if stock["state"] != "approved":
-        return None, f"{stock['stock_id']} は {stock['state']}。approved 以外は触らない"
+    # 承認済みと承認待ちだけ。**投稿済み・退役・却下には触らない**
+    # （投稿済みのURLを書き換えると、出したものと記録が食い違う）
+    if stock["state"] not in ("approved", "awaiting_approval"):
+        return None, (f"{stock['stock_id']} は {stock['state']}。"
+                      f"approved / awaiting_approval 以外は触らない")
     olds = sg.URL.findall("\n".join(stock["thread_parts"]))
     if len(olds) != 1:
         return None, f"URLが{len(olds)}個ある。1個でないと差し替えない"

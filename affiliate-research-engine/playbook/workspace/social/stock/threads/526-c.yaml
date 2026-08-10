@@ -25,7 +25,7 @@ text: '留学の候補を並べるとき、費用と効果を1つの表に入れ
 
   いま埋められそうなのは、第1カードのどこまでですか？
 
-  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
+  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=threads-526-c'
 thread_parts:
 - '留学の候補を並べるとき、費用と効果を1つの表に入れたくなります。
 
@@ -48,7 +48,7 @@ thread_parts:
 
   いま埋められそうなのは、第1カードのどこまでですか？
 
-  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads'
+  https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=threads-526-c'
 state: awaiting_approval
 gate_results:
 - id: article_published
@@ -86,7 +86,7 @@ rejected_reason: null
 scheduled_at: null
 posted_at: null
 posted_id: null
-content_hash: ce42166648f0b0ed
+content_hash: 89bf933b39b9e60d
 generator_version: social-v1
 material:
   search_intent: 留学と国内の学習で、どちらが早いのかを同じ物差しで比べたい
@@ -101,6 +101,9 @@ history:
   state: gated
 - at: 2026-08-10T16:08:14+0900
   state: awaiting_approval
+- at: 2026-08-10T16:54:29+0900
+  state: awaiting_approval
+  note: 'URL差し替え: 投稿単位で識別できる形式へ統一（utm_content=stock_id小文字）'
 post_type: misreading
 post_type_reason: 「現地が一番早い」という言われ方を、記事が読み直している。 費用から出るものと出ないものを分ける、という正し方が芯
 template_ids:
@@ -137,3 +140,9 @@ needs_human_review:
   why: 内容語が2語で判定できない。言い切りで、比較・因果・診断・効果・否定のどれかを含むので人が見る
 - text: 比べたいなら、1コマ中に自分が話している時間や、直してもらえる回数を別に記録することになります。
   why: 記事は確認項目・提案として書いている。投稿は言い切りなので人が見る
+prior_links:
+- at: 2026-08-10T16:54:29+0900
+  old_url: https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads
+  new_url: https://sakura-eigo.com/fast-verify-cost-time-travel/?utm_source=threads&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=threads-526-c
+  old_content_hash: ce42166648f0b0ed
+  reason: 投稿単位で識別できる形式へ統一（utm_content=stock_id小文字）
