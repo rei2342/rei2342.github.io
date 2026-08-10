@@ -87,6 +87,30 @@ jobs:
             -d @/tmp/payload.json | head -c 200
           echo ""
 
+      # ── 統合Daily Report（Ray側）へ渡すsnapshot ──────────────
+      # **日次処理のいちばん最後。** WordPress・SNS・収益の取得が
+      # 終わってから作るので、Rayが読む時点でいちばん新しい。
+      # ここで落ちても上の処理は終わっているので、本体は巻き戻らない。
+      - name: 統合Daily用のsnapshotを作る
+        if: always()
+        continue-on-error: true
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_ACCOUNTS: ${{ secrets.THREADS_ACCOUNTS }}
+        run: python affiliate-research-engine/playbook/scripts/snapshot_sakura.py
+
+      # git を使えない相手でも取れるように、成果物としても置く
+      - name: snapshotを成果物に上げる
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: sakura-snapshot
+          path: affiliate-research-engine/workspace/reports/daily/snapshots/sakura.json
+          retention-days: 14
+          if-no-files-found: warn
+
       - name: Commit
         if: always()
         run: |
@@ -94,7 +118,9 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add affiliate-research-engine/playbook/workspace/threads_insights/ \
                   affiliate-research-engine/playbook/workspace/ga4/ \
-                  affiliate-research-engine/playbook/workspace/patrol/ || true
+                  affiliate-research-engine/playbook/workspace/patrol/ \
+                  affiliate-research-engine/playbook/workspace/reports/daily/snapshots/ \
+                  affiliate-research-engine/workspace/reports/daily/snapshots/ || true
           git diff --staged --quiet && exit 0
           git commit -m "chore: morning check $(date +%Y-%m-%d)"
           for i in 1 2 3; do
