@@ -1,0 +1,8 @@
+# morning-check / snapshot が使う依存の正本。
+# ★一時的な pip install で足さない。ここに書く。
+requests>=2.31
+google-auth>=2.0
+# SNS在庫（YAML）の読み取りに必要。
+# 2026-08-10、これが無くて sns.x / sns.threads が
+# 「No module named 'yaml'」で全項目 unavailable になっていた。
+PyYAML>=6.0
