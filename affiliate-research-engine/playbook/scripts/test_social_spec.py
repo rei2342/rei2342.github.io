@@ -328,14 +328,30 @@ check("決められた順なら posted まで行ける", st["state"] == "posted"
 
 # ── 5. 実際の在庫 ────────────────────────────────────
 rows = inv.all_stock(spec)
-# 2026-08-10 の最終調整で10件すべてが承認された。**投稿はまだしない。**
-check("投稿済み・予約済みが無い",
-      not [s for _, s in rows if s["state"] in ("scheduled", "posted")])
+# 2026-08-10 の最終調整で10件すべてが承認され、そのうち X-546-b だけを
+# 実投稿テストに出した。**残りは approved のまま動かさない。**
 _live = [s for _, s in rows if s["state"] != "stale"]
 check("退役を除いた在庫が10件", len(_live) == 10, str(len(_live)))
-check("10件すべて approved",
-      sum(1 for s in _live if s["state"] == "approved") == 10,
-      str({s["state"]: 1 for s in _live}))
+check("approved か posted のどちらかしか無い",
+      all(s["state"] in ("approved", "posted") for s in _live),
+      str(sorted({s["state"] for s in _live})))
+# **scheduled のまま止まっているものが無い。**
+# 投稿に失敗したのに予約済みで残っていると、次の実行で二重に出る
+check("scheduled で止まっているものが無い",
+      not [s for s in _live if s["state"] == "scheduled"])
+_posted = [s for s in _live if s["state"] == "posted"]
+check("実投稿テストで出したのは1件だけ", len(_posted) == 1,
+      " / ".join(s["stock_id"] for s in _posted))
+for s in _posted:
+    check(f"{s['stock_id']}: 投稿IDと投稿時刻が入っている",
+          bool(s.get("posted_id")) and bool(s.get("posted_at")),
+          f"{s.get('posted_id')} / {s.get('posted_at')}")
+    _hist = [r for r in inv.read_history(spec, s["platform"])
+             if r.get("stock_id") == s["stock_id"] and r.get("result") == "ok"]
+    check(f"{s['stock_id']}: 履歴に成功が1本だけ残っている", len(_hist) == 1,
+          f"{len(_hist)}本")
+    check(f"{s['stock_id']}: 名指しで選んだ記録が残っている",
+          _hist and _hist[-1].get("selected_by") == "stock_id")
 # 取り消しは履歴に残っていること。**黙って戻さない**
 revoked = [s for _, s in rows if s.get("revoked_reason")]
 check("承認の取り消しに理由が残っている", len(revoked) >= 3,
@@ -487,9 +503,15 @@ def _fingerprint():
 _before = _fingerprint()
 
 # 名指しで1件だけ選ぶ
-_s, _why = sp.pick_by_id(spec, "x", "X-546-b")
-check("名指しした在庫だけを選ぶ", _s is not None and _s["stock_id"] == "X-546-b",
+# **投稿済みでない在庫で試す。** X-546-b は 2026-08-10 の実投稿テストで
+# posted になったので、名指しの対象としては approved の別件を使う
+_TARGET = "X-526-b"
+_s, _why = sp.pick_by_id(spec, "x", _TARGET)
+check("名指しした在庫だけを選ぶ", _s is not None and _s["stock_id"] == _TARGET,
       _why)
+check("投稿済みの stock_id は名指しでも投稿しない",
+      sp.pick_by_id(spec, "x", "X-546-b")[0] is None,
+      sp.pick_by_id(spec, "x", "X-546-b")[1])
 check("名指しは最古の承認済みを選ばない",
       _s is not None and _s["stock_id"] != "X-23-a")
 
@@ -530,7 +552,7 @@ check("本文と content_hash が合わなければ止まる",
 # --approve が無ければプレビューだけ。**1件も状態が動かない**
 _run = subprocess.run(
     [sys.executable, str(ROOT / "scripts/social_post.py"),
-     "--platform", "x", "--stock-id", "X-546-b"],
+     "--platform", "x", "--stock-id", _TARGET],
     capture_output=True, text=True, cwd=str(ROOT))
 check("--approve が無ければプレビューで終わる",
       _run.returncode == 0 and "投稿していない" in _run.stdout,
@@ -570,8 +592,8 @@ check("成功したときだけ posted へ動かす",
 import copy as _cp
 import social_retag as sr
 
-_base = "https://sakura-eigo.com/online-english-lessons-90-days-success/"
-_okurl = _base + "?utm_source=x&utm_medium=social&utm_content=x_546_b"
+_base = _s["article_url"].split("?")[0]
+_okurl = _base + "?utm_source=x&utm_medium=social&utm_content=retag_test"
 _r, _w = sr.retag(spec, _cp.deepcopy(_s), _okurl, "テスト")
 check("URLのクエリを差し替えられる", _r is not None and _okurl in _r["text"], _w)
 check("差し替えでURL以外が変わらない",
@@ -605,7 +627,7 @@ check("X加重の再計算も投稿より前",
       _src.index("sg.weighted_len(spec, sent_text)") < _i_post)
 
 # 実際に出す2件が、今の本文で上限内か
-for _sid in ("X-546-b",):
+for _sid in ("X-546-b", _TARGET):
     _st = [x for _, x in inv.all_stock(spec) if x["stock_id"] == _sid][0]
     _w2 = sg.weighted_len(spec, _st["text"])
     check(f"{_sid}: X加重が上限以下", _w2 <= spec["x"]["weighted"]["hard_limit"],
