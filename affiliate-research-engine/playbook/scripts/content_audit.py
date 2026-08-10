@@ -591,10 +591,12 @@ def write(spec, rows, missing, ids, pc, sa=None, sa_date="不明"):
                  "**やること: 最新本文で週次点検を回し直す。**\n\n")
 
         # 新旧の対応表。**旧指摘ごとに、いまどうなっているか**
-        L.append("### 新旧の対応表\n\n"
+        # **旧指摘のある記事を全部出す。** 隔離された分だけでは対応表にならない
+        with_old = [r for r in rows if sa.get(r["id"])]
+        L.append(f"### 新旧の対応表（旧指摘 {len(with_old)}本すべて）\n\n"
                  "| ID | 旧指摘（" + sa_date + "） | 最新の控えでの再現 "
-                 "| 判定に使ったもの |\n|---|---|---|---|\n")
-        for r in sorted(stale, key=lambda x: x["id"]):
+                 "| 扱い | 判定に使ったもの |\n|---|---|---|---|---|\n")
+        for r in sorted(with_old, key=lambda x: x["id"]):
             old = sa.get(r["id"], "")
             w = r["weekly"] or {}
             hits = [k for k, (v, _, sc_) in w.items() if v == "再現" and sc_]
@@ -602,7 +604,9 @@ def write(spec, rows, missing, ids, pc, sa=None, sa_date="不明"):
             same = [k for k in hits if k[:8] in old]
             verdict = ("**再現**: " + "・".join(same) if same
                        else "**再現せず**")
-            L.append(f"| {r['id']} | {old[:46]} | {verdict} "
+            how = ("採点に反映（生きている指摘）" if same
+                   else "`stale_audit_finding` へ隔離")
+            L.append(f"| {r['id']} | {old[:44]} | {verdict} | {how} "
                      f"| 本文の控え（{dump_stamp()}）＋ "
                      f"quality_rules {len(LOCAL_WEEKLY)}項目 |\n")
 
