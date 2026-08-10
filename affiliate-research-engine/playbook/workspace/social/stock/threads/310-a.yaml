@@ -91,13 +91,13 @@ material:
   core_answer: 無料で試せる期間は、サービスの良し悪しではなく、自分の生活が飲み込めるかを見る時間として使う
   one_check: 1週間で何日、実際に開けたかを数えて、予定した日数と比べる
   unique_artifact: 無料期間中に確認する5項目と、月額ではなく使えた回数で振り返る出し方
-created_at: 2026-08-10T09:50:16+0900
+created_at: 2026-08-10T11:09:46+0900
 history:
-- at: 2026-08-10T09:50:16+0900
+- at: 2026-08-10T11:09:46+0900
   state: generated
-- at: 2026-08-10T09:50:16+0900
+- at: 2026-08-10T11:09:46+0900
   state: gated
-- at: 2026-08-10T09:50:16+0900
+- at: 2026-08-10T11:09:46+0900
   state: awaiting_approval
 prior_history:
 - at: 2026-08-10T09:05:22+0900
@@ -118,6 +118,12 @@ prior_history:
   state: gated
 - at: 2026-08-10T09:08:40+0900
   state: awaiting_approval
+- at: 2026-08-10T09:50:16+0900
+  state: generated
+- at: 2026-08-10T09:50:16+0900
+  state: gated
+- at: 2026-08-10T09:50:16+0900
+  state: awaiting_approval
 post_type: comparison_axis
 post_type_reason: 記事が「無料アプリでできること」と「有料で足されること」を並べ、 無料期間中に見る項目まで出している。軸の作り方を渡す形が合う
 template_ids:
@@ -127,11 +133,17 @@ inferences: []
 threads_format: single
 artifact_used: 無料期間中にメモする4項目
 metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
   views: null
+  likes: null
   replies: null
   reposts: null
-  profile_visits: null
   link_clicks: null
+  profile_visits: null
 metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
 tone_warnings: []
 weighted_len: null

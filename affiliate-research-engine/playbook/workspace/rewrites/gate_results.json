@@ -1,0 +1,203 @@
+{
+ "546": {
+  "price_without_basedate": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "hype_words": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "institutional_without_source": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "missing_caveat": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "personal_plan": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "time_sensitive_fact": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "unverified_self_facts": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "institution_country_gate": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "cta_box_text_gate": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "cta_claim_gate": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "expired_cta_claims": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "experience_claims": {
+   "old": true,
+   "new": true,
+   "detail": "['ネイティブキャンプに体験表現「無料体験」。**unknown（使用したか未確認）** → 運営者に確認する']"
+  },
+  "fact_claims": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  }
+ },
+ "310": {
+  "price_without_basedate": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "hype_words": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "institutional_without_source": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "missing_caveat": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "personal_plan": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "time_sensitive_fact": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "unverified_self_facts": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "institution_country_gate": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "cta_box_text_gate": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "cta_claim_gate": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "expired_cta_claims": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "experience_claims": {
+   "old": true,
+   "new": true,
+   "detail": "['スパトレに体験表現「始めた」。**unknown（使用したか未確認）** → 運営者に確認する']"
+  },
+  "fact_claims": {
+   "old": true,
+   "new": true,
+   "detail": "['TOEIC 600点', 'TOEIC500点']"
+  }
+ },
+ "526": {
+  "price_without_basedate": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "hype_words": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "institutional_without_source": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "missing_caveat": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "personal_plan": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "time_sensitive_fact": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "unverified_self_facts": {
+   "old": true,
+   "new": true,
+   "detail": "[{'category': '第三者から言われた言葉', 'matched': '「早い」と言われ', 'sentence': '「早い」と言われているものの中身が、時間の量のことなのか、上達の速さの"
+  },
+  "institution_country_gate": {
+   "old": true,
+   "new": false,
+   "detail": ""
+  },
+  "cta_box_text_gate": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "cta_claim_gate": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "expired_cta_claims": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "experience_claims": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  },
+  "fact_claims": {
+   "old": false,
+   "new": false,
+   "detail": ""
+  }
+ }
+}

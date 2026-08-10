@@ -21,6 +21,39 @@ meta:
     丸められている値には `approximate: true` を付けた。
     **丸め値を厳密な数として比較に使わない**
 
+# ── 観測から何が言えるか（**効果の証明として扱わない**）──
+interpretation:
+  x_like_rate: >
+    同一アカウントの観測2件では、未完成の本音を含む投稿のいいね率が
+    高かった。ただし投稿時期、固定状態、表示経路、経過時間が異なるため、
+    因果や3倍の効果とは判定しない。市場仮説として保持し、
+    さくら自身の実投稿で検証する。
+  status: 市場仮説
+  verify_with: "さくら自身の実投稿（在庫の metrics 欄）"
+  do_not: >
+    **反応率を効果の証明として使わない。** 条件が一致していない観測値であり、
+    仕様や本文の根拠にしない
+
+# ── 反応率を比べるために保存する項目 ────────────────
+# 条件をそろえないと比べられない。**欄を先に作っておく**
+reaction_fields:
+  required:
+    - posted_at
+    - observed_at
+    - elapsed_hours
+    - pinned
+    - followers_at_observation
+    - views
+    - likes
+    - replies
+    - reposts
+    - link_clicks
+    - profile_visits
+  rule: >
+    **未取得は `未取得` と書く。0を入れない。**
+    posted_at・elapsed_hours・pinned・followers_at_observation が
+    欠けている観測は、率の比較に使わない
+
 references:
   # ── X ──────────────────────────────────────────────
   - url: "https://x.com/NanaoSakurada/status/2043269972705878481"
@@ -31,18 +64,24 @@ references:
       status: 取得済み
       source: "公開X画面を人が確認"
       observed_on: "2026-08-10"
+      posted_at: 未取得
+      observed_at: "2026-08-10"
+      elapsed_hours: 未取得
+      pinned: false
+      followers_at_observation: 未取得
+      comparable: "**不可**（posted_at・elapsed_hours・フォロワー数が未取得）"
       fields:
         views: {value: 350000, approximate: true}
         likes: {value: 24000, approximate: true}
         reposts: {value: 147, approximate: false}
         replies: {value: 176, approximate: false}
+        link_clicks: 未取得
+        profile_visits: 未取得
       ratios:
         likes_per_view: "約6.9%（概数どうしの割り算。目安）"
         replies_per_view: "約0.05%"
       read: >
-        **桁が違う。** 他の2件と同じ土俵で比べない。
-        いいねが伸びた投稿で、返信は views 比では多くない。
-        「応援できる余白」は**共感の量**に効いていて、会話の量ではない
+        **桁が違う。** アカウントも投稿時期も違うので、比較の対象にしない
     observation: >
       短い本音。緊張を開示している。応援できる余白がある。
       説明やノウハウを詰めずに会話を生んでいる
@@ -68,18 +107,25 @@ references:
       status: 取得済み
       source: "公開X画面を人が確認"
       observed_on: "2026-08-10"
+      posted_at: 未取得
+      observed_at: "2026-08-10"
+      elapsed_hours: 未取得
+      pinned: true
+      followers_at_observation: 未取得
+      comparable: "**不可**（固定投稿で表示経路が違い、経過時間も未取得）"
       fields:
         views: {value: 55000, approximate: true}
         likes: {value: 224, approximate: false}
         reposts: {value: 5, approximate: false}
         replies: {value: 2, approximate: false}
+        link_clicks: 未取得
+        profile_visits: 未取得
       ratios:
         likes_per_view: "約0.41%"
         replies_per_view: "約0.004%"
       read: >
         **固定投稿。** プロフィール訪問者の分が加算され続けるので、
-        views を他の投稿と並べない（CLAUDE.md の Threads 固定投稿と同じ扱い）。
-        いいね率は3件でいちばん低い
+        views を他の投稿と並べない（CLAUDE.md の Threads 固定投稿と同じ扱い）
     observation: >
       苦労への理解を先に置く。完成された先生口調ではなく、
       読者と近い距離から話している
@@ -103,19 +149,24 @@ references:
       status: 取得済み
       source: "公開X画面を人が確認"
       observed_on: "2026-08-10"
+      posted_at: 未取得
+      observed_at: "2026-08-10"
+      elapsed_hours: 未取得
+      pinned: false
+      followers_at_observation: 未取得
+      comparable: "**不可**（posted_at・elapsed_hours・フォロワー数が未取得）"
       fields:
         views: {value: 2235, approximate: false}
         likes: {value: 30, approximate: false}
-        reposts: {value: 未取得, approximate: null}
+        reposts: 未取得
         replies: {value: 2, approximate: false}
+        link_clicks: 未取得
+        profile_visits: 未取得
       ratios:
         likes_per_view: "約1.34%"
         replies_per_view: "約0.09%"
       read: >
-        **同じアカウントの固定でない投稿。** 固定（55,000view・0.41%）と
-        比べると、views は 1/25 だが**いいね率は3倍**。
-        「未完成の本音」は、届いた人に対しては強く効いている。
-        reposts は**未取得**（0ではない）
+        **同じアカウントの固定でない投稿。** reposts は**未取得**（0ではない）
     observation: >
       「耐えの時期ですね...」のような未完成の本音。短い段落。
       説明しすぎない余白

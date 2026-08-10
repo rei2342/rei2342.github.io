@@ -67,13 +67,13 @@ material:
   core_answer: まとめ記事の総額はそのまま使えない。自分の条件で3つに分けて出し直す
   one_check: 見ている記事が、どの国・どの期間・語学学校ありなしのどれを前提にしているかを確かめる
   unique_artifact: 必要額を3つの箱に分ける出し方と、ビザの残高証明が目標額とは別だという話
-created_at: 2026-08-10T09:50:16+0900
+created_at: 2026-08-10T11:09:45+0900
 history:
-- at: 2026-08-10T09:50:16+0900
+- at: 2026-08-10T11:09:45+0900
   state: generated
-- at: 2026-08-10T09:50:16+0900
+- at: 2026-08-10T11:09:45+0900
   state: gated
-- at: 2026-08-10T09:50:16+0900
+- at: 2026-08-10T11:09:45+0900
   state: awaiting_approval
 prior_history:
 - at: 2026-08-09T23:04:09+0900
@@ -105,6 +105,12 @@ prior_history:
   state: gated
 - at: 2026-08-10T09:08:38+0900
   state: awaiting_approval
+- at: 2026-08-10T09:50:16+0900
+  state: generated
+- at: 2026-08-10T09:50:16+0900
+  state: gated
+- at: 2026-08-10T09:50:16+0900
+  state: awaiting_approval
 revoked_reason: マーケットイン仕様（2026-08-10）で本文と検査が変わったため、投稿前に承認をやり直す
 post_type: checklist
 post_type_reason: 記事が「3つの箱」と「相談前に書き出す条件」を並べている。 読者が埋める枠を渡す形が合う
@@ -114,11 +120,17 @@ inferences: []
 threads_format: ''
 artifact_used: 必要額を3つの箱に分ける出し方
 metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
   views: null
+  likes: null
   replies: null
   reposts: null
-  profile_visits: null
   link_clicks: null
+  profile_visits: null
 metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
 tone_warnings: []
 weighted_len: 226

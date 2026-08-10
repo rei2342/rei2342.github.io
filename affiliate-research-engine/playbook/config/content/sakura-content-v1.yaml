@@ -128,6 +128,37 @@ voice:
     温度を上げるために、答えへ着くまでの行数を増やさない。
     代弁は1回。そのあとは判断材料へ進む
 
+# ── 表の出し方（2026-08-10 追加）──────────────────────
+tables:
+  no_horizontal_scroll: >
+    **横スクロール前提の表を使わない。** Cocoon の scrollable-table も
+    使わない。スマホで横に振らないと読めない表は、読まれない
+  responsive: >
+    PCでは表、スマホでは**縦型カードか項目別リスト**へ切り替える。
+    同じ内容を2回書かず、1つのHTMLをCSSで切り替える
+  method:
+    html: "各 td に data-label を付ける"
+    css: "テーマの追加CSSへ1回だけ入れる（下の snippet）"
+    snippet: |
+      @media (max-width: 600px) {
+        .sk-card table, .sk-card thead, .sk-card tbody,
+        .sk-card tr, .sk-card th, .sk-card td { display: block; }
+        .sk-card thead { display: none; }
+        .sk-card tr { border: 1px solid #f0d6de; border-radius: 8px;
+                      margin: 0 0 12px; padding: 8px 10px; }
+        .sk-card td { border: none; padding: 4px 0; }
+        .sk-card td::before { content: attr(data-label);
+                              display: block; font-size: .82em;
+                              color: #a06b7d; }
+      }
+  max_columns: 4
+  rule: >
+    列は4つまで。5つ以上要るときは、**表を分ける**か、
+    項目別リストにする。列を増やして横へ伸ばさない
+  human_step: >
+    追加CSSはテーマ側の作業。**人が1回入れる。**
+    入るまでは、記事側は項目別リストで出す
+
 # ── CTA判定 ─────────────────────────────────────────
 cta:
   count_rules:

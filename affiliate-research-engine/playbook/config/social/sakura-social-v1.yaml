@@ -251,8 +251,15 @@ threads:
     artifact_must_differ: true
   # 実投稿のあとに形を比べるための欄。**生成時は空で持つ**
   metrics:
-    fields: [views, replies, reposts, profile_visits, link_clicks]
+    # **条件をそろえないと率で比べられない。** 欄を先に作っておく
+    fields: [posted_at, observed_at, elapsed_hours, pinned,
+             followers_at_observation, views, likes, replies, reposts,
+             link_clicks, profile_visits]
     filled_by: "投稿後に人が入れる。APIで取れるものは取れた分だけ"
+    zero_rule: "**未取得は `未取得`。0を入れない**"
+    compare_rule: >
+      posted_at・elapsed_hours・pinned・followers_at_observation が
+      欠けている観測は、率の比較に使わない
     compare: >
       1投稿型と2投稿型を、同じ欄で並べる。
       比べるのは link_clicks / views と replies / views の2つ。

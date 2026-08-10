@@ -91,13 +91,13 @@ material:
   core_answer: 続かない理由は、話し始めるまでに触る回数が多いこと
   one_check: 前にやめたサービスで、やめた瞬間が授業中だったか予約の前だったかを書き出す
   unique_artifact: 操作の数え方と、料金を1回あたりで出す試算、解約日を先に決める7日の手順
-created_at: 2026-08-10T09:50:16+0900
+created_at: 2026-08-10T11:09:45+0900
 history:
-- at: 2026-08-10T09:50:16+0900
+- at: 2026-08-10T11:09:45+0900
   state: generated
-- at: 2026-08-10T09:50:16+0900
+- at: 2026-08-10T11:09:45+0900
   state: gated
-- at: 2026-08-10T09:50:16+0900
+- at: 2026-08-10T11:09:45+0900
   state: awaiting_approval
 prior_history:
 - at: 2026-08-10T09:05:22+0900
@@ -118,6 +118,12 @@ prior_history:
   state: gated
 - at: 2026-08-10T09:08:38+0900
   state: awaiting_approval
+- at: 2026-08-10T09:50:16+0900
+  state: generated
+- at: 2026-08-10T09:50:16+0900
+  state: gated
+- at: 2026-08-10T09:50:16+0900
+  state: awaiting_approval
 post_type: direct_answer
 post_type_reason: 「続かないのは意志が弱いからか」という1つの問いで来る読者に対して、 記事は「話し始めるまでの手数」という答えを本文の主張として持っている
 template_ids:
@@ -128,11 +134,17 @@ inferences: []
 threads_format: two_part
 artifact_used: 話し始めるまでの操作の数え方
 metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
   views: null
+  likes: null
   replies: null
   reposts: null
-  profile_visits: null
   link_clicks: null
+  profile_visits: null
 metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
 tone_warnings: []
 weighted_len: null

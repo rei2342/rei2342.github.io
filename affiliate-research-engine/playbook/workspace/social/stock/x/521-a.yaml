@@ -67,13 +67,13 @@ material:
   core_answer: 聞き流しを増やす前に、音が拾えていないのか、拾えても設問まで残らないのかを切り分ける
   one_check: 音声を1つ聞いたあと、設問を見ずに内容を1文で言えるかを試す
   unique_artifact: 止まっている場所を切り分ける3つの確認項目と、最初の2週間の組み方
-created_at: 2026-08-10T09:50:15+0900
+created_at: 2026-08-10T11:09:45+0900
 history:
-- at: 2026-08-10T09:50:15+0900
+- at: 2026-08-10T11:09:45+0900
   state: generated
-- at: 2026-08-10T09:50:15+0900
+- at: 2026-08-10T11:09:45+0900
   state: gated
-- at: 2026-08-10T09:50:15+0900
+- at: 2026-08-10T11:09:45+0900
   state: awaiting_approval
 prior_history:
 - at: 2026-08-10T09:05:21+0900
@@ -94,6 +94,12 @@ prior_history:
   state: gated
 - at: 2026-08-10T09:08:35+0900
   state: awaiting_approval
+- at: 2026-08-10T09:50:15+0900
+  state: generated
+- at: 2026-08-10T09:50:15+0900
+  state: gated
+- at: 2026-08-10T09:50:15+0900
+  state: awaiting_approval
 post_type: small_experiment
 post_type_reason: 記事に「音声を1つ聞いて、設問を見ずに内容を1文で言えるか試す」という、 その場で1回できる操作がある。読者が今日試せる形が中心
 template_ids: []
@@ -102,11 +108,17 @@ inferences: []
 threads_format: ''
 artifact_used: 止まっている場所を切り分ける3つの確認項目
 metrics:
+  posted_at: null
+  observed_at: null
+  elapsed_hours: null
+  pinned: null
+  followers_at_observation: null
   views: null
+  likes: null
   replies: null
   reposts: null
-  profile_visits: null
   link_clicks: null
+  profile_visits: null
 metrics_note: 投稿後に人が入れる。APIで取れるものは取れた分だけ
 tone_warnings: []
 weighted_len: 206
