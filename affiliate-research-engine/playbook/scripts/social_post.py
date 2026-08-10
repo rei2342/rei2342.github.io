@@ -10,8 +10,13 @@ social_post.py
   python social_post.py --platform x --stock-id X-546-b --approve
       … **投稿するものを名指しする。** 手で1件だけ試すときはこちら
 
-  python social_post.py --mark-posted TH-521-a --posted-id 1810...
-      … Threads は手で貼ったあと、投稿IDを登録する
+  python social_post.py --platform threads --stock-id THREADS-546-b
+      … Threads に貼る本文を、投稿する順に出す（投稿はしない）
+
+  python social_post.py --mark-posted THREADS-546-b \
+      --posted-url <親投稿のURL> --reply-url <返信のURL>
+      … Threads は手で貼ったあと、貼った先のURLを登録する。
+        2投稿構成なら親と返信の両方が要る
 
 投稿の直前にもう一度ゲートを通す。承認から時間が経って記事が
 変わっていることがあるため。**1回の実行で最大1件。**
@@ -137,7 +142,22 @@ def post_to_x(text):
     return str(c.create_tweet(text=text).data["id"])
 
 
-def mark_posted(spec, sid, posted_id):
+POST_URL = re.compile(r"https?://(?:www\.)?threads\.(?:net|com)/[^\s]+")
+
+
+def post_id_from_url(url):
+    """Threadsの投稿URLの末尾（/post/<コード>）を投稿IDとして使う。"""
+    m = re.search(r"/post/([A-Za-z0-9_\-]+)", url)
+    return m.group(1) if m else ""
+
+
+def mark_posted(spec, sid, posted_id, posted_url="", reply_url=""):
+    """**手で貼ったものを記録する。** 貼った先のURLまで残す。
+
+    2投稿構成のときは、親投稿と返信の両方のURLが要る。
+    どちらか片方だけだと、あとで「返信が本当にぶら下がったか」を
+    誰も確かめられない。
+    """
     hit = [(p, s) for p, s in inv.all_stock(spec) if s["stock_id"] == sid]
     if not hit:
         print(f"見つからない: {sid}")
@@ -146,17 +166,44 @@ def mark_posted(spec, sid, posted_id):
     if s["state"] not in ("approved", "scheduled"):
         print(f"{sid} は {s['state']}。承認済みでないものは記録しない")
         sys.exit(1)
+    n = len(s["thread_parts"])
+    if n > 1 and not (posted_url and reply_url):
+        print(f"{sid} は{n}投稿構成。--posted-url（親）と --reply-url（返信）"
+              f"の両方が要る")
+        sys.exit(1)
+    for label, u in (("親投稿", posted_url), ("返信", reply_url)):
+        if u and not POST_URL.fullmatch(u):
+            print(f"{label}のURLが Threads の投稿URLでない: {u}")
+            sys.exit(1)
+    if posted_url and posted_url == reply_url:
+        print("親投稿と返信のURLが同じ。貼り間違いの可能性がある")
+        sys.exit(1)
+    posted_id = posted_id or post_id_from_url(posted_url)
+    if not posted_id:
+        print("投稿IDが決まらない。--posted-id を渡すか、"
+              "/post/<コード> を含むURLを渡す")
+        sys.exit(1)
+    reply_id = post_id_from_url(reply_url)
+
     if s["state"] == "approved":
         inv.transition(spec, s, "scheduled", scheduled_at=inv.now())
-    inv.transition(spec, s, "posted", posted_at=inv.now(), posted_id=posted_id)
+    inv.transition(spec, s, "posted", posted_at=inv.now(), posted_id=posted_id,
+                   posted_url=posted_url or None, reply_id=reply_id or None,
+                   reply_url=reply_url or None)
     inv.save(spec, s)
     inv.append_history(spec, s["platform"], {
         "stock_id": sid, "article_id": s["article_id"],
-        "posted_id": posted_id, "posted_at": s["posted_at"],
+        "posted_id": posted_id, "posted_url": posted_url,
+        "reply_id": reply_id, "reply_url": reply_url,
+        "posted_at": s["posted_at"],
         "text": s["text"], "content_hash": s["content_hash"],
         "idempotency_key": inv.idempotency_key(s), "result": "ok",
         "how": "手で貼った"})
     print(f"{sid} → posted（{posted_id}）")
+    if posted_url:
+        print(f"  親投稿 {posted_url}")
+    if reply_url:
+        print(f"  返信   {reply_url}")
 
 
 def main():
@@ -168,20 +215,44 @@ def main():
                          "省略すると最古の approved を自動で選ぶ（定期運用用）")
     ap.add_argument("--mark-posted", default="")
     ap.add_argument("--posted-id", default="")
+    ap.add_argument("--posted-url", default="", help="親投稿のURL")
+    ap.add_argument("--reply-url", default="", help="返信（2投稿目）のURL")
     a = ap.parse_args()
     spec = ss.load_spec()
 
     if a.mark_posted:
-        if not a.posted_id:
-            print("--posted-id が要る")
+        if not (a.posted_id or a.posted_url):
+            print("--posted-id か --posted-url のどちらかが要る")
             sys.exit(1)
-        mark_posted(spec, a.mark_posted, a.posted_id)
+        mark_posted(spec, a.mark_posted, a.posted_id, a.posted_url,
+                    a.reply_url)
         return
 
     if a.platform == "threads":
-        print("Threads は投稿用トークンが無い。手で貼ってから "
-              "--mark-posted で登録する。")
-        sys.exit(1)
+        # **投稿はしない（トークンが無い）。** 貼るものをそのまま出す。
+        # ここに出た文字列を、そのままコピーして貼る。
+        # ラベル（【1投稿目】など）は付けない。付けると本文の一部として出る
+        if not a.stock_id:
+            print("Threads は投稿用トークンが無い。手で貼ってから "
+                  "--mark-posted で登録する。\n"
+                  "貼る本文を出すには --stock-id を渡す。")
+            sys.exit(1)
+        s, why = pick_by_id(spec, "threads", a.stock_id)
+        if why:
+            print(f"出せない: {why}")
+            sys.exit(1)
+        for i, part in enumerate(s["thread_parts"], 1):
+            where = "新規投稿" if i == 1 else f"{i - 1}投稿目への返信"
+            urls = sg.URL.findall(part)
+            print(f"───── {i}／{len(s['thread_parts'])}（{where}）"
+                  f" {len(part)}字 URL{len(urls)}個 ─────")
+            print(part)
+        print("──────────────────────────────────────────────")
+        print(f"stock_id: {s['stock_id']} / state: {s['state']}")
+        print("貼り終わったら、親投稿と返信のURLを渡して記録する:\n"
+              f"  python social_post.py --mark-posted {s['stock_id']} \\\n"
+              f"      --posted-url <親投稿のURL> --reply-url <返信のURL>")
+        return
 
     if a.stock_id:
         # **名指し。** 他の在庫は読むだけで、触らない

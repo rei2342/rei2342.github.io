@@ -1,8 +1,10 @@
 # 実投稿テストの計測予定（2026-08-10）
 #
-# **未取得は 0 にしない。`未取得` と書く。**
-# 0 と書くと「見られたが反応が無かった」という意味になり、
-# 取れていないだけの欄と区別できなくなる。
+# **未取得と 0 を分ける。**
+#   未取得 … 画面に出ていない／APIが返さない／その指標が無い。`未取得` と書く
+#   0      … **画面にその欄があり、そこに 0 と表示されている。** 0 と書く
+# 混ぜると「反応が無かった」と「見ていない」が区別できなくなる。
+# 迷ったら `未取得`。0 は、画面で 0 を見たときだけ書く。
 #
 # 見る場所（役割が違うので混ぜない）:
 #   views / likes / replies / reposts / profile_visits → 各SNSの画面
@@ -27,11 +29,16 @@ items:
   - stock_id: THREADS-546-b
     platform: threads
     article_id: 546
+    format: two_part        # 1投稿目は新規、2投稿目は1投稿目への返信
+    url_in_part: 2          # 記事URLは2投稿目だけ
     posted_id: 未取得       # 手で貼ったあとに入れる
-    posted_url: 未取得
+    posted_url: 未取得      # 親投稿
+    reply_url: 未取得       # 返信（2投稿目）
     posted_at: 未取得
     utm_content: threads_546_b
     pinned: false
+    # 親と返信で数字が別々に出る。**足さずに、分けて記録する**
+    per_post: [親投稿, 返信]
     observations:
       - {at: 投稿から24時間後, elapsed_hours: 24, status: 未取得}
       - {at: 投稿から48時間後, elapsed_hours: 48, status: 未取得}

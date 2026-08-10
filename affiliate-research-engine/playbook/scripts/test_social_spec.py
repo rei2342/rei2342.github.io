@@ -639,6 +639,42 @@ for _sid in ("X-546-b", "THREADS-546-b"):
     check(f"{_sid}: 本文と content_hash が合っている",
           inv.content_hash(_st["thread_parts"]) == _st["content_hash"])
 
+# 手貼りのThreadsは、貼る本文と、貼った先のURLの記録（2026-08-10）
+_th = [x for _, x in inv.all_stock(spec) if x["stock_id"] == "THREADS-546-b"][0]
+check("1投稿目に記事URLを入れない", not sg.URL.findall(_th["thread_parts"][0]),
+      " ".join(sg.URL.findall(_th["thread_parts"][0])))
+check("記事URLは2投稿目だけ",
+      len(sg.URL.findall(_th["thread_parts"][1])) == 1)
+_LABEL = re.compile(r"【\s*\d+\s*投稿目\s*】|===")
+check("本文に投稿ラベルが混ざっていない",
+      not [p for p in _th["thread_parts"] if _LABEL.search(p)])
+
+_r2 = subprocess.run(
+    [sys.executable, str(ROOT / "scripts/social_post.py"),
+     "--platform", "threads", "--stock-id", "THREADS-546-b"],
+    capture_output=True, text=True, cwd=str(ROOT))
+check("Threadsは貼る本文を出すだけで投稿しない",
+      _r2.returncode == 0 and "create_tweet" not in _r2.stdout,
+      _r2.stderr[-200:])
+for _i, _p in enumerate(_th["thread_parts"], 1):
+    check(f"貼る本文{_i}が全文出る", _p.strip() in _r2.stdout)
+check("貼る順（新規／返信）が出る",
+      "新規投稿" in _r2.stdout and "への返信" in _r2.stdout)
+check("出力にラベルを混ぜていない", not _LABEL.search(_r2.stdout))
+
+check("Threads投稿URLから投稿IDを取れる",
+      sp.post_id_from_url(
+          "https://www.threads.com/@sakura_eigo30/post/DAbc-1_2") == "DAbc-1_2")
+check("投稿URLでないものは投稿IDにしない",
+      not sp.post_id_from_url("https://www.threads.com/@sakura_eigo30"))
+check("記録に親投稿と返信の両方を受ける",
+      "--reply-url" in _src and "--posted-url" in _src)
+_mp = (ROOT / "scripts/social_post.py").read_text(encoding="utf-8")
+_mp = _mp[_mp.index("def mark_posted("):_mp.index("def main(")]
+check("2投稿構成で片方だけのURLは記録しない", "両方が要る" in _mp)
+check("親と返信が同じURLなら記録しない", "貼り間違い" in _mp)
+check("承認済み以外は手貼りでも記録しない", "承認済みでないものは記録しない" in _mp)
+
 # 定期運用の自動選択は残っている（cron 用）
 _ready = sorted([s for _, s in inv.all_stock(spec, "x")
                  if s["state"] == "approved"],
