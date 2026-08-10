@@ -115,9 +115,22 @@ def wp_count(**params):
 
 
 def wp_auth():
-    """下書き・予約は認証が要る。**パスワードは値として出さない。**"""
+    """下書き・予約は認証が要る。**パスワードは値として出さない。**
+
+    ユーザー名は既存の social_ops.py と同じものを使う。
+    ここだけ別名にしていたせいで、下書き・予約が HTTP 400 で落ちていた。
+    """
     pw = os.environ.get("WP_APP_PASSWORD", "")
-    return ("sakura", pw) if pw else None
+    if not pw:
+        return None
+    user = os.environ.get("WP_USER", "")
+    if not user:
+        try:
+            import social_ops
+            user = social_ops.AUTH[0]
+        except Exception:
+            return None
+    return (user, pw)
 
 
 def articles_block():
@@ -156,15 +169,23 @@ def articles_block():
 
 # ── SNS ──────────────────────────────────────────────
 def posts_yesterday(platform):
-    """在庫の投稿履歴から、昨日出した本数を数える。**実測。0なら0。**"""
-    import social_spec as ss
-    import social_inventory as inv
-    spec = ss.load_spec()
+    """在庫の投稿履歴から、昨日出した本数を数える。**実測。0なら0。**
+
+    履歴は1行1件のJSONなので、在庫の仕様（YAML）を読まずに数える。
+    仕様の読み込みに引きずられて数えられなくなるのを避ける。
+    """
+    p = ROOT / f"workspace/social/history/{platform}.jsonl"
+    if not p.exists():
+        return 0                     # まだ1件も出していない。**実測の0**
     _, _, yday = yesterday_range()
-    rows = [r for r in inv.read_history(spec, platform)
-            if r.get("result") == "ok"
-            and str(r.get("posted_at", "")).startswith(yday)]
-    return len(rows)
+    n = 0
+    for line in p.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        r = json.loads(line)
+        if r.get("result") == "ok" and str(r.get("posted_at", "")).startswith(yday):
+            n += 1
+    return n
 
 
 def threads_user_metrics():

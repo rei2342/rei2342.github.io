@@ -43,7 +43,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests google-auth -q
+        run: pip install requests google-auth pyyaml -q
 
       # トークン切れで止めない。GA4だけでも出るほうがよい
       - name: Threadsの数字を取る
@@ -123,9 +123,14 @@ jobs:
                   affiliate-research-engine/workspace/reports/daily/snapshots/ || true
           git diff --staged --quiet && exit 0
           git commit -m "chore: morning check $(date +%Y-%m-%d)"
+          # **走ったブランチへ戻す。** main 固定にしていたせいで、
+          # 作業ブランチから回したときにブランチ全体が main へ入った
+          # （2026-08-10に実際に起きた）。fetch-depth が1なので、
+          # 浅い履歴を main へリベースすると全ファイルが1コミットになる。
+          BR="${GITHUB_REF_NAME}"
           for i in 1 2 3; do
-            git fetch origin main || true
-            if git rebase -X theirs origin/main && git push origin HEAD:main; then exit 0; fi
+            git fetch origin "$BR" || true
+            if git rebase -X theirs "origin/$BR" && git push origin "HEAD:$BR"; then exit 0; fi
             git rebase --abort || true
             sleep $((i * 5))
           done
