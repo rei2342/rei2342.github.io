@@ -1,0 +1,37 @@
+name: 未公開記事への内部リンクを外す（1本だけ）
+
+# ★公開中の記事から、まだ公開されていない記事への404リンクを外す。
+#   アンカー1つを非リンク表記へ変えるだけ。それ以外の本文は変更しない。
+#   置換前後で他のhrefが完全一致することを検証してからPUTする。
+on:
+  workflow_dispatch:
+    inputs:
+      post_id:
+        description: '対象の記事ID'
+        required: true
+        default: '999'
+      target:
+        description: '外すリンクのURL断片'
+        required: true
+        default: '?p=1001'
+      dry_run:
+        description: 'true なら差分を表示するだけ'
+        required: false
+        default: 'true'
+
+jobs:
+  unlink:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          POST_ID: ${{ inputs.post_id }}
+          TARGET: ${{ inputs.target }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/unlink_pending_internal.py
