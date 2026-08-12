@@ -1,0 +1,42 @@
+name: 予約公開の前日検査（Fact Safety）
+
+# ★22:00 JST 指定の理由（docs/OPERATIONS.md に記録）
+#   予約公開は WordPress 側の cron が 07:00 に実行するので、公開直前をフックできない。
+#   さらに GitHub Actions の schedule は実測で毎回 68〜98分 遅れる（2026-08 実測）。
+#   06:00 指定では 07:00 に間に合わないことがある。締切から離すほうが確実。
+#   22:00 が 23:40 までずれても、公開まで 7時間以上の猶予が残る。
+on:
+  schedule:
+    - cron: '0 13 * * *'      # 13:00 UTC = 22:00 JST
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - name: 翌日07:00公開ぶんを検査（★読むだけ。WordPressは変更しない）
+        env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: python affiliate-research-engine/playbook/scripts/prepublish_fact_safety.py
+      - name: Commit（FAILがあったときだけファイルが増える）
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add affiliate-research-engine/playbook/workspace/reports/prepublish/ || true
+          git diff --staged --quiet && exit 0
+          git commit -m "chore: prepublish fact safety $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin "${{ github.ref_name }}" || true
+            if git rebase -X theirs "origin/${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}"; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
