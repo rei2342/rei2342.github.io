@@ -126,10 +126,19 @@ def check(post):
         add("pr_affiliate_consistency", True,
             f"リンク{'あり' if has_aff else 'なし'}／PR表記{'あり' if has_pr else 'なし'}")
 
-    words = [w for w in re.split(r"[、。「」『』（）\s,.\-—…？！?!]+", title) if len(w) >= 3]
-    hit = sum(1 for w in words if w in text)
-    add("title_body_match", (not words) or hit >= max(1, len(words) // 2),
-        f"タイトル語 {hit}/{len(words)} が本文にある", title[:70])
+    # ★2文字bigramの被覆率で見る。単語で切らない（日本語は分かち書きが要る）。
+    #   2026-08-12、#999「AI発音矯正アプリの選び方｜…」が記号切りで誤検知した。
+    #   誤検知で公開が止まるほうが高くつくので、まるで別物のときだけ捕まえる。
+    tt = re.sub(r"[、。「」『』（）()\s,.\-—…？！?!｜|／/：:；;・]+", "", title)
+    if len(tt) < 4:
+        ok_title = True
+    else:
+        grams = {tt[i:i + 2] for i in range(len(tt) - 1)}
+        body_flat = re.sub(r"\s+", "", text)
+        cov = sum(1 for g in grams if g in body_flat) / len(grams)
+        ok_title = cov >= 0.6
+    add("title_body_match", ok_title,
+        "タイトルと本文がまるで別物でないこと（bigram被覆60%以上）", title[:70])
 
     if ext:
         bad = [(u, c) for u, c in ((u, head_status(u)) for u in ext) if c is None or c >= 400]
