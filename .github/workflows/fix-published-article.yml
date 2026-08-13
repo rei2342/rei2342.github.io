@@ -1,0 +1,32 @@
+name: 公開記事の不整合を直す（404内部リンク / PR表記のズレ）
+
+# ★直すのは2種類だけ。それ以外の本文・タイトル・スラッグ・画像・カテゴリは触らない。
+#   ① 未公開記事へのリンク（404）を外し、文言は非リンクで残す
+#   ② アフィリリンク0本なのに付いているPR表記を外す
+#   置換前後で検証し、1つでも崩れたらPUTしない。
+on:
+  workflow_dispatch:
+    inputs:
+      post_id:
+        description: '対象の記事ID'
+        required: true
+      dry_run:
+        description: 'true なら差分を表示するだけ'
+        required: false
+        default: 'true'
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests -q
+      - env:
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          POST_ID: ${{ inputs.post_id }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python affiliate-research-engine/playbook/scripts/fix_published_article.py
