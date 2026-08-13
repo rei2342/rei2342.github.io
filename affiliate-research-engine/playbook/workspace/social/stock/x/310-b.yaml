@@ -23,7 +23,7 @@ thread_parts:
   初日に書く項目と7日ぶんの記録例を、記事に載せています。
 
   https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=x'
-state: approved
+state: stale
 gate_results:
 - id: article_published
   ok: true
@@ -47,14 +47,17 @@ gate_results:
   ok: true
   detail: ''
 - id: subset_gate
-  ok: true
-  detail: ''
+  ok: false
+  detail: 'unsupported: 無料で試せるサービスなら、使う予定だった日に実際に開（記事に対応する操作が見つからない）'
 - id: duplicate_gate
   ok: true
   detail: ''
 - id: cross_platform_gate
   ok: true
-  detail: XとThreadsの近さ 0.10（0.85未満にする）
+  detail: もう片方がまだ無い
+- id: article_unchanged
+  ok: true
+  detail: ''
 approved_at: 2026-08-10T14:12:45+0900
 rejected_reason: null
 scheduled_at: null
@@ -77,6 +80,8 @@ history:
   state: awaiting_approval
 - at: 2026-08-10T14:12:45+0900
   state: approved
+- at: 2026-08-13T14:18:22+0900
+  state: stale
 prior_history:
 - at: 2026-08-10T13:27:08+0900
   state: generated
