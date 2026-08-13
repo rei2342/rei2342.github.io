@@ -1,24 +1,29 @@
 name: X Poster（承認済み在庫だけを出す）
 
-# **生成しない。** 承認済みの在庫を1日1件だけ投稿する。
-# 2026-08-09に、生成して即投稿する運用を止めた。
-# 文面は scripts/social_generate.py が作り、人が承認するまで出ない。
-# ルールは config/social/sakura-social-v1.yaml が正本。
-
+# ★2026-08-13、定期実行を「必ず投稿0」から戻した。
+#   経緯：8/10 に安全ゲートとして --approve を workflow_dispatch の inputs にした。
+#   ところが schedule イベントでは workflow_dispatch の inputs は常に空なので、
+#   毎日 success で終わりながら**構造上100%投稿0**になっていた（8/08 が最後の投稿）。
+#
+#   直し方：人の --approve を要求するのをやめ、**機械承認（--auto）**にする。
+#   投稿直前のゲート（fact / broken / shape / length / link / article /
+#   unchanged / duplicate / cross_platform / subset / template）を全部通った
+#   在庫を**1日1件だけ**出す。1つでも落ちれば投稿せず stale へ戻す。
+#
+#   ★1日1件から増やさない。★失敗しても再試行しない。★在庫が無ければ何もしない。
+#   ★workspace/social/EMERGENCY_STOP を置けば、何があっても投稿しない。
 on:
   schedule:
     - cron: '30 3 * * *'    # 12:30 JST。1日1枠だけ
   workflow_dispatch:
     inputs:
       approve:
-        description: '実際に投稿する（外すと出す予定を表示するだけ）'
+        description: '人が承認して投稿する（外すと出す予定を表示するだけ）'
         type: boolean
         default: false
       stock_id:
-        description: '投稿する在庫を名指しする（例 X-546-b）。空なら最古の承認済みを自動で選ぶ'
+        description: '投稿する在庫を名指しする（例 X-546-b）。空なら最古の承認済み'
         type: string
-        required: false
-        default: ''
 
 jobs:
   post:
@@ -32,7 +37,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests tweepy pyyaml -q
-      - name: 承認済みを1件だけ出す
+      - name: ゲートを通った在庫を1件だけ出す
         env:
           WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
@@ -41,16 +46,19 @@ jobs:
           X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
           APPROVE: ${{ inputs.approve }}
           STOCK_ID: ${{ inputs.stock_id }}
+          EVENT: ${{ github.event_name }}
         run: |
           cd affiliate-research-engine/playbook
-          # **在庫の指定は引数で渡す。** 定期実行では空なので、
-          # これまでどおり最古の承認済みが選ばれる
           ARGS="--platform x"
           if [ -n "$STOCK_ID" ]; then
             ARGS="$ARGS --stock-id $STOCK_ID"
           fi
           if [ "$APPROVE" = "true" ]; then
+            # 人が明示的に承認したとき（workflow_dispatch）
             ARGS="$ARGS --approve"
+          elif [ "$EVENT" = "schedule" ]; then
+            # ★定期実行は機械承認。ゲートを全部通ったものだけ1件出す
+            ARGS="$ARGS --auto"
           fi
           echo "実行: python scripts/social_post.py $ARGS"
           python scripts/social_post.py $ARGS
@@ -61,8 +69,10 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add affiliate-research-engine/playbook/workspace/social/ || true
           git diff --staged --quiet && exit 0
-          git commit -m "chore: social post state $(date -u +%Y-%m-%dT%H:%MZ)"
-          # **走ったブランチへ戻す。** 在庫は作業ブランチにしか無いので、
-          # main へ押し込むとブランチ全体が main に入ってしまう
-          git pull --rebase origin "$GITHUB_REF_NAME" || true
-          git push origin "HEAD:$GITHUB_REF_NAME" || true
+          git commit -m "chore: x post $(date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git fetch origin "${{ github.ref_name }}" || true
+            if git rebase -X theirs "origin/${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}"; then exit 0; fi
+            git rebase --abort || true
+            sleep $((i * 5))
+          done
