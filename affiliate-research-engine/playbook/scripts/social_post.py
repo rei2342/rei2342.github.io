@@ -226,7 +226,15 @@ def mark_posted(spec, sid, posted_id, posted_url="", reply_url=""):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--platform", choices=["x", "threads"], default="x")
-    ap.add_argument("--approve", action="store_true")
+    ap.add_argument("--approve", action="store_true",
+                    help="人が承認して投稿する（workflow_dispatch 用）")
+    # ★2026-08-13 追加。定期実行を「必ず投稿0」から戻すための機械承認。
+    #   --approve は workflow_dispatch の inputs でしか渡せず、schedule では常に空。
+    #   そのため 8/10 以降、定期実行は構造上100%投稿0だった。
+    #   --auto はゲートを全部通ったものだけを1件投稿する。
+    #   ゲートが1つでも落ちれば投稿しない（stale へ戻す）。
+    ap.add_argument("--auto", action="store_true",
+                    help="ゲートを全部通った在庫を1件だけ自動投稿する（schedule 用）")
     ap.add_argument("--stock-id", default="",
                     help="投稿する在庫を名指しする（手動テスト用）。"
                          "省略すると最古の approved を自動で選ぶ（定期運用用）")
@@ -236,6 +244,14 @@ def main():
     ap.add_argument("--reply-url", default="", help="返信（2投稿目）のURL")
     a = ap.parse_args()
     spec = ss.load_spec()
+
+    # ★緊急停止。このファイルがあれば、何があっても投稿しない。
+    #   人が1ファイル置くだけで全自動投稿を止められるようにしておく。
+    stop = ROOT / "workspace" / "social" / "EMERGENCY_STOP"
+    if stop.exists() and (a.approve or a.auto):
+        print(f"EMERGENCY_STOP があるので投稿しない: {stop}")
+        print(stop.read_text(encoding="utf-8")[:300] if stop.stat().st_size else "")
+        return
 
     if a.mark_posted:
         if not (a.posted_id or a.posted_url):
@@ -295,8 +311,9 @@ def main():
 
     # 承認から時間が経っている。記事が変わっていないかもう一度見る
     import social_generate as gen
-    art = gen.fetch_article(s["article_id"]) if a.approve else None
-    if a.approve:
+    will_post = a.approve or a.auto
+    art = gen.fetch_article(s["article_id"]) if will_post else None
+    if will_post:
         if not art:
             print("\n記事を取得できない。中止する。")
             sys.exit(1)
@@ -313,9 +330,13 @@ def main():
             print("\n投稿直前のゲートで落ちた。stale へ戻す。\n" + sg.fmt(res))
             sys.exit(1)
 
-    if not a.approve:
-        print("\n--approve が無いので、ここで終わり。**投稿していない。**")
+    if not will_post:
+        print("\n--approve も --auto も無いので、ここで終わり。**投稿していない。**")
         return
+    if a.auto and not a.approve:
+        # ★ここまで来たということは、投稿直前のゲートを全部通っている。
+        #   人の承認の代わりに、機械承認で1件だけ出す。
+        print("\n[auto] 投稿直前のゲートを全て通過。機械承認で1件だけ投稿する。")
 
     # ── 送る直前の表示と、その本文の固定 ─────────────────
     shown_hash = show_before_post(s, a.platform, spec)
