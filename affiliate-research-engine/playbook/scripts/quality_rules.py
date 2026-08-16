@@ -117,9 +117,15 @@ FACTS_CSV = _workspace("experience_facts.csv")
 
 # 記事に出てくるサービス名。台帳のキーと揃える
 SERVICE_NAMES = (
-    "speek", "スパトレ", "DMM英会話", "ネイティブキャンプ留学", "ネイティブキャンプ",
+    # 2026-08-16に本番の設置実績へ合わせた。**長い名前を先に置く。**
+    # 「ネイティブキャンプ留学」より先に「ネイティブキャンプ」が
+    # 当たると、留学案件の台帳を引けなくなる
+    "RIZAP ENGLISH", "Bizmates Coaching", "Bizmates",
+    "ベストティーチャー", "SakuraMobile", "Notta Memo", "Notta",
+    "ネイティブキャンプ留学", "ネイティブキャンプ",
     "QQ English", "レアジョブ英会話", "スタディサプリ", "スタサプ",
-    "Notta Memo", "Notta", "U-GAKU", "留学情報館", "フィリピン留学ナビ", "CEBRIDGE",
+    "speek", "スパトレ", "DMM英会話", "U-GAKU", "留学情報館",
+    "フィリピン留学ナビ", "CEBRIDGE",
 )
 
 

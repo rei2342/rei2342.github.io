@@ -25,133 +25,85 @@ else:
     TARGET_IDS = _DEFAULT_IDS
 
 # ── Affiliate links ──────────────────────────────────────────────────
+# ── Affiliate links ──────────────────────────────────────────────────
+# **A8の実HTML（2026-08-16に本番57記事へ入っているもの）。**
+# href と img src は必ず同じ a8mat を使う。片方だけ差し替えると成果が付かない。
+# rel は A8 の発行コードに入っていないので、こちらで必ず付ける。
+#
+# アンカー文言に「無料」「保証」「回数」などの訴求語を書けるのは、
+# **workspace/cta_claims.csv に verified な行がある案件だけ。**
+# 台帳に無い案件は中立の文言にしてある（cta_claim_gate が落とすため）。
 LINKS = {
-    "speek": (
-        "speek",
-        '<a href="//af.moshimo.com/af/c/click?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056&url=https%3A%2F%2Fwww.speek.jp%2F"'
-        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ speek公式サイトで発音矯正スクールの内容を確認する</a>'
-        '<img src="//i.moshimo.com/af/i/impression?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056"'
-        ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
+    "nativecamp": (
+        "ネイティブキャンプ",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28DJG2+35VG+6LWTE" rel="sponsored nofollow noopener" target="_blank">→ ネイティブキャンプの7日間無料体験を試す</a><img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4B9W9D+28DJG2+35VG+6LWTE" alt="" loading="lazy">',
     ),
-    "phil_navi": (
-        "5640986",
-        '<a href="//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992"'
-        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ フィリピン留学ナビ公式サイトで留学プランと相談の申し込み方法を見る</a>'
-        '<img src="//i.moshimo.com/af/i/impression?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992"'
-        ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
+    "nativecamp_unlimited": (
+        "ネイティブキャンプ",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28DJG2+35VG+64JTE" rel="sponsored nofollow noopener" target="_blank">→ ネイティブキャンプ（予約不要・レッスン回数無制限）の無料体験を試す</a><img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4B9W9D+28DJG2+35VG+64JTE" alt="" loading="lazy">',
     ),
-    "ugaku": (
-        "5640988",
-        '<a href="//af.moshimo.com/af/c/click?a_id=5640988&p_id=4449&pc_id=11553&pl_id=59973&url=https%3A%2F%2Fu-gaku.jp%2F%3Futm_source%3Dmoshimo%26utm_medium%3Daffiliate%26utm_campaign%3Dimg01"'
-        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ 国内英語留学U-GAKUの無料カウンセリングを申し込む</a>'
-        '<img src="//i.moshimo.com/af/i/impression?a_id=5640988&p_id=4449&pc_id=11553&pl_id=59973"'
-        ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
+    "best_teacher": (
+        "ベストティーチャー",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4BA75B+5L8J8Y+2ZIK+6HES2" rel="sponsored nofollow noopener" target="_blank">→ ベストティーチャー公式サイトで「書いてから話す」進め方を確認する</a><img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BA75B+5L8J8Y+2ZIK+6HES2" alt="" loading="lazy">',
     ),
-    "johokan": (
-        "5640990",
-        '<a href="//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F%2Fwww.ryugaku-johokan.com%2Findex_mr.php%3Futm_source%3Dmoshimo%26utm_medium%3Daffiliate%26utm_campaign%3Dcounseling"'
-        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ 留学情報館の無料カウンセリングを申し込む</a>'
-        '<img src="//i.moshimo.com/af/i/impression?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884"'
-        ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
+    "sakura_mobile": (
+        "SakuraMobile",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4BA75B+7118VM+3Z3Y+C0IZM" rel="sponsored nofollow noopener" target="_blank">→ SakuraMobile 海外WiFi公式サイトで料金と対応国を確認する</a><img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BA75B+7118VM+3Z3Y+C0IZM" alt="" loading="lazy">',
     ),
-    "cebridge": (
-        "5640987",
-        '<a href="//af.moshimo.com/af/c/click?a_id=5640987&p_id=4201&pc_id=10658&pl_id=57293&url=https%3A%2F%2Fcebridge.jp%2F"'
-        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ CEBRIDGEでフィリピン留学の無料カウンセリングを申し込む</a>'
-        '<img src="//i.moshimo.com/af/i/impression?a_id=5640987&p_id=4201&pc_id=10658&pl_id=57293"'
-        ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
+    "rizap_english": (
+        "RIZAP ENGLISH",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4BA75B+6OJ56A+CW6+BR2ER6" rel="sponsored nofollow noopener" target="_blank">→ RIZAP ENGLISH公式サイトでカウンセリングの内容を確認する</a><img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BA75B+6OJ56A+CW6+BR2ER6" alt="" loading="lazy">',
     ),
-    "sptr": (
-        "5640981",
-        '<a href="//af.moshimo.com/af/c/click?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559&url=https%3A%2F%2Fsptr.jp"'
-        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ スパトレ（第二言語習得論ベースの英語トレーニング）の7日間無料体験を見る</a>'
-        '<img src="//i.moshimo.com/af/i/impression?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559"'
-        ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
-    ),
-    "dmm": (
-        "5640982",
-        '<a href="//af.moshimo.com/af/c/click?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962"'
-        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
-        '→ DMM英会話の無料体験レッスンを試す</a>'
-        '<img src="//i.moshimo.com/af/i/impression?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962"'
-        ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
+    "bizmates_coaching": (
+        "Bizmates Coaching",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4BA75B+4TULF6+2QEI+NTJWY" rel="sponsored nofollow noopener" target="_blank">→ Bizmates Coaching公式サイトでビジネス特化の進め方を確認する</a><img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BA75B+4TULF6+2QEI+NTJWY" alt="" loading="lazy">',
     ),
     "nativecamp_ryugaku": (
-        "a8_s00000014758002",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE" rel="sponsored nofollow noopener">→ ネイティブキャンプ留学で留学費用の無料見積もりを取る</a><img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=4B9W9D+27S3UA+35VG+BWVTE" alt="" loading="lazy">'
+        "ネイティブキャンプ留学",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE" rel="sponsored nofollow noopener" target="_blank">→ ネイティブキャンプ留学で留学費用の無料見積もりを取る</a><img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=4B9W9D+27S3UA+35VG+BWVTE" alt="" loading="lazy">',
+    ),
+    "nativecamp_ryugaku_price": (
+        "ネイティブキャンプ留学",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BX3J6" rel="sponsored nofollow noopener" target="_blank">→ ネイティブキャンプ留学公式サイトで費用の内訳を確認する</a><img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4B9W9D+27S3UA+35VG+BX3J6" alt="" loading="lazy">',
     ),
     "qq_english": (
-        "a8_s00000020929001",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2IHWQA+4HHM+60H7M" rel="sponsored nofollow noopener">→ QQ English公式サイトでレッスンの内容と料金を確認する</a><img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=4B9W9D+2IHWQA+4HHM+60H7M" alt="" loading="lazy">'
-    ),
-    "nativecamp": (
-        "a8_s00000014758001",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28DJG2+35VG+64JTE" rel="sponsored nofollow noopener">→ ネイティブキャンプ（予約不要・レッスン回数無制限）の無料トライアルを試す</a><img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4B9W9D+28DJG2+35VG+64JTE" alt="" loading="lazy">'
-    ),
-    "rarejob": (
-        "a8_s00000008409001",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" rel="sponsored nofollow noopener">→ レアジョブ英会話の7日間無料体験を試す</a><img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" alt="" loading="lazy">'
-    ),
-    "sapuri_nichijo": (
-        "a8_s00000015388006",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" rel="sponsored nofollow noopener">→ スタディサプリENGLISH 新日常英会話コースの初回無料体験を試す</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" alt="" loading="lazy">'
-    ),
-    "sapuri_setplan": (
-        "a8_s00000015388008",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" rel="sponsored nofollow noopener">→ スタディサプリENGLISH 新日常英会話セットプラン（アプリ＋英会話）の初回無料体験を試す</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" alt="" loading="lazy">'
-    ),
-    # Notta（A8）: EPC50以上・CTR5%以上。英語学習そのものではないが、
-    # さくらは営業事務で英語の会議・電話に詰まる、という既存の軸がある。
-    # 「聞き取れなかったところを後から文字起こしで確認する」用途でだけ出す。
-    # 学習法・留学の記事に混ぜない（後付けの紹介になるため）。
-    # Notta Memo（A8）: EPC26.59。ハード製品でさくらは持っていないので、
-    # 「使った」とは絶対に書かない。「同僚に勧められて調べた」までにする。
-    # 録音して聞き直す話のときだけ出す（recording トピック）。
-    "notta_memo": (
-        "BWVTE",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9YLD+2HB1IQ+5988+BWVTE" rel="sponsored nofollow noopener">'
-        '→ 会議を録って後から聞き直す（Notta Memo・AIボイスレコーダー）</a>'
-        '<img border="0" width="1" height="1" style="border:none" alt="" loading="lazy"'
-        ' src="https://www14.a8.net/0.gif?a8mat=4B9YLD+2HB1IQ+5988+BWVTE">'
+        "QQ English",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2IHWQA+4HHM+669JM" rel="sponsored nofollow noopener" target="_blank">→ QQ English公式サイトでレッスンの内容と料金を確認する</a><img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=4B9W9D+2IHWQA+4HHM+669JM" alt="" loading="lazy">',
     ),
     "notta": (
-        "5ZEMQ",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ" rel="sponsored nofollow noopener">'
-        '→ 英語の会議を文字起こしして後から確認する（Notta公式サイト）</a>'
-        '<img border="0" width="1" height="1" style="border:none" alt="" loading="lazy"'
-        ' src="https://www19.a8.net/0.gif?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ">'
+        "Notta",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ" rel="sponsored nofollow noopener" target="_blank">→ Notta公式サイトで文字起こしの機能と料金を確認する</a><img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ" alt="" loading="lazy">',
+    ),
+    "rarejob": (
+        "レアジョブ英会話",
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" rel="sponsored nofollow noopener" target="_blank">→ レアジョブ英会話の7日間無料体験を試す</a><img border="0" width="1" height="1" src="https://www14.a8.net/0.gif?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" alt="" loading="lazy">',
     ),
 }
 
 # ── Topic → max 2 programs, priority order ────────────────────────────────────
+# ── トピック → 案件（2026-08-16に本番の設置実績へ合わせた）──────
+# **報酬額で決めない。** 決め方は3段:
+#   1. 記事の結論と地続きか      ← 第一条件
+#   2. 無料の入口があるか
+#   3. 同点なら報酬額と確定率
+# RIZAP ENGLISH は高単価だが EPC も確定率も未取得なので、
+# コーチング系の記事から広げない（ASP_RECORD_UNVERIFIED 扱い）。
 TOPIC_MAP = {
-    # NC留学はセブのスクールを取り扱う（公式リリースで確認済み）ため主力に
-    "philippines":    ["nativecamp_ryugaku", "phil_navi"],
-    "workingholiday": ["nativecamp_ryugaku", "johokan"],
-    "study_abroad":   ["nativecamp_ryugaku", "johokan"],
-    "agent":          ["nativecamp_ryugaku", "johokan"],
-    "coaching":       ["speek", "sptr"],
-    "toeic":          ["speek", "sptr"],
-    "pronunciation":  ["speek", "sptr"],
-    "training":       ["sptr", "sapuri_nichijo"],    # スパトレ(第二言語習得論)＋スタサプ(アプリ学習)
-    "eikaiwa":        ["qq_english", "nativecamp"],  # QQ(確定率97.45%)＋NC(初成果ボーナス対象)
-    "domestic":       ["ugaku"],
-    # 職場で英語に詰まる場面。Nottaは学習サービスではないので、
-    # 学習法・留学のトピックには入れない（後付けの紹介になる）
-    "work_english":   ["notta", "qq_english"],
-    # 録音して聞き直す話。ハードとソフトの2択を並べる
-    "recording":      ["notta_memo", "notta"],
-    "default":        ["speek", "dmm"],              # 汎用は高単価speek＋DMMを露出
-    # 控え（LINKSには登録済み。実績を見て入れ替える）:
-    #   rarejob        … 確定率39%と低いため主力から外す。本人OK/セルフバック可なので原体験づくり用
-    #   sapuri_setplan … sapuri_nichijo と役割が重複するため控え
+    "coaching":       ["rizap_english", "bizmates_coaching"],
+    "work_english":   ["bizmates_coaching", "notta"],
+    "eikaiwa":        ["nativecamp_unlimited"],
+    "training":       ["best_teacher", "nativecamp"],
+    "pronunciation":  ["best_teacher", "nativecamp"],
+    "toeic":          ["rarejob", "nativecamp"],
+    "agent":          ["nativecamp_ryugaku_price"],
+    "study_abroad":   ["nativecamp_ryugaku_price"],
+    "philippines":    ["qq_english", "sakura_mobile"],
+    "workingholiday": ["sakura_mobile", "nativecamp_ryugaku"],
+    "domestic":       ["nativecamp_ryugaku_price"],
+    "recording":      ["notta", "bizmates_coaching"],
+    "default":        ["nativecamp", "best_teacher"],
 }
+
 
 def classify(title):
     t = title
