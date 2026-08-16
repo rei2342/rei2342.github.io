@@ -38,6 +38,10 @@ OUT = Path("affiliate-research-engine/playbook/workspace/categories")
 # 47本を4カテゴリに寄せると「海外留学・ワーホリ」だけ21本になり偏る。
 # 留学系を3つに割ると 13/11/7/6/5/4 と均等になり、
 # カテゴリと主力案件が1対1で対応する（ネイティブキャンプ留学＝留学3種）。
+# **記事は必ず8つのどれかに入れる。** 未対応のトピックを None のまま
+# 返すと Uncategorized に溜まる。2026-08-16に20本の誤分類が見つかったので、
+# 全トピックへ行き先を用意した。正本は
+# config/content/sakura-content-v1.yaml の categories。
 TOPIC_CATEGORY = {
     "philippines":    "フィリピン・セブ留学",
     "workingholiday": "海外留学・ワーホリ",
@@ -45,10 +49,14 @@ TOPIC_CATEGORY = {
     "agent":          "留学エージェント・費用",
     "domestic":       "留学エージェント・費用",
     "coaching":       "英語コーチング",
-    "toeic":          "英語学習法",
+    # TOEICは専用のカテゴリがある。学習法へ入れない（2026-08-16に分離）
+    "toeic":          "TOEIC・スコア",
     "pronunciation":  "英語学習法",
     "training":       "英語学習法",
     "eikaiwa":        "英会話サービス比較",
+    # 会議・録音は職場の場面。学習サービスの比較ではないので英会話へ入れない
+    "work_english":   "AI英語学習",
+    "recording":      "AI英語学習",
     "default":        "英語学習法",
 }
 

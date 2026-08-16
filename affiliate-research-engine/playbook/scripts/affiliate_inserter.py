@@ -29,7 +29,7 @@ LINKS = {
     "speek": (
         "speek",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056&url=https%3A%2F%2Fwww.speek.jp%2F"'
-        ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
+        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
         '→ speek公式サイトで発音矯正スクールの内容を確認する</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640991&p_id=4940&pc_id=13178&pl_id=65056"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
@@ -37,7 +37,7 @@ LINKS = {
     "phil_navi": (
         "5640986",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992"'
-        ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
+        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
         '→ フィリピン留学ナビ公式サイトで留学プランと相談の申し込み方法を見る</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640986&p_id=6385&pc_id=18040&pl_id=81992"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
@@ -45,7 +45,7 @@ LINKS = {
     "ugaku": (
         "5640988",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640988&p_id=4449&pc_id=11553&pl_id=59973&url=https%3A%2F%2Fu-gaku.jp%2F%3Futm_source%3Dmoshimo%26utm_medium%3Daffiliate%26utm_campaign%3Dimg01"'
-        ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
+        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
         '→ 国内英語留学U-GAKUの無料カウンセリングを申し込む</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640988&p_id=4449&pc_id=11553&pl_id=59973"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
@@ -53,7 +53,7 @@ LINKS = {
     "johokan": (
         "5640990",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884&url=https%3A%2F%2Fwww.ryugaku-johokan.com%2Findex_mr.php%3Futm_source%3Dmoshimo%26utm_medium%3Daffiliate%26utm_campaign%3Dcounseling"'
-        ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
+        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
         '→ 留学情報館の無料カウンセリングを申し込む</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640990&p_id=4347&pc_id=11168&pl_id=58884"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
@@ -61,7 +61,7 @@ LINKS = {
     "cebridge": (
         "5640987",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640987&p_id=4201&pc_id=10658&pl_id=57293&url=https%3A%2F%2Fcebridge.jp%2F"'
-        ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
+        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
         '→ CEBRIDGEでフィリピン留学の無料カウンセリングを申し込む</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640987&p_id=4201&pc_id=10658&pl_id=57293"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
@@ -69,7 +69,7 @@ LINKS = {
     "sptr": (
         "5640981",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559&url=https%3A%2F%2Fsptr.jp"'
-        ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
+        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
         '→ スパトレ（第二言語習得論ベースの英語トレーニング）の7日間無料体験を見る</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640981&p_id=2409&pc_id=5246&pl_id=31559"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
@@ -77,34 +77,34 @@ LINKS = {
     "dmm": (
         "5640982",
         '<a href="//af.moshimo.com/af/c/click?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962"'
-        ' rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
+        ' rel="sponsored nofollow noopener" referrerpolicy="no-referrer-when-downgrade" attributionsrc>'
         '→ DMM英会話の無料体験レッスンを試す</a>'
         '<img src="//i.moshimo.com/af/i/impression?a_id=5640982&p_id=6652&pc_id=18969&pl_id=84962"'
         ' width="1" height="1" style="border:none;" alt="" loading="lazy">'
     ),
     "nativecamp_ryugaku": (
         "a8_s00000014758002",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE" rel="nofollow">→ ネイティブキャンプ留学で留学費用の無料見積もりを取る</a><img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=4B9W9D+27S3UA+35VG+BWVTE" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+27S3UA+35VG+BWVTE" rel="sponsored nofollow noopener">→ ネイティブキャンプ留学で留学費用の無料見積もりを取る</a><img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=4B9W9D+27S3UA+35VG+BWVTE" alt="" loading="lazy">'
     ),
     "qq_english": (
         "a8_s00000020929001",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2IHWQA+4HHM+60H7M" rel="nofollow">→ QQ English公式サイトでレッスンの内容と料金を確認する</a><img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=4B9W9D+2IHWQA+4HHM+60H7M" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2IHWQA+4HHM+60H7M" rel="sponsored nofollow noopener">→ QQ English公式サイトでレッスンの内容と料金を確認する</a><img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=4B9W9D+2IHWQA+4HHM+60H7M" alt="" loading="lazy">'
     ),
     "nativecamp": (
         "a8_s00000014758001",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28DJG2+35VG+64JTE" rel="nofollow">→ ネイティブキャンプ（予約不要・レッスン回数無制限）の無料トライアルを試す</a><img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4B9W9D+28DJG2+35VG+64JTE" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28DJG2+35VG+64JTE" rel="sponsored nofollow noopener">→ ネイティブキャンプ（予約不要・レッスン回数無制限）の無料トライアルを試す</a><img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4B9W9D+28DJG2+35VG+64JTE" alt="" loading="lazy">'
     ),
     "rarejob": (
         "a8_s00000008409001",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" rel="nofollow">→ レアジョブ英会話の7日間無料体験を試す</a><img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" rel="sponsored nofollow noopener">→ レアジョブ英会話の7日間無料体験を試す</a><img border="0" width="1" height="1" src="https://www19.a8.net/0.gif?a8mat=4B9W9D+1LR2GI+1SVU+686ZM" alt="" loading="lazy">'
     ),
     "sapuri_nichijo": (
         "a8_s00000015388006",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" rel="nofollow">→ スタディサプリENGLISH 新日常英会話コースの初回無料体験を試す</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" rel="sponsored nofollow noopener">→ スタディサプリENGLISH 新日常英会話コースの初回無料体験を試す</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+2OG8S2+3AQG+ZS5GI" alt="" loading="lazy">'
     ),
     "sapuri_setplan": (
         "a8_s00000015388008",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" rel="nofollow">→ スタディサプリENGLISH 新日常英会話セットプラン（アプリ＋英会話）の初回無料体験を試す</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" alt="" loading="lazy">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" rel="sponsored nofollow noopener">→ スタディサプリENGLISH 新日常英会話セットプラン（アプリ＋英会話）の初回無料体験を試す</a><img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4B9W9D+28YZ1U+3AQG+1BTJB6" alt="" loading="lazy">'
     ),
     # Notta（A8）: EPC50以上・CTR5%以上。英語学習そのものではないが、
     # さくらは営業事務で英語の会議・電話に詰まる、という既存の軸がある。
@@ -115,14 +115,14 @@ LINKS = {
     # 録音して聞き直す話のときだけ出す（recording トピック）。
     "notta_memo": (
         "BWVTE",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9YLD+2HB1IQ+5988+BWVTE" rel="nofollow">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9YLD+2HB1IQ+5988+BWVTE" rel="sponsored nofollow noopener">'
         '→ 会議を録って後から聞き直す（Notta Memo・AIボイスレコーダー）</a>'
         '<img border="0" width="1" height="1" style="border:none" alt="" loading="lazy"'
         ' src="https://www14.a8.net/0.gif?a8mat=4B9YLD+2HB1IQ+5988+BWVTE">'
     ),
     "notta": (
         "5ZEMQ",
-        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ" rel="nofollow">'
+        '<a href="https://px.a8.net/svt/ejp?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ" rel="sponsored nofollow noopener">'
         '→ 英語の会議を文字起こしして後から確認する（Notta公式サイト）</a>'
         '<img border="0" width="1" height="1" style="border:none" alt="" loading="lazy"'
         ' src="https://www19.a8.net/0.gif?a8mat=4B9YLD+EAFAQ+5988+5ZEMQ">'
@@ -248,7 +248,10 @@ def strip_box(content):
 #     案件ごとに確認しているのに、箱の見出しが一括で「無料」と言ってしまう
 # 新しい見出しは行動も訴求も主張しない。**リンク先が公式であることだけ**を言う。
 CTA_HEADING = "▶ 公式サイトで内容と料金を確認する"
-CTA_NOTE = ("料金・キャンペーンは改定されます。申し込む前に、"
+# **PR表記は消さない。** 景品表示法のステマ規制。
+# 消費者庁の指針では冒頭が望ましく、末尾のみは次善策になる。
+# 文面の正本は config/content/sakura-content-v1.yaml の affiliate_link.pr_notice
+CTA_NOTE = ("料金・キャンペーンは改定されるため、申し込む前に"
             "各公式サイトの最新表示を確認してください。")
 
 def build_cta(topic):
