@@ -47,8 +47,13 @@ for k in ("title", "meta_description", "keyword_strategy", "categories",
 t = spec["title"]
 check("KWをタイトルに入れることが必須", t["keyword_required"] is True)
 check("KWの位置が冒頭20文字以内", "20" in t["keyword_position"])
-check("タイトルの長さが32〜40字",
-      (t["length"]["min"], t["length"]["max"]) == (32, 40), str(t["length"]))
+check("タイトルの長さが28〜40字（2026-08-16夜の決定）",
+      (t["length"]["min"], t["length"]["max"]) == (28, 40), str(t["length"]))
+check("止める条件と通す条件を分けている",
+      set(t["gate"]) == {"stop", "warn"}, str(sorted(t.get("gate", {}))))
+check("長さは警告であって門ではない",
+      any("28〜40" in w for w in t["gate"]["warn"]))
+check("KW未渡しは門", any("KWが渡っていない" in s for s in t["gate"]["stop"]))
 check("旧タイトル型を明示的に置き換えている",
       "使わない" in t["supersedes"] and "2026-08-01" in t["supersedes"])
 
@@ -66,7 +71,7 @@ check("KWを渡さない古い呼び出しが残っていない",
 
 # ── 3. タイトル規則が正本とプロンプトで一致 ────────────
 check("プロンプトに「冒頭20文字以内」がある", "冒頭20文字以内" in wf)
-check("プロンプトに「全角32〜40文字」がある", "32〜40" in wf)
+check("プロンプトに「全角28〜40文字」がある", "28〜40" in wf)
 check("プロンプトが疑問形を優先している", "疑問形" in wf)
 check("プロンプトが旧型（30〜45字の一人称+数字型）を捨てている",
       "30〜45字の短い一人称+数字型" not in wf.replace(
@@ -101,6 +106,50 @@ if wp_step:
     check("規則違反で exit していない",
           "sys.exit" not in body[idx_check:idx_post])
 
+# ── 4-2. メタ ────────────────────────────────────────
+md = spec["meta_description"]
+check("メタの長さが110〜130字",
+      (md["length"]["min"], md["length"]["max"]) == (110, 130), str(md["length"]))
+check("メタの反映先が Rank Math", "rankmath" in md["write_to"]["endpoint"])
+check("反映を確認して1回だけ再送する、と書いてある",
+      "1回だけ" in md["write_to"]["verify"])
+check("プロンプトが110〜130を指示している", "110〜130" in wf)
+
+import rankmath_meta as rm
+_ok = ("英語コーチングは意味ないと感じる原因は4つに分かれます。料金が高いかどうかでは"
+       "なく、どこで手が止まっているかで見直す場所が変わります。高額なプランを払う前に、"
+       "自分がどの型に当てはまるかを確認して、次に見る場所を決められます。")
+check("正しいメタは通る", not rm.check(_ok, "英語コーチング 意味ない"),
+      str(rm.check(_ok, "英語コーチング 意味ない")))
+check("短いメタは落ちる", bool(rm.check("英語コーチングは意味ないのか。", "英語コーチング")))
+check("「〜について解説します」は落ちる",
+      any("解説" in b for b in rm.check("あ"*100 + "英語について詳しく解説します。", "")))
+check("煽りは落ちる", any("煽り" in b for b in rm.check("あ"*100 + "必見の内容です。", "")))
+check("名詞止めは落ちる",
+      any("体言止め" in b for b in rm.check("あ"*100 + "確認する4つのポイント", "")))
+check("述語で終わるものは体言止め扱いしない",
+      not any("体言止め" in b for b in rm.check("あ"*100 + "次に見る場所が分かる", "")))
+check("送る前に必ず検査する（--write が無ければ送らない）",
+      "--write が無いので送っていない" in
+      (ROOT / "scripts/rankmath_meta.py").read_text(encoding="utf-8"))
+check("メタ以外を送っていない",
+      '"content"' not in (ROOT / "scripts/rankmath_meta.py").read_text(encoding="utf-8")
+      and '"slug"' not in (ROOT / "scripts/rankmath_meta.py").read_text(encoding="utf-8"))
+
+# ── 4-3. 内部リンク（孤立記事を作らない）──────────────
+il = spec["internal_links"]
+check("主軸が8本", len(il["hubs"]) == 8, str([h["id"] for h in il["hubs"]]))
+check("997（AI英語学習）が主軸に入っている",
+      997 in [h["id"] for h in il["hubs"]])
+check("公開時に主軸→子記事のリンクを必須にしている",
+      any("主軸記事 →" in r for r in il["on_publish_required"]))
+check("ハブブロックはアフィリンクより後ろ",
+      "後ろ" in il["hub_block"]["position"])
+check("プロンプトが主軸へのリンクを指示している",
+      "主軸" in wf and "hub_link" in wf)
+check("孤立0がベースラインとして記録されている",
+      il["baseline_2026_08_16"]["orphans"] == 0)
+
 # ── 5. アフィリエイトリンク ────────────────────────────
 ai = (ROOT / "scripts/affiliate_inserter.py").read_text(encoding="utf-8")
 rels = set(re.findall(r'rel="([^"]*)"', ai))
@@ -113,7 +162,24 @@ check("PR表記が消えていない",
 check("料金改定の注意が入っている", "改定される" in ai)
 check("1記事あたりの上限が2件", spec["affiliate_link"]["max_per_article"] == 2)
 
+# 実HTMLの整合。**href と img src の a8mat が一致していること**
+import re as _re
 import affiliate_inserter as af
+for key, (name, htm) in af.LINKS.items():
+    mats = _re.findall(r"a8mat=([A-Z0-9+]+)", htm)
+    check(f"{key}: href と img の a8mat が同じ",
+          len(mats) == 2 and mats[0] == mats[1], str(mats))
+    check(f"{key}: rel が付いている", 'rel="sponsored nofollow noopener"' in htm)
+    check(f"{key}: target=_blank", 'target="_blank"' in htm)
+
+# **台帳で裏が取れていない訴求語をアンカーへ書いていない**
+import quality_rules as _q
+for topic in af.TOPIC_MAP:
+    cta, progs = af.build_cta(topic)
+    ng = _q.cta_claim_gate(cta)
+    check(f"CTA台帳: {topic}", not ng,
+          ng[0]["reason"] if ng else "")
+
 for topic, progs in af.TOPIC_MAP.items():
     check(f"トピック {topic}: 案件が2件以内", len(progs) <= 2, str(progs))
 
