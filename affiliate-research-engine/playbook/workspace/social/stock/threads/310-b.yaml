@@ -57,7 +57,7 @@ thread_parts:
   7日ぶん並べると、予定と実際のずれが見えてきます。
 
   https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=threads'
-state: approved
+state: stale
 gate_results:
 - id: article_published
   ok: true
@@ -111,6 +111,8 @@ history:
   state: awaiting_approval
 - at: 2026-08-10T14:06:21+0900
   state: approved
+- at: 2026-08-16T22:04:16+0900
+  state: stale
 prior_history:
 - at: 2026-08-10T13:27:08+0900
   state: generated
@@ -166,3 +168,61 @@ claim_counts:
   needs_human_review: 0
   total: 9
 needs_human_review: []
+stale_reason: article_modified_after_generation
+staled_at: 2026-08-16T22:04:16+0900
+superseded_text: '無料で試せるサービスでも、機能を比べ続けると選びにくくなることがあります。
+
+
+  そんなときは「高機能か」より「自分の生活の中で無理なく開けたか」を先に見てみると分かりやすいです。
+
+
+  1日につき、この5行だけ書き出します。
+
+
+  ・使う予定だった日
+
+  ・実際に開けた日
+
+  ・準備時間
+
+  ・アプリ使用時間
+
+  ・発話時間
+
+
+  これとは別に、初日のうちに「無料で試せる期間の最終日」と「次回の請求日」を見てカレンダーへ入れておくと安心です📝
+
+
+  7日ぶん並べると、予定と実際のずれが見えてきます。
+
+  https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=threads'
+superseded_thread_parts:
+- '無料で試せるサービスでも、機能を比べ続けると選びにくくなることがあります。
+
+
+  そんなときは「高機能か」より「自分の生活の中で無理なく開けたか」を先に見てみると分かりやすいです。
+
+
+  1日につき、この5行だけ書き出します。
+
+
+  ・使う予定だった日
+
+  ・実際に開けた日
+
+  ・準備時間
+
+  ・アプリ使用時間
+
+  ・発話時間
+
+
+  これとは別に、初日のうちに「無料で試せる期間の最終日」と「次回の請求日」を見てカレンダーへ入れておくと安心です📝
+
+
+  7日ぶん並べると、予定と実際のずれが見えてきます。
+
+  https://sakura-eigo.com/cheap-english-learning-apps-free/?utm_source=threads'
+generated_at: 2026-08-10T14:04:58+0900
+article_modified_gmt_at_generation: '2026-08-10T02:51:19'
+article_modified_gmt_now: '2026-08-16T12:43:11'

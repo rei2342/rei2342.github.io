@@ -47,7 +47,7 @@ thread_parts:
   3つのうち、いちばん自信がないのはどれですか？
 
   https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=threads-521-c'
-state: awaiting_approval
+state: stale
 gate_results:
 - id: article_published
   ok: true
@@ -102,6 +102,8 @@ history:
 - at: 2026-08-10T16:54:29+0900
   state: awaiting_approval
   note: 'URL差し替え: 投稿単位で識別できる形式へ統一（utm_content=stock_id小文字）'
+- at: 2026-08-16T22:04:14+0900
+  state: stale
 post_type: small_experiment
 post_type_reason: 記事に「音声を1つ聞いて、設問を見ずに内容を1文で言えるか試す」という、 その場で1回できる操作がある。読者が今日試せる形が中心
 template_ids:
@@ -139,3 +141,51 @@ prior_links:
   new_url: https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=threads-521-c
   old_content_hash: 464d5105192ca599
   reason: 投稿単位で識別できる形式へ統一（utm_content=stock_id小文字）
+stale_reason: article_modified_after_generation
+staled_at: 2026-08-16T22:04:14+0900
+superseded_text: 'TOEICのリスニングは、教材の数より、どこで止まっているかで次が変わります。
+
+
+  音が拾えていないのか、拾えても設問まで残らないのか。今日1回、音声を1つだけ設問を見ずに聞いて、内容を1文で言えるか試してみると分かりやすいです。
+
+
+  TOEICのリスニングが伸びないときは、まず3つの角度から確かめられます。
+
+
+  ・流し終わったあとに内容を1文で言えるか
+
+  ・意味が一拍遅れる感覚があるか
+
+  ・自分の音を録って、お手本と比べられるか
+
+
+  言えるのに設問で迷うなら、音そのものとは別の場所も見る余地があります。記録するものを再生時間から「言えた回数」に変えておくと、あとで見返しやすくなります🌿
+
+
+  3つのうち、いちばん自信がないのはどれですか？
+
+  https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=threads-521-c'
+superseded_thread_parts:
+- 'TOEICのリスニングは、教材の数より、どこで止まっているかで次が変わります。
+
+
+  音が拾えていないのか、拾えても設問まで残らないのか。今日1回、音声を1つだけ設問を見ずに聞いて、内容を1文で言えるか試してみると分かりやすいです。'
+- 'TOEICのリスニングが伸びないときは、まず3つの角度から確かめられます。
+
+
+  ・流し終わったあとに内容を1文で言えるか
+
+  ・意味が一拍遅れる感覚があるか
+
+  ・自分の音を録って、お手本と比べられるか
+
+
+  言えるのに設問で迷うなら、音そのものとは別の場所も見る余地があります。記録するものを再生時間から「言えた回数」に変えておくと、あとで見返しやすくなります🌿
+
+
+  3つのうち、いちばん自信がないのはどれですか？
+
+  https://sakura-eigo.com/toeic-listening-325-to-improvement/?utm_source=threads&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=threads-521-c'
+generated_at: 2026-08-10T16:08:13+0900
+article_modified_gmt_at_generation: '2026-08-10T07:04:19'
+article_modified_gmt_now: '2026-08-16T12:23:41'

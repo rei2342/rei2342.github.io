@@ -47,7 +47,7 @@ thread_parts:
   数字を置けなかった欄が、次に確認するところです🌿
 
   https://sakura-eigo.com/%e3%80%8c%e3%83%af%e3%83%bc%e3%83%9b%e3%83%aa-%e8%b2%af%e9%87%91-%e3%81%84%e3%81%8f%e3%82%89%e5%bf%85%e8%a6%81%e3%80%8d%e3%81%a7%e5%87%ba%e3%81%9f200%e4%b8%87%e3%81%ab%e6%80%af%e3%81%88%e3%81%a6/?utm_source=threads&utm_medium=social&utm_campaign=social_pilot_20260810&utm_content=threads-23-c'
-state: awaiting_approval
+state: rejected
 gate_results:
 - id: article_published
   ok: true
@@ -80,7 +80,7 @@ gate_results:
   ok: true
   detail: XとThreadsの近さ 0.09（0.85未満にする）
 approved_at: null
-rejected_reason: null
+rejected_reason: 記事23はワーホリ主軸(305)の子記事。SNSに出す優先度が低い（2026-08-16の判断）
 scheduled_at: null
 posted_at: null
 posted_id: null
@@ -102,6 +102,8 @@ history:
 - at: 2026-08-10T16:54:28+0900
   state: awaiting_approval
   note: 'URL差し替え: 投稿単位で識別できる形式へ統一（utm_content=stock_id小文字）'
+- at: 2026-08-16T22:04:14+0900
+  state: rejected
 post_type: checklist
 post_type_reason: 記事が「3つの箱」と「相談前に書き出す条件」を並べている。 読者が埋める枠を渡す形が合う
 template_ids: []
