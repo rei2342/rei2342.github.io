@@ -434,6 +434,32 @@ def has_secret(snap):
     return hits
 
 
+def _count_measured(snap):
+    """実測できた項目の数。**上書きしてよいかの判断に使う。**"""
+    return sum(1 for b in ("articles", "sns", "revenue")
+               for m in _flat((snap or {}).get(b, {}))
+               if m.get("status") == "measured")
+
+
+def _read_existing():
+    """いま置いてあるスナップショットのうち、**いちばん測れている版**を返す。
+
+    置き場は2つある。片方だけ劣化していることがあるので、
+    最初に見つかったほうで判断すると見落とす（実際に見落とした）。
+    """
+    best = None
+    for p in OUT_PATHS:
+        if not p.exists():
+            continue
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if best is None or _count_measured(d) > _count_measured(best):
+            best = d
+    return best
+
+
 def is_stale(snap, at=None):
     """**古いsnapshotを今日の値として使わせない。**
 
@@ -474,6 +500,24 @@ def main():
     if leaked:
         print(f"秘密が混ざっている。**書かない**: {leaked[:3]}")
         return 1
+
+    # **測れなかった実行で、測れた記録を消さない。**
+    # 開発コンテナからは sakura-eigo.com へ出られないので、ここで実行すると
+    # WordPress の項目が全部 unavailable になる。それをそのまま書くと、
+    # Actions が取った実測値（published_total: 53 など）が消える。
+    # 2026-08-10 と 08-16 に実際に2回消してしまった。
+    n_new = _count_measured(snap)
+    old = _read_existing()
+    if old is not None and not os.environ.get("SNAPSHOT_FORCE"):
+        n_old = _count_measured(old)
+        if n_new < n_old:
+            print(f"**書かない。** 今回 measured {n_new}件 / いまのファイル "
+                  f"{n_old}件。測れた記録のほうが多いので上書きしない\n"
+                  f"  いまのファイル: {old.get('generated_at')}\n"
+                  f"  取れなかった理由: "
+                  f"{(snap['collection_errors'] or [{}])[0].get('reason', '')[:80]}\n"
+                  f"  上書きするなら SNAPSHOT_FORCE=1 を付ける")
+            return 0        # **失敗ではない。** 本体の処理を止めない
     body = json.dumps(snap, ensure_ascii=False, indent=1) + "\n"
     for p in OUT_PATHS:
         try:

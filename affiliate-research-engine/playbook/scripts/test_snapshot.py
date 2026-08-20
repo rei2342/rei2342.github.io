@@ -186,6 +186,42 @@ _a = json.loads(sn.OUT_PATHS[0].read_text(encoding="utf-8"))
 _b = json.loads(sn.OUT_PATHS[1].read_text(encoding="utf-8"))
 check("2つの置き場で中身が同じ", _a == _b)
 
+# ── 測れなかった実行が、測れた記録を消さない ─────────
+# 開発コンテナからは sakura-eigo.com へ出られないので、ここで実行すると
+# WordPress の項目が全部 unavailable になる。それを書いて、Actions が
+# 取った実測値を消してしまった（2026-08-10 と 08-16 に2回）
+_rich = {"articles": {"published_total": sn.metric(53, "measured", "wordpress"),
+                      "drafts": sn.metric(0, "measured", "wordpress")},
+         "sns": {}, "revenue": {}}
+_poor = {"articles": {"published_total": sn.unavailable("wordpress", "繋がらない"),
+                      "drafts": sn.unavailable("wordpress", "繋がらない")},
+         "sns": {}, "revenue": {}}
+check("測れた数を数えられる",
+      sn._count_measured(_rich) == 2 and sn._count_measured(_poor) == 0,
+      f"{sn._count_measured(_rich)} / {sn._count_measured(_poor)}")
+
+import json as _json
+_bk = [(p2, p2.read_text(encoding="utf-8")) for p2 in sn.OUT_PATHS if p2.exists()]
+try:
+    # **片方だけ測れている状態**を作る。最初に見つかったほうで判断すると
+    # 見落とす（実際に見落として、ガードが素通りした）
+    _rich_full = dict(_json.loads(_bk[0][1]))
+    _rich_full["articles"] = dict(_rich_full["articles"])
+    _rich_full["articles"]["published_total"] = sn.metric(53, "measured", "wordpress")
+    sn.OUT_PATHS[-1].write_text(_json.dumps(_rich_full, ensure_ascii=False), encoding="utf-8")
+    _best = sn._read_existing()
+    check("置き場が2つあっても、いちばん測れている版を見る",
+          sn._count_measured(_best) >= sn._count_measured(_json.loads(_bk[0][1])))
+finally:
+    for p2, body in _bk:
+        p2.write_text(body, encoding="utf-8")
+
+_src_sn = (ROOT / "scripts/snapshot_sakura.py").read_text(encoding="utf-8")
+check("測れた記録より少ないときは書かない", "測れた記録のほうが多いので上書きしない" in _src_sn)
+check("書かなくても失敗にしない（本体を止めない）",
+      "**失敗ではない。** 本体の処理を止めない" in _src_sn)
+check("意図的に上書きする逃げ道がある", "SNAPSHOT_FORCE" in _src_sn)
+
 print()
 if fails:
     print(f"失敗 {len(fails)}件")
