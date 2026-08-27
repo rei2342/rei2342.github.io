@@ -2,7 +2,7 @@
  "schema_version": "site-daily-snapshot/1",
  "site": "sakura",
  "site_name": "sakura-eigo.com",
- "generated_at": "2026-08-26T12:50:30+09:00",
+ "generated_at": "2026-08-27T22:40:08+09:00",
  "stale_after_hours": 24,
  "value_status": {
   "measured": "実測できた。0 は「測って0だった」",
@@ -11,38 +11,38 @@
  },
  "articles": {
   "published_total": {
-   "value": 63,
+   "value": 68,
    "status": "measured",
    "source": "wordpress",
-   "observed_at": "2026-08-26T12:50:26+09:00",
+   "observed_at": "2026-08-27T22:40:05+09:00",
    "note": ""
   },
   "published_yesterday": {
+   "value": 1,
+   "status": "measured",
+   "source": "wordpress",
+   "observed_at": "2026-08-27T22:40:05+09:00",
+   "note": "2026-08-26（JST）に公開されたもの"
+  },
+  "updated_yesterday": {
    "value": 0,
    "status": "measured",
    "source": "wordpress",
-   "observed_at": "2026-08-26T12:50:27+09:00",
-   "note": "2026-08-25（JST）に公開されたもの"
-  },
-  "updated_yesterday": {
-   "value": 2,
-   "status": "measured",
-   "source": "wordpress",
-   "observed_at": "2026-08-26T12:50:28+09:00",
-   "note": "2026-08-25（JST）に更新されたもの"
+   "observed_at": "2026-08-27T22:40:06+09:00",
+   "note": "2026-08-26（JST）に更新されたもの"
   },
   "drafts": {
    "value": 3,
    "status": "measured",
    "source": "wordpress",
-   "observed_at": "2026-08-26T12:50:29+09:00",
+   "observed_at": "2026-08-27T22:40:07+09:00",
    "note": ""
   },
   "scheduled": {
    "value": 0,
    "status": "measured",
    "source": "wordpress",
-   "observed_at": "2026-08-26T12:50:30+09:00",
+   "observed_at": "2026-08-27T22:40:07+09:00",
    "note": ""
   }
  },
@@ -52,35 +52,35 @@
     "value": 0,
     "status": "measured",
     "source": "social_inventory",
-    "observed_at": "2026-08-26T12:50:30+09:00",
+    "observed_at": "2026-08-27T22:40:07+09:00",
     "note": "在庫の投稿履歴から実測"
    },
    "followers": {
     "value": null,
     "status": "unavailable",
     "source": "x_api",
-    "observed_at": "2026-08-26T12:50:30+09:00",
+    "observed_at": "2026-08-27T22:40:07+09:00",
     "note": "読み取り用のAPIを持っていない（投稿用トークンのみ）"
    },
    "views": {
     "value": null,
     "status": "unavailable",
     "source": "x_api",
-    "observed_at": "2026-08-26T12:50:30+09:00",
+    "observed_at": "2026-08-27T22:40:07+09:00",
     "note": "読み取り用のAPIを持っていない。画面からの手入力待ち"
    },
    "profile_visits": {
     "value": null,
     "status": "unavailable",
     "source": "x_api",
-    "observed_at": "2026-08-26T12:50:30+09:00",
+    "observed_at": "2026-08-27T22:40:07+09:00",
     "note": "同上"
    },
    "link_clicks": {
     "value": null,
     "status": "unavailable",
     "source": "x_api",
-    "observed_at": "2026-08-26T12:50:30+09:00",
+    "observed_at": "2026-08-27T22:40:07+09:00",
     "note": "同上"
    }
   },
@@ -89,35 +89,35 @@
     "value": 0,
     "status": "measured",
     "source": "social_inventory",
-    "observed_at": "2026-08-26T12:50:30+09:00",
+    "observed_at": "2026-08-27T22:40:08+09:00",
     "note": "在庫の投稿履歴から実測"
    },
    "followers": {
     "value": 25,
     "status": "measured",
     "source": "threads_api",
-    "observed_at": "2026-08-26T12:50:30+09:00",
+    "observed_at": "2026-08-27T22:40:08+09:00",
     "note": ""
    },
    "views": {
-    "value": 0,
-    "status": "measured",
+    "value": null,
+    "status": "measuring",
     "source": "threads_insights",
-    "observed_at": "2026-08-26T12:50:30+09:00",
-    "note": "昨日出した投稿の表示数の合計"
+    "observed_at": "2026-08-27T22:40:08+09:00",
+    "note": "2026-08-26 に出した投稿が無い"
    },
    "profile_visits": {
     "value": null,
     "status": "unavailable",
     "source": "threads_api",
-    "observed_at": "2026-08-26T12:50:30+09:00",
+    "observed_at": "2026-08-27T22:40:08+09:00",
     "note": "アカウント単位のプロフィール表示は未取得。画面からの手入力待ち"
    },
    "link_clicks": {
     "value": null,
     "status": "unavailable",
     "source": "threads_api",
-    "observed_at": "2026-08-26T12:50:30+09:00",
+    "observed_at": "2026-08-27T22:40:08+09:00",
     "note": "Threads APIにリンククリックの指標が無い。GA4側で見る"
    }
   }
@@ -127,42 +127,42 @@
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-26T12:50:30+09:00",
+   "observed_at": "2026-08-27T22:40:08+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   },
   "affiliate_clicks": {
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-26T12:50:30+09:00",
+   "observed_at": "2026-08-27T22:40:08+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   },
   "conversions_pending": {
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-26T12:50:30+09:00",
+   "observed_at": "2026-08-27T22:40:08+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   },
   "conversions_confirmed": {
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-26T12:50:30+09:00",
+   "observed_at": "2026-08-27T22:40:08+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   },
   "revenue_pending": {
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-26T12:50:30+09:00",
+   "observed_at": "2026-08-27T22:40:08+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   },
   "revenue_confirmed": {
    "value": null,
    "status": "unavailable",
    "source": "asp_manual",
-   "observed_at": "2026-08-26T12:50:30+09:00",
+   "observed_at": "2026-08-27T22:40:08+09:00",
    "note": "ASP管理画面へのログイン取得はしない方針（規約とBAN回避）。手入力の台帳もまだ無い"
   }
  },
