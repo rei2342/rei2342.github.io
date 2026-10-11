@@ -1,27 +1,26 @@
-# GA4 アクセス 2026-10-10
+# GA4 アクセス 2026-10-11
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **60** / ユーザー **53** / ページビュー **73**
+- セッション **57** / ユーザー **51** / ページビュー **70**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 36 | 34 |
+| (direct) | (none) | 34 | 32 |
 | google | organic | 8 | 8 |
 | bing | organic | 6 | 5 |
 | yahoo | organic | 4 | 2 |
 | adv-console.a8.net | referral | 2 | 2 |
 | duckduckgo | organic | 2 | 2 |
-| threads | social | 1 | 0 |
 | x | profile | 1 | 0 |
 
 ## 着地ページ × 流入元
 
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
-| / | (direct) | 6 |
+| / | (direct) | 5 |
 | /put-on-core-image/ | yahoo | 3 |
 | / | adv-console.a8.net | 2 |
 | /canada-working-holiday-cost/ | (direct) | 2 |
@@ -33,7 +32,6 @@
 | /ryugaku-soudan-shitsumon-10/ | (direct) | 2 |
 | /study-abroad-insurance-1year-cost/ | duckduckgo | 2 |
 | / | google | 1 |
-| / | threads | 1 |
 | /adult-study-abroad-cost-real/ | (direct) | 1 |
 | /articles/ | google | 1 |
 | /canada-working-holiday-cost/ | google | 1 |
@@ -50,7 +48,6 @@
 | /english-coaching-worth-it/ | (direct) | 1 |
 | /english-conversation-daily-effectiveness/ | (direct) | 1 |
 | /english-self-study-adult-method/ | (direct) | 1 |
-| /get-over-core-image/ | (direct) | 1 |
 | /hold-core-image/ | (direct) | 1 |
 | /kyoshitsu-vs-online/ | (direct) | 1 |
 | /online-english-lessons-90-days-success/ | (direct) | 1 |
@@ -70,14 +67,13 @@
 
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
-| / | threads | 1 |
 | /ryugaku-soudan-shitsumon-10/ | x | 1 |
 
 ## ページ別 上位20
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
-| 10 | 10 | 1.1分 | / |
+| 8 | 8 | 1.4分 | / |
 | 8 | 4 | 0.6分 | /core-image-english-words/ |
 | 5 | 4 | 1.2分 | /ryugaku-soudan-shitsumon-10/ |
 | 4 | 2 | 4.0分 | /hatsuon-review-price/ |
