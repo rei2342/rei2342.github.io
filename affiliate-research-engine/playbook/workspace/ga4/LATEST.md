@@ -1,15 +1,15 @@
-# GA4 アクセス 2026-10-11
+# GA4 アクセス 2026-10-12
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **57** / ユーザー **51** / ページビュー **70**
+- セッション **54** / ユーザー **48** / ページビュー **66**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 34 | 32 |
-| google | organic | 8 | 8 |
+| (direct) | (none) | 32 | 30 |
+| google | organic | 7 | 7 |
 | bing | organic | 6 | 5 |
 | yahoo | organic | 4 | 2 |
 | adv-console.a8.net | referral | 2 | 2 |
@@ -20,30 +20,30 @@
 
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
-| / | (direct) | 5 |
+| / | (direct) | 6 |
 | /put-on-core-image/ | yahoo | 3 |
 | / | adv-console.a8.net | 2 |
 | /canada-working-holiday-cost/ | (direct) | 2 |
-| /cebu-island-one-month-study-abroad/ | (direct) | 2 |
-| /core-image-english-words/ | google | 2 |
 | /hatsuon-review-price/ | (direct) | 2 |
 | /keep-core-image/ | bing | 2 |
 | /run-core-image/ | bing | 2 |
-| /ryugaku-soudan-shitsumon-10/ | (direct) | 2 |
 | /study-abroad-insurance-1year-cost/ | duckduckgo | 2 |
 | / | google | 1 |
 | /adult-study-abroad-cost-real/ | (direct) | 1 |
+| /ai-eikaiwa-vs-online-eikaiwa/ | (direct) | 1 |
 | /articles/ | google | 1 |
 | /canada-working-holiday-cost/ | google | 1 |
 | /category/ai-english/ | google | 1 |
 | /category/core-image/ | (direct) | 1 |
 | /cebu-beginner-mistakes-design/ | (direct) | 1 |
+| /cebu-island-one-month-study-abroad/ | (direct) | 1 |
 | /come-core-image/ | (direct) | 1 |
 | /core-image-english-words/ | (direct) | 1 |
+| /core-image-english-words/ | google | 1 |
 | /core-image-english-words/ | yahoo | 1 |
 | /eikaiwa-not-continuing-solution/ | (direct) | 1 |
+| /eiken-adult-second-exam-schedule/ | (direct) | 1 |
 | /english-coaching-12-questions/ | (direct) | 1 |
-| /english-coaching-after-graduation/ | (direct) | 1 |
 | /english-coaching-price-comparison/ | (direct) | 1 |
 | /english-coaching-worth-it/ | (direct) | 1 |
 | /english-conversation-daily-effectiveness/ | (direct) | 1 |
@@ -58,7 +58,6 @@
 | /ryugaku-soudan-shitsumon-10/ | x | 1 |
 | /second-language-acquisition-theory-gap/ | (direct) | 1 |
 | /spring-core-image/ | bing | 1 |
-| /study-abroad-agent-comparison/ | (direct) | 1 |
 | /study-abroad-decision-deadline/ | google | 1 |
 | /working-holiday-savings-amount/ | bing | 1 |
 | /プライバシーポリシー/ | (direct) | 1 |
@@ -73,24 +72,24 @@
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
-| 8 | 8 | 1.4分 | / |
-| 8 | 4 | 0.6分 | /core-image-english-words/ |
-| 5 | 4 | 1.2分 | /ryugaku-soudan-shitsumon-10/ |
+| 9 | 9 | 1.2分 | / |
+| 7 | 3 | 0.9分 | /core-image-english-words/ |
 | 4 | 2 | 4.0分 | /hatsuon-review-price/ |
 | 3 | 3 | 3.5分 | /canada-working-holiday-cost/ |
 | 3 | 2 | 0.1分 | /category/core-image/ |
 | 3 | 3 | 0.0分 | /put-on-core-image/ |
 | 2 | 1 | 0.1分 | /category/core-image/page/2/ |
-| 2 | 2 | 0.0分 | /cebu-island-one-month-study-abroad/ |
 | 2 | 2 | 1.0分 | /keep-core-image/ |
 | 2 | 2 | 0.0分 | /run-core-image/ |
+| 2 | 2 | 0.0分 | /ryugaku-soudan-shitsumon-10/ |
 | 2 | 1 | 0.1分 | /spring-core-image/ |
 | 2 | 2 | 0.9分 | /study-abroad-insurance-1year-cost/ |
 | 1 | 1 | 0.0分 | /adult-study-abroad-cost-real/ |
+| 1 | 1 | 0.0分 | /ai-eikaiwa-vs-online-eikaiwa/ |
 | 1 | 1 | 0.0分 | /articles/ |
 | 1 | 1 | 0.0分 | /category/ai-english/ |
 | 1 | 1 | 0.0分 | /cebu-beginner-mistakes-design/ |
+| 1 | 1 | 0.0分 | /cebu-island-one-month-study-abroad/ |
 | 1 | 1 | 0.0分 | /come-core-image/ |
 | 1 | 1 | 0.0分 | /eikaiwa-not-continuing-solution/ |
-| 1 | 1 | 0.0分 | /english-coaching-12-questions/ |
 
