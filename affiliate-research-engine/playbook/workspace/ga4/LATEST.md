@@ -1,19 +1,18 @@
-# GA4 アクセス 2026-10-13
+# GA4 アクセス 2026-10-14
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **52** / ユーザー **46** / ページビュー **64**
+- セッション **50** / ユーザー **44** / ページビュー **62**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 30 | 28 |
+| (direct) | (none) | 29 | 27 |
 | google | organic | 7 | 7 |
 | bing | organic | 5 | 4 |
 | yahoo | organic | 4 | 2 |
 | duckduckgo | organic | 2 | 2 |
-| adv-console.a8.net | referral | 1 | 1 |
 | iconlet.com | referral | 1 | 1 |
 | oskope.com | referral | 1 | 1 |
 | x | profile | 1 | 0 |
@@ -28,19 +27,18 @@
 | /hatsuon-review-price/ | (direct) | 2 |
 | /run-core-image/ | bing | 2 |
 | /study-abroad-insurance-1year-cost/ | duckduckgo | 2 |
-| / | adv-console.a8.net | 1 |
 | / | google | 1 |
 | / | iconlet.com | 1 |
 | / | oskope.com | 1 |
 | /adult-study-abroad-cost-real/ | (direct) | 1 |
 | /ai-eikaiwa-vs-online-eikaiwa/ | (direct) | 1 |
 | /articles/ | google | 1 |
+| /business-english-study-method/ | (direct) | 1 |
 | /canada-working-holiday-cost/ | google | 1 |
 | /category/ai-english/ | google | 1 |
 | /category/core-image/ | (direct) | 1 |
 | /cebu-beginner-mistakes-design/ | (direct) | 1 |
 | /cebu-island-one-month-study-abroad/ | (direct) | 1 |
-| /come-core-image/ | (direct) | 1 |
 | /core-image-english-words/ | (direct) | 1 |
 | /core-image-english-words/ | google | 1 |
 | /core-image-english-words/ | yahoo | 1 |
@@ -53,7 +51,6 @@
 | /english-self-study-adult-method/ | (direct) | 1 |
 | /hold-core-image/ | (direct) | 1 |
 | /keep-core-image/ | bing | 1 |
-| /kyoshitsu-vs-online/ | (direct) | 1 |
 | /overseas-move-30s-not-late/ | (direct) | 1 |
 | /pronunciation-school-comparison/ | (direct) | 1 |
 | /ryugaku-soudan-shitsumon-10/ | google | 1 |
@@ -75,7 +72,7 @@
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
-| 10 | 10 | 1.1分 | / |
+| 9 | 9 | 1.2分 | / |
 | 7 | 3 | 0.9分 | /core-image-english-words/ |
 | 4 | 2 | 4.0分 | /hatsuon-review-price/ |
 | 3 | 3 | 3.5分 | /canada-working-holiday-cost/ |
@@ -89,10 +86,10 @@
 | 1 | 1 | 0.0分 | /adult-study-abroad-cost-real/ |
 | 1 | 1 | 0.0分 | /ai-eikaiwa-vs-online-eikaiwa/ |
 | 1 | 1 | 0.0分 | /articles/ |
+| 1 | 1 | 0.0分 | /business-english-study-method/ |
 | 1 | 1 | 0.0分 | /category/ai-english/ |
 | 1 | 1 | 0.0分 | /cebu-beginner-mistakes-design/ |
 | 1 | 1 | 0.0分 | /cebu-island-one-month-study-abroad/ |
-| 1 | 1 | 0.0分 | /come-core-image/ |
 | 1 | 1 | 0.0分 | /eikaiwa-not-continuing-solution/ |
 | 1 | 1 | 0.1分 | /eiken-adult-second-exam-schedule/ |
 
