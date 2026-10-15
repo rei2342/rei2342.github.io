@@ -1,14 +1,14 @@
-# GA4 アクセス 2026-10-14
+# GA4 アクセス 2026-10-15
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **50** / ユーザー **44** / ページビュー **62**
+- セッション **47** / ユーザー **42** / ページビュー **57**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 29 | 27 |
+| (direct) | (none) | 26 | 25 |
 | google | organic | 7 | 7 |
 | bing | organic | 5 | 4 |
 | yahoo | organic | 4 | 2 |
@@ -21,10 +21,9 @@
 
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
-| / | (direct) | 6 |
+| / | (direct) | 5 |
 | /put-on-core-image/ | yahoo | 3 |
 | /canada-working-holiday-cost/ | (direct) | 2 |
-| /hatsuon-review-price/ | (direct) | 2 |
 | /run-core-image/ | bing | 2 |
 | /study-abroad-insurance-1year-cost/ | duckduckgo | 2 |
 | / | google | 1 |
@@ -37,7 +36,6 @@
 | /canada-working-holiday-cost/ | google | 1 |
 | /category/ai-english/ | google | 1 |
 | /category/core-image/ | (direct) | 1 |
-| /cebu-beginner-mistakes-design/ | (direct) | 1 |
 | /cebu-island-one-month-study-abroad/ | (direct) | 1 |
 | /core-image-english-words/ | (direct) | 1 |
 | /core-image-english-words/ | google | 1 |
@@ -58,6 +56,7 @@
 | /second-language-acquisition-theory-gap/ | (direct) | 1 |
 | /spring-core-image/ | bing | 1 |
 | /study-abroad-decision-deadline/ | google | 1 |
+| /take-core-image/ | (direct) | 1 |
 | /working-holiday-savings-amount/ | bing | 1 |
 | /プライバシーポリシー/ | (direct) | 1 |
 
@@ -72,9 +71,8 @@
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
-| 9 | 9 | 1.2分 | / |
+| 8 | 8 | 0.0分 | / |
 | 7 | 3 | 0.9分 | /core-image-english-words/ |
-| 4 | 2 | 4.0分 | /hatsuon-review-price/ |
 | 3 | 3 | 3.5分 | /canada-working-holiday-cost/ |
 | 3 | 2 | 0.1分 | /category/core-image/ |
 | 3 | 3 | 0.0分 | /put-on-core-image/ |
@@ -88,8 +86,9 @@
 | 1 | 1 | 0.0分 | /articles/ |
 | 1 | 1 | 0.0分 | /business-english-study-method/ |
 | 1 | 1 | 0.0分 | /category/ai-english/ |
-| 1 | 1 | 0.0分 | /cebu-beginner-mistakes-design/ |
 | 1 | 1 | 0.0分 | /cebu-island-one-month-study-abroad/ |
 | 1 | 1 | 0.0分 | /eikaiwa-not-continuing-solution/ |
 | 1 | 1 | 0.1分 | /eiken-adult-second-exam-schedule/ |
+| 1 | 1 | 0.0分 | /english-coaching-12-questions/ |
+| 1 | 1 | 0.0分 | /english-coaching-price-comparison/ |
 
