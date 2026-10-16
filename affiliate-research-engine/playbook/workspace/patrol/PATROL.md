@@ -1,4 +1,4 @@
-# 日次パトロール 2026-10-15
+# 日次パトロール 2026-10-16
 
 直近14日
 
@@ -12,31 +12,29 @@
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **47** セッション / うちSNS由来 **1**
+- 全流入 **43** セッション / うちSNS由来 **1**
 
 | 参照元 | セッション |
 |---|---|
 | x | 1 |
 
-**2026-10-01以降の投稿 1本 / 表示18 → 着地1（5.56%）**
+**2026-10-02以降の投稿 1本 / 表示18 → 着地1（5.56%）**
 
 ### 着地ページ 上位
 
 | 着地ページ | セッション |
 |---|---|
-| / | 8 |
-| /canada-working-holiday-cost/ | 3 |
-| /core-image-english-words/ | 3 |
-| /put-on-core-image/ | 3 |
-| /run-core-image/ | 2 |
+| / | 9 |
+| /core-image-english-words/ | 2 |
+| /put-on-core-image/ | 2 |
 | /ryugaku-soudan-shitsumon-10/ | 2 |
 | /study-abroad-insurance-1year-cost/ | 2 |
 | /adult-study-abroad-cost-real/ | 1 |
 | /ai-eikaiwa-vs-online-eikaiwa/ | 1 |
 | /articles/ | 1 |
 | /business-english-study-method/ | 1 |
+| /canada-working-holiday-cost/ | 1 |
 | /category/ai-english/ | 1 |
-| /category/core-image/ | 1 |
 | /cebu-island-one-month-study-abroad/ | 1 |
 | /eikaiwa-not-continuing-solution/ | 1 |
 | /eiken-adult-second-exam-schedule/ | 1 |
@@ -44,6 +42,8 @@
 | /english-coaching-price-comparison/ | 1 |
 | /english-coaching-worth-it/ | 1 |
 | /english-conversation-daily-effectiveness/ | 1 |
+| /japanese-teacher-online-english/ | 1 |
+| /keep-core-image/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
