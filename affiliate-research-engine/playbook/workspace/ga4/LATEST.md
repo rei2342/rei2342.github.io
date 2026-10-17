@@ -1,28 +1,27 @@
-# GA4 アクセス 2026-10-16
+# GA4 アクセス 2026-10-17
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **43** / ユーザー **39** / ページビュー **53**
+- セッション **37** / ユーザー **36** / ページビュー **47**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 24 | 24 |
+| (direct) | (none) | 23 | 23 |
 | google | organic | 7 | 7 |
-| bing | organic | 4 | 3 |
-| yahoo | organic | 3 | 1 |
 | duckduckgo | organic | 2 | 2 |
+| bing | organic | 1 | 1 |
 | iconlet.com | referral | 1 | 1 |
 | oskope.com | referral | 1 | 1 |
 | x | profile | 1 | 0 |
+| yahoo | organic | 1 | 1 |
 
 ## 着地ページ × 流入元
 
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
-| / | (direct) | 6 |
-| /put-on-core-image/ | yahoo | 2 |
+| / | (direct) | 5 |
 | /study-abroad-insurance-1year-cost/ | duckduckgo | 2 |
 | / | google | 1 |
 | / | iconlet.com | 1 |
@@ -43,11 +42,9 @@
 | /english-coaching-worth-it/ | (direct) | 1 |
 | /english-conversation-daily-effectiveness/ | (direct) | 1 |
 | /japanese-teacher-online-english/ | (direct) | 1 |
-| /keep-core-image/ | bing | 1 |
 | /overseas-move-30s-not-late/ | (direct) | 1 |
 | /philippines-english-study-after-return/ | (direct) | 1 |
 | /pronunciation-school-comparison/ | (direct) | 1 |
-| /run-core-image/ | bing | 1 |
 | /ryugaku-soudan-shitsumon-10/ | google | 1 |
 | /ryugaku-soudan-shitsumon-10/ | x | 1 |
 | /second-language-acquisition-theory-gap/ | (direct) | 1 |
@@ -55,7 +52,6 @@
 | /study-abroad-decision-deadline/ | google | 1 |
 | /study-abroad-quit-job-anxiety/ | (direct) | 1 |
 | /take-core-image/ | (direct) | 1 |
-| /working-holiday-savings-amount/ | bing | 1 |
 | /プライバシーポリシー/ | (direct) | 1 |
 
 ### そのうちSNS由来だけ
@@ -69,11 +65,10 @@
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
-| 9 | 9 | 0.0分 | / |
+| 8 | 8 | 0.0分 | / |
 | 6 | 2 | 1.3分 | /core-image-english-words/ |
 | 2 | 1 | 0.1分 | /category/core-image/ |
 | 2 | 1 | 0.1分 | /category/core-image/page/2/ |
-| 2 | 2 | 0.0分 | /put-on-core-image/ |
 | 2 | 2 | 0.0分 | /ryugaku-soudan-shitsumon-10/ |
 | 2 | 1 | 0.1分 | /spring-core-image/ |
 | 2 | 2 | 0.9分 | /study-abroad-insurance-1year-cost/ |
@@ -89,4 +84,5 @@
 | 1 | 1 | 0.0分 | /english-coaching-12-questions/ |
 | 1 | 1 | 0.0分 | /english-coaching-price-comparison/ |
 | 1 | 1 | 0.0分 | /english-coaching-worth-it/ |
+| 1 | 1 | 0.0分 | /english-conversation-daily-effectiveness/ |
 
