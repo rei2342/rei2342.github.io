@@ -1,39 +1,35 @@
-# 日次パトロール 2026-10-17
+# 日次パトロール 2026-10-18
 
 直近14日
 
 ## ① Threads（表示された数）
 
-| 表示 | いいね | 返信 | 投稿日 | アカウント | 本文 |
-|---|---|---|---|---|---|
-| 18 | - | - | 2026-10-03 | akira_life_500 | 「他部署を手伝った」で終わる実績メモ。 相手の仕事と、自分の担当を分 |
-
-固定を除いた 1本の中央値 **18** / 最高 **18**
+履歴がまだ無い。`threads-insights` を先に回す。
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **37** セッション / うちSNS由来 **1**
+- 全流入 **41** セッション / うちSNS由来 **1**
 
 | 参照元 | セッション |
 |---|---|
 | x | 1 |
 
-**2026-10-03以降の投稿 1本 / 表示18 → 着地1（5.56%）**
+2026-10-04 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
 | 着地ページ | セッション |
 |---|---|
-| / | 8 |
-| /core-image-english-words/ | 2 |
+| / | 10 |
+| /core-image-english-words/ | 3 |
 | /ryugaku-soudan-shitsumon-10/ | 2 |
 | /study-abroad-insurance-1year-cost/ | 2 |
-| /adult-study-abroad-cost-real/ | 1 |
 | /ai-eikaiwa-vs-online-eikaiwa/ | 1 |
 | /articles/ | 1 |
 | /business-english-study-method/ | 1 |
 | /canada-working-holiday-cost/ | 1 |
 | /category/ai-english/ | 1 |
+| /category/英語コーチング/ | 1 |
 | /cebu-island-one-month-study-abroad/ | 1 |
 | /eikaiwa-not-continuing-solution/ | 1 |
 | /eiken-adult-second-exam-schedule/ | 1 |
@@ -41,9 +37,9 @@
 | /english-coaching-price-comparison/ | 1 |
 | /english-coaching-worth-it/ | 1 |
 | /english-conversation-daily-effectiveness/ | 1 |
+| /english-meeting-listening-preparation-tips/ | 1 |
 | /japanese-teacher-online-english/ | 1 |
 | /overseas-move-30s-not-late/ | 1 |
-| /philippines-english-study-after-return/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
