@@ -1,4 +1,4 @@
-# 日次パトロール 2026-10-18
+# 日次パトロール 2026-10-19
 
 直近14日
 
@@ -8,13 +8,13 @@
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **41** セッション / うちSNS由来 **1**
+- 全流入 **37** セッション / うちSNS由来 **1**
 
 | 参照元 | セッション |
 |---|---|
 | x | 1 |
 
-2026-10-04 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-10-05 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
@@ -22,13 +22,9 @@
 |---|---|
 | / | 10 |
 | /core-image-english-words/ | 3 |
-| /ryugaku-soudan-shitsumon-10/ | 2 |
 | /study-abroad-insurance-1year-cost/ | 2 |
 | /ai-eikaiwa-vs-online-eikaiwa/ | 1 |
-| /articles/ | 1 |
 | /business-english-study-method/ | 1 |
-| /canada-working-holiday-cost/ | 1 |
-| /category/ai-english/ | 1 |
 | /category/英語コーチング/ | 1 |
 | /cebu-island-one-month-study-abroad/ | 1 |
 | /eikaiwa-not-continuing-solution/ | 1 |
@@ -40,6 +36,10 @@
 | /english-meeting-listening-preparation-tips/ | 1 |
 | /japanese-teacher-online-english/ | 1 |
 | /overseas-move-30s-not-late/ | 1 |
+| /philippines-english-study-after-return/ | 1 |
+| /pronunciation-school-comparison/ | 1 |
+| /ryugaku-soudan-shitsumon-10/ | 1 |
+| /second-language-acquisition-theory-gap/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
