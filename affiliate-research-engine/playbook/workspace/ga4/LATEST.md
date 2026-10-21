@@ -1,18 +1,19 @@
-# GA4 アクセス 2026-10-20
+# GA4 アクセス 2026-10-21
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **39** / ユーザー **38** / ページビュー **49**
+- セッション **45** / ユーザー **44** / ページビュー **58**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 30 | 30 |
-| bing | organic | 2 | 2 |
+| (direct) | (none) | 34 | 34 |
+| bing | organic | 3 | 3 |
 | duckduckgo | organic | 2 | 2 |
 | google | organic | 1 | 1 |
 | iconlet.com | referral | 1 | 1 |
+| note.com | referral | 1 | 1 |
 | oskope.com | referral | 1 | 1 |
 | x | profile | 1 | 0 |
 | yahoo | organic | 1 | 1 |
@@ -34,16 +35,22 @@
 | /core-image-english-words/ | bing | 1 |
 | /core-image-english-words/ | google | 1 |
 | /core-image-english-words/ | yahoo | 1 |
+| /dmm-eikaiwa-beginner-consistency-check/ | note.com | 1 |
 | /eikaiwa-not-continuing-solution/ | (direct) | 1 |
 | /eiken-adult-second-exam-schedule/ | (direct) | 1 |
 | /english-coaching-12-questions/ | (direct) | 1 |
-| /english-coaching-price-comparison/ | (direct) | 1 |
 | /english-conversation-daily-effectiveness/ | (direct) | 1 |
 | /english-meeting-listening-preparation-tips/ | (direct) | 1 |
+| /english-restart-at-30-speaking/ | (direct) | 1 |
+| /give-core-image/ | (direct) | 1 |
+| /go-core-image/ | bing | 1 |
 | /japanese-teacher-online-english/ | (direct) | 1 |
+| /kyozai-owaranai/ | (direct) | 1 |
 | /overseas-move-30s-not-late/ | (direct) | 1 |
 | /page/3/ | (direct) | 1 |
 | /philippines-english-study-after-return/ | (direct) | 1 |
+| /philippines-study-abroad-adult-costs/ | (direct) | 1 |
+| /philippines-study-abroad-consultation/ | (direct) | 1 |
 | /pronunciation-school-comparison/ | (direct) | 1 |
 | /ryugaku-soudan-shitsumon-10/ | x | 1 |
 | /second-language-acquisition-theory-gap/ | (direct) | 1 |
@@ -58,6 +65,7 @@
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
 | / | iconlet.com | 1 |
+| /dmm-eikaiwa-beginner-consistency-check/ | note.com | 1 |
 | /ryugaku-soudan-shitsumon-10/ | x | 1 |
 
 ## ページ別 上位20
@@ -68,20 +76,20 @@
 | 8 | 4 | 0.7分 | /core-image-english-words/ |
 | 2 | 1 | 0.1分 | /category/core-image/ |
 | 2 | 1 | 0.1分 | /category/core-image/page/2/ |
+| 2 | 2 | 0.0分 | /japanese-teacher-online-english/ |
 | 2 | 1 | 0.1分 | /spring-core-image/ |
 | 2 | 2 | 0.9分 | /study-abroad-insurance-1year-cost/ |
 | 1 | 1 | 0.0分 | /ai-eikaiwa-vs-online-eikaiwa/ |
 | 1 | 1 | 0.0分 | /business-english-study-method/ |
+| 1 | 1 | 0.2分 | /category/ai-english/ |
 | 1 | 1 | 0.0分 | /category/toeic-score/ |
 | 1 | 1 | 0.0分 | /category/英語コーチング/ |
 | 1 | 1 | 0.0分 | /cebu-island-one-month-study-abroad/ |
+| 1 | 1 | 14.8分 | /chatgpt-english-learning-steps/ |
+| 1 | 1 | 0.5分 | /dmm-eikaiwa-beginner-consistency-check/ |
 | 1 | 1 | 0.0分 | /eikaiwa-not-continuing-solution/ |
 | 1 | 1 | 0.1分 | /eiken-adult-second-exam-schedule/ |
 | 1 | 1 | 0.0分 | /english-coaching-12-questions/ |
-| 1 | 1 | 0.0分 | /english-coaching-price-comparison/ |
 | 1 | 1 | 0.0分 | /english-conversation-daily-effectiveness/ |
 | 1 | 1 | 0.0分 | /english-meeting-listening-preparation-tips/ |
-| 1 | 1 | 0.2分 | /get-core-image/ |
-| 1 | 1 | 0.0分 | /japanese-teacher-online-english/ |
-| 1 | 1 | 0.0分 | /overseas-move-30s-not-late/ |
 

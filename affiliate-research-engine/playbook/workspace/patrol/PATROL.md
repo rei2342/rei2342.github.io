@@ -1,4 +1,4 @@
-# 日次パトロール 2026-10-20
+# 日次パトロール 2026-10-21
 
 直近14日
 
@@ -8,13 +8,14 @@
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **39** セッション / うちSNS由来 **1**
+- 全流入 **45** セッション / うちSNS由来 **2**
 
 | 参照元 | セッション |
 |---|---|
+| note.com | 1 |
 | x | 1 |
 
-2026-10-06 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-10-07 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
@@ -28,18 +29,18 @@
 | /category/toeic-score/ | 1 |
 | /category/英語コーチング/ | 1 |
 | /cebu-island-one-month-study-abroad/ | 1 |
+| /dmm-eikaiwa-beginner-consistency-check/ | 1 |
 | /eikaiwa-not-continuing-solution/ | 1 |
 | /eiken-adult-second-exam-schedule/ | 1 |
 | /english-coaching-12-questions/ | 1 |
-| /english-coaching-price-comparison/ | 1 |
 | /english-conversation-daily-effectiveness/ | 1 |
 | /english-meeting-listening-preparation-tips/ | 1 |
+| /english-restart-at-30-speaking/ | 1 |
+| /give-core-image/ | 1 |
+| /go-core-image/ | 1 |
 | /japanese-teacher-online-english/ | 1 |
+| /kyozai-owaranai/ | 1 |
 | /overseas-move-30s-not-late/ | 1 |
-| /page/3/ | 1 |
-| /philippines-english-study-after-return/ | 1 |
-| /pronunciation-school-comparison/ | 1 |
-| /ryugaku-soudan-shitsumon-10/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
