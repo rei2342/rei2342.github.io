@@ -1,14 +1,14 @@
-# GA4 アクセス 2026-10-22
+# GA4 アクセス 2026-10-23
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **38** / ユーザー **38** / ページビュー **42**
+- セッション **37** / ユーザー **37** / ページビュー **41**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 30 | 30 |
+| (direct) | (none) | 29 | 29 |
 | bing | organic | 3 | 3 |
 | google | organic | 1 | 1 |
 | iconlet.com | referral | 1 | 1 |
@@ -20,7 +20,7 @@
 
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
-| / | (direct) | 7 |
+| / | (direct) | 6 |
 | / | iconlet.com | 1 |
 | / | oskope.com | 1 |
 | /ai-eikaiwa-vs-online-eikaiwa/ | (direct) | 1 |
@@ -39,7 +39,6 @@
 | /go-core-image/ | bing | 1 |
 | /japanese-teacher-online-english/ | (direct) | 1 |
 | /kyozai-owaranai/ | (direct) | 1 |
-| /overseas-move-30s-not-late/ | (direct) | 1 |
 | /page/3/ | (direct) | 1 |
 | /philippines-english-study-after-return/ | (direct) | 1 |
 | /philippines-study-abroad-adult-costs/ | (direct) | 1 |
@@ -48,6 +47,7 @@
 | /pronunciation-school-comparison/ | (direct) | 1 |
 | /second-language-acquisition-theory-gap/ | (direct) | 1 |
 | /spring-core-image/ | bing | 1 |
+| /study-abroad-agent-comparison/ | (direct) | 1 |
 | /study-abroad-quit-job-anxiety/ | (direct) | 1 |
 | /take-core-image/ | (direct) | 1 |
 | /working-holiday-age-30/ | (direct) | 1 |
@@ -64,7 +64,7 @@
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
-| 9 | 9 | 0.0分 | / |
+| 8 | 8 | 0.0分 | / |
 | 3 | 3 | 0.2分 | /core-image-english-words/ |
 | 2 | 2 | 0.0分 | /japanese-teacher-online-english/ |
 | 2 | 1 | 0.1分 | /spring-core-image/ |
@@ -82,6 +82,6 @@
 | 1 | 1 | 0.0分 | /give-core-image/ |
 | 1 | 1 | 0.4分 | /go-core-image/ |
 | 1 | 1 | 0.0分 | /kyozai-owaranai/ |
-| 1 | 1 | 0.0分 | /overseas-move-30s-not-late/ |
 | 1 | 1 | 0.0分 | /page/3/ |
+| 1 | 1 | 0.0分 | /philippines-english-study-after-return/ |
 
