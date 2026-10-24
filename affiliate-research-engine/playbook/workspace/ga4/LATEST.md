@@ -1,15 +1,15 @@
-# GA4 アクセス 2026-10-23
+# GA4 アクセス 2026-10-24
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **37** / ユーザー **37** / ページビュー **41**
+- セッション **35** / ユーザー **35** / ページビュー **38**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 29 | 29 |
-| bing | organic | 3 | 3 |
+| (direct) | (none) | 28 | 28 |
+| bing | organic | 2 | 2 |
 | google | organic | 1 | 1 |
 | iconlet.com | referral | 1 | 1 |
 | note.com | referral | 1 | 1 |
@@ -45,8 +45,6 @@
 | /philippines-study-abroad-consultation/ | (direct) | 1 |
 | /present-core-image/ | google | 1 |
 | /pronunciation-school-comparison/ | (direct) | 1 |
-| /second-language-acquisition-theory-gap/ | (direct) | 1 |
-| /spring-core-image/ | bing | 1 |
 | /study-abroad-agent-comparison/ | (direct) | 1 |
 | /study-abroad-quit-job-anxiety/ | (direct) | 1 |
 | /take-core-image/ | (direct) | 1 |
@@ -67,7 +65,6 @@
 | 8 | 8 | 0.0分 | / |
 | 3 | 3 | 0.2分 | /core-image-english-words/ |
 | 2 | 2 | 0.0分 | /japanese-teacher-online-english/ |
-| 2 | 1 | 0.1分 | /spring-core-image/ |
 | 1 | 1 | 0.0分 | /ai-eikaiwa-vs-online-eikaiwa/ |
 | 1 | 1 | 0.0分 | /business-english-study-method/ |
 | 1 | 1 | 0.2分 | /category/ai-english/ |
@@ -84,4 +81,5 @@
 | 1 | 1 | 0.0分 | /kyozai-owaranai/ |
 | 1 | 1 | 0.0分 | /page/3/ |
 | 1 | 1 | 0.0分 | /philippines-english-study-after-return/ |
+| 1 | 1 | 0.0分 | /philippines-study-abroad-adult-costs/ |
 
