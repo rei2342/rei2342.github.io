@@ -1,4 +1,4 @@
-# 日次パトロール 2026-10-25
+# 日次パトロール 2026-10-26
 
 直近14日
 
@@ -8,26 +8,27 @@
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **34** セッション / うちSNS由来 **1**
+- 全流入 **36** セッション / うちSNS由来 **1**
 
 | 参照元 | セッション |
 |---|---|
 | note.com | 1 |
 
-2026-10-11 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-10-12 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
 | 着地ページ | セッション |
 |---|---|
 | / | 10 |
-| /core-image-english-words/ | 2 |
+| /core-image-english-words/ | 3 |
 | /ai-eikaiwa-vs-online-eikaiwa/ | 1 |
 | /business-english-study-method/ | 1 |
 | /category/toeic-score/ | 1 |
+| /category/uncategorized/ | 1 |
 | /category/英語コーチング/ | 1 |
 | /dmm-eikaiwa-beginner-consistency-check/ | 1 |
-| /eiken-adult-second-exam-schedule/ | 1 |
+| /english-coaching-worth-it/ | 1 |
 | /english-meeting-listening-preparation-tips/ | 1 |
 | /english-restart-at-30-speaking/ | 1 |
 | /give-core-image/ | 1 |
@@ -39,12 +40,19 @@
 | /philippines-study-abroad-adult-costs/ | 1 |
 | /philippines-study-abroad-consultation/ | 1 |
 | /present-core-image/ | 1 |
-| /study-abroad-agent-comparison/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
 **アフィリエイトリンクのクリックは0件。**
 記事には来ていてもリンクは踏まれていない。
+
+<details><summary>外部リンク全体</summary>
+
+| クリック先 | 回数 |
+|---|---|
+| px.moshimo.com | 2 |
+
+</details>
 
 ---
 
