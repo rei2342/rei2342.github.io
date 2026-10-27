@@ -1,4 +1,4 @@
-# GA4 アクセス 2026-10-26
+# GA4 アクセス 2026-10-27
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
@@ -24,7 +24,6 @@
 | /core-image-english-words/ | (direct) | 2 |
 | / | iconlet.com | 1 |
 | / | oskope.com | 1 |
-| /ai-eikaiwa-vs-online-eikaiwa/ | (direct) | 1 |
 | /business-english-study-method/ | (direct) | 1 |
 | /category/toeic-score/ | (direct) | 1 |
 | /category/uncategorized/ | (direct) | 1 |
@@ -42,6 +41,7 @@
 | /philippines-english-study-after-return/ | (direct) | 1 |
 | /philippines-study-abroad-adult-costs/ | (direct) | 1 |
 | /philippines-study-abroad-consultation/ | (direct) | 1 |
+| /present-core-image/ | (direct) | 1 |
 | /present-core-image/ | google | 1 |
 | /study-abroad-agent-comparison/ | (direct) | 1 |
 | /study-abroad-quit-job-anxiety/ | (direct) | 1 |
@@ -65,7 +65,7 @@
 | 3 | 3 | 0.7分 | /core-image-english-words/ |
 | 2 | 1 | 0.3分 | /english-coaching-worth-it/ |
 | 2 | 2 | 0.0分 | /japanese-teacher-online-english/ |
-| 1 | 1 | 0.0分 | /ai-eikaiwa-vs-online-eikaiwa/ |
+| 2 | 2 | 2.3分 | /present-core-image/ |
 | 1 | 1 | 0.0分 | /business-english-study-method/ |
 | 1 | 1 | 0.2分 | /category/ai-english/ |
 | 1 | 1 | 0.0分 | /category/toeic-score/ |

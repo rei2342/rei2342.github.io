@@ -1,4 +1,4 @@
-# 日次パトロール 2026-10-26
+# 日次パトロール 2026-10-27
 
 直近14日
 
@@ -14,7 +14,7 @@
 |---|---|
 | note.com | 1 |
 
-2026-10-12 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-10-13 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
@@ -22,7 +22,7 @@
 |---|---|
 | / | 10 |
 | /core-image-english-words/ | 3 |
-| /ai-eikaiwa-vs-online-eikaiwa/ | 1 |
+| /present-core-image/ | 2 |
 | /business-english-study-method/ | 1 |
 | /category/toeic-score/ | 1 |
 | /category/uncategorized/ | 1 |
@@ -39,7 +39,7 @@
 | /philippines-english-study-after-return/ | 1 |
 | /philippines-study-abroad-adult-costs/ | 1 |
 | /philippines-study-abroad-consultation/ | 1 |
-| /present-core-image/ | 1 |
+| /study-abroad-agent-comparison/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
