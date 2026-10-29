@@ -1,14 +1,14 @@
-# GA4 アクセス 2026-10-28
+# GA4 アクセス 2026-10-29
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **36** / ユーザー **36** / ページビュー **40**
+- セッション **35** / ユーザー **35** / ページビュー **39**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 31 | 31 |
+| (direct) | (none) | 30 | 30 |
 | bing | organic | 2 | 2 |
 | chatgpt.com | ai-assistant | 1 | 1 |
 | google | organic | 1 | 1 |
@@ -21,7 +21,6 @@
 | / | (direct) | 8 |
 | /core-image-english-words/ | (direct) | 2 |
 | /ai-pronunciation-app-how-to-choose/ | (direct) | 1 |
-| /business-english-study-method/ | (direct) | 1 |
 | /category/toeic-score/ | (direct) | 1 |
 | /category/uncategorized/ | (direct) | 1 |
 | /category/英語コーチング/ | (direct) | 1 |
@@ -65,7 +64,6 @@
 | 2 | 2 | 0.0分 | /japanese-teacher-online-english/ |
 | 2 | 2 | 2.3分 | /present-core-image/ |
 | 1 | 1 | 0.0分 | /ai-pronunciation-app-how-to-choose/ |
-| 1 | 1 | 0.0分 | /business-english-study-method/ |
 | 1 | 1 | 0.2分 | /category/ai-english/ |
 | 1 | 1 | 0.0分 | /category/toeic-score/ |
 | 1 | 1 | 0.0分 | /category/uncategorized/ |
@@ -78,4 +76,5 @@
 | 1 | 1 | 0.0分 | /kyozai-owaranai/ |
 | 1 | 1 | 0.0分 | /page/3/ |
 | 1 | 1 | 0.0分 | /philippines-english-study-after-return/ |
+| 1 | 1 | 0.0分 | /philippines-study-abroad-adult-costs/ |
 

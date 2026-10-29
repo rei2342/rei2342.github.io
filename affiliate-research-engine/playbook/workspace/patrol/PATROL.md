@@ -1,4 +1,4 @@
-# 日次パトロール 2026-10-28
+# 日次パトロール 2026-10-29
 
 直近14日
 
@@ -8,13 +8,13 @@
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **36** セッション / うちSNS由来 **1**
+- 全流入 **35** セッション / うちSNS由来 **1**
 
 | 参照元 | セッション |
 |---|---|
 | note.com | 1 |
 
-2026-10-14 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-10-15 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
@@ -25,7 +25,6 @@
 | /go-core-image/ | 2 |
 | /present-core-image/ | 2 |
 | /ai-pronunciation-app-how-to-choose/ | 1 |
-| /business-english-study-method/ | 1 |
 | /category/toeic-score/ | 1 |
 | /category/uncategorized/ | 1 |
 | /category/英語コーチング/ | 1 |
@@ -40,6 +39,7 @@
 | /philippines-english-study-after-return/ | 1 |
 | /philippines-study-abroad-adult-costs/ | 1 |
 | /philippines-study-abroad-consultation/ | 1 |
+| /study-abroad-agent-comparison/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
