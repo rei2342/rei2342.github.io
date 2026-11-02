@@ -1,14 +1,14 @@
-# GA4 アクセス 2026-11-01
+# GA4 アクセス 2026-11-02
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **31** / ユーザー **31** / ページビュー **35**
+- セッション **29** / ユーザー **29** / ページビュー **33**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 24 | 24 |
+| (direct) | (none) | 22 | 22 |
 | bing | organic | 3 | 3 |
 | chatgpt.com | ai-assistant | 1 | 1 |
 | google | organic | 1 | 1 |
@@ -41,8 +41,6 @@
 | /present-core-image/ | google | 1 |
 | /study-abroad-agent-comparison/ | (direct) | 1 |
 | /toeic-600-plateau-breakthrough-study/ | bing | 1 |
-| /working-holiday-age-30/ | (direct) | 1 |
-| /プロフィール/ | (direct) | 1 |
 
 ### そのうちSNS由来だけ
 
