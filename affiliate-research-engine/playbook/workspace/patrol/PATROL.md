@@ -1,4 +1,4 @@
-# 日次パトロール 2026-11-03
+# 日次パトロール 2026-11-04
 
 直近14日
 
@@ -8,35 +8,33 @@
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **27** セッション / うちSNS由来 **2**
+- 全流入 **23** セッション / うちSNS由来 **2**
 
 | 参照元 | セッション |
 |---|---|
 | note | 1 |
 | note.com | 1 |
 
-2026-10-20 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-10-21 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
 | 着地ページ | セッション |
 |---|---|
 | / | 7 |
-| /core-image-english-words/ | 2 |
-| /go-core-image/ | 2 |
 | /present-core-image/ | 2 |
+| /adult-english-pronunciation-age/ | 1 |
 | /ai-eikaiwa-vs-online-eikaiwa/ | 1 |
 | /ai-pronunciation-app-how-to-choose/ | 1 |
 | /canada-working-holiday-language-school-budget/ | 1 |
 | /category/uncategorized/ | 1 |
+| /core-image-english-words/ | 1 |
 | /dmm-eikaiwa-beginner-consistency-check/ | 1 |
 | /english-coaching-worth-it/ | 1 |
 | /english-restart-at-30-speaking/ | 1 |
-| /give-core-image/ | 1 |
+| /go-core-image/ | 1 |
 | /kyozai-owaranai/ | 1 |
 | /make-core-image/ | 1 |
-| /philippines-study-abroad-adult-costs/ | 1 |
-| /philippines-study-abroad-consultation/ | 1 |
 | /study-abroad-agent-comparison/ | 1 |
 | /toeic-600-plateau-breakthrough-study/ | 1 |
 
