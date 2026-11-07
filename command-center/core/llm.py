@@ -16,7 +16,13 @@ def _client():
         import anthropic
     except ImportError as e:
         raise LLMError("anthropic が未インストール。pip install -r requirements.txt") from e
-    return anthropic.Anthropic()  # ANTHROPIC_API_KEY / ant auth login のプロファイルを自動解決
+    import os
+
+    if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN") or os.environ.get("REI_AFFSAKU")):
+        raise LLMError("Anthropic API キーが無い: config/.env か環境変数に ANTHROPIC_API_KEY（GitHub Secret REI_AFFSAKU と同じ値）を設定")
+    key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("REI_AFFSAKU")
+    # クラウドセッションでは ANTHROPIC_BASE_URL がセッション用に向いているので、ユーザーキー利用時は公式APIに固定する
+    return anthropic.Anthropic(api_key=key, base_url="https://api.anthropic.com") if key else anthropic.Anthropic()
 
 
 def generate_json(system: str, user: str, schema: dict[str, Any], settings: dict | None = None,

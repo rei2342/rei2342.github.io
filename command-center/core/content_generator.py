@@ -55,6 +55,10 @@ SYSTEM = """あなたは日本語SNS・ブログ運用の編集者。対象ア�
 - buzz_followup は、その投稿が伸びたときにリプライ欄へぶら下げる1投稿（誘導先URLを1つ含める）。"""
 
 
+AUTO_TOPIC = ("（未指定）上の実投稿・既存記事タイトル・誘導先・案件から、このアカウントの読者が今いちばん迷っていそうなことを1つ選ぶ。"
+              "既存記事と同じテーマは避け、誘導先（noteの有料記事・WP記事・LINE・案件）に自然につながるものにする。")
+
+
 def _persona_block(acct: Account) -> str:
     p = acct.persona
     cal = acct.calibration()
@@ -121,7 +125,7 @@ def generate(account_key: str, topic: str, platforms: list[str] | None = None, a
                           f"{json.dumps(affs, ensure_ascii=False) if affs else 'なし（自分のnote/WP/LINEへの誘導だけ）'}")
     user = (f"# アカウント実データ\n{_persona_block(acct)}\n\n"
             f"# 誘導先（自分の資産）\n{json.dumps(ctx['own_destinations'], ensure_ascii=False)}\n\n"
-            f"# 今回のテーマ\n{topic}\n{('補足: ' + notes) if notes else ''}\n"
+            f"# 今回のテーマ\n{topic or AUTO_TOPIC}\n{('補足: ' + notes) if notes else ''}\n"
             f"{('参照してよい一次情報URL: ' + ', '.join(source_urls)) if source_urls else ''}\n\n"
             f"# 出力する媒体\n" + "\n\n".join(spec_lines) +
             "\n\n先に reader_problem（読者の迷い）と angle（このアカウントならではの切り口）を決め、全媒体で一貫させる。")
@@ -134,7 +138,7 @@ def generate(account_key: str, topic: str, platforms: list[str] | None = None, a
     from core.llm import generate_json
 
     result = generate_json(SYSTEM.replace("{pr}", pr), user, schema, settings)
-    return finalize_draft(acct, topic, targets, result, ctx, settings, render_images)
+    return finalize_draft(acct, topic or f"[自動] {result.get('reader_problem', '')}", targets, result, ctx, settings, render_images)
 
 
 def finalize_draft(acct: Account, topic: str, targets: list[str], result: dict, ctx: dict, settings: dict,

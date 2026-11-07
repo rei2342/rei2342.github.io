@@ -6,7 +6,6 @@ note には公式の投稿APIが無いので、本人のログインセッショ
 from __future__ import annotations
 
 import html
-import os
 import re
 
 from core import config as C
@@ -66,8 +65,7 @@ def md_to_html(md: str) -> str:
 
 
 def _browser(pw, headless=True):
-    exe = os.environ.get("CHROMIUM_PATH")
-    return pw.chromium.launch(headless=headless, executable_path=exe) if exe else pw.chromium.launch(headless=headless)
+    return C.launch_chromium(pw, headless=headless)
 
 
 def login(account_key: str, timeout_sec: int = 300) -> str:

@@ -26,8 +26,10 @@ publishing:
   instagram:
     # IG Graph API は画像を公開URLで渡す必要がある。
     # 例: このリポジトリの GitHub Pages を使うなら https://rei2342.github.io/command-center/data/media
-    public_media_base_url: ""
+    public_media_base_url: ""     # 空なら WordPress のメディアに自動アップロードしてそのURLを使う
     media_dir: data/media
+    # 自分のWPが無いアカウント（AKIRA等）の画像を置くWPアカウント。空なら credentials.global_fallback_account
+    media_wp_account: ""
 
 credentials:
   # 既存 GitHub Secrets（WP_APP_PASSWORD / X_API_KEY 等）は さくら(sakura-eigo.com) 用。
@@ -39,9 +41,12 @@ affiliate:
   pr_label_required: true
   # もしもの登録媒体ID → 登録URL。マスターに対応表が無いので、確定したら記入する。
   # 記入が無い媒体IDの案件は「媒体一致を確認できない」として自動挿入しない。
-  moshimo_media_map: {}
-    # "677298": "https://sakura-eigo.com/"
-    # "684125": "https://erabi-ai.com/"
+  # 2026-11-07 実測: 公開記事の現行タグに各媒体の a_id が載っていることを WP REST で確認して記入
+  #   677298: sakura-eigo.com 公開記事に a_id=5640991/5640981/5640990/5640982（マスターで 677298 の現行コード）
+  #   684125: erabi-ai.com 公開記事に a_id=5805180/5876760（マスターで 684125 の現行コード）
+  moshimo_media_map:
+    "677298": "https://sakura-eigo.com/"
+    "684125": "https://erabi-ai.com/"
   # マスターでは全案件 auto_publish_allowed=false。人が確認した案件だけここで許可する。
   auto_publish_overrides: []      # 例: ["s00000017068001"]
 

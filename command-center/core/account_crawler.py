@@ -99,7 +99,10 @@ def crawl_x(url: str, handle: str | None = None, account_key: str = "", **_) -> 
                   "metrics": x.get("public_metrics")} for x in t.json().get("data", [])]
         return {"source": "x_api_v2", "profile": {"name": user.get("name"), "bio": user.get("description"),
                                                   "metrics": user.get("public_metrics")}, "posts": posts}
-    return crawl_with_browser(url, article_selector="article [data-testid='tweetText']")
+    d = crawl_with_browser(url, article_selector="article [data-testid='tweetText']")
+    if d.get("partial"):
+        d["error"] = "X は未ログインだと投稿を出さない。X_BEARER_TOKEN__<アカウント> を設定すると API v2 で投稿も取る（プロフィールは取得済み）"
+    return d
 
 
 def crawl_threads(url: str, account_key: str = "", **_) -> dict:
@@ -113,7 +116,7 @@ def crawl_threads(url: str, account_key: str = "", **_) -> dict:
                  for x in th.get("data", []) if x.get("text")]
         return {"source": "threads_api", "profile": {"name": me.get("username"), "bio": me.get("threads_biography")},
                 "posts": posts}
-    return crawl_with_browser(url, article_selector="div[data-pressable-container] span[dir='auto']")
+    return crawl_with_browser(url, article_selector="div[data-pressable-container]")
 
 
 def crawl_instagram(url: str, account_key: str = "", **_) -> dict:
@@ -138,12 +141,8 @@ def crawl_with_browser(url: str, article_selector: str = "article") -> dict:
         from playwright.sync_api import sync_playwright
     except ImportError as e:
         raise RuntimeError("playwright 未インストール: pip install playwright && playwright install chromium") from e
-    exe = os.environ.get("CHROMIUM_PATH")
     with sync_playwright() as pw:
-        try:
-            browser = pw.chromium.launch(headless=True, executable_path=exe) if exe else pw.chromium.launch(headless=True)
-        except Exception:
-            browser = pw.chromium.launch(headless=True, executable_path="/opt/pw-browsers/chromium")
+        browser = C.launch_chromium(pw)
         page = browser.new_page(user_agent=UA.replace("CommandCenterCrawler/1.0; ", ""), locale="ja-JP")
         page.goto(url, wait_until="domcontentloaded", timeout=45000)
         page.wait_for_timeout(4000)
@@ -155,14 +154,26 @@ def crawl_with_browser(url: str, article_selector: str = "article") -> dict:
         browser.close()
     seen, posts = set(), []
     for t in texts:
-        t = t.strip()
+        lines = t.strip().split("\n")
+        # Threads: 先頭の「ID / 日付」行と末尾の数字だけの行（いいね数等）を落とす
+        while lines and (re.fullmatch(r"[A-Za-z0-9_.]{3,30}", lines[0].strip()) or re.fullmatch(r"[\d/年月日:\s時間分前週]+", lines[0].strip())):
+            lines.pop(0)
+        while lines and re.fullmatch(r"[\d,.万K\s]*", lines[-1].strip()):
+            lines.pop()
+        t = "\n".join(lines).strip()
+        if len(t) < 15:
+            continue
         if t not in seen:
             seen.add(t)
             posts.append({"text": t[:1000], "url": url})
-    if not posts and not meta.get("description"):
-        raise RuntimeError("公開ページから本文を取れない（ログイン壁の可能性）。API トークンを設定するとAPI経由で取る")
-    return {"source": "browser_public_page", "profile": {"name": meta.get("og_title") or meta.get("title"),
+    if meta.get("description") and re.search(r"アカウントを作成、またはアカウントにログイン|Log in|Sign up", meta["description"]):
+        meta["description"] = None  # ログイン誘導の定型文はプロフィールではない
+    out = {"source": "browser_public_page", "profile": {"name": meta.get("og_title") or meta.get("title"),
                                                           "bio": meta.get("description")}, "posts": posts[:20]}
+    if not posts:  # プロフィールは残し、投稿が取れなかったことを明示する
+        out["partial"] = True
+        out["error"] = "公開ページに投稿が出ない（ログイン壁）。プロフィールのみ取得。API トークンを設定するとAPI経由で投稿も取る"
+    return out
 
 
 CRAWLERS = {"wordpress": crawl_wordpress, "note": crawl_note, "x": crawl_x,
@@ -204,7 +215,7 @@ def style_profile(texts: list[str]) -> dict[str, Any]:
 
 
 def summarize_tone(account: Account, data: dict, settings: dict) -> dict | None:
-    if not os.environ.get("ANTHROPIC_API_KEY") and not os.environ.get("ANTHROPIC_AUTH_TOKEN"):
+    if not any(os.environ.get(k) for k in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "REI_AFFSAKU")):
         return None
     from core.llm import generate_json
 
@@ -246,13 +257,14 @@ def crawl(account_key: str, urls: dict[str, str] | None = None, platforms: list[
             continue
         try:
             d = fn(url, handle=acct.handle(p) if not urls else handle_from_url(url), account_key=acct.key)
-            d["ok"] = True
+            d["ok"] = not d.get("partial")
         except Exception as e:  # 1媒体の失敗で全体を止めない
             d = {"ok": False, "error": f"{type(e).__name__}: {e}"[:400], "posts": []}
         d["url"] = url
         d["fetched_at"] = C.now_iso()
         results[p] = d
     texts = [x.get("text", "") for d in results.values() for x in d.get("posts", [])]
+    bios = {p: (d.get("profile") or {}).get("bio") for p, d in results.items() if (d.get("profile") or {}).get("bio")}
     calib = {
         "account_key": acct.key,
         "label": acct.label,
@@ -260,6 +272,7 @@ def crawl(account_key: str, urls: dict[str, str] | None = None, platforms: list[
         "platforms": results,
         "style_metrics": style_profile(texts),
         "style_by_platform": {p: style_profile([x.get("text", "") for x in d.get("posts", [])]) for p, d in results.items()},
+        "profiles": bios,
         "recent_titles": [x.get("title") for d in results.values() for x in d.get("posts", []) if x.get("title")][:30],
         "existing_urls": [x.get("url") for d in results.values() for x in d.get("posts", []) if x.get("url")][:60],
     }

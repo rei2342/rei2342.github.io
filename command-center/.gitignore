@@ -3,3 +3,4 @@ config/history/
 data/
 !data/.gitkeep
 __pycache__/
+.venv/

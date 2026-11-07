@@ -31,3 +31,21 @@ def recent_posts(acct, n: int = 20) -> list[dict]:
     r = requests.get(f"{endpoint(acct)}/posts", params={"per_page": n, "_fields": "id,link,title,date"}, timeout=30)
     r.raise_for_status()
     return [{"id": p["id"], "url": p["link"], "title": p["title"]["rendered"], "date": p["date"]} for p in r.json()]
+
+
+def upload_media(acct, path: str, settings, title: str | None = None) -> dict:
+    """/wp-json/wp/v2/media に画像を上げて公開URL（source_url）を返す。"""
+    import mimetypes
+    from pathlib import Path
+
+    p = Path(path)
+    ctype = mimetypes.guess_type(p.name)[0] or "image/png"
+    auth = (C.cred("WP_USER", acct.key, settings), C.cred("WP_APP_PASSWORD", acct.key, settings))
+    r = requests.post(f"{endpoint(acct)}/media", data=p.read_bytes(), auth=auth, timeout=120,
+                      headers={"Content-Type": ctype, "Content-Disposition": f'attachment; filename="{p.name}"'})
+    if r.status_code >= 300:
+        raise RuntimeError(f"WP media upload {r.status_code}: {r.text[:300]}")
+    j = r.json()
+    if title:
+        requests.post(f"{endpoint(acct)}/media/{j['id']}", json={"title": title, "alt_text": title}, auth=auth, timeout=30)
+    return {"id": j["id"], "url": j["source_url"]}

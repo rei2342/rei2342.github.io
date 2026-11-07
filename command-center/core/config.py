@@ -146,3 +146,23 @@ def read_jsonl(path: Path) -> list[dict]:
                 except json.JSONDecodeError:
                     continue
     return out
+
+
+def chromium_executable() -> str | None:
+    """Playwright が同梱版を見つけられない環境向け（CHROMIUM_PATH → /opt/pw-browsers の順）。"""
+    import glob
+
+    if os.environ.get("CHROMIUM_PATH"):
+        return os.environ["CHROMIUM_PATH"]
+    hits = sorted(glob.glob("/opt/pw-browsers/chromium-*/chrome-linux*/chrome"))
+    return hits[-1] if hits else None
+
+
+def launch_chromium(pw, headless: bool = True):
+    try:
+        return pw.chromium.launch(headless=headless)
+    except Exception:
+        exe = chromium_executable()
+        if not exe:
+            raise
+        return pw.chromium.launch(headless=headless, executable_path=exe)

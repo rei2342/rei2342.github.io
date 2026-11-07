@@ -5,8 +5,8 @@
   python main.py accounts                       マスターから認識したアカウントと媒体ルーティング
   python main.py import <json> [--merge]        Astra の accounts_master.json を取り込む
   python main.py env-template                   マスターから config/.env.example を生成
-  python main.py crawl <account> [--platform x] 実アカウントを取得して文体を校正
-  python main.py generate <account> "<テーマ>"  持っている媒体分の原稿を一括生成
+  python main.py crawl <account>|--all [--platform x] 実アカウントを取得して文体を校正
+  python main.py generate --account さくら [--topic ...] [--all]  媒体分を一括生成（テーマ省略=実データから自動選定）
   python main.py drafts [<account>]             下書き一覧
   python main.py approve <draft_id> [-p x ...]  承認
   python main.py publish <draft_id> [--live]    配信（--live 無しは outbox へ保存のみ）
@@ -87,8 +87,9 @@ def main():
     sp.add_parser("accounts")
     i = sp.add_parser("import"); i.add_argument("path"); i.add_argument("--merge", action="store_true")
     sp.add_parser("env-template")
-    c = sp.add_parser("crawl"); c.add_argument("account"); c.add_argument("--platform", action="append"); c.add_argument("--no-llm", action="store_true")
-    g = sp.add_parser("generate"); g.add_argument("account"); g.add_argument("topic")
+    c = sp.add_parser("crawl"); c.add_argument("account", nargs="?"); c.add_argument("--all", action="store_true"); c.add_argument("--platform", action="append"); c.add_argument("--no-llm", action="store_true")
+    g = sp.add_parser("generate"); g.add_argument("account_pos", nargs="?"); g.add_argument("topic_pos", nargs="?")
+    g.add_argument("--account"); g.add_argument("--topic", default=""); g.add_argument("--all", action="store_true")
     g.add_argument("--platform", action="append"); g.add_argument("--affiliate", action="append")
     g.add_argument("--source", action="append"); g.add_argument("--notes", default="")
     ds = sp.add_parser("drafts"); ds.add_argument("account", nargs="?")
@@ -121,17 +122,37 @@ def main():
     elif a.cmd == "crawl":
         from core.account_crawler import crawl
 
-        res = crawl(L.get_account(a.account).key, platforms=a.platform, use_llm=not a.no_llm)
-        _p({p: {"ok": d["ok"], "source": d.get("source"), "posts": len(d.get("posts", [])), "error": d.get("error")}
-            for p, d in res["platforms"].items()})
-        _p(res.get("style_metrics"))
+        for n in ([x.key for x in L.get_accounts()] if a.all else [a.account]):
+            acct = L.get_account(n)
+            res = crawl(acct.key, platforms=a.platform, use_llm=not a.no_llm)
+            print(f"■ {acct.label}")
+            for p, d in res["platforms"].items():
+                print(f"  {'✓' if d['ok'] else '✗'} {p:<10} {d.get('source') or '':<20} {len(d.get('posts', []))}件 {(d.get('error') or '')[:120]}")
+            sm = res.get("style_metrics") or {}
+            if sm:
+                print(f"  文体: 平均{sm['avg_chars']}字 / 1行{sm['chars_per_line']}字 / です・ます率{sm['desu_masu_ratio']} / 絵文字{sm['emoji_per_post']}/投稿")
+            if res.get("tone_summary_error"):
+                print(f"  トーン要約: {res['tone_summary_error'][:120]}")
     elif a.cmd == "generate":
         from core.content_generator import generate
 
-        d = generate(L.get_account(a.account).key, a.topic, a.platform, a.affiliate, a.notes, a.source)
-        print(f"draft: {d['id']}")
-        _p({"reader_problem": d["reader_problem"], "angle": d["angle"], "issues": d["issues"]})
-        print(f"→ 確認: data/drafts/{d['id']}.json   承認: python main.py approve {d['id']}")
+        names = [x.key for x in L.get_accounts()] if a.all else [a.account or a.account_pos]
+        if not names[0]:
+            sys.exit("アカウントを指定: generate --account さくら（全員なら --all）")
+        failed = 0
+        for n in names:
+            acct = L.get_account(n)
+            try:
+                d = generate(acct.key, a.topic or a.topic_pos or "", a.platform, a.affiliate, a.notes, a.source)
+            except Exception as e:
+                failed += 1
+                print(f"✗ {acct.label}: {type(e).__name__}: {e}")
+                continue
+            errs = [i for i in d["issues"] if i["level"] == "error"]
+            print(f"✓ {acct.label}: draft {d['id']}  テーマ「{d['topic'][:40]}」 媒体={list(d['outputs'])} error={len(errs)} warn={len(d['issues']) - len(errs)}")
+            for i in d["issues"]:
+                print(f"    {i['level']:5} {i['platform']} {i['where']}: {i['msg']}")
+        sys.exit(1 if failed else 0)
     elif a.cmd == "drafts":
         from core import drafts
 

@@ -70,26 +70,55 @@ def threads_recent_metrics(acct, settings, hours: int = 48) -> list[dict]:
 
 
 # ---------------------------------------------------------------- Instagram
-def _public_urls(paths: list[str], draft_id: str, settings) -> list[str]:
+def media_host_account(acct, settings):
+    """IG 画像を置く WP アカウント: 自分の WP → settings の media_wp_account → global_fallback_account。"""
+    from core.account_loader import get_account
+
+    if acct.is_active("wordpress") and C.has_creds("wordpress", acct.key, settings):
+        return acct
+    ig = settings.get("publishing", {}).get("instagram", {})
+    key = ig.get("media_wp_account") or settings.get("credentials", {}).get("global_fallback_account")
+    if key:
+        host = get_account(key)
+        if host.is_active("wordpress") and C.has_creds("wordpress", host.key, settings):
+            return host
+    return None
+
+
+def _public_urls(paths: list[str], draft: dict, acct, settings) -> list[str]:
     ig = settings.get("publishing", {}).get("instagram", {})
     base = (ig.get("public_media_base_url") or "").rstrip("/")
-    if not base:
-        raise RuntimeError("publishing.instagram.public_media_base_url が未設定（IG は公開URLの画像しか受け付けない）")
-    media_root = C.ROOT / ig.get("media_dir", "data/media")
+    if base:  # 静的ホスティングを明示している場合
+        media_root = C.ROOT / ig.get("media_dir", "data/media")
+        urls = []
+        for p in paths:
+            p = Path(p)
+            dest = media_root / draft["id"] / p.name
+            if p.resolve() != dest.resolve():
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(p, dest)
+            urls.append(f"{base}/{draft['id']}/{p.name}")
+        return urls
+    host = media_host_account(acct, settings)
+    if not host:
+        raise RuntimeError("IG 画像の置き場が無い: 認証済みの WordPress が無く public_media_base_url も未設定")
+    from publishers.wp_publisher import upload_media
+
+    cache = draft.setdefault("results", {}).setdefault("instagram_media", {})
     urls = []
     for p in paths:
-        p = Path(p)
-        dest = media_root / draft_id / p.name
-        if p.resolve() != dest.resolve():
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(p, dest)
-        urls.append(f"{base}/{draft_id}/{p.name}")
+        if p not in cache:  # 再試行時に二重アップロードしない
+            cache[p] = upload_media(host, p, settings, title=f"{acct.label} {Path(p).stem}")
+            from core import drafts as D
+
+            D.save(draft)
+        urls.append(cache[p]["url"])
     return urls
 
 
 def ig_carousel(acct, body, draft, settings) -> dict:
     tok, uid = C.cred("IG_ACCESS_TOKEN", acct.key, settings), C.cred("IG_USER_ID", acct.key, settings)
-    urls = _public_urls(body.get("image_paths", []), draft["id"], settings)
+    urls = _public_urls(body.get("image_paths", []), draft, acct, settings)
     children = []
     for u in urls:
         children.append(_ok(requests.post(f"{GRAPH}/{uid}/media", data={"image_url": u, "is_carousel_item": "true",
@@ -122,8 +151,11 @@ def publish(acct, platform, body, draft, settings, dry_run=True) -> dict:
         return {"ok": True, "post_id": ids[0], "post_ids": ids, "url": f"https://www.threads.com/@{acct.handle('threads')}"}
     if platform == "instagram":
         if dry_run:
+            host = media_host_account(acct, settings)
             return {"ok": True, "dry_run": True, "outbox": outbox("instagram", acct.key, {
-                "images": body.get("image_paths", []), "caption": body["caption"], "hashtags": body.get("hashtags", [])})}
+                "images": body.get("image_paths", []), "caption": body["caption"], "hashtags": body.get("hashtags", []),
+                "media_host": (f"{host.label} WP /wp-json/wp/v2/media" if host else
+                               settings.get("publishing", {}).get("instagram", {}).get("public_media_base_url") or "未確定")})}
         return ig_carousel(acct, body, draft, settings)
     raise ValueError(platform)
 
