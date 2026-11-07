@@ -1,4 +1,4 @@
-# 日次パトロール 2026-11-06
+# 日次パトロール 2026-11-07
 
 直近14日
 
@@ -14,7 +14,7 @@
 |---|---|
 | note | 1 |
 
-2026-10-23 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-10-24 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
@@ -29,13 +29,13 @@
 | /category/uncategorized/ | 1 |
 | /core-image-english-words/ | 1 |
 | /eikaiwa-not-continuing-solution/ | 1 |
+| /english-coaching-12-questions/ | 1 |
 | /english-coaching-worth-it/ | 1 |
 | /english-fluency-how-long/ | 1 |
 | /fast-verify-cost-time-travel/ | 1 |
 | /keep-core-image/ | 1 |
 | /make-core-image/ | 1 |
 | /present-core-image/ | 1 |
-| /study-abroad-agent-comparison/ | 1 |
 | /toeic-600-plateau-breakthrough-study/ | 1 |
 | /working-holiday-age-30/ | 1 |
 | /working-holiday-savings-amount/ | 1 |

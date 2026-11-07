@@ -1,4 +1,4 @@
-# GA4 アクセス 2026-11-06
+# GA4 アクセス 2026-11-07
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
@@ -25,6 +25,7 @@
 | /category/uncategorized/ | (direct) | 1 |
 | /core-image-english-words/ | (direct) | 1 |
 | /eikaiwa-not-continuing-solution/ | (direct) | 1 |
+| /english-coaching-12-questions/ | (direct) | 1 |
 | /english-coaching-worth-it/ | chatgpt.com | 1 |
 | /english-fluency-how-long/ | (direct) | 1 |
 | /fast-verify-cost-time-travel/ | (direct) | 1 |
@@ -33,7 +34,6 @@
 | /keep-core-image/ | (direct) | 1 |
 | /make-core-image/ | bing | 1 |
 | /present-core-image/ | (direct) | 1 |
-| /study-abroad-agent-comparison/ | (direct) | 1 |
 | /toeic-600-plateau-breakthrough-study/ | bing | 1 |
 | /working-holiday-age-30/ | (direct) | 1 |
 | /working-holiday-savings-amount/ | (direct) | 1 |
@@ -59,12 +59,12 @@
 | 1 | 1 | 0.0分 | /category/uncategorized/ |
 | 1 | 1 | 1.8分 | /core-image-english-words/ |
 | 1 | 1 | 0.0分 | /eikaiwa-not-continuing-solution/ |
+| 1 | 1 | 0.0分 | /english-coaching-12-questions/ |
 | 1 | 1 | 0.0分 | /english-fluency-how-long/ |
 | 1 | 1 | 0.0分 | /fast-verify-cost-time-travel/ |
 | 1 | 1 | 0.0分 | /keep-core-image/ |
 | 1 | 1 | 0.1分 | /make-core-image/ |
 | 1 | 1 | 0.0分 | /present-core-image/ |
-| 1 | 1 | 0.0分 | /study-abroad-agent-comparison/ |
 | 1 | 1 | 0.7分 | /toeic-600-plateau-breakthrough-study/ |
 | 1 | 1 | 0.0分 | /working-holiday-age-30/ |
 | 1 | 1 | 0.0分 | /working-holiday-savings-amount/ |
