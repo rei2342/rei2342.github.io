@@ -1,0 +1,5 @@
+config/.env
+config/history/
+data/
+!data/.gitkeep
+__pycache__/
