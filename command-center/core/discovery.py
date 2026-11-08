@@ -179,7 +179,7 @@ def run(roots: list[str] | None = None, include_browser: bool = True) -> dict:
             if ig:
                 resolved.append({"platform": plat, "value": val, "source_count": len(srcs),
                                  "decision": "keep" if (plat, val.lower()) in kept else "ignore",
-                                 "reason": ig.get("reason") or ig.get("memo"), "alias_of": ig.get("alias_of")})
+                                 "reason": ig.get("reason") or ig.get("memo"), "alias_of": ig.get("alias_of"), "account": ig.get("account")})
                 continue
             key = known.get((plat, val.lower().removeprefix("www."))) or (
                 next((k for (pl, h), k in known.items() if h == val.lower()), None) if plat == "mention" else None)

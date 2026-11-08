@@ -49,3 +49,27 @@ def upload_media(acct, path: str, settings, title: str | None = None) -> dict:
     if title:
         requests.post(f"{endpoint(acct)}/media/{j['id']}", json={"title": title, "alt_text": title}, auth=auth, timeout=30)
     return {"id": j["id"], "url": j["source_url"]}
+
+
+def post_remote_draft(acct, body, settings) -> dict:
+    """承認前の疎通テスト用。status は常に draft に固定し、publish には絶対にしない。"""
+    payload = {"title": body["title"], "content": body["html"], "excerpt": body.get("excerpt", ""),
+               "slug": body.get("slug") or None, "status": "draft"}
+    auth = (C.cred("WP_USER", acct.key, settings), C.cred("WP_APP_PASSWORD", acct.key, settings))
+    if not all(auth):
+        return {"ok": False, "error": "WP_USER / WP_APP_PASSWORD が未設定（ログイン済みChromeの wp-admin から入れる）"}
+    r = requests.post(f"{endpoint(acct)}/posts", json={k: v for k, v in payload.items() if v is not None},
+                      auth=auth, timeout=60)
+    if r.status_code >= 300:
+        return {"ok": False, "status_code": r.status_code, "error": r.text[:400]}
+    j = r.json()
+    if j.get("status") != "draft":
+        return {"ok": False, "error": f"想定外の status={j.get('status')}", "post_id": j.get("id")}
+    return remote_draft_result(acct, j)
+
+
+def remote_draft_result(acct, j: dict) -> dict:
+    base = acct.platform("wordpress")["url"].rstrip("/")
+    return {"ok": True, "post_id": j["id"], "status": j["status"],
+            "edit_url": f"{base}/wp-admin/post.php?post={j['id']}&action=edit",
+            "preview_url": f"{base}/?p={j['id']}&preview=true"}

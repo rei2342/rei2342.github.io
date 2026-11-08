@@ -103,6 +103,9 @@ def main():
     nl = sp.add_parser("note-login"); nl.add_argument("account")
     bl = sp.add_parser("browser-login"); bl.add_argument("platform", choices=["x", "instagram"])
     ip = sp.add_parser("import-posts"); ip.add_argument("account"); ip.add_argument("platform"); ip.add_argument("path")
+    wd = sp.add_parser("wp-draft"); wd.add_argument("draft_id")
+    sp.add_parser("affiliate-harvest")
+    au = sp.add_parser("affiliate-audit"); au.add_argument("--json", action="store_true")
     en = sp.add_parser("enable"); en.add_argument("account"); en.add_argument("platform"); en.add_argument("--off", action="store_true")
     sp.add_parser("dashboard")
     a = ap.parse_args()
@@ -218,6 +221,36 @@ def main():
                     seen.add(t[:80]); n += 1
                     f.write(json.dumps({**r, "text": t, "imported_at": C.now_iso()}, ensure_ascii=False) + "\n")
         print(f"{acct.label}.{a.platform}: {n}件 追加 → {out}")
+    elif a.cmd == "wp-draft":
+        # 承認ゲートの前に、WP へ status=draft で入るかだけを確かめる（公開はしない）
+        from core import drafts
+        from core.account_loader import get_account
+        from publishers import wp_publisher
+        d = drafts.get(a.draft_id)
+        acct = get_account(d["account_key"])
+        res = wp_publisher.post_remote_draft(acct, d["outputs"]["wordpress"], C.load_settings())
+        d.setdefault("history", []).append({"at": C.now_iso(), "event": "wp_remote_draft", "result": res})
+        d.setdefault("remote_drafts", {})["wordpress"] = res
+        drafts.save(d)
+        print(json.dumps(res, ensure_ascii=False, indent=1))
+    elif a.cmd == "affiliate-harvest":
+        from core import affiliate_unlock as U
+        h = U.harvest(L.load_master())
+        print(f"{len(h['rows'])} 件の A8 タグを自前WPの公開記事から取得（クリックはしていない）")
+    elif a.cmd == "affiliate-audit":
+        from core import affiliate_unlock as U
+        rep = U.audit(L.load_master(), C.load_settings())
+        C.write_json(C.data_path("affiliate", "audit.json"), rep)
+        if a.json:
+            print(json.dumps(rep, ensure_ascii=False, indent=1))
+        else:
+            print(f"A8 参加中 {rep['a8_total']} 件の内訳: {json.dumps(rep['breakdown'], ensure_ascii=False)}")
+            for k, v in rep["per_account"].items():
+                if v["wordpress"]:
+                    print(f"  {k}: WP経由で使える案件 {v['count_via_wp']} 件 ／ SNS直貼り {json.dumps({p: len(x) for p, x in v['direct_on_sns'].items()})}")
+            for f in rep["flags"]:
+                if f["state"] in ("media_mismatch", "media_unverified", "not_partnered"):
+                    print(f"  ⚠ {f['state']}: {f['site']} {f['media_code']} 広告主{f['advertiser']} {f['reason']}（{len(f['pages'])}記事）")
     elif a.cmd == "enable":
         acct = L.get_account(a.account)
         L.set_write_enabled(acct.key, a.platform, not a.off)

@@ -231,6 +231,55 @@ def test_candidate_notes_survive_replace_import():
         C.MASTER_PATH.write_bytes(bak)
 
 
+def test_a8_decode_matches_verified_codes():
+    from core import affiliate_unlock as U
+
+    m = L.load_master()
+    for p in m["asp_inventory"]["a8"]["programs"]:
+        if p.get("affiliate_url"):
+            d = U.decode_a8(p["affiliate_url"])
+            assert d["advertiser"] == int(p["program_id"][1:-3]), p["program_id"]
+    assert set(U.media_code_map(m).values()) <= {r["media_id"] for r in m["asp_inventory"]["a8"]["registered_media"]}
+
+
+def test_harvested_codes_respect_media():
+    """確認済み媒体のコードだけが、その媒体のサイトで使える。他媒体・未確認媒体のコードは使わない。"""
+    from core import affiliate_unlock as U
+
+    m = L.load_master()
+    codes = {v: k for k, v in U.media_code_map(m).items()}
+    sk, er = codes.get("001"), codes.get("007")
+    if not (sk and er):
+        return
+    ok = f"https://px.a8.net/svt/ejp?a8mat={sk}+ZZZZZZ+4JKM+5YRHE"     # 4JKM = 211990 → 広告主 21199（2案件 → ambiguous）
+    one = f"https://px.a8.net/svt/ejp?a8mat={sk}+ZZZZZZ+5NSE+5YRHE"    # 5NSE = 264110 → 広告主 26411（1案件）
+    wrong = f"https://px.a8.net/svt/ejp?a8mat={er}+ZZZZZZ+5988+5YRHE"  # erabi のコードを sakura に
+    unknown = "https://px.a8.net/svt/ejp?a8mat=ZZZZZZ+ZZZZZZ+5NSE+5YRHE"
+    rows = [{"account_key": "sakura_eigo30", "site": "https://sakura-eigo.com/", "page": "https://sakura-eigo.com/x/", **U.decode_a8(h)}
+            for h in (ok, one, wrong, unknown)]
+    res = U.resolve(m, {"rows": rows})
+    st = {(r["media_code"], r["advertiser"]): r["state"] for r in res["usable"] + res["flags"]}
+    assert st[(sk, 26411)] == "usable"
+    assert st[(sk, 21199)] == "ambiguous"
+    assert st[(er, 24524)] == "media_mismatch"
+    assert st[("ZZZZZZ", 26411)] == "media_unverified"
+
+
+def test_cushion_routes_sns_to_own_wp():
+    from core import content_generator as G
+
+    s = C.load_settings()
+    a = L.get_account("sakura_eigo30")
+    ctx = G.build_context(a, a.active_platforms(), s, None, [])
+    wp = a.platform("wordpress")["url"]
+    for p, c in ctx["per_platform"].items():
+        if p == "wordpress":
+            continue
+        assert not c["affiliate_urls"], p            # SNS/note に広告リンクは渡さない
+        if c.get("cushion"):
+            assert c["cushion"]["via_url"] == wp and wp in c["allowed_urls"]
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in list(globals().items()):

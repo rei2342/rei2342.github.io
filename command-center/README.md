@@ -71,3 +71,13 @@ automation/ buzz_hunter
 dashboard/  app.py
 main.py   tests/test_pipeline.py（オフラインのE2E。python tests/test_pipeline.py）
 ```
+
+## 眠っている A8 案件の解放とクッション導線（2026-11-08）
+
+- マスターの A8 参加中 116 件のうち、広告コードがあるのは 3 件だけ。残り 113 件は「登録媒体URLの不一致」ではなく、広告コード未取得・媒体未紐付けで止まっていた。
+- `python main.py affiliate-harvest` … 自前WP（さくら・ユイ・レイ）の公開記事を未ログインの REST で読み、貼られている A8 タグを `data/affiliate/harvested_a8.json` に集める。リンクはクリックしない。
+- a8mat の3番目のブロックは「広告主番号×10 の36進」。マスターで媒体確認済みの3件と ARE DB の6件で検算済み。1番目のブロック（媒体コード）は、確認済み案件から逆引きした分だけ信用する。
+- 使える案件に戻す条件: 媒体コードが確認済み媒体 ／ その媒体の登録URLの記事に貼られている ／ 参加中一覧で広告主が1件に決まる。どれか1つでも欠ければ `affiliate-audit` で ⚠ として出す（media_unverified / media_mismatch / not_partnered / ambiguous）。
+- `python main.py affiliate-audit` … 116 件の内訳と、アカウントごとに「WP経由で使える案件数」と「SNSへ直接貼れる案件数」を出す。
+- クッション導線: SNS・note には広告リンクを渡さない。同じアカウントの WP を誘導先として許可し、WP 記事の中で広告リンクを踏ませる（`affiliate.cushion_via_wordpress`）。
+- `python main.py wp-draft <draft_id>` … 承認ゲートの前の疎通テスト。status は常に draft に固定し、公開はしない。

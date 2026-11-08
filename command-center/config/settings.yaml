@@ -55,13 +55,20 @@ affiliate:
   moshimo_media_map:
     "677298": "https://sakura-eigo.com/"
     "684125": "https://erabi-ai.com/"
+  # 公開記事から戻した A8 広告コード（python main.py affiliate-harvest で data/affiliate/harvested_a8.json に保存）。
+  # 確認済み媒体のコードが、その媒体の登録URLの記事に貼られていて、広告主が参加中一覧で1件に決まるものだけ使う。
+  use_harvested_codes: true
+  # SNS/note には広告リンクを貼らず、同じアカウントの自前WP記事へ送り、WP記事内で広告リンクを踏ませる。
+  cushion_via_wordpress: true
   # マスターでは全案件 auto_publish_allowed=false。人が確認した案件だけここで許可する。
   auto_publish_overrides: []      # 例: ["s00000017068001"]
 
 funnel:
   # マスターで prelaunch / unverified の誘導先は自動では使わない。稼働したらここに足す。
   extra_destinations: {}
-    # kasumi_nagi_: [{type: line, url: "https://lin.ee/tcuxNo6", label: "なぎLINE"}]
+    # kasumi_nagi_: [{type: line, url: "https://lin.ee/tcuxNo6", label: "花澄なぎ LINE（@892yohkm）"}]
+    # ↑ 所属は 2026-11-08 に確定（なぎ）。チャット・あいさつ・自動応答が Off（2026-10-11 管理画面）なので、
+    #   運用を始めるまで誘導先に入れない。始めたらこの行のコメントを外す。
 
 buzz:
   platforms: [x, threads]

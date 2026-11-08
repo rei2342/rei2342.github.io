@@ -99,6 +99,20 @@ def build_context(acct: Account, platforms: list[str], settings: dict, affiliate
         allowed = sorted(set(own_urls + [a["affiliate_url"] for a in usable] + source_urls + [target]))
         per[p] = {"target_url": target, "affiliates": usable, "blocked_affiliates": [a for a in pool if not a["usable"]],
                   "allowed_urls": allowed, "affiliate_urls": [a["affiliate_url"] for a in usable]}
+    # クッション導線: SNS/note には広告リンクを貼らず、自前WPの記事へ送り、WP記事の中で広告リンクを踏ませる。
+    # 媒体一致の判定は WP 側で済んでいるので、SNS 側に渡すのは「WPに何の案件があるか」と誘導先URLだけ。
+    wp_url = acct.platform("wordpress").get("url") if acct.is_active("wordpress") else None
+    if wp_url and settings.get("affiliate", {}).get("cushion_via_wordpress", True):
+        wp_pool = [a for a in affiliate_pool(acct, wp_url, settings) if a["usable"]]
+        if affiliate_ids:
+            wp_pool = [a for a in wp_pool if a["program_id"] in affiliate_ids]
+        for p, c in per.items():
+            if p == "wordpress" or not wp_pool:
+                continue
+            c["cushion"] = {"via_url": wp_url, "via_platform": "wordpress",
+                            "programs": [{"program_id": a["program_id"], "program_name": a["program_name"]} for a in wp_pool]}
+            if wp_url not in c["allowed_urls"]:
+                c["allowed_urls"] = sorted(set(c["allowed_urls"] + [wp_url]))
     return {"own_destinations": own, "per_platform": per}
 
 
@@ -122,7 +136,11 @@ def generate(account_key: str, topic: str, platforms: list[str] | None = None, a
         spec_lines.append(f"## {p} ({FORMAT_BY_PLATFORM[p]})\n{SPECS[p]}\n配信先: {c['target_url']}\n"
                           f"この媒体で使ってよいURL: {json.dumps(c['allowed_urls'], ensure_ascii=False)}\n"
                           f"この媒体で使ってよいアフィリエイト案件（テーマに合うものだけ。合わなければ使わない）: "
-                          f"{json.dumps(affs, ensure_ascii=False) if affs else 'なし（自分のnote/WP/LINEへの誘導だけ）'}")
+                          f"{json.dumps(affs, ensure_ascii=False) if affs else 'なし（自分のnote/WP/LINEへの誘導だけ）'}"
+                          + (f"\nクッション導線: この媒体には広告リンクを貼らず、自分のWP（{c['cushion']['via_url']}）の記事へ誘導する。"
+                             f"WP記事側で扱える案件: {json.dumps([x['program_name'] for x in c['cushion']['programs']][:15], ensure_ascii=False)}。"
+                             "WPの記事テーマとつながる場合だけ、WPへの誘導文を入れる（案件名や成果条件をSNS側で断定しない）"
+                             if c.get("cushion") else ""))
     user = (f"# アカウント実データ\n{_persona_block(acct)}\n\n"
             f"# 誘導先（自分の資産）\n{json.dumps(ctx['own_destinations'], ensure_ascii=False)}\n\n"
             f"# 今回のテーマ\n{topic or AUTO_TOPIC}\n{('補足: ' + notes) if notes else ''}\n"

@@ -287,7 +287,18 @@ def affiliate_pool(account: Account, target_url: str | None, settings: dict | No
     s = settings or C.load_settings()
     overrides = set(s.get("affiliate", {}).get("auto_publish_overrides") or [])
     out = []
-    for prog in account.monetize.get("matched_affiliates") or []:
+    from core import affiliate_unlock
+
+    matched = list(account.monetize.get("matched_affiliates") or [])
+    recovered = {p["program_id"]: p for p in affiliate_unlock.recovered_programs(account.key, account.master, s)}
+    # マスターで広告コードが空の案件は、公開記事から戻したコードで埋める（Astra の訴求・条件は残す）
+    for i, p in enumerate(matched):
+        rp = recovered.pop(p.get("program_id"), None)
+        if rp and not p.get("affiliate_url"):
+            matched[i] = {**p, **{k: rp[k] for k in ("affiliate_url", "affiliate_url_media_id", "code_source", "code_pages")},
+                          "fit_warning": p.get("fit_warning") or rp["fit_warning"]}
+    matched += list(recovered.values())
+    for prog in matched:
         url = prog.get("affiliate_url")
         reg = registered_media_url(prog, account.master, s)
         usable, reason = True, "OK"
@@ -311,6 +322,7 @@ def affiliate_pool(account: Account, target_url: str | None, settings: dict | No
             "appeal_point": prog.get("appeal_point"),
             "conversion_conditions": prog.get("conversion_conditions"),
             "fit_warning": prog.get("fit_warning"),
+            "code_source": prog.get("code_source", "master"),
             "registered_media_url": reg,
             "usable": usable,
             "reason": reason,
