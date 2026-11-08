@@ -135,9 +135,10 @@ def generate(account_key: str, topic: str, platforms: list[str] | None = None, a
               "properties": {"reader_problem": {"type": "string"}, "angle": {"type": "string"},
                              "outputs": {"type": "object", "additionalProperties": False, "required": targets,
                                          "properties": {p: PLATFORM_SCHEMAS[p] for p in targets}}}}
-    from core.llm import generate_json
+    from core import llm
 
-    result = generate_json(SYSTEM.replace("{pr}", pr), user, schema, settings)
+    result = llm.generate_json(SYSTEM.replace("{pr}", pr), user, schema, settings)
+    result["_llm_backend"] = llm.last_backend
     return finalize_draft(acct, topic or f"[自動] {result.get('reader_problem', '')}", targets, result, ctx, settings, render_images)
 
 
@@ -156,7 +157,7 @@ def finalize_draft(acct: Account, topic: str, targets: list[str], result: dict, 
     d = {
         "id": draft_id, "account_key": acct.key, "account_label": acct.label, "topic": topic,
         "created_at": C.now_iso(), "reader_problem": result.get("reader_problem"), "angle": result.get("angle"),
-        "outputs": result["outputs"], "context": ctx, "issues": issues,
+        "outputs": result["outputs"], "context": ctx, "issues": issues, "llm_backend": result.get("_llm_backend"),
         "platform_status": {p: "draft" for p in targets}, "history": [{"at": C.now_iso(), "event": "generated"}],
     }
     if render_images and "instagram" in result["outputs"]:

@@ -120,6 +120,11 @@ def import_master(new: dict[str, Any], mode: str = "replace", note: str = "impor
             if top in new:
                 merged[top] = new[top]
         new = merged
+    elif C.MASTER_PATH.exists() and "candidate_notes" not in new:
+        # 人が確定した discover 候補メモは Astra の差し替えで消さない
+        cur_notes = load_master().get("candidate_notes")
+        if cur_notes:
+            new = {**new, "candidate_notes": cur_notes}
     save_master(new, note=f"{note} ({mode})")
     return new, warnings
 

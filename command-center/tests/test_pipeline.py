@@ -80,8 +80,10 @@ def test_generate_to_dryrun_publish(tmp_path=None):
     from core import drafts
     from publishers.base import publish_draft
 
+    import shutil
+
     s = C.load_settings()
-    made = []
+    made, outbox_files = [], []
     for acct in L.get_accounts():
         targets = acct.active_platforms()
         ctx = G.build_context(acct, targets, s, None, [])
@@ -94,8 +96,15 @@ def test_generate_to_dryrun_publish(tmp_path=None):
         drafts.approve(d["id"])
         r = publish_draft(d["id"], live=False)
         assert r["dry_run"] and all(v.get("ok") for v in r["results"].values()), r
-    for i in made:  # 後片付け
+        outbox_files += [v["outbox"] for v in r["results"].values() if isinstance(v.get("outbox"), str)]
+    for i in made:  # 後片付け（ダッシュボードの outbox・画像にダミーを残さない）
         drafts.path(i).unlink(missing_ok=True)
+        C.DATA_DIR.joinpath("outbox", "note", f"{i}.png").unlink(missing_ok=True)
+        shutil.rmtree(C.ROOT / s.get("publishing", {}).get("instagram", {}).get("media_dir", "data/media") / i,
+                      ignore_errors=True)
+    for f in outbox_files:
+        Path(f).unlink(missing_ok=True)
+        Path(f).with_suffix(".png").unlink(missing_ok=True)
 
 
 def test_buzz_evaluate():
@@ -136,6 +145,90 @@ def test_revenue_csv():
             revenue.LEDGER.unlink(missing_ok=True)
         else:
             revenue.LEDGER.write_bytes(bak)
+
+
+def test_llm_backend_fallback_order():
+    """先頭が残高不足などで落ちたら次へ。拒否は次へ回さない。鍵が無いものは飛ばす。"""
+    from core import llm
+
+    calls = []
+    orig = dict(llm.BACKENDS)
+    try:
+        def broke(*a):
+            calls.append("broke"); raise llm.LLMError("credit balance is too low")
+
+        def missing(*a):
+            calls.append("missing"); raise llm.BackendUnavailable("no key")
+
+        def ok(*a):
+            calls.append("ok"); return {"v": 1}
+
+        llm.BACKENDS.update({"anthropic_api": broke, "openai": missing, "claude_cli": ok})
+        s = {"llm": {"backends": ["anthropic_api", "openai", "claude_cli"]}}
+        assert llm.generate_json("s", "u", {"type": "object"}, s) == {"v": 1}
+        assert calls == ["broke", "missing", "ok"] and llm.last_backend == "claude_cli"
+
+        def refuse(*a):
+            raise llm.LLMRefusal("refused")
+
+        llm.BACKENDS.update({"anthropic_api": refuse})
+        calls.clear()
+        try:
+            llm.generate_json("s", "u", {"type": "object"}, s)
+            raise AssertionError("拒否が次のバックエンドに回った")
+        except llm.LLMRefusal:
+            pass
+        assert calls == []
+    finally:
+        llm.BACKENDS.clear(); llm.BACKENDS.update(orig)
+
+
+def test_cli_env_drops_api_keys():
+    import os
+
+    from core import llm
+
+    os.environ["ANTHROPIC_API_KEY"] = os.environ.get("ANTHROPIC_API_KEY", "x") or "x"
+    env = llm._cli_env()
+    assert not any(k.startswith(("ANTHROPIC", "CLAUDE")) for k in env) and env.get("USER")
+
+
+def test_local_logs_only_own_posts(tmp=None):
+    import json
+    import tempfile
+
+    from core import account_crawler as A
+
+    with tempfile.TemporaryDirectory() as d:
+        f = Path(d) / "x.jsonl"
+        f.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in [
+            {"text": "本人の投稿テキストです。十分な長さ", "url": "https://x.com/sakura_eigo30/status/1"},
+            {"text": "競合の投稿テキストです。十分な長さ", "url": "https://x.com/someone_else/status/2"},
+        ]), encoding="utf-8")
+        orig = A._local_log_paths
+        try:
+            A._local_log_paths = lambda *a: [(f, False)]
+            got = A.crawl_local_logs("x", "sakura_eigo30", "sakura_eigo30")["posts"]
+            assert [p["url"] for p in got] == ["https://x.com/sakura_eigo30/status/1"]
+            A._local_log_paths = lambda *a: [(f, True)]  # アカウント専用ログは絞らない
+            assert len(A.crawl_local_logs("x", "sakura_eigo30", "sakura_eigo30")["posts"]) == 2
+        finally:
+            A._local_log_paths = orig
+
+
+def test_candidate_notes_survive_replace_import():
+    m = L.load_master()
+    if not m.get("candidate_notes"):
+        return
+    import copy
+
+    bak = C.MASTER_PATH.read_bytes()
+    try:
+        new = copy.deepcopy(m); new.pop("candidate_notes")
+        L.import_master(new, "replace", note="test")
+        assert L.load_master().get("candidate_notes") == m["candidate_notes"]
+    finally:
+        C.MASTER_PATH.write_bytes(bak)
 
 
 if __name__ == "__main__":

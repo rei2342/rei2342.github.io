@@ -5,7 +5,15 @@ llm:
   model: claude-opus-5-5          # 量産時に下げたいなら claude-sonnet-5-5
   effort: high                    # low | medium | high | xhigh | max
   max_tokens: 32000
-  use_server_fallback: true       # 拒否時にサーバー側で別モデルへ自動フォールバック
+  use_server_fallback: true       # 拒否時にサーバー側で別モデルへ自動フォールバック（anthropic_api のみ）
+  # 上から順に試す。claude_cli はローカルの Claude Code CLI（サブスク枠・APIクレジット不要）。
+  # 鍵や CLI が無いものは飛ばし、残高不足・認証失敗などで落ちたら次へ。拒否された場合は次へ回さず止める。
+  backends: [claude_cli, anthropic_api, openai, gemini]
+  claude_cli_path: ""             # 空なら PATH → ~/.claude/local → Claude デスクトップ同梱の順に探す
+  cli_model: claude-opus-5-5
+  cli_timeout_sec: 900
+  openai_model: gpt-5
+  gemini_model: gemini-2.5-pro
 
 mode:
   # true の間はどの publisher も外部に書き込まない（payload を data/outbox に保存するだけ）
@@ -75,6 +83,19 @@ schedule:
   buzz_hunter_interval_minutes: 30
   crawler_interval_hours: 24
   quiet_hours_jst: [1, 6]         # この時間帯は自動リプライしない
+
+crawl:
+  # X / IG のログイン壁対策（API トークンが無いときの取得順）:
+  #   1) 専用プロファイル（python main.py browser-login x|instagram で人が一度ログイン。パスワードは保存しない）
+  #   2) ローカルの投稿ログ data/local_posts/<internal_key>/<platform>.jsonl ＋ 下の local_log_globs
+  #   3) X のみ Nitter 系 RSS  4) 公開ページ
+  # Chrome 本体のプロファイル／Cookie は読まない（Keychain の保存済み認証情報に触れるため）。
+  browser_profile_dir: data/browser_profiles
+  local_log_globs:
+    # {platform} {handle} {account} を置換。相対パスは command-center/ 基準。文字列だけなら本人の投稿を url/handle で絞って読む
+    - path: "../affiliate-research-engine/playbook/workspace/social/history/{platform}.jsonl"
+      account: sakura_eigo30      # さくらの投稿履歴（本文に handle が無いので所有者を明示）
+  nitter_instances: [https://nitter.net, https://xcancel.com, https://nitter.poast.org]
 
 platform_limits:
   x_weighted_chars: 280           # 日本語は1文字2カウント → 実質140字

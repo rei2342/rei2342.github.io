@@ -12,11 +12,13 @@ ASP 管理画面・ログインが必要なページには入らない。
 from __future__ import annotations
 
 import html
+import json
 import os
 import re
 import statistics
 from collections import Counter
 from typing import Any
+from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
@@ -99,10 +101,10 @@ def crawl_x(url: str, handle: str | None = None, account_key: str = "", **_) -> 
                   "metrics": x.get("public_metrics")} for x in t.json().get("data", [])]
         return {"source": "x_api_v2", "profile": {"name": user.get("name"), "bio": user.get("description"),
                                                   "metrics": user.get("public_metrics")}, "posts": posts}
-    d = crawl_with_browser(url, article_selector="article [data-testid='tweetText']")
-    if d.get("partial"):
-        d["error"] = "X は未ログインだと投稿を出さない。X_BEARER_TOKEN__<アカウント> を設定すると API v2 で投稿も取る（プロフィールは取得済み）"
-    return d
+    return _login_wall_chain("x", url, h, account_key, article_selector="article [data-testid='tweetText']",
+                             extra=[lambda: crawl_nitter_rss(h)],
+                             hint="X は未ログインだと投稿を出さない。X_BEARER_TOKEN__<アカウント> を入れるか、"
+                                  "python main.py browser-login x で専用プロファイルにログインする")
 
 
 def crawl_threads(url: str, account_key: str = "", **_) -> dict:
@@ -119,7 +121,7 @@ def crawl_threads(url: str, account_key: str = "", **_) -> dict:
     return crawl_with_browser(url, article_selector="div[data-pressable-container]")
 
 
-def crawl_instagram(url: str, account_key: str = "", **_) -> dict:
+def crawl_instagram(url: str, handle: str | None = None, account_key: str = "", **_) -> dict:
     tok, uid = C.cred("IG_ACCESS_TOKEN", account_key), C.cred("IG_USER_ID", account_key)
     if tok and uid:
         r = _get(f"https://graph.facebook.com/v21.0/{uid}",
@@ -132,26 +134,182 @@ def crawl_instagram(url: str, account_key: str = "", **_) -> dict:
                   "media_type": m.get("media_type")} for m in j.get("media", {}).get("data", [])]
         return {"source": "ig_graph_api", "profile": {"name": j.get("username"), "bio": j.get("biography"),
                                                       "followers": j.get("followers_count")}, "posts": posts}
-    return crawl_with_browser(url, article_selector="article h1, article span")
+    return _login_wall_chain("instagram", url, handle or handle_from_url(url), account_key, article_selector="article h1, article span",
+                             ig=True, hint="公開ページに投稿が出ない（ログイン壁）。IG_ACCESS_TOKEN を入れるか、"
+                                           "python main.py browser-login instagram で専用プロファイルにログインする")
 
 
-def crawl_with_browser(url: str, article_selector: str = "article") -> dict:
-    """公開ページを Chromium で開いてプロフィールと見えている投稿テキストを拾う（ログインはしない）。"""
+# ---------------------------------------------------------------- ログイン壁の回避（X / IG）
+def profile_dir(platform: str) -> Path:
+    """Playwright の persistent context 用の専用プロファイル。人が一度だけ手でログインする（パスワードは保存しない）。"""
+    base = C.load_settings().get("crawl", {}).get("browser_profile_dir", "data/browser_profiles")
+    return C.ROOT / base / platform
+
+
+def has_profile(platform: str) -> bool:
+    d = profile_dir(platform)
+    return d.exists() and any(d.iterdir())
+
+
+def _login_wall_chain(platform: str, url: str, handle: str | None, account_key: str, article_selector: str,
+                      hint: str, extra: list | None = None, ig: bool = False) -> dict:
+    """API が無いときの取得順: ログイン済み専用プロファイル → ローカルの投稿ログ → (X) Nitter RSS → 公開ページ。
+    取れた経路を source に、試した経路を tried に残す。複数経路の投稿は重複を除いて合わせる。"""
+    tried, got, profile = [], [], {}
+    steps = []
+    if has_profile(platform):
+        steps.append(("browser_profile", lambda: crawl_with_browser(url, article_selector, persistent=platform, ig=ig)))
+    steps.append(("local_logs", lambda: crawl_local_logs(platform, handle, account_key)))
+    steps += [("nitter_rss", f) for f in (extra or [])]
+    steps.append(("browser_public_page", lambda: crawl_with_browser(url, article_selector, ig=ig)))
+    for name, fn in steps:
+        try:
+            d = fn() or {}
+        except Exception as e:
+            tried.append(f"{name}: {type(e).__name__}: {str(e)[:120]}")
+            continue
+        n = len(d.get("posts") or [])
+        tried.append(f"{name}: {n}件")
+        if not profile.get("bio") and (d.get("profile") or {}).get("bio"):
+            profile = d["profile"]
+        elif not profile and d.get("profile"):
+            profile = d["profile"]
+        if n:
+            got.append((d.get("source") or name, d["posts"]))
+            if name == "browser_profile":
+                break  # ログイン済みで直近が取れたら十分
+    seen, posts = set(), []
+    for _, ps in got:
+        for x in ps:
+            key = (x.get("text") or "")[:80]
+            if key and key not in seen:
+                seen.add(key)
+                posts.append(x)
+    posts.sort(key=lambda x: x.get("date") or "", reverse=True)
+    out = {"source": "+".join(dict.fromkeys(s for s, _ in got)) or "browser_public_page", "profile": profile,
+           "posts": posts[:25], "tried": tried}
+    if not posts:
+        out["partial"] = True
+        out["error"] = hint
+    return out
+
+
+def _local_log_paths(platform: str, handle: str | None, account_key: str) -> list:
+    """data/local_posts/<internal_key>/<platform>.jsonl（取り込み済みログ）＋ settings.crawl.local_log_globs。"""
+    import glob
+
+    paths = [(C.DATA_DIR / "local_posts" / account_key / f"{platform}.jsonl", True)]
+    for ent in (C.load_settings().get("crawl", {}).get("local_log_globs") or []):
+        # 文字列 = 本人の投稿を url/handle で絞る。{path, account} = そのアカウント専用のログ（絞らない）
+        pat, owner = (ent, None) if isinstance(ent, str) else (ent.get("path", ""), ent.get("account"))
+        if owner and owner != account_key:
+            continue
+        pat = pat.replace("{platform}", platform).replace("{handle}", handle or "").replace("{account}", account_key)
+        pp = Path(pat).expanduser()
+        pp = pp if pp.is_absolute() else C.ROOT / pp  # 相対パスは command-center/ 基準
+        paths += [(Path(p), bool(owner)) for p in glob.glob(str(pp), recursive=True)]
+    return [(p, own) for p, own in dict.fromkeys(paths) if p.exists()]
+
+
+def crawl_local_logs(platform: str, handle: str | None, account_key: str) -> dict:
+    """運用ログ（jsonl / json 配列）から、そのアカウント・媒体の投稿本文を読む。
+    1行1投稿で text|caption|body|full_text のどれかを持つものを拾い、url/handle/account で本人の投稿に絞る。"""
+    posts = []
+    hl = (handle or "").lower()
+    for p, own_file in _local_log_paths(platform, handle, account_key):
+        raw = p.read_text(encoding="utf-8", errors="ignore")
+        try:
+            rows = json.loads(raw)
+            if isinstance(rows, dict):
+                rows = rows.get("posts") or rows.get("data") or [rows]
+        except json.JSONDecodeError:
+            rows = []
+            for line in raw.splitlines():
+                try:
+                    rows.append(json.loads(line))
+                except json.JSONDecodeError:
+                    pass
+        for r in rows:
+            if not isinstance(r, dict):
+                continue
+            text = r.get("text") or r.get("caption") or r.get("full_text") or r.get("body") or ""
+            if len(text.strip()) < 10:
+                continue
+            u = r.get("url") or r.get("permalink") or r.get("posted_url") or ""
+            who = str(r.get("handle") or r.get("username") or r.get("account") or "").lstrip("@").lower()
+            if not own_file and hl and hl not in u.lower() and who != hl:
+                continue  # 他人の投稿（競合調査ログなど）は混ぜない
+            posts.append({"text": text[:1000], "url": u or None, "date": r.get("date") or r.get("posted_at") or r.get("timestamp"),
+                          "metrics": r.get("metrics"), "log_file": str(p)})
+    return {"source": "local_logs", "profile": {}, "posts": posts}
+
+
+def crawl_nitter_rss(handle: str | None) -> dict:
+    """Nitter 系ミラーの RSS（settings.crawl.nitter_instances）。多くは止まっているので短いタイムアウトで順に試す。"""
+    import xml.etree.ElementTree as ET
+
+    if not handle:
+        return {}
+    last = None
+    for inst in C.load_settings().get("crawl", {}).get("nitter_instances") or []:
+        try:
+            r = requests.get(f"{inst.rstrip('/')}/{handle}/rss", headers={"User-Agent": UA}, timeout=8)
+            if r.status_code != 200 or "<rss" not in r.text[:500]:
+                last = f"{inst}: HTTP {r.status_code}"
+                continue
+            root = ET.fromstring(r.content)
+            posts = []
+            for it in root.iter("item"):
+                text = _strip(it.findtext("description") or it.findtext("title") or "")
+                if len(text) >= 10 and not text.startswith("RT by"):
+                    posts.append({"text": text[:1000], "url": (it.findtext("link") or "").replace(inst.rstrip("/"), "https://x.com"),
+                                  "date": it.findtext("pubDate")})
+            if posts:
+                return {"source": f"nitter_rss({inst})", "profile": {}, "posts": posts[:20]}
+        except Exception as e:
+            last = f"{inst}: {type(e).__name__}"
+    raise RuntimeError(last or "nitter_instances 未設定")
+
+
+def crawl_with_browser(url: str, article_selector: str = "article", persistent: str | None = None,
+                       ig: bool = False) -> dict:
+    """Chromium でページを開いてプロフィールと見えている投稿テキストを拾う。
+    persistent=媒体名 のときは専用プロファイル（人が手でログイン済み）を使う。ここでログイン操作はしない。"""
     try:
         from playwright.sync_api import sync_playwright
     except ImportError as e:
         raise RuntimeError("playwright 未インストール: pip install playwright && playwright install chromium") from e
-    with sync_playwright() as pw:
-        browser = C.launch_chromium(pw)
-        page = browser.new_page(user_agent=UA.replace("CommandCenterCrawler/1.0; ", ""), locale="ja-JP")
-        page.goto(url, wait_until="domcontentloaded", timeout=45000)
-        page.wait_for_timeout(4000)
-        meta = page.evaluate("""() => {
+    js_meta = """() => {
             const g = n => (document.querySelector(`meta[property="${n}"],meta[name="${n}"]`)||{}).content||null;
             return {title: document.title, og_title: g('og:title'), description: g('og:description') || g('description')};
-        }""")
+        }"""
+    with sync_playwright() as pw:
+        if persistent:
+            ctx = pw.chromium.launch_persistent_context(str(profile_dir(persistent)), headless=True, locale="ja-JP")
+            page = ctx.pages[0] if ctx.pages else ctx.new_page()
+        else:
+            browser = C.launch_chromium(pw)
+            page = browser.new_page(user_agent=UA.replace("CommandCenterCrawler/1.0; ", ""), locale="ja-JP")
+        page.goto(url, wait_until="domcontentloaded", timeout=45000)
+        page.wait_for_timeout(4000)
+        meta = page.evaluate(js_meta)
+        if persistent:
+            for _ in range(3):  # 直近をもう少し読み込む
+                page.mouse.wheel(0, 2500)
+                page.wait_for_timeout(1500)
         texts = page.eval_on_selector_all(article_selector, "els => els.map(e => e.innerText).filter(t => t && t.length > 15)")
-        browser.close()
+        if persistent and ig:
+            # IG はグリッドから投稿URLを拾い、各投稿のキャプションを読む
+            links = page.eval_on_selector_all("a[href*='/p/'], a[href*='/reel/']", "els => [...new Set(els.map(e => e.href))]")[:12]
+            texts = []
+            for ln in links:
+                page.goto(ln, wait_until="domcontentloaded", timeout=45000)
+                page.wait_for_timeout(2500)
+                cap = page.evaluate(js_meta).get("description") or ""
+                cap = re.sub(r'^.*?: "|"\s*$', "", cap, flags=re.S) if ': "' in cap else cap
+                if len(cap) > 15:
+                    texts.append(cap)
+        (ctx if persistent else browser).close()
     seen, posts = set(), []
     for t in texts:
         lines = t.strip().split("\n")
@@ -168,7 +326,7 @@ def crawl_with_browser(url: str, article_selector: str = "article") -> dict:
             posts.append({"text": t[:1000], "url": url})
     if meta.get("description") and re.search(r"アカウントを作成、またはアカウントにログイン|Log in|Sign up", meta["description"]):
         meta["description"] = None  # ログイン誘導の定型文はプロフィールではない
-    out = {"source": "browser_public_page", "profile": {"name": meta.get("og_title") or meta.get("title"),
+    out = {"source": "browser_profile" if persistent else "browser_public_page", "profile": {"name": meta.get("og_title") or meta.get("title"),
                                                           "bio": meta.get("description")}, "posts": posts[:20]}
     if not posts:  # プロフィールは残し、投稿が取れなかったことを明示する
         out["partial"] = True
@@ -215,9 +373,11 @@ def style_profile(texts: list[str]) -> dict[str, Any]:
 
 
 def summarize_tone(account: Account, data: dict, settings: dict) -> dict | None:
-    if not any(os.environ.get(k) for k in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "REI_AFFSAKU")):
+    from core import llm
+
+    if not llm.available():
         return None
-    from core.llm import generate_json
+    generate_json = llm.generate_json
 
     samples = []
     for p, d in data.items():

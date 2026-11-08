@@ -6026,5 +6026,52 @@
       "note": "UI表示の全19項目を取得。応答JSONのコピーはUI操作で失敗したため、overview原文を根拠に点数を転記。"
     }
   },
-  "bio_extraction_note": "actual_bioは実ページからの抜粋。表示DOMに基づき空白・改行を正規化した箇所があり、完全な組版再現ではない。"
+  "bio_extraction_note": "actual_bioは実ページからの抜粋。表示DOMに基づき空白・改行を正規化した箇所があり、完全な組版再現ではない。",
+  "candidate_notes": {
+    "_note": "discover の候補を人が確定したメモ。マスターのアカウント・媒体には入れていない（誘導先として使う前に、どのアカウントのLINEかを確定する）。",
+    "decided_at": "2026-11-08",
+    "decided_by": "レイ（チャット指示）",
+    "keep": [
+      {
+        "platform": "line",
+        "value": "https://liff.line.me/2011760798-nnVExN2O",
+        "status": "own_asset_candidate",
+        "account": null,
+        "memo": "自分のLINE関連アセット。どのアカウントの誘導先かは未確定",
+        "found_in": [
+          "~/Documents/Codex/2026-10-11/task-2/inputs/競合比較と改善テスト_20261005.json",
+          "~/Documents/Codex/2026-10-11/task-5/deliverables/render/metrics.json"
+        ]
+      },
+      {
+        "platform": "line",
+        "value": "https://lin.ee/tcuxNo6",
+        "status": "own_asset_candidate",
+        "account": null,
+        "memo": "自分のLINE関連アセット。どのアカウントの誘導先かは未確定",
+        "found_in": [
+          "~/Documents/Codex/2026-10-11/task-2/inputs/競合比較と改善テスト_20261005.json",
+          "~/Documents/Codex/2026-10-11/task-5/deliverables/cta-action-change.json"
+        ]
+      }
+    ],
+    "ignore": [
+      {
+        "platform": "x",
+        "value": "saukra_eigo",
+        "reason": "タイポ。正式は @sakura_eigo30",
+        "alias_of": "sakura_eigo30"
+      },
+      {
+        "platform": "x",
+        "value": "nagi",
+        "reason": "nagi-bot のテスト用"
+      },
+      {
+        "platform": "x",
+        "value": "nagi_test",
+        "reason": "nagi-bot のテスト用"
+      }
+    ]
+  }
 }

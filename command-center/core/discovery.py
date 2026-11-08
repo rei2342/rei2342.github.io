@@ -168,9 +168,19 @@ def run(roots: list[str] | None = None, include_browser: bool = True) -> dict:
                 known[(plat, h)] = a["internal_key"]
             if v.get("domain"):
                 known[("wordpress", v["domain"].lower())] = a["internal_key"]
-    matches, candidates = [], []
+    # 人が確定済みの候補（accounts_master.candidate_notes）: ignore は落とす（alias_of は正式アカウントに寄せる）、keep は別枠
+    notes = master.get("candidate_notes") or {}
+    ignored = {(i["platform"], i["value"].lower()): i for i in notes.get("ignore", [])}
+    kept = {(k["platform"], k["value"].lower()): k for k in notes.get("keep", [])}
+    matches, candidates, resolved = [], [], []
     for plat, vals in found.items():
         for val, srcs in vals.items():
+            ig = ignored.get((plat, val.lower())) or kept.get((plat, val.lower()))
+            if ig:
+                resolved.append({"platform": plat, "value": val, "source_count": len(srcs),
+                                 "decision": "keep" if (plat, val.lower()) in kept else "ignore",
+                                 "reason": ig.get("reason") or ig.get("memo"), "alias_of": ig.get("alias_of")})
+                continue
             key = known.get((plat, val.lower().removeprefix("www."))) or (
                 next((k for (pl, h), k in known.items() if h == val.lower()), None) if plat == "mention" else None)
             row = {"platform": plat, "value": val, "sources": sorted(srcs)[:5], "source_count": len(srcs)}
@@ -178,6 +188,7 @@ def run(roots: list[str] | None = None, include_browser: bool = True) -> dict:
     report = {"generated_at": C.now_iso(), "roots": [str(r) for r in roots_p], "files_scanned": scanned,
               "browser_sources": browsers, "matched_to_master": sorted(matches, key=lambda r: -r["source_count"]),
               "unmatched_candidates": sorted(candidates, key=lambda r: -r["source_count"])[:200],
+              "resolved_candidates": resolved,
               "credential_keys": env_keys}
     C.write_json(C.DATA_DIR / "discovery" / "report.json", report)
     return report

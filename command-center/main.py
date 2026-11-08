@@ -13,6 +13,8 @@
   python main.py buzz [--loop] [--live]         バズ検知（＋設定次第で追撃リプライ）
   python main.py reply <alert_id> [--live]      検知した投稿へ追撃リプライ
   python main.py note-login <account>           note のログインセッションを保存
+  python main.py browser-login x|instagram      X / IG の専用ブラウザプロファイルに手でログイン（クロールのログイン壁対策）
+  python main.py import-posts <account> <platform> <file>  手元の投稿ログ(jsonl/json)を校正用に取り込む
   python main.py enable <account> <platform>    その媒体への書き込みを許可
   python main.py dashboard                      Streamlit を起動
 """
@@ -58,7 +60,8 @@ def cmd_env_template(a):
     lines = ["# 生成: python main.py env-template（アカウントは accounts_master.json から動的に展開）",
              "# 値は config/.env に書く。.env は git に入れない。", "",
              "# GitHub Actions では既存 Secret REI_AFFSAKU を ANTHROPIC_API_KEY として渡している",
-             "ANTHROPIC_API_KEY=", "",
+             "# 生成は settings.yaml llm.backends の順（既定: Claude CLI=サブスク枠 → この API キー → OpenAI → Gemini）",
+             "ANTHROPIC_API_KEY=", "OPENAI_API_KEY=", "GEMINI_API_KEY=", "",
              "# 既存 Secret と同じ形式も読める: THREADS_ACCOUNTS=[{\"name\":\"さくら\",\"token\":\"...\"},{\"name\":\"AKIRA\",\"token\":\"...\"}]",
              "THREADS_ACCOUNTS=", "",
              "# ---- 既存 GitHub Secrets と同名（settings.credentials.global_fallback_account のアカウントで使う）",
@@ -98,6 +101,8 @@ def main():
     b = sp.add_parser("buzz"); b.add_argument("--loop", action="store_true"); b.add_argument("--live", action="store_true")
     r = sp.add_parser("reply"); r.add_argument("alert_id"); r.add_argument("--live", action="store_true"); r.add_argument("--text")
     nl = sp.add_parser("note-login"); nl.add_argument("account")
+    bl = sp.add_parser("browser-login"); bl.add_argument("platform", choices=["x", "instagram"])
+    ip = sp.add_parser("import-posts"); ip.add_argument("account"); ip.add_argument("platform"); ip.add_argument("path")
     en = sp.add_parser("enable"); en.add_argument("account"); en.add_argument("platform"); en.add_argument("--off", action="store_true")
     sp.add_parser("dashboard")
     a = ap.parse_args()
@@ -181,6 +186,38 @@ def main():
         from publishers.note_publisher import login
 
         print("保存:", login(L.get_account(a.account).key))
+    elif a.cmd == "browser-login":
+        from playwright.sync_api import sync_playwright
+
+        from core.account_crawler import profile_dir
+
+        d = profile_dir(a.platform)
+        d.mkdir(parents=True, exist_ok=True)
+        url = {"x": "https://x.com/login", "instagram": "https://www.instagram.com/accounts/login/"}[a.platform]
+        with sync_playwright() as pw:
+            ctx = pw.chromium.launch_persistent_context(str(d), headless=False, locale="ja-JP")
+            (ctx.pages[0] if ctx.pages else ctx.new_page()).goto(url)
+            input(f"開いたウィンドウで {a.platform} に手でログインし、終わったら Enter: ")
+            ctx.close()
+        print("保存:", d, "（以後 crawl はこのプロファイルで読む）")
+    elif a.cmd == "import-posts":
+        acct = L.get_account(a.account)
+        src = Path(a.path).expanduser().read_text(encoding="utf-8")
+        try:
+            rows = json.loads(src)
+            rows = rows if isinstance(rows, list) else rows.get("posts") or [rows]
+        except json.JSONDecodeError:
+            rows = [json.loads(x) for x in src.splitlines() if x.strip()]
+        out = C.data_path("local_posts", acct.key, f"{a.platform}.jsonl")
+        seen = {json.loads(x).get("text", "")[:80] for x in out.read_text(encoding="utf-8").splitlines()} if out.exists() else set()
+        n = 0
+        with out.open("a", encoding="utf-8") as f:
+            for r in rows:
+                t = (r.get("text") or r.get("caption") or "")
+                if len(t) >= 10 and t[:80] not in seen:
+                    seen.add(t[:80]); n += 1
+                    f.write(json.dumps({**r, "text": t, "imported_at": C.now_iso()}, ensure_ascii=False) + "\n")
+        print(f"{acct.label}.{a.platform}: {n}件 追加 → {out}")
     elif a.cmd == "enable":
         acct = L.get_account(a.account)
         L.set_write_enabled(acct.key, a.platform, not a.off)
