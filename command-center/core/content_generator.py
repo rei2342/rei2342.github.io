@@ -59,6 +59,61 @@ AUTO_TOPIC = ("（未指定）上の実投稿・既存記事タイトル・誘�
               "既存記事と同じテーマは避け、誘導先（noteの有料記事・WP記事・LINE・案件）に自然につながるものにする。")
 
 
+FUNNEL = """# 構成（悩み解決型ファネル。全媒体共通）
+1. フック: 読者が「困っている場面」「試してダメだったこと」「まだ解けていない疑問」のどれかを、読者側の言葉で1行目に置く。
+   - pain_hook.hook_line をそのまま X の1投稿目の1行目・Threads の1投稿目の1行目・WP 記事の導入（PR表記の直後の最初の段落）・
+     note の本文1段落目に入れる（媒体ごとの言い回しの調整は2行目以降で）。
+   - 案件名・商品名・価格からは書き始めない。
+2. 共感と原因: 試したことがなぜうまくいかなかったのかを、判断基準の形で示す（読者を責めない）。
+3. 解き方: 自分で今日できる確認・手順を先に渡す（ここだけでも役に立つこと）。
+4. 解決策の提示: 手順で足りない人に向けて、許可された案件（WP）・有料note・LINE などを「この場面ならこれ」という順で1〜2個だけ示す。
+   案件のスペック紹介を主にしない。合う案件が無ければ案件は使わず、自分のnote/WP/LINEへの誘導だけにする。
+5. CTA: 次の一歩を1つに絞る。"""
+
+SEED_RULES = """# Muse 調査のシード（最優先のネタ元）
+下の seed は Muse で Threads/Instagram から集めた実在の読者の声（または本人のストーリーズ書き起こし）。
+- reader_problem と pain_hook は seed から作る。seed に無い悩みや体験を足さない。
+- 他人の投稿の原文（quote）をそのまま引用しない。個人が分かる情報・@ハンドル・URLは書かない。場面として言い換える。
+- kind=own_story は本人が実際に話した内容。話した範囲の言い換えは使ってよいが、話していない経歴・数字・体験は足さない。
+- pain_hook.source には seed の id を入れる。"""
+
+PAIN_HOOK_SCHEMA = {"type": "object", "additionalProperties": False,
+                    "required": ["scene", "tried_failed", "open_question", "hook_line", "source"],
+                    "properties": {"scene": {"type": "string"}, "tried_failed": {"type": "string"},
+                                   "open_question": {"type": "string"}, "hook_line": {"type": "string"},
+                                   "source": {"type": "string"}}}
+
+
+def _norm_text(s: str) -> str:
+    import re
+
+    return re.sub(r"<[^>]+>|[\s　#*>「」『』、。,.!！?？…・|｜]", "", s or "")
+
+
+def check_hook(result: dict) -> list[dict]:
+    """pain_hook.hook_line が各媒体の冒頭に入っているか（悩み解決型の1行目ルール）。"""
+    hook = (result.get("pain_hook") or {}).get("hook_line") or ""
+    key = _norm_text(hook)[:14]
+    if not key:
+        return [{"level": "error", "platform": "all", "where": "pain_hook", "msg": "pain_hook.hook_line が空"}]
+    outs = result.get("outputs", {})
+    heads = {}
+    if (outs.get("x") or {}).get("posts"):
+        heads["x"] = outs["x"]["posts"][0][:200]
+    if (outs.get("threads") or {}).get("posts"):
+        heads["threads"] = outs["threads"]["posts"][0][:300]
+    if "wordpress" in outs:
+        heads["wordpress"] = (outs["wordpress"].get("html") or "")[:900]
+    if "note" in outs:
+        heads["note"] = (outs["note"].get("markdown") or "")[:600]
+    issues = []
+    for p, head in heads.items():
+        if key not in _norm_text(head):
+            issues.append({"level": "error", "platform": p, "where": "冒頭",
+                           "msg": f"フック「{hook[:30]}」が冒頭に入っていない（悩み解決型の1行目ルール）"})
+    return issues
+
+
 def _persona_block(acct: Account) -> str:
     p = acct.persona
     cal = acct.calibration()
@@ -117,9 +172,16 @@ def build_context(acct: Account, platforms: list[str], settings: dict, affiliate
 
 
 def generate(account_key: str, topic: str, platforms: list[str] | None = None, affiliate_ids: list[str] | None = None,
-             notes: str = "", source_urls: list[str] | None = None, render_images: bool = True) -> dict:
+             notes: str = "", source_urls: list[str] | None = None, render_images: bool = True,
+             use_muse: bool = True) -> dict:
     settings = C.load_settings()
     acct = get_account(account_key)
+    seed = None
+    if use_muse:
+        from core import muse_ingestor
+
+        muse_ingestor.ingest_inbox()            # inbox に置かれた新しいファイルを先に取り込む
+        seed = muse_ingestor.next_seed(acct.key)
     active = acct.active_platforms()
     targets = [p for p in (platforms or active) if p in active and p in PLATFORM_SCHEMAS]
     if not targets:
@@ -143,21 +205,35 @@ def generate(account_key: str, topic: str, platforms: list[str] | None = None, a
                              if c.get("cushion") else ""))
     user = (f"# アカウント実データ\n{_persona_block(acct)}\n\n"
             f"# 誘導先（自分の資産）\n{json.dumps(ctx['own_destinations'], ensure_ascii=False)}\n\n"
-            f"# 今回のテーマ\n{topic or AUTO_TOPIC}\n{('補足: ' + notes) if notes else ''}\n"
+            f"{FUNNEL}\n\n"
+            + (f"{SEED_RULES}\nseed: {json.dumps(seed, ensure_ascii=False)}\n\n" if seed else "")
+            + f"# 今回のテーマ\n{topic or ('（Muse のシードから決める）' if seed else AUTO_TOPIC)}\n{('補足: ' + notes) if notes else ''}\n"
             f"{('参照してよい一次情報URL: ' + ', '.join(source_urls)) if source_urls else ''}\n\n"
             f"# 出力する媒体\n" + "\n\n".join(spec_lines) +
-            "\n\n先に reader_problem（読者の迷い）と angle（このアカウントならではの切り口）を決め、全媒体で一貫させる。")
+            "\n\n先に reader_problem（読者の迷い）・pain_hook（場面・試してダメだったこと・未解決の疑問・1行目）・"
+            "angle（このアカウントならではの切り口）を決め、全媒体で一貫させる。")
 
     schema = {"type": "object", "additionalProperties": False,
-              "required": ["reader_problem", "angle", "outputs"],
-              "properties": {"reader_problem": {"type": "string"}, "angle": {"type": "string"},
+              "required": ["reader_problem", "pain_hook", "angle", "outputs"],
+              "properties": {"reader_problem": {"type": "string"}, "pain_hook": PAIN_HOOK_SCHEMA, "angle": {"type": "string"},
                              "outputs": {"type": "object", "additionalProperties": False, "required": targets,
                                          "properties": {p: PLATFORM_SCHEMAS[p] for p in targets}}}}
     from core import llm
 
     result = llm.generate_json(SYSTEM.replace("{pr}", pr), user, schema, settings)
+    hook_issues = check_hook(result)
+    if hook_issues:                             # 1行目ルールを外したら1回だけ作り直す
+        fix = "\n\n# 前回の出力の不備（直して全体を出し直す）\n" + "\n".join(f"- {i['platform']}: {i['msg']}" for i in hook_issues)
+        result = llm.generate_json(SYSTEM.replace("{pr}", pr), user + fix, schema, settings)
     result["_llm_backend"] = llm.last_backend
-    return finalize_draft(acct, topic or f"[自動] {result.get('reader_problem', '')}", targets, result, ctx, settings, render_images)
+    result["_muse_seed"] = seed
+    label = topic or (f"[Muse] {result.get('reader_problem', '')}" if seed else f"[自動] {result.get('reader_problem', '')}")
+    d = finalize_draft(acct, label, targets, result, ctx, settings, render_images)
+    if seed:
+        from core import muse_ingestor
+
+        muse_ingestor.mark_used(acct.key, seed["id"], d["id"])
+    return d
 
 
 def finalize_draft(acct: Account, topic: str, targets: list[str], result: dict, ctx: dict, settings: dict,
@@ -171,10 +247,12 @@ def finalize_draft(acct: Account, topic: str, targets: list[str], result: dict, 
         issues += guards.check_platform(p, body, {"allowed_urls": c["allowed_urls"], "affiliate_urls": c["affiliate_urls"],
                                                   "pr_label": aff_cfg.get("pr_label", "PR"),
                                                   "pr_label_required": aff_cfg.get("pr_label_required", True)}, limits)
+    issues += check_hook(result)
     draft_id = drafts.new_id(acct.key)
     d = {
         "id": draft_id, "account_key": acct.key, "account_label": acct.label, "topic": topic,
         "created_at": C.now_iso(), "reader_problem": result.get("reader_problem"), "angle": result.get("angle"),
+        "pain_hook": result.get("pain_hook"), "muse_seed": result.get("_muse_seed"),
         "outputs": result["outputs"], "context": ctx, "issues": issues, "llm_backend": result.get("_llm_backend"),
         "platform_status": {p: "draft" for p in targets}, "history": [{"at": C.now_iso(), "event": "generated"}],
     }
@@ -200,5 +278,7 @@ def revalidate(draft_id: str) -> dict:
                                                   "pr_label": aff_cfg.get("pr_label", "PR"),
                                                   "pr_label_required": aff_cfg.get("pr_label_required", True)},
                                         settings.get("platform_limits", {}))
+    if d.get("pain_hook"):
+        issues += check_hook({"pain_hook": d["pain_hook"], "outputs": d["outputs"]})
     d["issues"] = issues
     return drafts.save(d)

@@ -85,7 +85,8 @@ c[3].metric("TODAY ¥", f"{rev['today']:,.0f}")
 c[4].metric("MONTH ¥", f"{rev['month']:,.0f}")
 c[5].metric("BUZZ ALERTS", len(new_alerts))
 
-t1, t2, t3, t4, t5 = st.tabs(["01 ACCOUNTS", "02 CRAWL & SYNC", "03 REVENUE & BUZZ", "04 GENERATE & PUBLISH", "05 SYSTEM"])
+t1, t2, t3, t4, t6, t5 = st.tabs(["01 ACCOUNTS", "02 CRAWL & SYNC", "03 REVENUE & BUZZ", "04 GENERATE & PUBLISH",
+                                  "05 MUSE RESEARCH", "06 SYSTEM"])
 
 # ================================================================ 01 ACCOUNTS
 with t1:
@@ -352,7 +353,94 @@ with t4:
             st.json(publish_draft(sel, ap_targets, live=live))
         a4.download_button("JSON 書き出し", json.dumps(d, ensure_ascii=False, indent=2), file_name=f"{sel}.json")
 
-# ================================================================ 05 SYSTEM
+# ================================================================ 05 MUSE RESEARCH
+with t6:
+    import subprocess
+
+    from core import muse_ingestor as MI
+
+    st.subheader("Muse 需要調査 → 取り込み → 悩み解決型の原稿")
+    st.caption("① アカウントを選ぶ → ② 調査プロンプトを右上のコピーボタンでコピーして Muse に投げる → "
+               "③ Muse が返した表（CSV / Markdown表 / JSON）をそのまま貼る → ④ 保存して生成")
+    mk = st.selectbox("アカウント", list(LABELS), format_func=LABELS.get, key="muse_acct")
+    ma = L.get_account(mk, M)
+    m1, m2 = st.columns([3, 2])
+    with m1:
+        kind = st.radio("調べるもの", ["audience_pain", "own_story"], horizontal=True,
+                        format_func=lambda k: "読者の悩み（Threads / IG・直近30日）" if k == "audience_pain"
+                        else "本人のストーリーズ書き起こし")
+        cdays, cn = st.columns(2)
+        days = cdays.number_input("期間（日）", 7, 90, 30, step=1)
+        nrows = cn.number_input("件数", 5, 50, 20, step=5, disabled=kind == "own_story")
+        prompt = MI.stories_prompt(ma, int(days)) if kind == "own_story" else MI.research_prompt(ma, int(days), int(nrows))
+        st.code(prompt, language="text")   # 右上のアイコンでワンクリックコピー
+    with m2:
+        stx = MI.stats()
+        rows = [{"account": LABELS[a.key], "未使用シード": stx.get(a.key, {}).get("pending", 0),
+                 "取り込み済み": stx.get(a.key, {}).get("total", 0), "うちストーリーズ": stx.get(a.key, {}).get("stories", 0)}
+                for a in ACCOUNTS]
+        st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+        nxt = MI.next_seed(mk)
+        if nxt:
+            st.markdown("**次に使うシード**")
+            st.caption(f"場面: {nxt.get('scene') or nxt.get('topic')}")
+            if nxt.get("tried_failed"):
+                st.caption(f"試してダメ: {nxt['tried_failed']}")
+            if nxt.get("open_question"):
+                st.caption(f"未解決: {nxt['open_question']}")
+
+    pasted = st.text_area("Muse の出力を貼り付け", height=220, key="muse_paste",
+                          placeholder=MI.STORY_HEADER if kind == "own_story" else MI.PAIN_HEADER)
+    preview = MI.parse_table(pasted) if pasted.strip() else []
+    if pasted.strip():
+        usable = [r for r in preview if (r.get("transcript") if kind == "own_story" else (r.get("scene") or r.get("open_question")))]
+        st.caption(f"読めた行: {len(preview)} ／ シードとして使える行: {len(usable)}")
+        if preview:
+            st.dataframe(pd.DataFrame(preview).head(30), hide_index=True, use_container_width=True)
+
+    log_path = C.DATA_DIR / "muse_generate.log"
+    pid_path = C.DATA_DIR / "muse_generate.pid"
+
+    def _running() -> bool:
+        try:
+            import os
+
+            os.kill(int(pid_path.read_text()), 0)
+            return True
+        except Exception:
+            return False
+
+    def _launch(args: list[str]) -> None:
+        with open(log_path, "w") as lf:
+            proc = subprocess.Popen([sys.executable, str(ROOT / "main.py"), "generate", *args],
+                                    cwd=str(ROOT), stdout=lf, stderr=subprocess.STDOUT)
+        pid_path.write_text(str(proc.pid))
+
+    b1, b2, b3 = st.columns(3)
+    busy = _running()
+    if b1.button("💾 保存して、このアカウントの原稿を生成", type="primary", disabled=busy or not preview):
+        f = MI.save_paste(pasted, mk, kind)
+        rep = MI.ingest_inbox(M)
+        st.success(f"{f.name} を保存・取り込み: {rep['files']}")
+        _launch(["--account", mk])
+        st.rerun()
+    if b2.button("💾 保存して、6アカウント分を生成", disabled=busy or not preview):
+        f = MI.save_paste(pasted, mk, kind)
+        MI.ingest_inbox(M)
+        _launch(["--all"])
+        st.rerun()
+    if b3.button("▶ 未使用シードがあるアカウントだけ生成", disabled=busy):
+        _launch(["--all", "--muse-only"])
+        st.rerun()
+    st.caption("Muse のシードが無いアカウントは、クロールした実投稿から悩みを選んで同じ悩み解決型で生成する。"
+               "生成はバックグラウンドで走る（1アカウント数分）。でき上がった原稿は 04 GENERATE & PUBLISH で確認・承認。")
+    if log_path.exists():
+        st.markdown(badge("生成中", "mid") if busy else badge("待機", "ok"), unsafe_allow_html=True)
+        st.code(log_path.read_text()[-3000:] or "（まだ出力なし）", language="text")
+        if busy and st.button("↻ 進捗を更新"):
+            st.rerun()
+
+# ================================================================ 06 SYSTEM
 with t5:
     st.subheader("動作モード")
     nd = st.toggle("DRY RUN（外部へ一切書き込まない）", value=settings.get("mode", {}).get("dry_run", True))

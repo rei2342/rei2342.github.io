@@ -58,21 +58,25 @@ def test_guards():
     assert guards.x_weighted_len("abc https://example.com/very/long") == 4 + 23
 
 
+HOOK = "迷ったまま申し込みを先送りしている人へ"
+
+
 def _fake_result(targets, acct, ctx):
     own = acct.own_destinations()[0]["url"] if acct.own_destinations() else ""
     outs = {}
     for p in targets:
         if p == "wordpress":
             outs[p] = {"title": "t", "slug": "t", "excerpt": "e", "meta_description": "m",
-                       "html": "<h2>見出し</h2>" + "<p>本文。</p>" * 400, "affiliate_program_ids": []}
+                       "html": f"<p>{HOOK}</p><h2>見出し</h2>" + "<p>本文。</p>" * 400, "affiliate_program_ids": []}
         elif p == "note":
-            outs[p] = {"title": "t", "markdown": "## 見出し\n" + "本文。\n" * 500, "hashtags": [], "affiliate_program_ids": []}
+            outs[p] = {"title": "t", "markdown": f"{HOOK}\n\n## 見出し\n" + "本文。\n" * 500, "hashtags": [], "affiliate_program_ids": []}
         elif p in ("x", "threads"):
-            outs[p] = {"posts": ["迷っている人へ。確認するのは1点だけ。", f"続きはこちら {own}"], "buzz_followup": f"まとめ {own}"}
+            outs[p] = {"posts": [HOOK + "\n確認するのは1点だけ。", f"続きはこちら {own}"], "buzz_followup": f"まとめ {own}"}
         elif p == "instagram":
             outs[p] = {"slides": [{"headline": f"見出し{i}", "body": "本文" * 10} for i in range(6)],
                        "caption": "保存して見返してね。詳しくはプロフィールから", "hashtags": ["#a", "#b", "#c"]}
-    return {"reader_problem": "r", "angle": "a", "outputs": outs}
+    return {"reader_problem": "r", "angle": "a", "outputs": outs,
+            "pain_hook": {"scene": "s", "tried_failed": "t", "open_question": "q", "hook_line": HOOK, "source": "test"}}
 
 
 def test_generate_to_dryrun_publish(tmp_path=None):
@@ -84,19 +88,29 @@ def test_generate_to_dryrun_publish(tmp_path=None):
 
     s = C.load_settings()
     made, outbox_files = [], []
-    for acct in L.get_accounts():
-        targets = acct.active_platforms()
-        ctx = G.build_context(acct, targets, s, None, [])
-        d = G.finalize_draft(acct, "テスト", targets, _fake_result(targets, acct, ctx), ctx, s, render_images=True)
-        made.append(d["id"])
-        assert set(d["outputs"]) == set(targets)
-        assert not guards.has_errors(d["issues"]), d["issues"]
-        if "instagram" in targets:
-            assert len(d["outputs"]["instagram"]["image_paths"]) == 6
-        drafts.approve(d["id"])
-        r = publish_draft(d["id"], live=False)
-        assert r["dry_run"] and all(v.get("ok") for v in r["results"].values()), r
-        outbox_files += [v["outbox"] for v in r["results"].values() if isinstance(v.get("outbox"), str)]
+    try:
+        for acct in L.get_accounts():
+            targets = acct.active_platforms()
+            ctx = G.build_context(acct, targets, s, None, [])
+            d = G.finalize_draft(acct, "テスト", targets, _fake_result(targets, acct, ctx), ctx, s, render_images=True)
+            made.append(d["id"])
+            assert set(d["outputs"]) == set(targets)
+            assert not guards.has_errors(d["issues"]), d["issues"]
+            if "instagram" in targets:
+                assert len(d["outputs"]["instagram"]["image_paths"]) == 6
+            drafts.approve(d["id"])
+            r = publish_draft(d["id"], live=False)
+            outbox_files += [v["outbox"] for v in r["results"].values() if isinstance(v.get("outbox"), str)]
+            assert r["dry_run"] and all(v.get("ok") for v in r["results"].values()), r
+    finally:
+        _cleanup(made, outbox_files, s)
+
+
+def _cleanup(made, outbox_files, s):
+    import shutil
+
+    from core import drafts
+
     for i in made:  # 後片付け（ダッシュボードの outbox・画像にダミーを残さない）
         drafts.path(i).unlink(missing_ok=True)
         C.DATA_DIR.joinpath("outbox", "note", f"{i}.png").unlink(missing_ok=True)
@@ -270,6 +284,59 @@ def test_cushion_routes_sns_to_own_wp():
         assert not c["affiliate_urls"], p            # SNS/note に広告リンクは渡さない
         if c.get("cushion"):
             assert c["cushion"]["via_url"] == wp and wp in c["allowed_urls"]
+
+
+def test_muse_parse_formats():
+    from core import muse_ingestor as MI
+
+    csv_jp = "アカウント,媒体,困っている場面,試してダメだったこと,未解決の疑問,反応\nsakura_eigo30,threads,出発前に英会話を始めたら続かない,アプリを3つ試した,何から削ればいい？,1.2k\n"
+    md = "| scene | open_question |\n|---|---|\n| 面接で英語が出ない | 何を覚える？ |\n"
+    js = '[{"scene": "s", "open_question": "q", "quote": "@someone https://x.com/a 本文"}]'
+    a = MI.parse_table(csv_jp)
+    assert a[0]["scene"].startswith("出発前") and a[0]["account"] == "sakura_eigo30" and MI._engagement(a[0]["engagement"]) == 1200
+    assert MI.parse_table(md)[0]["open_question"] == "何を覚える？"
+    it = MI.normalize(MI.parse_table(js)[0], "sakura_eigo30", "audience_pain", "t.json")
+    assert "@someone" not in it["quote"] and "https://" not in it["quote"]
+
+
+def test_muse_inbox_seed_priority(tmp=None):
+    import tempfile
+
+    from core import muse_ingestor as MI
+
+    saved = (MI.INBOX, MI.STORE, MI.STATE)
+    with tempfile.TemporaryDirectory() as td:
+        MI.INBOX, MI.STORE = Path(td) / "inbox", Path(td) / "store"
+        MI.STATE = MI.INBOX / ".ingested.json"
+        try:
+            MI.INBOX.mkdir()
+            (MI.INBOX / "sakura_eigo30__pain.csv").write_text(
+                "scene,tried_failed,open_question,engagement\n低反応の悩み,,疑問A,3\n高反応の悩み,試したB,疑問B,500\n", encoding="utf-8")
+            (MI.INBOX / "akira_life_500__stories.csv").write_text("date,transcript,topic\n2026-11-01,今日は会議の話,会議\n", encoding="utf-8")
+            (MI.INBOX / "unknown.csv").write_text("scene\nx\n", encoding="utf-8")
+            rep = MI.ingest_inbox()
+            assert any(f["file"] == "unknown.csv" for f in rep["skipped"])
+            assert MI.ingest_inbox()["files"] == []                      # 同じファイルは二重に取り込まない
+            seed = MI.next_seed("sakura_eigo30")
+            assert seed["scene"] == "高反応の悩み" and seed["related"][0]["scene"] == "低反応の悩み"
+            MI.mark_used("sakura_eigo30", seed["id"], "d1")
+            assert MI.next_seed("sakura_eigo30")["scene"] == "低反応の悩み"
+            assert MI.next_seed("akira_life_500")["kind"] == "own_story"
+            assert "sakura_eigo30" in MI.research_prompt(L.get_account("sakura_eigo30"))
+        finally:
+            MI.INBOX, MI.STORE, MI.STATE = saved
+
+
+def test_hook_must_open_every_platform():
+    from core.content_generator import check_hook
+
+    hook = "英会話アプリを3つ試しても、口が動かないまま出発日が近づく"
+    ok = {"pain_hook": {"hook_line": hook}, "outputs": {
+        "x": {"posts": [hook + "\n\n次に"]}, "wordpress": {"html": "<p>PR</p><p>" + hook + "。</p>"},
+        "note": {"markdown": hook + "\n\n本文"}}}
+    assert check_hook(ok) == []
+    bad = {"pain_hook": {"hook_line": hook}, "outputs": {"x": {"posts": ["プログリットの料金は"]}}}
+    assert check_hook(bad)[0]["platform"] == "x"
 
 
 if __name__ == "__main__":

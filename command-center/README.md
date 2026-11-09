@@ -83,3 +83,25 @@ main.py   tests/test_pipeline.py（オフラインのE2E。python tests/test_pip
 - `python main.py affiliate-audit` … 116 件の内訳・アカウント別のWP経由で使える案件数・媒体ずれ。
 - クッション導線: SNS・note には広告リンクを渡さず、同じアカウントのWP記事へ送る（`affiliate.cushion_via_wordpress`）。
 - `python main.py wp-draft <draft_id>` … 承認前の疎通テスト。status は常に draft。
+
+## Muse 需要調査 → 悩み解決型の原稿（2026-11-09）
+
+Meta の Muse で集めた「読者の生の悩み」と「AKIRA のストーリーズ書き起こし」を、generate のネタ元として最優先で使う。
+
+1. **調査プロンプトを作る**: ダッシュボード `05 MUSE RESEARCH` でアカウントを選ぶと、そのアカウントの読者層・テーマに合わせた
+   Muse 用プロンプト（直近30日の Threads/IG から悩みを CSV で20件）が出る。右上のアイコンでコピー。
+   CLI なら `python main.py muse-prompt さくら`（ストーリーズは `--stories`）。
+2. **取り込む**: Muse の返した表（CSV / TSV / Markdown表 / JSON）を画面に貼って保存するか、
+   `data/muse_inbox/<account_key>__xxx.csv` に置く（サブフォルダ `data/muse_inbox/<account_key>/` でも、表の `account` 列でも可）。
+   ファイル名に `stories` を含むものは本人のストーリーズ書き起こしとして扱う。`python main.py muse-ingest` で手動取り込みも可。
+   列名は日本語（困っている場面／試してダメだったこと／未解決の疑問 …）でも英語（scene／tried_failed／open_question …）でも読む。
+3. **生成**: `generate` は毎回 inbox を取り込み、未使用のシードを1つ（反応の大きい順 → 無ければストーリーズ）選んで使う。
+   使ったシードは `data/muse/<account_key>/items.jsonl` で使用済みになる。
+   `generate --all --muse-only` で未使用シードがあるアカウントだけ、`--no-muse` でシードを使わずに生成。
+
+**悩み解決型ファネル**（シードの有無にかかわらず全原稿に適用）:
+フック（場面・試してダメだったこと・未解決の疑問を読者の言葉で1行目に）→ 共感と原因 → 今日できる手順 → 解決策として案件・有料note・LINE を1〜2個 → CTA。
+`pain_hook.hook_line` が X / Threads の1投稿目・WP の導入・note の1段落目に入っていなければ検査 error（生成時は1回だけ自動で作り直す）。
+
+他人の投稿は場面として言い換えて使い、原文の引用・@ハンドル・URL は原稿に載せない（取り込み時に @ハンドルと URL を落とす）。
+ストーリーズは本人が話した範囲だけを使い、話していない経歴・数字は足さない。

@@ -95,6 +95,11 @@ def main():
     g.add_argument("--account"); g.add_argument("--topic", default=""); g.add_argument("--all", action="store_true")
     g.add_argument("--platform", action="append"); g.add_argument("--affiliate", action="append")
     g.add_argument("--source", action="append"); g.add_argument("--notes", default="")
+    g.add_argument("--no-muse", action="store_true", help="Muse のシードを使わない")
+    g.add_argument("--muse-only", action="store_true", help="未使用の Muse シードがあるアカウントだけ生成")
+    sp.add_parser("muse-ingest")
+    mp = sp.add_parser("muse-prompt"); mp.add_argument("account"); mp.add_argument("--stories", action="store_true")
+    mp.add_argument("--days", type=int, default=30); mp.add_argument("--n", type=int, default=20)
     ds = sp.add_parser("drafts"); ds.add_argument("account", nargs="?")
     ap_ = sp.add_parser("approve"); ap_.add_argument("draft_id"); ap_.add_argument("-p", "--platform", action="append")
     pb = sp.add_parser("publish"); pb.add_argument("draft_id"); pb.add_argument("-p", "--platform", action="append"); pb.add_argument("--live", action="store_true")
@@ -148,20 +153,44 @@ def main():
         names = [x.key for x in L.get_accounts()] if a.all else [a.account or a.account_pos]
         if not names[0]:
             sys.exit("アカウントを指定: generate --account さくら（全員なら --all）")
+        if a.muse_only:
+            from core import muse_ingestor
+
+            muse_ingestor.ingest_inbox()
+            names = [n for n in names if muse_ingestor.pending(L.get_account(n).key)]
+            print(f"Muse の未使用シードがあるアカウント: {names or 'なし'}")
         failed = 0
         for n in names:
             acct = L.get_account(n)
             try:
-                d = generate(acct.key, a.topic or a.topic_pos or "", a.platform, a.affiliate, a.notes, a.source)
+                d = generate(acct.key, a.topic or a.topic_pos or "", a.platform, a.affiliate, a.notes, a.source,
+                             use_muse=not a.no_muse)
             except Exception as e:
                 failed += 1
                 print(f"✗ {acct.label}: {type(e).__name__}: {e}")
                 continue
             errs = [i for i in d["issues"] if i["level"] == "error"]
             print(f"✓ {acct.label}: draft {d['id']}  テーマ「{d['topic'][:40]}」 媒体={list(d['outputs'])} error={len(errs)} warn={len(d['issues']) - len(errs)}")
+            if d.get("pain_hook"):
+                src = "Muse " + d["muse_seed"]["id"] if d.get("muse_seed") else "シードなし"
+                print(f"    フック（{src}）: {d['pain_hook']['hook_line']}")
             for i in d["issues"]:
                 print(f"    {i['level']:5} {i['platform']} {i['where']}: {i['msg']}")
         sys.exit(1 if failed else 0)
+    elif a.cmd == "muse-ingest":
+        from core import muse_ingestor
+
+        rep = muse_ingestor.ingest_inbox()
+        for f in rep["files"]:
+            print(f"取り込み {f['file']}: {f['added'] or '0件'}")
+        for f in rep["skipped"]:
+            print(f"⚠ {f['file']}: {f['reason']}")
+        print(json.dumps(muse_ingestor.stats(), ensure_ascii=False))
+    elif a.cmd == "muse-prompt":
+        from core import muse_ingestor
+
+        acct = L.get_account(a.account)
+        print(muse_ingestor.stories_prompt(acct, a.days) if a.stories else muse_ingestor.research_prompt(acct, a.days, a.n))
     elif a.cmd == "drafts":
         from core import drafts
 
