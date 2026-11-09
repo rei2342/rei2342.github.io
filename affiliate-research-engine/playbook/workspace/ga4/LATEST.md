@@ -1,4 +1,4 @@
-# GA4 アクセス 2026-11-08
+# GA4 アクセス 2026-11-09
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
@@ -21,12 +21,12 @@
 | /adult-english-pronunciation-age/ | (direct) | 1 |
 | /ai-eikaiwa-vs-online-eikaiwa/ | (direct) | 1 |
 | /ai-pronunciation-app-how-to-choose/ | (direct) | 1 |
+| /canada-working-holiday-cost/ | (direct) | 1 |
 | /canada-working-holiday-language-school-budget/ | note | 1 |
 | /category/ryugaku-agent-cost/ | (direct) | 1 |
 | /category/uncategorized/ | (direct) | 1 |
 | /category/英語コーチング/ | (direct) | 1 |
 | /category/英語学習法/ | (direct) | 1 |
-| /core-image-english-words/ | (direct) | 1 |
 | /eikaiwa-not-continuing-solution/ | (direct) | 1 |
 | /english-coaching-12-questions/ | (direct) | 1 |
 | /english-coaching-worth-it/ | chatgpt.com | 1 |
@@ -60,12 +60,12 @@
 | 1 | 1 | 0.0分 | /adult-english-pronunciation-age/ |
 | 1 | 1 | 0.0分 | /ai-eikaiwa-vs-online-eikaiwa/ |
 | 1 | 1 | 0.0分 | /ai-pronunciation-app-how-to-choose/ |
+| 1 | 1 | 0.0分 | /canada-working-holiday-cost/ |
 | 1 | 1 | 0.0分 | /canada-working-holiday-language-school-budget/ |
 | 1 | 1 | 0.0分 | /category/ryugaku-agent-cost/ |
 | 1 | 1 | 0.0分 | /category/uncategorized/ |
 | 1 | 1 | 0.0分 | /category/英語コーチング/ |
 | 1 | 1 | 0.0分 | /category/英語学習法/ |
-| 1 | 1 | 1.8分 | /core-image-english-words/ |
 | 1 | 1 | 0.0分 | /eikaiwa-not-continuing-solution/ |
 | 1 | 1 | 0.0分 | /english-coaching-12-questions/ |
 | 1 | 1 | 0.0分 | /english-fluency-how-long/ |

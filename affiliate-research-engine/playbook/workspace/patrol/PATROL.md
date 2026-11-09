@@ -1,4 +1,4 @@
-# 日次パトロール 2026-11-08
+# 日次パトロール 2026-11-09
 
 直近14日
 
@@ -14,7 +14,7 @@
 |---|---|
 | note | 1 |
 
-2026-10-25 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-10-26 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
@@ -25,12 +25,12 @@
 | /adult-english-pronunciation-age/ | 1 |
 | /ai-eikaiwa-vs-online-eikaiwa/ | 1 |
 | /ai-pronunciation-app-how-to-choose/ | 1 |
+| /canada-working-holiday-cost/ | 1 |
 | /canada-working-holiday-language-school-budget/ | 1 |
 | /category/ryugaku-agent-cost/ | 1 |
 | /category/uncategorized/ | 1 |
 | /category/英語コーチング/ | 1 |
 | /category/英語学習法/ | 1 |
-| /core-image-english-words/ | 1 |
 | /eikaiwa-not-continuing-solution/ | 1 |
 | /english-coaching-12-questions/ | 1 |
 | /english-coaching-worth-it/ | 1 |
