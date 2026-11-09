@@ -290,12 +290,12 @@ def affiliate_pool(account: Account, target_url: str | None, settings: dict | No
     from core import affiliate_unlock
 
     matched = list(account.monetize.get("matched_affiliates") or [])
-    recovered = {p["program_id"]: p for p in affiliate_unlock.recovered_programs(account.key, account.master, s)}
+    recovered = {p["program_id"]: p for p in affiliate_unlock.recovered_programs(account, account.master, s)}
     # マスターで広告コードが空の案件は、公開記事から戻したコードで埋める（Astra の訴求・条件は残す）
     for i, p in enumerate(matched):
         rp = recovered.pop(p.get("program_id"), None)
         if rp and not p.get("affiliate_url"):
-            matched[i] = {**p, **{k: rp[k] for k in ("affiliate_url", "affiliate_url_media_id", "code_source", "code_pages")},
+            matched[i] = {**p, **{k: rp[k] for k in ("affiliate_url", "affiliate_url_media_id", "code_source")},
                           "fit_warning": p.get("fit_warning") or rp["fit_warning"]}
     matched += list(recovered.values())
     for prog in matched:

@@ -105,6 +105,7 @@ def main():
     ip = sp.add_parser("import-posts"); ip.add_argument("account"); ip.add_argument("platform"); ip.add_argument("path")
     wd = sp.add_parser("wp-draft"); wd.add_argument("draft_id")
     sp.add_parser("affiliate-harvest")
+    ic = sp.add_parser("import-a8-codes"); ic.add_argument("path")
     au = sp.add_parser("affiliate-audit"); au.add_argument("--json", action="store_true")
     en = sp.add_parser("enable"); en.add_argument("account"); en.add_argument("platform"); en.add_argument("--off", action="store_true")
     sp.add_parser("dashboard")
@@ -237,6 +238,11 @@ def main():
         from core import affiliate_unlock as U
         h = U.harvest(L.load_master())
         print(f"{len(h['rows'])} 件の A8 タグを自前WPの公開記事から取得（クリックはしていない）")
+    elif a.cmd == "import-a8-codes":
+        from core import affiliate_unlock as U
+        raw = json.loads(Path(a.path).read_text())
+        out = U.import_console_codes(raw["rows"] if isinstance(raw, dict) else raw, raw.get("fetched_at") if isinstance(raw, dict) else None)
+        print(f"{len(out['codes'])} 案件の媒体別コードを取り込み")
     elif a.cmd == "affiliate-audit":
         from core import affiliate_unlock as U
         rep = U.audit(L.load_master(), C.load_settings())
@@ -248,9 +254,10 @@ def main():
             for k, v in rep["per_account"].items():
                 if v["wordpress"]:
                     print(f"  {k}: WP経由で使える案件 {v['count_via_wp']} 件 ／ SNS直貼り {json.dumps({p: len(x) for p, x in v['direct_on_sns'].items()})}")
-            for f in rep["flags"]:
-                if f["state"] in ("media_mismatch", "media_unverified", "not_partnered"):
-                    print(f"  ⚠ {f['state']}: {f['site']} {f['media_code']} 広告主{f['advertiser']} {f['reason']}（{len(f['pages'])}記事）")
+            print(f"  SNS・note用リンクがある案件: {rep['sns_note_link_available']} 件")
+            for f in rep["harvest_checks"]:
+                if f["state"] != "ok":
+                    print(f"  ⚠ {f['state']}: {f['site']} {f.get('program_name') or '広告主' + str(f['advertiser'])} {f['reason']}（{len(f['pages'])}記事）")
     elif a.cmd == "enable":
         acct = L.get_account(a.account)
         L.set_write_enabled(acct.key, a.platform, not a.off)

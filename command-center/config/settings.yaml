@@ -55,9 +55,10 @@ affiliate:
   moshimo_media_map:
     "677298": "https://sakura-eigo.com/"
     "684125": "https://erabi-ai.com/"
-  # 公開記事から戻した A8 広告コード（python main.py affiliate-harvest で data/affiliate/harvested_a8.json に保存）。
-  # 確認済み媒体のコードが、その媒体の登録URLの記事に貼られていて、広告主が参加中一覧で1件に決まるものだけ使う。
-  use_harvested_codes: true
+  # A8 管理画面で媒体別に取った広告コード（python main.py import-a8-codes で data/affiliate/a8_console_codes.json）。
+  # WP の媒体向けのコードだけを使う。対象案件は Astra の matched_affiliates ＋ そのWPの公開記事で本人が既に使っている案件。
+  # 公開記事のタグ（affiliate-harvest）は使用状況と媒体ずれの検出にだけ使い、広告コードとしては使わない。
+  use_console_codes: true
   # SNS/note には広告リンクを貼らず、同じアカウントの自前WP記事へ送り、WP記事内で広告リンクを踏ませる。
   cushion_via_wordpress: true
   # マスターでは全案件 auto_publish_allowed=false。人が確認した案件だけここで許可する。

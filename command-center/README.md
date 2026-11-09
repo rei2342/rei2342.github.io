@@ -72,12 +72,14 @@ dashboard/  app.py
 main.py   tests/test_pipeline.py（オフラインのE2E。python tests/test_pipeline.py）
 ```
 
-## 眠っている A8 案件の解放とクッション導線（2026-11-08）
+## 眠っている A8 案件の解放とクッション導線（2026-11-08〜09）
 
-- マスターの A8 参加中 116 件のうち、広告コードがあるのは 3 件だけ。残り 113 件は「登録媒体URLの不一致」ではなく、広告コード未取得・媒体未紐付けで止まっていた。
-- `python main.py affiliate-harvest` … 自前WP（さくら・ユイ・レイ）の公開記事を未ログインの REST で読み、貼られている A8 タグを `data/affiliate/harvested_a8.json` に集める。リンクはクリックしない。
-- a8mat の3番目のブロックは「広告主番号×10 の36進」。マスターで媒体確認済みの3件と ARE DB の6件で検算済み。1番目のブロック（媒体コード）は、確認済み案件から逆引きした分だけ信用する。
-- 使える案件に戻す条件: 媒体コードが確認済み媒体 ／ その媒体の登録URLの記事に貼られている ／ 参加中一覧で広告主が1件に決まる。どれか1つでも欠ければ `affiliate-audit` で ⚠ として出す（media_unverified / media_mismatch / not_partnered / ambiguous）。
-- `python main.py affiliate-audit` … 116 件の内訳と、アカウントごとに「WP経由で使える案件数」と「SNSへ直接貼れる案件数」を出す。
-- クッション導線: SNS・note には広告リンクを渡さない。同じアカウントの WP を誘導先として許可し、WP 記事の中で広告リンクを踏ませる（`affiliate.cushion_via_wordpress`）。
-- `python main.py wp-draft <draft_id>` … 承認ゲートの前の疎通テスト。status は常に draft に固定し、公開はしない。
+- マスターの A8 参加中 116 件のうち、広告コードがあるのは 3 件だけだった。残り 113 件は「登録媒体URLの不一致」ではなく、広告コード未取得で止まっていた。
+- a8mat の構造（管理画面で媒体001〜008を切り替えて実測）: `<案件側ブロック>+<媒体×案件ごとのコード>+<広告主番号×10の36進>+<素材>`。
+  **媒体で変わるのは2番目のブロックだけ**。1番目のブロックで媒体を判定してはいけない（11/08 の版はこれを誤っていた）。
+- 正本は管理画面の媒体別コード。ログイン済みChromeで `/program/create-link?programId=..&websiteId=001..008` を読み、`python main.py import-a8-codes <json>` で `data/affiliate/a8_console_codes.json` に取り込む（広告リンクはクリックしない）。
+- WP で使う案件 = Astra の matched_affiliates ＋ そのWPの公開記事で本人が既に使っている案件。広告コードは必ずそのWPの媒体ID向けのものを使う。
+- `python main.py affiliate-harvest` … 自前WPの公開記事のタグを集め、管理画面のコードと2番目のブロックで照合して媒体ずれを出す。
+- `python main.py affiliate-audit` … 116 件の内訳・アカウント別のWP経由で使える案件数・媒体ずれ。
+- クッション導線: SNS・note には広告リンクを渡さず、同じアカウントのWP記事へ送る（`affiliate.cushion_via_wordpress`）。
+- `python main.py wp-draft <draft_id>` … 承認前の疎通テスト。status は常に draft。

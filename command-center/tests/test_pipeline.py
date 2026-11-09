@@ -239,30 +239,22 @@ def test_a8_decode_matches_verified_codes():
         if p.get("affiliate_url"):
             d = U.decode_a8(p["affiliate_url"])
             assert d["advertiser"] == int(p["program_id"][1:-3]), p["program_id"]
-    assert set(U.media_code_map(m).values()) <= {r["media_id"] for r in m["asp_inventory"]["a8"]["registered_media"]}
 
 
-def test_harvested_codes_respect_media():
-    """確認済み媒体のコードだけが、その媒体のサイトで使える。他媒体・未確認媒体のコードは使わない。"""
+def test_harvested_codes_checked_against_console_media():
+    """公開記事のタグは、管理画面の媒体別コードと2番目のブロックが一致したときだけ媒体が決まる。"""
     from core import affiliate_unlock as U
 
     m = L.load_master()
-    codes = {v: k for k, v in U.media_code_map(m).items()}
-    sk, er = codes.get("001"), codes.get("007")
-    if not (sk and er):
-        return
-    ok = f"https://px.a8.net/svt/ejp?a8mat={sk}+ZZZZZZ+4JKM+5YRHE"     # 4JKM = 211990 → 広告主 21199（2案件 → ambiguous）
-    one = f"https://px.a8.net/svt/ejp?a8mat={sk}+ZZZZZZ+5NSE+5YRHE"    # 5NSE = 264110 → 広告主 26411（1案件）
-    wrong = f"https://px.a8.net/svt/ejp?a8mat={er}+ZZZZZZ+5988+5YRHE"  # erabi のコードを sakura に
-    unknown = "https://px.a8.net/svt/ejp?a8mat=ZZZZZZ+ZZZZZZ+5NSE+5YRHE"
-    rows = [{"account_key": "sakura_eigo30", "site": "https://sakura-eigo.com/", "page": "https://sakura-eigo.com/x/", **U.decode_a8(h)}
-            for h in (ok, one, wrong, unknown)]
-    res = U.resolve(m, {"rows": rows})
-    st = {(r["media_code"], r["advertiser"]): r["state"] for r in res["usable"] + res["flags"]}
-    assert st[(sk, 26411)] == "usable"
-    assert st[(sk, 21199)] == "ambiguous"
-    assert st[(er, 24524)] == "media_mismatch"
-    assert st[("ZZZZZZ", 26411)] == "media_unverified"
+    codes = {"s00000017068001": {
+        "001": {"href": "x", "partner_code": "4S2ALU", "material": "TEXT", "media_options": [], "sns_link": True},
+        "007": {"href": "x", "partner_code": "4S2F8I", "material": "TEXT", "media_options": [], "sns_link": True}}}
+    rows = [{"account_key": "sakura_eigo30", "site": "https://sakura-eigo.com/", "page": "p", **U.decode_a8(h)}
+            for h in ("https://px.a8.net/svt/ejp?a8mat=4BA75B+4S2ALU+3NP4+5YRHE",   # 001 のコード → ok
+                      "https://px.a8.net/svt/ejp?a8mat=4BA75B+4S2F8I+3NP4+5YRHE",   # 007 のコードを sakura に → ずれ
+                      "https://px.a8.net/svt/ejp?a8mat=4BA75B+ZZZZZZ+3NP4+5YRHE")]  # どれとも一致しない
+    st = {r["partner_code"]: r["state"] for r in U.check_harvest(m, {"rows": rows}, codes)}
+    assert st == {"4S2ALU": "ok", "4S2F8I": "media_mismatch", "ZZZZZZ": "not_in_console"}
 
 
 def test_cushion_routes_sns_to_own_wp():
