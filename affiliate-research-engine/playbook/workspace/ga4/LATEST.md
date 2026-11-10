@@ -1,16 +1,15 @@
-# GA4 アクセス 2026-11-09
+# GA4 アクセス 2026-11-10
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **30** / ユーザー **30** / ページビュー **31**
+- セッション **28** / ユーザー **28** / ページビュー **28**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 24 | 24 |
+| (direct) | (none) | 23 | 23 |
 | bing | organic | 4 | 4 |
-| chatgpt.com | ai-assistant | 1 | 1 |
 | note | article | 1 | 1 |
 
 ## 着地ページ × 流入元
@@ -24,12 +23,10 @@
 | /canada-working-holiday-cost/ | (direct) | 1 |
 | /canada-working-holiday-language-school-budget/ | note | 1 |
 | /category/ryugaku-agent-cost/ | (direct) | 1 |
-| /category/uncategorized/ | (direct) | 1 |
 | /category/英語コーチング/ | (direct) | 1 |
 | /category/英語学習法/ | (direct) | 1 |
 | /eikaiwa-not-continuing-solution/ | (direct) | 1 |
 | /english-coaching-12-questions/ | (direct) | 1 |
-| /english-coaching-worth-it/ | chatgpt.com | 1 |
 | /english-fluency-how-long/ | (direct) | 1 |
 | /fast-verify-cost-time-travel/ | (direct) | 1 |
 | /get-core-image/ | (direct) | 1 |
@@ -48,14 +45,12 @@
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
 | /canada-working-holiday-language-school-budget/ | note | 1 |
-| /english-coaching-worth-it/ | chatgpt.com | 1 |
 
 ## ページ別 上位20
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
 | 6 | 6 | 1.0分 | / |
-| 2 | 1 | 0.3分 | /english-coaching-worth-it/ |
 | 2 | 2 | 0.0分 | /go-core-image/ |
 | 1 | 1 | 0.0分 | /adult-english-pronunciation-age/ |
 | 1 | 1 | 0.0分 | /ai-eikaiwa-vs-online-eikaiwa/ |
@@ -63,7 +58,6 @@
 | 1 | 1 | 0.0分 | /canada-working-holiday-cost/ |
 | 1 | 1 | 0.0分 | /canada-working-holiday-language-school-budget/ |
 | 1 | 1 | 0.0分 | /category/ryugaku-agent-cost/ |
-| 1 | 1 | 0.0分 | /category/uncategorized/ |
 | 1 | 1 | 0.0分 | /category/英語コーチング/ |
 | 1 | 1 | 0.0分 | /category/英語学習法/ |
 | 1 | 1 | 0.0分 | /eikaiwa-not-continuing-solution/ |
@@ -74,4 +68,6 @@
 | 1 | 1 | 0.0分 | /keep-core-image/ |
 | 1 | 1 | 0.1分 | /make-core-image/ |
 | 1 | 1 | 0.0分 | /present-core-image/ |
+| 1 | 1 | 0.7分 | /toeic-600-plateau-breakthrough-study/ |
+| 1 | 1 | 0.0分 | /working-holiday-age-30/ |
 
