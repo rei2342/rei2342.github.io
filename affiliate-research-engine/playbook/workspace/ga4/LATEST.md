@@ -1,22 +1,22 @@
-# GA4 アクセス 2026-11-11
+# GA4 アクセス 2026-11-12
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **25** / ユーザー **25** / ページビュー **25**
+- セッション **27** / ユーザー **27** / ページビュー **27**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 20 | 20 |
-| bing | organic | 4 | 4 |
+| (direct) | (none) | 21 | 21 |
+| bing | organic | 5 | 5 |
 | note | article | 1 | 1 |
 
 ## 着地ページ × 流入元
 
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
-| / | (direct) | 6 |
+| / | (direct) | 7 |
 | /adult-english-pronunciation-age/ | (direct) | 1 |
 | /ai-eikaiwa-vs-online-eikaiwa/ | (direct) | 1 |
 | /canada-working-holiday-cost/ | (direct) | 1 |
@@ -29,6 +29,7 @@
 | /english-fluency-how-long/ | (direct) | 1 |
 | /fast-verify-cost-time-travel/ | (direct) | 1 |
 | /get-core-image/ | (direct) | 1 |
+| /get-core-image/ | bing | 1 |
 | /go-core-image/ | bing | 1 |
 | /keep-core-image/ | (direct) | 1 |
 | /make-core-image/ | bing | 1 |
@@ -47,7 +48,8 @@
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
-| 6 | 6 | 1.0分 | / |
+| 7 | 7 | 0.8分 | / |
+| 2 | 2 | 0.1分 | /get-core-image/ |
 | 1 | 1 | 0.0分 | /adult-english-pronunciation-age/ |
 | 1 | 1 | 0.0分 | /ai-eikaiwa-vs-online-eikaiwa/ |
 | 1 | 1 | 0.0分 | /canada-working-holiday-cost/ |
@@ -59,7 +61,6 @@
 | 1 | 1 | 0.0分 | /english-coaching-12-questions/ |
 | 1 | 1 | 0.0分 | /english-fluency-how-long/ |
 | 1 | 1 | 0.0分 | /fast-verify-cost-time-travel/ |
-| 1 | 1 | 0.0分 | /get-core-image/ |
 | 1 | 1 | 0.0分 | /go-core-image/ |
 | 1 | 1 | 0.0分 | /keep-core-image/ |
 | 1 | 1 | 0.1分 | /make-core-image/ |

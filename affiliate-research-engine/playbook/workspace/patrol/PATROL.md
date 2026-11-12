@@ -1,4 +1,4 @@
-# 日次パトロール 2026-11-11
+# 日次パトロール 2026-11-12
 
 直近14日
 
@@ -8,19 +8,20 @@
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **25** セッション / うちSNS由来 **1**
+- 全流入 **27** セッション / うちSNS由来 **1**
 
 | 参照元 | セッション |
 |---|---|
 | note | 1 |
 
-2026-10-28 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-10-29 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
 | 着地ページ | セッション |
 |---|---|
-| / | 6 |
+| / | 7 |
+| /get-core-image/ | 2 |
 | /adult-english-pronunciation-age/ | 1 |
 | /ai-eikaiwa-vs-online-eikaiwa/ | 1 |
 | /canada-working-holiday-cost/ | 1 |
@@ -32,7 +33,6 @@
 | /english-coaching-12-questions/ | 1 |
 | /english-fluency-how-long/ | 1 |
 | /fast-verify-cost-time-travel/ | 1 |
-| /get-core-image/ | 1 |
 | /go-core-image/ | 1 |
 | /keep-core-image/ | 1 |
 | /make-core-image/ | 1 |
