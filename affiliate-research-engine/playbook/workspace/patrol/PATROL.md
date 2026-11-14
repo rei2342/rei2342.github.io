@@ -1,4 +1,4 @@
-# 日次パトロール 2026-11-13
+# 日次パトロール 2026-11-14
 
 直近14日
 
@@ -8,13 +8,11 @@
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **25** セッション / うちSNS由来 **1**
+- 全流入 **27** セッション / うちSNS由来 **0**
 
-| 参照元 | セッション |
-|---|---|
-| note | 1 |
+SNS由来の着地は0件。
 
-2026-10-30 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-10-31 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
@@ -23,28 +21,27 @@
 | / | 5 |
 | /get-core-image/ | 2 |
 | /adult-english-pronunciation-age/ | 1 |
-| /ai-eikaiwa-vs-online-eikaiwa/ | 1 |
 | /canada-working-holiday-cost/ | 1 |
-| /canada-working-holiday-language-school-budget/ | 1 |
 | /category/ryugaku-agent-cost/ | 1 |
+| /category/英会話サービス比較/ | 1 |
 | /category/英語コーチング/ | 1 |
 | /category/英語学習法/ | 1 |
+| /cebu-1month-review/ | 1 |
 | /eikaiwa-not-continuing-solution/ | 1 |
 | /english-coaching-12-questions/ | 1 |
 | /english-fluency-how-long/ | 1 |
 | /fast-verify-cost-time-travel/ | 1 |
 | /go-core-image/ | 1 |
 | /keep-core-image/ | 1 |
+| /philippines-study-abroad-adult-costs/ | 1 |
+| /present-core-image/ | 1 |
 | /take-off-core-image/ | 1 |
 | /toeic-600-plateau-breakthrough-study/ | 1 |
 | /working-holiday-age-30/ | 1 |
-| /working-holiday-english-anxiety/ | 1 |
-| /working-holiday-savings-amount/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
-**アフィリエイトリンクのクリックは0件。**
-記事には来ていてもリンクは踏まれていない。
+アフィリエイトリンクのクリックは0件。
 
 ---
 
