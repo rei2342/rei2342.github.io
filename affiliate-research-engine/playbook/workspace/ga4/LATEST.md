@@ -1,14 +1,14 @@
-# GA4 アクセス 2026-11-15
+# GA4 アクセス 2026-11-16
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **28** / ユーザー **28** / ページビュー **28**
+- セッション **29** / ユーザー **29** / ページビュー **29**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 23 | 23 |
+| (direct) | (none) | 24 | 24 |
 | bing | organic | 3 | 3 |
 | google | organic | 2 | 2 |
 
@@ -18,6 +18,7 @@
 |---|---|---|
 | / | (direct) | 5 |
 | /canada-working-holiday-cost/ | (direct) | 2 |
+| /working-holiday-age-30/ | (direct) | 2 |
 | /adult-english-pronunciation-age/ | (direct) | 1 |
 | /category/ryugaku-agent-cost/ | (direct) | 1 |
 | /category/英会話サービス比較/ | (direct) | 1 |
@@ -36,7 +37,6 @@
 | /present-core-image/ | google | 1 |
 | /put-on-core-image/ | google | 1 |
 | /take-off-core-image/ | (direct) | 1 |
-| /working-holiday-age-30/ | (direct) | 1 |
 | /working-holiday-english-anxiety/ | bing | 1 |
 | /working-holiday-savings-amount/ | (direct) | 1 |
 
@@ -53,6 +53,7 @@
 | 5 | 5 | 1.1分 | / |
 | 2 | 2 | 0.0分 | /canada-working-holiday-cost/ |
 | 2 | 2 | 0.1分 | /get-core-image/ |
+| 2 | 2 | 0.0分 | /working-holiday-age-30/ |
 | 1 | 1 | 0.0分 | /adult-english-pronunciation-age/ |
 | 1 | 1 | 0.0分 | /category/ryugaku-agent-cost/ |
 | 1 | 1 | 0.0分 | /category/英会話サービス比較/ |
@@ -69,5 +70,4 @@
 | 1 | 1 | 3.5分 | /present-core-image/ |
 | 1 | 1 | 0.3分 | /put-on-core-image/ |
 | 1 | 1 | 0.0分 | /take-off-core-image/ |
-| 1 | 1 | 0.0分 | /working-holiday-age-30/ |
 
