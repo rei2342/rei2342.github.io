@@ -1,4 +1,4 @@
-# GA4 アクセス 2026-11-16
+# GA4 アクセス 2026-11-17
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
@@ -8,15 +8,15 @@
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 24 | 24 |
+| (direct) | (none) | 23 | 23 |
 | bing | organic | 3 | 3 |
-| google | organic | 2 | 2 |
+| google | organic | 3 | 3 |
 
 ## 着地ページ × 流入元
 
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
-| / | (direct) | 5 |
+| / | (direct) | 4 |
 | /canada-working-holiday-cost/ | (direct) | 2 |
 | /working-holiday-age-30/ | (direct) | 2 |
 | /adult-english-pronunciation-age/ | (direct) | 1 |
@@ -25,6 +25,7 @@
 | /category/英語コーチング/ | (direct) | 1 |
 | /category/英語学習法/ | (direct) | 1 |
 | /cebu-1month-review/ | (direct) | 1 |
+| /core-image-english-words/ | google | 1 |
 | /eikaiwa-not-continuing-solution/ | (direct) | 1 |
 | /english-coaching-12-questions/ | (direct) | 1 |
 | /english-fluency-how-long/ | (direct) | 1 |
@@ -50,7 +51,7 @@
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
-| 5 | 5 | 1.1分 | / |
+| 4 | 4 | 1.4分 | / |
 | 2 | 2 | 0.0分 | /canada-working-holiday-cost/ |
 | 2 | 2 | 0.1分 | /get-core-image/ |
 | 2 | 2 | 0.0分 | /working-holiday-age-30/ |
@@ -60,6 +61,7 @@
 | 1 | 1 | 0.0分 | /category/英語コーチング/ |
 | 1 | 1 | 0.0分 | /category/英語学習法/ |
 | 1 | 1 | 0.0分 | /cebu-1month-review/ |
+| 1 | 1 | 0.0分 | /core-image-english-words/ |
 | 1 | 1 | 0.0分 | /eikaiwa-not-continuing-solution/ |
 | 1 | 1 | 0.0分 | /english-coaching-12-questions/ |
 | 1 | 1 | 0.0分 | /english-fluency-how-long/ |
@@ -69,5 +71,4 @@
 | 1 | 1 | 0.0分 | /philippines-study-abroad-adult-costs/ |
 | 1 | 1 | 3.5分 | /present-core-image/ |
 | 1 | 1 | 0.3分 | /put-on-core-image/ |
-| 1 | 1 | 0.0分 | /take-off-core-image/ |
 

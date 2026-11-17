@@ -1,4 +1,4 @@
-# 日次パトロール 2026-11-16
+# 日次パトロール 2026-11-17
 
 直近14日
 
@@ -12,13 +12,13 @@
 
 SNS由来の着地は0件。
 
-2026-11-02 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-11-03 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
 | 着地ページ | セッション |
 |---|---|
-| / | 5 |
+| / | 4 |
 | /canada-working-holiday-cost/ | 2 |
 | /get-core-image/ | 2 |
 | /working-holiday-age-30/ | 2 |
@@ -28,6 +28,7 @@ SNS由来の着地は0件。
 | /category/英語コーチング/ | 1 |
 | /category/英語学習法/ | 1 |
 | /cebu-1month-review/ | 1 |
+| /core-image-english-words/ | 1 |
 | /eikaiwa-not-continuing-solution/ | 1 |
 | /english-coaching-12-questions/ | 1 |
 | /english-fluency-how-long/ | 1 |
@@ -37,7 +38,6 @@ SNS由来の着地は0件。
 | /philippines-study-abroad-adult-costs/ | 1 |
 | /present-core-image/ | 1 |
 | /put-on-core-image/ | 1 |
-| /take-off-core-image/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
