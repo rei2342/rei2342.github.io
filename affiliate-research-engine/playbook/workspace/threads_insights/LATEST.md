@@ -1,11 +1,11 @@
-# Threads 数字 2026-11-17
+# Threads 数字 2026-11-18
 
-測定 2026-11-17T11:26:12.301144+00:00
+測定 2026-11-18T11:00:08.024085+00:00
 
 ## 取得できなかったアカウント
 
-- **さくら**: HTTP 400: {"error":{"message":"Error validating access token: Session has expired on Sunday, 04-Oct-26 19:16:58 PDT. The current time is Tuesday, 17-Nov-26 03:26:12 PST.","type":"OAuthException","code":190,"err
-- **AKIRA**: HTTP 400: {"error":{"message":"Error validating access token: Session has expired on Sunday, 04-Oct-26 18:28:39 PDT. The current time is Tuesday, 17-Nov-26 03:26:13 PST.","type":"OAuthException","code":190,"err
+- **さくら**: HTTP 400: {"error":{"message":"Error validating access token: Session has expired on Sunday, 04-Oct-26 19:16:58 PDT. The current time is Wednesday, 18-Nov-26 03:00:08 PST.","type":"OAuthException","code":190,"e
+- **AKIRA**: HTTP 400: {"error":{"message":"Error validating access token: Session has expired on Sunday, 04-Oct-26 18:28:39 PDT. The current time is Wednesday, 18-Nov-26 03:00:08 PST.","type":"OAuthException","code":190,"e
 
 トークンは60日程度で失効します。切れていれば取り直してください。
 

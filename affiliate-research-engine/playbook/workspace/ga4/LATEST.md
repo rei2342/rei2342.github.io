@@ -1,14 +1,14 @@
-# GA4 アクセス 2026-11-17
+# GA4 アクセス 2026-11-18
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **29** / ユーザー **29** / ページビュー **29**
+- セッション **31** / ユーザー **31** / ページビュー **31**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 23 | 23 |
+| (direct) | (none) | 25 | 25 |
 | bing | organic | 3 | 3 |
 | google | organic | 3 | 3 |
 
@@ -36,7 +36,9 @@
 | /keep-core-image/ | (direct) | 1 |
 | /philippines-study-abroad-adult-costs/ | (direct) | 1 |
 | /present-core-image/ | google | 1 |
+| /put-core-image/ | (direct) | 1 |
 | /put-on-core-image/ | google | 1 |
+| /set-core-image/ | (direct) | 1 |
 | /take-off-core-image/ | (direct) | 1 |
 | /working-holiday-english-anxiety/ | bing | 1 |
 | /working-holiday-savings-amount/ | (direct) | 1 |
@@ -70,5 +72,5 @@
 | 1 | 1 | 0.0分 | /keep-core-image/ |
 | 1 | 1 | 0.0分 | /philippines-study-abroad-adult-costs/ |
 | 1 | 1 | 3.5分 | /present-core-image/ |
-| 1 | 1 | 0.3分 | /put-on-core-image/ |
+| 1 | 1 | 0.0分 | /put-core-image/ |
 
