@@ -1,4 +1,4 @@
-# 日次パトロール 2026-11-18
+# 日次パトロール 2026-11-19
 
 直近14日
 
@@ -8,21 +8,21 @@
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **31** セッション / うちSNS由来 **0**
+- 全流入 **33** セッション / うちSNS由来 **0**
 
 SNS由来の着地は0件。
 
-2026-11-04 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-11-05 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
 | 着地ページ | セッション |
 |---|---|
-| / | 4 |
+| / | 5 |
+| /present-core-image/ | 3 |
 | /canada-working-holiday-cost/ | 2 |
 | /get-core-image/ | 2 |
 | /working-holiday-age-30/ | 2 |
-| /adult-english-pronunciation-age/ | 1 |
 | /category/ryugaku-agent-cost/ | 1 |
 | /category/英会話サービス比較/ | 1 |
 | /category/英語コーチング/ | 1 |
@@ -36,8 +36,8 @@ SNS由来の着地は0件。
 | /go-core-image/ | 1 |
 | /keep-core-image/ | 1 |
 | /philippines-study-abroad-adult-costs/ | 1 |
-| /present-core-image/ | 1 |
 | /put-core-image/ | 1 |
+| /put-on-core-image/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
