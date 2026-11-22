@@ -1,22 +1,22 @@
-# GA4 アクセス 2026-11-21
+# GA4 アクセス 2026-11-22
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **33** / ユーザー **32** / ページビュー **33**
+- セッション **31** / ユーザー **30** / ページビュー **31**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 22 | 22 |
+| (direct) | (none) | 21 | 21 |
 | google | organic | 7 | 6 |
-| bing | organic | 4 | 4 |
+| bing | organic | 3 | 3 |
 
 ## 着地ページ × 流入元
 
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
-| / | (direct) | 5 |
+| / | (direct) | 4 |
 | /present-core-image/ | google | 3 |
 | /canada-working-holiday-cost/ | (direct) | 2 |
 | /take-core-image/ | (direct) | 2 |
@@ -39,7 +39,6 @@
 | /set-core-image/ | (direct) | 1 |
 | /take-off-core-image/ | (direct) | 1 |
 | /working-holiday-age-30/ | (direct) | 1 |
-| /working-holiday-english-anxiety/ | bing | 1 |
 
 ### そのうちSNS由来だけ
 
@@ -51,7 +50,7 @@
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
-| 5 | 5 | 1.1分 | / |
+| 4 | 4 | 0.0分 | / |
 | 4 | 4 | 1.4分 | /present-core-image/ |
 | 4 | 4 | 0.0分 | /take-core-image/ |
 | 2 | 2 | 0.0分 | /canada-working-holiday-cost/ |
@@ -70,5 +69,4 @@
 | 1 | 1 | 0.0分 | /set-core-image/ |
 | 1 | 1 | 0.0分 | /take-off-core-image/ |
 | 1 | 1 | 0.0分 | /working-holiday-age-30/ |
-| 1 | 1 | 0.3分 | /working-holiday-english-anxiety/ |
 
