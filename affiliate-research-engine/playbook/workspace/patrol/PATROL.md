@@ -1,4 +1,4 @@
-# 日次パトロール 2026-11-22
+# 日次パトロール 2026-11-23
 
 直近14日
 
@@ -8,11 +8,11 @@
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **31** セッション / うちSNS由来 **0**
+- 全流入 **28** セッション / うちSNS由来 **0**
 
 SNS由来の着地は0件。
 
-2026-11-08 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-11-09 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
@@ -23,13 +23,10 @@ SNS由来の着地は0件。
 | /take-core-image/ | 4 |
 | /canada-working-holiday-cost/ | 2 |
 | /core-image-english-words/ | 2 |
-| /get-core-image/ | 2 |
-| /category/ryugaku-agent-cost/ | 1 |
 | /category/英会話サービス比較/ | 1 |
-| /category/英語コーチング/ | 1 |
-| /category/英語学習法/ | 1 |
 | /cebu-1month-review/ | 1 |
 | /cebu-beginner-mistakes-design/ | 1 |
+| /get-core-image/ | 1 |
 | /philippines-english-study-after-return/ | 1 |
 | /philippines-study-abroad-adult-costs/ | 1 |
 | /put-core-image/ | 1 |
@@ -37,6 +34,7 @@ SNS由来の着地は0件。
 | /set-core-image/ | 1 |
 | /take-off-core-image/ | 1 |
 | /working-holiday-age-30/ | 1 |
+| /working-holiday-english-anxiety/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
