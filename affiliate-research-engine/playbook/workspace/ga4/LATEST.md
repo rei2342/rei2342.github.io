@@ -1,4 +1,4 @@
-# GA4 アクセス 2026-11-23
+# GA4 アクセス 2026-11-24
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
@@ -8,23 +8,26 @@
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 18 | 18 |
+| (direct) | (none) | 17 | 17 |
 | google | organic | 7 | 6 |
 | bing | organic | 3 | 3 |
+| duckduckgo | organic | 1 | 1 |
 
 ## 着地ページ × 流入元
 
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
-| / | (direct) | 4 |
+| / | (direct) | 3 |
 | /present-core-image/ | google | 3 |
-| /canada-working-holiday-cost/ | (direct) | 2 |
 | /take-core-image/ | (direct) | 2 |
 | /take-core-image/ | google | 2 |
+| /canada-working-holiday-cost/ | (direct) | 1 |
 | /category/英会話サービス比較/ | (direct) | 1 |
 | /cebu-1month-review/ | (direct) | 1 |
 | /cebu-beginner-mistakes-design/ | (direct) | 1 |
+| /core-image-english-words/ | (direct) | 1 |
 | /core-image-english-words/ | bing | 1 |
+| /core-image-english-words/ | duckduckgo | 1 |
 | /core-image-english-words/ | google | 1 |
 | /get-core-image/ | bing | 1 |
 | /philippines-english-study-after-return/ | (direct) | 1 |
@@ -47,11 +50,11 @@
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
-| 4 | 4 | 0.0分 | / |
+| 4 | 4 | 0.7分 | /core-image-english-words/ |
 | 4 | 4 | 1.4分 | /present-core-image/ |
 | 4 | 4 | 0.0分 | /take-core-image/ |
-| 2 | 2 | 0.0分 | /canada-working-holiday-cost/ |
-| 2 | 2 | 0.3分 | /core-image-english-words/ |
+| 3 | 3 | 0.0分 | / |
+| 1 | 1 | 0.0分 | /canada-working-holiday-cost/ |
 | 1 | 1 | 0.0分 | /category/英会話サービス比較/ |
 | 1 | 1 | 0.0分 | /cebu-1month-review/ |
 | 1 | 1 | 0.0分 | /cebu-beginner-mistakes-design/ |
