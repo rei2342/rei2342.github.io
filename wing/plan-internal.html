@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>WING 事業設計</title>
+<meta name="description" content="WING 事業設計（社内用）">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,600;0,700;1,700;1,800;1,900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: single column, navy brand-committed, numbered sections as a real sequence */
+:root{
+  --ink:#0E1727;
+  --surface:#1B2847;
+  --surface-2:#223052;
+  --surface-3:#2B3A5E;
+  --line:rgba(240,237,232,.13);
+  --line-strong:rgba(240,237,232,.26);
+  --paper:#F0EDE8;
+  --dim:rgba(240,237,232,.66);
+  --faint:rgba(240,237,232,.40);
+  --accent:#D9AC97;
+  --accent-hi:#EDC8B2;
+  --good:#7FC9A9;
+  --warn:#E5B169;
+  --display:'Archivo','Noto Sans JP',system-ui,sans-serif;
+  --body:'Noto Sans JP','Archivo',system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--ink);color:var(--paper);font-family:var(--body);line-height:1.8;margin:0;
+  -webkit-font-smoothing:antialiased;font-size:15px}
+.wrap{max-width:1000px;margin:0 auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+section{padding-block:58px;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+
+/* hero */
+.hero{margin-top:calc(-1 * env(safe-area-inset-top,0px));padding-top:calc(env(safe-area-inset-top,0px) + 56px);padding-bottom:48px;background:var(--surface);border-bottom:1px solid var(--line-strong)}
+.mark{font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(44px,10vw,88px);letter-spacing:-.03em;line-height:.9;margin:0}
+.smile{width:clamp(78px,16vw,150px);height:22px;margin:8px 0 22px;display:block}
+.hero h1{font-family:var(--display);font-weight:700;font-size:clamp(20px,3.4vw,27px);margin:0 0 10px;letter-spacing:.01em;text-wrap:balance}
+.hero p{color:var(--dim);margin:0;max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.meta span{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;font-family:var(--display);font-weight:600;
+  border:1px solid var(--line-strong);border-radius:999px;padding:5px 13px;color:var(--faint)}
+
+h2{font-family:var(--display);font-weight:700;font-size:clamp(22px,4vw,31px);letter-spacing:-.01em;margin:0 0 6px;text-wrap:balance}
+.num{font-family:var(--display);font-style:italic;font-weight:800;font-size:13px;letter-spacing:.14em;color:var(--accent);display:block;margin-bottom:12px}
+.lede{color:var(--dim);max-width:68ch;margin:0 0 30px}
+h3{font-family:var(--display);font-weight:700;font-size:17px;margin:34px 0 12px;letter-spacing:.01em}
+h4{font-size:14px;margin:0 0 6px;font-weight:700}
+p{margin:0 0 14px}
+strong{color:var(--accent-hi);font-weight:700}
+em{font-style:normal;color:var(--accent);font-weight:700}
+a{color:var(--accent)}
+ul{margin:0 0 14px;padding-left:1.15em}
+li{margin-bottom:7px}
+li::marker{color:var(--faint)}
+
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(248px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(205px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;min-width:0}
+.card.lift{background:var(--surface-2);border-color:var(--line-strong)}
+.card.accent{border-color:rgba(217,172,151,.5);background:linear-gradient(180deg,rgba(217,172,151,.09),var(--surface))}
+.card p:last-child,.card ul:last-child{margin-bottom:0}
+.kicker{font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin-bottom:9px}
+.small{font-size:13px;color:var(--dim)}
+.tiny{font-size:12px;color:var(--faint);line-height:1.65}
+
+.tablewrap{overflow-x:auto;margin:0 0 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:13.5px}
+th,td{text-align:left;padding:12px 15px;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-family:var(--display);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:600;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.hl td{background:rgba(217,172,151,.1)}
+tr.tot td{border-top:1px solid var(--line-strong);font-weight:700}
+
+/* stat tiles */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:12px;margin-bottom:30px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 17px;min-width:0}
+.stat .v{font-family:var(--display);font-weight:800;font-style:italic;font-size:30px;line-height:1.05;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat .l{font-size:11.5px;color:var(--faint);margin-top:5px;line-height:1.5}
+
+/* ladder */
+.ladder{display:flex;flex-direction:column;gap:10px}
+.rung{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;border:1px solid var(--line);
+  border-radius:12px;padding:16px 18px;background:var(--surface)}
+.rung .t{font-family:var(--display);font-weight:800;font-style:italic;font-size:17px;letter-spacing:-.01em}
+.rung .d{font-size:12.5px;color:var(--dim);margin-top:3px}
+.rung .p{font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap;color:var(--accent);font-variant-numeric:tabular-nums;text-align:right}
+.rung.r0{background:transparent;border-style:dashed}
+.rung.r1{background:var(--surface-2)}
+.rung.r2{background:var(--surface-3);border-color:var(--line-strong)}
+.rung.r3{background:linear-gradient(100deg,rgba(217,172,151,.17),var(--surface-3));border-color:rgba(217,172,151,.45)}
+.arrowrow{text-align:center;color:var(--faint);font-size:11px;letter-spacing:.1em;margin:-2px 0}
+
+/* chart */
+figure{margin:0 0 18px}
+.chartbox{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:10px 4px}
+svg.chart{display:block;min-width:620px;width:100%;height:auto}
+.pt{transition:r .12s ease}
+g.ptg:hover .pt{r:7.5}
+figcaption{font-size:12px;color:var(--faint);margin-top:9px;line-height:1.6}
+
+/* timeline */
+.tl{display:flex;flex-direction:column;gap:0}
+.tl-item{display:grid;grid-template-columns:86px minmax(0,1fr);gap:16px;padding:16px 0;border-top:1px solid var(--line)}
+.tl-item:first-child{border-top:0}
+.tl-when{font-family:var(--display);font-weight:800;font-style:italic;font-size:14px;color:var(--accent);letter-spacing:-.01em;padding-top:2px}
+.tl-what h4{margin-bottom:4px}
+.tl-what p{margin:0;font-size:13.5px;color:var(--dim)}
+.tl-kpi{display:inline-block;margin-top:8px;font-size:11.5px;font-family:var(--display);font-weight:600;letter-spacing:.06em;
+  border:1px solid var(--line-strong);border-radius:999px;padding:3px 11px;color:var(--paper)}
+
+.flag{border-left:2px solid var(--warn);padding:2px 0 2px 15px;margin:0 0 16px}
+.flag h4{color:var(--warn);font-family:var(--display);font-size:13px;letter-spacing:.03em}
+.flag p{margin:0;font-size:13.5px;color:var(--dim)}
+.src{font-size:11.5px;color:var(--faint);line-height:1.7}
+.src a{color:var(--faint);text-decoration:underline;text-underline-offset:2px}
+footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--faint);font-size:12px}
+@media (max-width:560px){
+  .tl-item{grid-template-columns:1fr;gap:4px}
+  .rung{grid-template-columns:1fr;gap:8px}
+  .rung .p{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-size:14px;font-family:system-ui,sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="wrap">
+    <p class="mark">WING</p>
+    <svg class="smile" viewBox="0 0 150 22" fill="none" aria-hidden="true"><path d="M4 4c18 16 124 16 142 0" stroke="#D9AC97" stroke-width="7" stroke-linecap="round"/></svg>
+    <h1>歯科衛生士2.0 — 事業設計書</h1>
+    <p>サブスク／スウェーデン研修／SUMMIT／Perio Lab を一本の導線に束ねる。価格・順番・年間コンテンツまで確定レベルで落とした設計案。</p>
+    <div class="meta"><span>2026.11.25</span><span>市場調査込み</span><span>v4 セッション型に修正</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<section>
+  <span class="num">01 — 現在地</span>
+  <h2>資産と制約を数字で</h2>
+  <p class="lede">設計の出発点は「やりたいこと」じゃなくて、いま手元にある札と、半年後の締切。</p>
+  <div class="stats">
+    <div class="stat"><div class="v">128</div><div class="l">@wing_dh フォロワー。<strong>開設から数日</strong>・広告ゼロ</div></div>
+    <div class="stat"><div class="v">43%</div><div class="l">1投稿のいいね率（55／128）。異常に濃い</div></div>
+    <div class="stat"><div class="v">20+</div><div class="l">Perio Lab 講座生＝確実に握れる初期母集団</div></div>
+    <div class="stat"><div class="v">2027.6</div><div class="l">スウェーデン研修 第1期（告知済み）</div></div>
+    <div class="stat"><div class="v">14.3万</div><div class="l">就業歯科衛生士（R2年度・厚労省）</div></div>
+    <div class="stat"><div class="v">382万</div><div class="l">DH平均年収。全産業平均より100万超低い</div></div>
+  </div>
+
+  <h3>ここから導かれること</h3>
+  <div class="grid g3">
+    <div class="card accent">
+      <div class="kicker">機会 A</div>
+      <h4>需要はもう証明されている</h4>
+      <p class="small">広告ゼロ・1投稿で数日128人、いいね率43%、フォロー返しなし。<strong>「誰も欲しがらない」リスクは既に消えている</strong>。足りないのは人数ではなく受け皿（LINE・決済・場）。この伸びなら、2月のローンチ時に数百人規模の母集団がある前提で組める。</p>
+    </div>
+    <div class="card">
+      <div class="kicker">制約 B</div>
+      <h4>研修の締切が全体の逆算起点</h4>
+      <p class="small">2027年6月に12〜15人を海外に連れて行くなら、申込締切は3月。50万円の商品はCVR 2〜4%なので、<strong>3月時点で濃いリスト400〜700人</strong>が必要。</p>
+    </div>
+    <div class="card">
+      <div class="kicker">制約 C</div>
+      <h4>DHは可処分所得が低い</h4>
+      <p class="small">平均年収382万。月5,500円は飲み会1〜2回じゃなく「迷う金額」。ただし<strong>安ければ入るわけでもない</strong>。見放題で1,000円の競合がいる以上、価格で殴り合ったら底なし。中身で説明できる額に置く。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="num">02 — 競合</span>
+  <h2>歯科のオンライン学習は、もう価格が壊れている</h2>
+  <p class="lede">「コンテンツが見放題」で戦う市場は飽和済み。DH向けに限れば月1,000円まで落ちている。ここに参入する理由がない。</p>
+
+  <figure>
+    <div class="chartbox">
+      <svg class="chart" viewBox="0 0 760 450" role="img" aria-labelledby="mapt mapd">
+        <title id="mapt">歯科系オンライン学習サービスのポジショニングマップ</title>
+        <desc id="mapd">横軸は月額換算価格、縦軸は提供価値の性質。既存サービスはすべてコンテンツ量志向の低〜中価格帯に集中し、体験・関係性志向の領域が空いている。</desc>
+        <rect x="88" y="58" width="296" height="150" fill="#D9AC97" opacity="0.07" rx="8"/>
+        <text x="100" y="78" fill="#D9AC97" font-family="Archivo,sans-serif" font-size="11.5" font-weight="700" letter-spacing="1.4">空白地帯</text>
+        <line x1="80" y1="402" x2="722" y2="402" stroke="rgba(240,237,232,.26)" stroke-width="1.5"/>
+        <line x1="80" y1="50" x2="80" y2="402" stroke="rgba(240,237,232,.26)" stroke-width="1.5"/>
+        <g font-family="Archivo,sans-serif" font-size="11" fill="rgba(240,237,232,.40)" text-anchor="middle">
+          <line x1="90" y1="402" x2="90" y2="407" stroke="rgba(240,237,232,.26)"/><text x="90" y="422">¥0</text>
+          <line x1="235" y1="402" x2="235" y2="407" stroke="rgba(240,237,232,.26)"/><text x="235" y="422">2,500</text>
+          <line x1="380" y1="402" x2="380" y2="407" stroke="rgba(240,237,232,.26)"/><text x="380" y="422">5,000</text>
+          <line x1="526" y1="402" x2="526" y2="407" stroke="rgba(240,237,232,.26)"/><text x="526" y="422">7,500</text>
+          <line x1="671" y1="402" x2="671" y2="407" stroke="rgba(240,237,232,.26)"/><text x="671" y="422">10,000</text>
+        </g>
+        <text x="401" y="441" fill="rgba(240,237,232,.40)" font-family="Archivo,sans-serif" font-size="11.5" text-anchor="middle" letter-spacing="1">月額換算価格（円）</text>
+        <text x="72" y="62" fill="rgba(240,237,232,.40)" font-size="11.5" text-anchor="end" font-family="'Noto Sans JP',sans-serif">体験・関係性</text>
+        <text x="72" y="398" fill="rgba(240,237,232,.40)" font-size="11.5" text-anchor="end" font-family="'Noto Sans JP',sans-serif">コンテンツ量</text>
+
+        <g font-size="12.5" fill="rgba(240,237,232,.66)" font-family="'Noto Sans JP',sans-serif">
+          <g class="ptg"><title>THREEE.：年4,000円（DH）＝月換算333円</title>
+            <circle class="pt" cx="109" cy="307" r="5" fill="rgba(240,237,232,.45)"/>
+            <text x="121" y="311">THREEE. ¥333</text></g>
+          <g class="ptg"><title>MY PLACE：DH 月額1,000円</title>
+            <circle class="pt" cx="148" cy="241" r="5" fill="rgba(240,237,232,.45)"/>
+            <text x="160" y="245">MY PLACE ¥1,000</text></g>
+          <g class="ptg"><title>Dentwave Prime：年払いのみ、月換算2,750円</title>
+            <circle class="pt" cx="250" cy="352" r="5" fill="rgba(240,237,232,.45)"/>
+            <text x="262" y="356">Dentwave Prime ¥2,750</text></g>
+          <g class="ptg"><title>IPSGオンラインサロン：年44,400円＝月換算3,700円</title>
+            <circle class="pt" cx="305" cy="258" r="5" fill="rgba(240,237,232,.45)"/>
+            <text x="317" y="262">IPSG ¥3,700</text></g>
+          <g class="ptg"><title>オガラボ（ESSENCE）：月額5,500円・Dr中心・2年限定</title>
+            <circle class="pt" cx="410" cy="291" r="5" fill="rgba(240,237,232,.45)"/>
+            <text x="422" y="295">オガラボ ¥5,500（Dr中心）</text></g>
+          <g class="ptg"><title>ORTC PRIME：月額5,500円・セミナー見放題</title>
+            <circle class="pt" cx="410" cy="364" r="5" fill="rgba(240,237,232,.45)"/>
+            <text x="422" y="368">ORTC PRIME ¥5,500</text></g>
+          <g class="ptg"><title>1Dプレミアム：月額9,800円〜・Dr中心</title>
+            <circle class="pt" cx="659" cy="357" r="5" fill="rgba(240,237,232,.45)"/>
+            <text x="647" y="361" text-anchor="end">1Dプレミアム ¥9,800〜</text></g>
+          <g class="ptg"><title>WING CLUB（提案）：月額2,980円。コンテンツ量ではなく体験と関係性で勝つ</title>
+            <circle class="pt" cx="263" cy="109" r="8.5" fill="#D9AC97"/>
+            <circle cx="263" cy="109" r="15" fill="none" stroke="#D9AC97" stroke-width="1.2" opacity=".45"/>
+            <text x="284" y="113" fill="#F0EDE8" font-weight="700" font-family="Archivo,'Noto Sans JP',sans-serif">WING CLUB ¥2,980</text></g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>価格は各社公開情報（2025〜2026年の掲載値）を月額換算。縦軸は「何にお金を払っているか」の定性評価。既存7サービスが下半分に固まっている。</figcaption>
+  </figure>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4>既存プレイヤーの弱点</h4>
+      <ul class="small">
+        <li><em>Dr向けの余り物</em>：ORTC・1D・オガラボはDr基準で組まれ、DHは「見てもいいよ」の扱い</li>
+        <li><em>受け身で終わる</em>：見放題は見ない。視聴は積むが臨床は変わらない</li>
+        <li><em>国内の流派に閉じる</em>：講師が日本の有名臨床家に偏り、前提が更新されない</li>
+        <li><em>出口がない</em>：学んでも院での評価・給与・キャリアに接続しない</li>
+      </ul>
+    </div>
+    <div class="card accent">
+      <h4>WINGだけが持っている札</h4>
+      <ul class="small">
+        <li><em>海外のリアル</em>：スウェーデン現地研修、米・仏・蘭のパートナー。金を積んでも真似しづらい</li>
+        <li><em>DH専用設計</em>：Dr市場のおこぼれではなく、DHが主語</li>
+        <li><em>Founderが当事者</em>：@dh_yuka_ が現役DHで「まだ挑戦の途中」。上から教える構図じゃない</li>
+        <li><em>Perio Labという実績</em>：認定取得という"結果が出る"導線を既に持っている</li>
+        <li><em>立ち上がりが異常に速い</em>：広告なし・1投稿で数日128人、エンゲージ43%。母集団は放っていても増える</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="num">03 — 戦略</span>
+  <h2>コンテンツを売るな。「連れて行く」を売れ</h2>
+  <p class="lede">これが全設計の背骨。ここがブレると、ただの安いオガラボになる。</p>
+
+  <div class="card lift" style="margin-bottom:22px">
+    <div class="kicker">Core Insight</div>
+    <p style="font-family:var(--display);font-weight:700;font-size:clamp(17px,3vw,22px);line-height:1.6;margin:0 0 12px;text-wrap:balance">
+      情報はもう無料で余っている。DHが本当に買えないのは、<em>視野が変わる体験</em>と、<em>それを一緒に通る仲間</em>。</p>
+    <p class="small" style="margin:0">だからWINGの月額は「動画が見られる権利」ではなく、<strong>海外研修とリアルイベントに、安く・優先で・仲間と行ける権利</strong>として設計する。ORTCやオガラボと同じ土俵に立たないので、月5,500円と比較されない。</p>
+  </div>
+
+  <div class="card lift" style="margin-bottom:22px">
+    <div class="kicker">体験特化に振り切るなら</div>
+    <h4 style="font-family:var(--display);font-size:17px;margin-bottom:10px">「講義を聞いて終わる回」を、1回も作らない</h4>
+    <p class="small" style="margin:0 0 12px">ゲスト講師の講義だけなら、どれだけ中身が良くても会員から見れば<strong>受け身の視聴</strong>で、構造としてはORTCの見放題と変わらない。だから<em>ワークをセッションの中に埋め込む</em>。別枠の「実践会」を月2回目として立てるのではなく、1回のセッションの中で講義→対談→ワークまで通す。</p>
+    <p class="small" style="margin:0">理由は2つ。DHが月2回オンラインに出るのは現実的に重い。そして<strong>その場で手を動かさないと、持ち帰りは起きない</strong>。運営負荷も半分で済む。具体は次項。</p>
+  </div>
+
+  <h3>タグライン案</h3>
+  <div class="grid g3">
+    <div class="card accent"><div class="kicker">推し</div><p style="font-family:var(--display);font-weight:700;font-size:18px;margin:0 0 8px">視野が広がると、手元が変わる。</p><p class="tiny" style="margin:0">GLOBAL（視野）→ EDUCATION（手元）→ CAREER（その先）の3本柱を1行で繋いでいる。既存のロゴ・世界観とも矛盾しない。</p></div>
+    <div class="card"><p style="font-family:var(--display);font-weight:700;font-size:18px;margin:0 0 8px">医院の外に、同僚をつくる。</p><p class="tiny" style="margin:0">孤独＝DHの一番深い痛み。コミュニティ商材としては最も刺さるが、学習要素が後退して見える。</p></div>
+    <div class="card"><p style="font-family:var(--display);font-weight:700;font-size:18px;margin:0 0 8px">翼は、外に出たときに生える。</p><p class="tiny" style="margin:0">ブランド名の回収は綺麗。ただ抽象度が高く、LPのH1よりストーリーズ向き。</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="num">04 — 事業構成</span>
+  <h2>4プロダクトを1本の階段にする</h2>
+  <p class="lede">単品を並べるのではなく、下から上へ押し上がる形に組む。各段が上の段の販売装置になっている状態がゴール。</p>
+
+  <div class="ladder">
+    <div class="rung r0">
+      <div><div class="t">INSTAGRAM ／ LINE</div><div class="d">無料。月1の対談ライブ告知と、研修の裏側。ここで名前と顔を覚えてもらう</div></div>
+      <div class="p">¥0</div>
+    </div>
+    <div class="arrowrow">↓ リスト化</div>
+    <div class="rung r1">
+      <div><div class="t">WING SESSION（単発）</div><div class="d">ゲスト講師の講義＋対談＋ワークで90分。非会員に開く唯一の枠で、ショーケース兼集客装置</div></div>
+      <div class="p">¥5,500 ／回</div>
+    </div>
+    <div class="arrowrow">↓ 会員化</div>
+    <div class="rung r2">
+      <div><div class="t">WING CLUB（月額・定員100名）</div><div class="d">セッション全12回＋<strong>班（Pod）での持ち寄り</strong>＋アーカイブ。単発で買えるのはセッション1回だけ。<strong>継続と関係性の部分は売っていない</strong></div></div>
+      <div class="p">¥3,980 ／月</div>
+    </div>
+    <div class="arrowrow">↓ 本命への送客</div>
+    <div class="rung r3">
+      <div><div class="t">SCANDINAVIAN APPROACH</div><div class="d">スウェーデン現地研修・年1回・12〜20名。利益の主源泉であり、ブランドの証明</div></div>
+      <div class="p">¥498,000＋渡航費</div>
+    </div>
+    <div class="arrowrow">＋ 横に</div>
+    <div class="rung r2">
+      <div><div class="t">WING SUMMIT（年1・リアル）</div><div class="d">グループワーク＋懇親。海外に行けない層の受け皿であり、CLUB継続の最大の理由</div></div>
+      <div class="p">会員 ¥12,000</div>
+    </div>
+    <div class="rung r2">
+      <div><div class="t">Perio Lab（既存・並列ブランド）</div><div class="d">認定取得という明確なゴール商材。WINGとは別ブランドのまま相互送客</div></div>
+      <div class="p">既存価格</div>
+    </div>
+  </div>
+
+  <h3>Perio Lab との噛ませ方</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>卒業＝解約、にしない</h4>
+      <p class="small">Perio Lab は「認定を取る」というゴールがあるので、終われば関係が切れる。終了時に <strong>WING CLUB 3ヶ月無料</strong>を付けて受け皿にする。講座生20人強がそのまま初期会員になり、立ち上げ時のコミュニティの密度を作る。</p>
+    </div>
+    <div class="card">
+      <h4>逆流も作る</h4>
+      <p class="small">CLUB会員向けに年2回「認定、取るか迷ってる人の会」を開催 → Perio Lab へ送る。CLUBは入口の広い漏斗、Perio Labは深い縦穴。<strong>ブランドは分けたまま、名簿だけ繋ぐ</strong>のが正解（統合すると両方ぼやける）。</p>
+    </div>
+  </div>
+
+  <h3>月次ループ — セッション1回＋持ち寄り</h3>
+  <p class="lede" style="margin-bottom:18px">1回のセッションの中で、インプットからアウトプットまで通す。別枠の実践会は立てない。</p>
+  <div class="grid g3">
+    <div class="card"><div class="kicker">Session 01</div><h4>講義｜40分</h4><p class="small">ゲスト講師が、その領域の「なぜそうするのか」から</p></div>
+    <div class="card"><div class="kicker">Session 02</div><h4>対談｜20分</h4><p class="small">WING側が現場の疑問をぶつける。質問は事前に会員から集める</p></div>
+    <div class="card"><div class="kicker">Session 03</div><h4>ワーク｜30分</h4><p class="small">自分の患者に当てはめて、<strong>明日やることを1つ決める</strong>。ここがセッションの核</p></div>
+    <div class="card accent"><div class="kicker">月末</div><h4>持ち寄り｜班</h4><p class="small">やってみてどうだったかを班で共有。<strong>会員限定</strong>。非同期でも成立する形にする</p></div>
+  </div>
+  <p class="tiny" style="margin-top:12px">毎回この型で固定する。再現性があると、申し込む側が「何が起きるか」を想像できる。ただし<strong>ワークの設計はWING側が作る</strong>——ゲストにそこまで要求すると、講師の確保が一気に難しくなる。</p>
+
+  <h3>班（Pod）制 — 100人の部屋では誰も喋らない</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>入会時に5〜6人へ配属</h4>
+      <p class="small">コミュニティが死ぬ最大の原因は「全体チャットに誰も書き込まない」。班に割って月1で集まる形にすると発言率が桁で変わる。<strong>班は最強の解約抑止装置</strong>でもある。辞めるときサービスではなく5人に対して抜けることになるから。</p>
+    </div>
+    <div class="card">
+      <h4>定員100名・以降はウェイトリスト</h4>
+      <p class="small">体験特化は会員数に比例して運営コストが増える。無制限に増やせば必ず質が落ちる。<strong>定員を先に切ると希少性が武器に変わる</strong>。この伸び方なら、募集と同時に埋め切る設計が現実的。2期で200名に拡張する前提で組む。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="num">05 — 価格</span>
+  <h2>単発を「割高に」置くのが設計の肝</h2>
+  <p class="lede">非会員の単発参加は、絶対に開けるべき。ただし価格は会員の月額より高く。これだけで入会ボタンの説得力が変わる。</p>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>商品</th><th class="n">非会員</th><th class="n">WING CLUB会員</th><th>意図</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td><strong>WING CLUB</strong><div class="tiny">定員100名／年払い ¥39,800（2ヶ月分無料）</div></td><td class="n">—</td><td class="n">¥3,980 ／月</td><td class="small">体験の運営コストは会員数に比例する。見放題型（1,000〜5,500）より上に置き、中身で説明する</td></tr>
+        <tr><td>WING SESSION（1回）<div class="tiny">講義40分＋対談20分＋ワーク30分</div></td><td class="n">¥5,500</td><td class="n">込み</td><td class="small">ワーク込み90分なら業界相場で5,000〜8,000円。<strong>1回出るだけで会員の約2ヶ月分</strong>になる</td></tr>
+        <tr class="hl"><td><strong>班（Pod）・持ち寄り・アーカイブ</strong></td><td class="n">参加不可</td><td class="n">込み</td><td class="small">会員と非会員の差を「割引」ではなく<strong>継続と関係性</strong>に置く。単発で買えるのは1回分の体験だけ</td></tr>
+        <tr><td>SCANDINAVIAN APPROACH<div class="tiny">プログラム費。渡航費は別途実費</div></td><td class="n">¥498,000</td><td class="n">¥448,000</td><td class="small">▲5万＝会費12.5ヶ月分。研修を考えた瞬間に入会が合理的になる</td></tr>
+        <tr><td>WING SUMMIT（年1・リアル）</td><td class="n">¥19,800</td><td class="n">¥12,000</td><td class="small">▲7,800＝会費2ヶ月分。年末の解約を止める</td></tr>
+        <tr><td>ハンズオン／少人数会</td><td class="n">参加不可</td><td class="n">実費＋優先枠</td><td class="small">「会員にしか開かない扉」を1つ作る</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid g2">
+    <div class="card accent">
+      <div class="kicker">第1期・100名</div>
+      <h4>Founding Member ¥2,980／月（価格ロック）</h4>
+      <p class="small">退会しない限り永久2,980円。建て付けは「実績がないから安くします」ではなく、<strong>「第1期の100名だけの価格」</strong>。弱さを認める言い方をした瞬間に単価は二度と上がらなくなるので、募集文に「実績がない」とは書かない。<strong>ただし「一度抜けたら二度と戻れない」にはしない</strong>。人質に見える設計は、辞めるときに必ず恨まれるから。卒業後も空きがあれば同価格で復帰可にする（理由は09）。</p>
+    </div>
+    <div class="card">
+      <div class="kicker">やらないこと</div>
+      <h4>プランの複数化は初年度やらない</h4>
+      <p class="small">ベーシック／プロの2段構成は、会員100人未満のフェーズでは管理コストと意思決定コストだけ増えて効かない。<strong>1プラン＋年払い＋Founding価格</strong>の3択に絞る。分岐は会員300人を超えてから。</p>
+    </div>
+  </div>
+
+  <div class="flag" style="margin-top:24px">
+    <h4>要検証：スウェーデン研修の原価</h4>
+    <p>エルバのイェテボリ大学研修は <strong>受講費 約69.6万＋旅行費 85万〜＝150万超</strong>（2026年コース実績）。「自費50万」をオールインで組むのは、現地大学・講師を使う限り構造的に無理がある。<br>
+    推奨：<strong>プログラム費 ¥498,000 と 渡航費実費（約35〜45万）を分離</strong>し、合計85〜95万で「国内既存ツアーの約6割」と打ち出す。オールイン50万で行きたいなら、大学連携を外して臨床現場視察＋現地DHとのセッション中心、3泊5日、ストックホルム以外の都市、で原価を削る設計変更が要る。<em>どちらを採るかで募集文面が変わるので、ここは12月中に決める。</em></p>
+  </div>
+</section>
+
+<section>
+  <span class="num">06 — 収益</span>
+  <h2>Year 1（2027年）の現実線</h2>
+  <p class="lede">サブスク単体では食えない。研修が利益の主役で、サブスクはその母集団を貯める装置。<strong>会員を150名想定から定員100名に絞っても、合計売上はほぼ変わらない</strong>。濃い80名からの研修CVRが上がって打ち消すからで、密度を取った方が構造は堅い。</p>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>商品</th><th>前提</th><th class="n">売上</th><th class="n">粗利目安</th></tr></thead>
+      <tbody>
+        <tr><td>WING CLUB</td><td class="small">定員100名・平均在籍80名 × 平均3,000円 × 12ヶ月<br><span class="tiny">ゲスト講師謝礼（月5万×12）と決済手数料を控除</span></td><td class="n">288万</td><td class="n">約190万</td></tr>
+        <tr class="hl"><td>SCANDINAVIAN APPROACH</td><td class="small">18名 × ¥498,000（濃い80名からCVR20%超を狙う）</td><td class="n">896万</td><td class="n">約310万</td></tr>
+        <tr><td>WING SUMMIT</td><td class="small">70名 × 平均15,000円</td><td class="n">105万</td><td class="n">約53万</td></tr>
+        <tr><td>単発参加（非会員）</td><td class="small">月平均12名 × 5,500円 × 12ヶ月</td><td class="n">79万</td><td class="n">約66万</td></tr>
+        <tr class="tot"><td>合計</td><td class="small">Perio Lab は別勘定</td><td class="n">1,368万</td><td class="n">約619万</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>効かせどころは3つだけ</h3>
+  <div class="grid g3">
+    <div class="card"><div class="kicker">レバー 1</div><h4>年払い比率</h4><p class="small">年払いが3割を超えると、解約率が実質半減しキャッシュが前倒しで入る。<strong>入会フォームの初期選択を年払いにする</strong>だけで比率は動く。</p></div>
+    <div class="card"><div class="kicker">レバー 2</div><h4>研修の定員</h4><p class="small">15名→20名で売上+250万。ただし現地のハンドリング上限がある。<strong>定員を決める前に現地側と握る</strong>こと。ここが全社の利益を決める。</p></div>
+    <div class="card"><div class="kicker">レバー 3</div><h4>ゲスト講師の発信力</h4><p class="small">ゲスト側が自分のアカウントで告知する座組にできるか。謝礼より<strong>「相互送客の設計」</strong>を交渉材料にする。無料で母集団が増える唯一の口。</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="num">07 — コンテンツ</span>
+  <h2>セッション12回を、物語の順番に並べる</h2>
+  <p class="lede">分野を羅列すると「ごった煮」に見える。3本柱（EDUCATION／GLOBAL／CAREER）に割り当て、<strong>足元 → 世界 → 隣接領域 → 出口</strong>の順で1年を組む。GLOBAL期が研修募集と重なるのが構造上の要点。</p>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th class="n">#</th><th>時期</th><th>テーマ</th><th>柱</th><th>狙い</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td class="n">01</td><td>2027.1</td><td><strong>OHI & TBI</strong></td><td>EDUCATION</td><td class="small">全員が毎日やっていて、全員が自己流。<strong>初回に海外ネタを持ってこない</strong>。明日のアポが変わる話から入るのが拡散の条件</td></tr>
+        <tr><td class="n">02</td><td>2027.2</td><td>歯周病（Perio Lab連動）</td><td>EDUCATION</td><td class="small">Perio Lab 講座生が全員来る回。コミュニティの密度を最初に作る</td></tr>
+        <tr><td class="n">03</td><td>2027.3</td><td>ドクター（Perio Lab パートナー）</td><td>EDUCATION</td><td class="small">「Drはどこを見てDHを評価しているか」。院内での立ち回りに直結させる</td></tr>
+        <tr class="hl"><td class="n">04</td><td>2027.4</td><td><strong>スウェーデン</strong>（研修プレビュー）</td><td>GLOBAL</td><td class="small">研修募集の本体。現地パートナーを出して、行く理由を視覚化する</td></tr>
+        <tr><td class="n">05</td><td>2027.5</td><td>オランダ</td><td>GLOBAL</td><td class="small">予防の制度設計。締切直前に「世界は違う」をもう一押し</td></tr>
+        <tr><td class="n">06</td><td>2027.7</td><td>フランス</td><td>GLOBAL</td><td class="small">研修直後。参加者の生報告とセットで、翌年1期の待機リストを作る</td></tr>
+        <tr><td class="n">07</td><td>2027.8</td><td>矯正</td><td>EDUCATION</td><td class="small">DHの関与余地が大きく、求人価値に直結する領域</td></tr>
+        <tr><td class="n">08</td><td>2027.9</td><td>小児</td><td>EDUCATION</td><td class="small">予防の本丸。スウェーデン編の内容がそのまま効いてくる</td></tr>
+        <tr><td class="n">09</td><td>2027.10</td><td>インプラント／外科</td><td>EDUCATION</td><td class="small">メインテナンスの責任範囲。SUMMIT直前の実務回</td></tr>
+        <tr class="hl"><td class="n">10</td><td>2027.11</td><td><strong>アメリカ</strong></td><td>CAREER</td><td class="small">DHのキャリアと収入が最も開いている国。「出口」の提示として最強</td></tr>
+        <tr><td class="n">11</td><td>2027.12</td><td>企業（メーカー・人事）</td><td>CAREER</td><td class="small">チェアサイド以外の食い扶持。年末の解約抑止タイミングに当てる</td></tr>
+        <tr><td class="n">12</td><td>2028.1</td><td>SNS・発信</td><td>CAREER</td><td class="small">会員自身が発信者になる回。ここからアンバサダーを作って翌年の集客に回す</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flag">
+    <h4>順番の意図（ここは譲らない方がいい）</h4>
+    <p>アメリカ・フランスは引きが強いので初回に置きたくなるが、<strong>128フォロワーの段階で「海外」は遠すぎて入会に繋がらない</strong>。憧れは拡散するが財布は開かない。足元（OHI&TBI）で信頼を取り、4ヶ月かけて世界に連れ出す。この順番自体が「翼が生える」というブランドの物語になる。</p>
+  </div>
+</section>
+
+<section>
+  <span class="num">08 — 実行</span>
+  <h2>12月から逆算したローンチ</h2>
+  <p class="lede">ストーリーズで「12月にスケジュール確定次第アナウンス」と出している。そこから動かす前提で組んだ。</p>
+
+  <div class="tl">
+    <div class="tl-item"><div class="tl-when">12月</div><div class="tl-what">
+      <h4>LINE公式を開設し、LPを公開</h4>
+      <p>Instagram単体ではDMが流れて追えない。CLUBも研修も、申込・連絡・決済の受け皿が要る。年間スケジュールの発表と同時にLINE登録を取る。<strong>投稿は週2〜3本に上げる</strong>（1投稿のままだとアカウントが死んでいると判断される）。</p>
+      <span class="tl-kpi">KPI：LINE登録 300</span></div></div>
+
+    <div class="tl-item"><div class="tl-when">1月</div><div class="tl-what">
+      <h4>第1回セッションを「無料」で開催（OHI&TBI）</h4>
+      <p>最初の1回は売らない。アーカイブをLINE登録者限定で配り、登録を回収する。終了直後に Founding Member の募集を開く。</p>
+      <span class="tl-kpi">KPI：ライブ参加 100／LINE 500</span></div></div>
+
+    <div class="tl-item"><div class="tl-when">2月</div><div class="tl-what">
+      <h4>WING CLUB 正式ローンチ ＋ 研修1期 募集開始</h4>
+      <p>Perio Lab 講座生20人強をまず入れて、空っぽのコミュニティを見せない。研修は<strong>会員先行3日間</strong>を設けて、会費を払う理由を初回から証明する。</p>
+      <span class="tl-kpi">KPI：会員 60／研修申込 8</span></div></div>
+
+    <div class="tl-item"><div class="tl-when">3月</div><div class="tl-what">
+      <h4>研修 募集締切</h4>
+      <p>定員に届かない場合の代替案（人数を減らして実施／時期をずらす）を<strong>2月末までに決めておく</strong>。走りながら考えると告知が濁って、ブランドが傷つく。</p>
+      <span class="tl-kpi">KPI：研修 12〜15名確定</span></div></div>
+
+    <div class="tl-item"><div class="tl-when">6月</div><div class="tl-what">
+      <h4>SCANDINAVIAN APPROACH 第1期 実施</h4>
+      <p>現地での撮影を最優先タスクとして同行者に割り振る。<strong>ここで撮った素材が、翌年の集客予算そのもの</strong>になる。帰国後2週間以内にダイジェストを出す。</p>
+      <span class="tl-kpi">KPI：素材本数 ＞ 参加人数×3</span></div></div>
+
+    <div class="tl-item"><div class="tl-when">10月</div><div class="tl-what">
+      <h4>WING SUMMIT 第1回（リアル）</h4>
+      <p>研修組が登壇して報告する構成にする。行けなかった会員にとっては「次は自分が」の動機になり、第2期の待機リストがその場で埋まる。</p>
+      <span class="tl-kpi">KPI：参加 80／2期待機 20</span></div></div>
+
+    <div class="tl-item"><div class="tl-when">12月</div><div class="tl-what">
+      <h4>年払い切替キャンペーン ＋ 2期募集</h4>
+      <p>1年経つと継続判断が来る。年末に年払いへ巻き取って、翌年の解約を構造的に潰す。</p>
+      <span class="tl-kpi">KPI：定員100名充足／年払い比率 30%</span></div></div>
+  </div>
+</section>
+
+<section>
+  <span class="num">09 — 退会設計</span>
+  <h2>辞め方を設計しないと、辞めた人が敵になる</h2>
+  <p class="lede">解約はゼロにできない。本当の問題は率ではなく、<strong>辞めた人が主催者を嫌いになるかどうか</strong>。歯科衛生士は横のつながりが濃い世界なので、1人の悪評が10人の入会を潰す。だから「辞め方」を商品の一部として設計する。</p>
+
+  <h3>なぜ嫌いになるのか — 原因は5つしかない</h3>
+  <div class="grid g3" style="margin-bottom:34px">
+    <div class="card"><div class="kicker">原因 1</div><h4>辞めさせてもらえない</h4><p class="small">導線が深い、引き止めDMが来る、理由の記入が必須。これは一発で恨まれる。</p></div>
+    <div class="card"><div class="kicker">原因 2</div><h4>元が取れなかった罪悪感</h4><p class="small">参加できなかったのが自分の都合でも、人は「自分が悪い」を認めたくない。<strong>罪悪感は必ず外部に転嫁される</strong>。沈黙の離脱者が一番危ない。</p></div>
+    <div class="card"><div class="kicker">原因 3</div><h4>班から黙って消える気まずさ</h4><p class="small">班（Pod）は継続の最大装置だが、副作用もここ。5人に「抜けます」が言えずフェードアウトすると、後ろめたさが嫌悪に変わる。</p></div>
+    <div class="card"><div class="kicker">原因 4</div><h4>辞めた後も売り込まれる</h4><p class="small">退会後にイベント告知やDMが届く。「金づるとしか見られていなかった」になる。</p></div>
+    <div class="card"><div class="kicker">原因 5</div><h4>価格ロックが人質に見える</h4><p class="small">「一度抜けると二度とこの価格に戻れない」は入会時には効くが、辞めるときには<strong>縛られていた証拠</strong>に変わる。ここは設計を変える。</p></div>
+  </div>
+
+  <h3>対策 — 6つを運用ルールとして最初から固定する</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>施策</th><th>いつ</th><th>中身</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td><strong>「卒業していい」と最初に言う</strong></td><td class="small">入会オリエン</td><td class="small">「WINGは一生いる場所じゃない。必要がなくなったら卒業してください」と主催者が明言する。<strong>辞める許可を先に出しておく</strong>のが最も効く一手。これがないと、辞める＝裏切りの空気が勝手に育つ</td></tr>
+        <tr><td>休会（Pause）制度</td><td class="small">常設</td><td class="small">課金を止めて在籍だけ残す。「辞める」より「休む」の方が心理コストが低く、復帰率も高い。<strong>退会フォームの第一選択肢を休会にする</strong></td></tr>
+        <tr><td>班での卒業報告</td><td class="small">月末の持ち寄り</td><td class="small">「今月で卒業します」を言える枠を作る。黙って消えるのが一番後味が悪い。送別の形にすれば、関係は良いまま終わる</td></tr>
+        <tr><td>3クリック解約・引き止め禁止</td><td class="small">常設</td><td class="small">フォームから1分。理由の記入は任意。引き止めの連絡をしないことを<strong>入会時に明言</strong>しておく</td></tr>
+        <tr class="hl"><td><strong>価格ロックを復帰時も有効に</strong></td><td class="small">設計変更</td><td class="small">「卒業生は空きがあれば同じ価格で戻れる」に変える。入会インセンティブは定員100名の希少性で代替できる。遺恨がゼロになり、復帰率が上がるのでLTVではむしろ得</td></tr>
+        <tr><td>Alumni 導線</td><td class="small">退会直後</td><td class="small">退会＝縁切りにしない。無料のAlumniタグに移し、SUMMITと無料回だけ案内する。<strong>辞めた人が外部の応援者になる</strong>。狭い業界ではこれが最大の防御</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>沈黙の離脱を潰す（原因2への手当て）</h3>
+  <p class="lede" style="margin-bottom:30px">放置された人が一番恨む。毎月末、会員ごとに「今月参加したもの」を自動で送る。参加ゼロの人には班から一声かける。これだけで、罪悪感の外部化はかなり防げる。</p>
+
+  <h3>退会時メッセージの型</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4 style="color:var(--warn)">言ってはいけない</h4>
+      <p class="small" style="margin:0 0 8px">「退会されたのは<strong>残念です</strong>。またのご参加をお待ちしています」</p>
+      <p class="tiny" style="margin:0">「残念」は相手を加害者にする言葉。「お待ちしています」は次も売る気配。どちらも後味を悪くする。</p>
+    </div>
+    <div class="card accent">
+      <h4>そのまま使える文面</h4>
+      <p class="small" style="margin:0">○ヶ月、おつかれさまでした。<br>WINGは一生いる場所ではないので、必要がなくなったら卒業するのが正しい使い方だと思っています。<br>またタイミングが合えば、同じ価格で戻ってこられます。SUMMITも卒業生価格でご案内しますので、気が向いたら顔を出してください。<br>臨床、応援しています。</p>
+    </div>
+  </div>
+
+  <div class="flag" style="margin-top:26px">
+    <h4>返金ルールも先に決めておく</h4>
+    <p>月額は当月末まで利用可・日割り返金なし。<strong>年払いは残月分を月額換算で返金</strong>（割引分は差し引く）。これを規約に書いておくと「取られた」感が消える。研修は渡航費が絡むのでキャンセルポリシーの明文化が必須。</p>
+  </div>
+
+  <h3>構造の話 — 不満の向き先を分散させる</h3>
+  <p class="lede" style="margin-bottom:0">すべてがFounder個人に紐付いていると、不満も全部個人に向かう。対談には常にゲストがいて、班は会員同士で回り、実践会はピア同士。<strong>Founderは「教える人」ではなく「場を作る人」</strong>という立て付けを、運用でも守る。班のファシリテーターを会員から立てるのが、一番効く具体策。</p>
+</section>
+
+<section>
+  <span class="num">10 — 宿題</span>
+  <h2>12月中に潰す論点</h2>
+  <div class="grid g2">
+    <div class="card"><h4>① 研修の原価と座組</h4><p class="small">「WING × case」の共同主催で、収益分配と役割分担はどうなっているか。現地コーディネート・通訳・講師謝礼の実費を積んで、498,000円で粗利が残るかを先に検算する。<strong>ここが決まらないと募集文が書けない</strong>。</p></div>
+    <div class="card"><h4>② 決済とコミュニティの基盤</h4><p class="small">月額課金の実装（Stripe／UTAGE／FANTS等）と、会員の居場所（LINEオープンチャット／Discord／Facebook）。DHの利用実態を考えると<strong>LINE基盤が最有力</strong>。ここを決めないと2月ローンチに間に合わない。</p></div>
+    <div class="card"><h4>③ Founder の露出量</h4><p class="small">現状 @dh_yuka_ が顔。WING単体のフォロワーは128だが、個人側のフォロワーをどれだけ流せるかで初速が変わる。<strong>個人アカウントからの送客計画を数字で持つ</strong>。</p></div>
+    <div class="card"><h4>④ ゲスト講師の確保順と謝礼</h4><p class="small">1月のOHI&TBI回が最優先。未確定の領域（歯周病・矯正・小児・企業・SNS）は<strong>年間スケジュール公開前に最低3ヶ月先まで埋める</strong>。対談だけなら謝礼なしでも成立するが、<strong>講義を依頼するなら謝礼が要る</strong>。相場（3〜8万）を先に決めて予算化する。</p></div>
+    <div class="card"><h4>⑤ 規約とキャンセルポリシー</h4><p class="small">退会・休会・返金・復帰価格を文章化して、<strong>入会ページに最初から載せる</strong>。特に研修は航空券・宿泊のキャンセル料が発生するので、何日前までに何%返すかを募集開始時点で確定させる。ここが曖昧だと、トラブルが起きた瞬間にブランドが飛ぶ。</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="num">出典</span>
+  <h2>参照データ</h2>
+  <p class="src">
+    価格・市場データの参照元。掲載時点の値のため、募集開始前に各公式で再確認すること。<br><br>
+    <a href="https://www.omori-dent.com/myplace/index.html">MY PLACE（DH月額1,000円）</a>・
+    <a href="https://threee.online/join/">THREEE.（DH年4,000円）</a>・
+    <a href="https://ortc.jp/">ORTC PRIME（月額5,500円）</a>・
+    <a href="https://lp.oned.jp/premium-detail-2">1Dプレミアム（月額9,800円〜）</a>・
+    <a href="https://www.dentwave.com/lps/dentwaveprime">Dentwave Prime（月換算2,750円・年払）</a>・
+    <a href="https://ipsg.ne.jp/introduction/">IPSG オンラインサロン（年44,400円）</a><br>
+    <a href="https://www.elva.co.jp/20260403185000">エルバ 2026 イェテボリ大学研修コース（受講費696,300円＋旅行費85万〜）</a><br>
+    <a href="https://www.mhlw.go.jp/content/10804000/000912195.pdf">厚労省：歯科衛生士 免許登録298,644人／業務従事142,760人（R2年度）</a>・
+    <a href="https://job-medley.com/tips/?p=30398">DH平均年収 382.5万円（R4賃金構造基本統計調査ベース）</a><br>
+    <a href="https://perio.jp/member/certification/hygienist/file/new/chart_hygienist.pdf">日本歯周病学会 認定歯科衛生士 制度（Perio Lab 関連）</a>
+  </p>
+</section>
+
+<footer>
+  <div>WING｜歯科衛生士2.0　事業設計 v2（体験特化）— 2026.11.25</div>
+  <div style="margin-top:4px">数値は提案前提の試算。研修原価と座組の確定後に再計算が必要。</div>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>WING 歯科衛生士2.0</title>
+<meta name="description" content="WING｜歯科衛生士2.0 — 臨床の質を上げ、世界とつながり、キャリアの選択肢を広げるコミュニティ">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,700;0,800;1,800;1,900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+<style>
+/* Oversized Japanese display type carries the page; navy↔paper band inversion sets the rhythm */
+:root{
+  --navy:#16223C;
+  --navy-d:#0D1626;
+  --navy-l:#1F2D4D;
+  --paper:#F2EFE9;
+  --accent:#D9AC97;
+  --accent-ink:#A5705A;
+  --accent-hi:#F1CFB9;
+  --display:'Archivo','Noto Sans JP',system-ui,sans-serif;
+  --body:'Noto Sans JP','Archivo',system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--navy-d);color:var(--paper);font-family:var(--body);font-size:15px;line-height:1.95;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* progress */
+#prog{position:fixed;top:0;left:0;height:3px;width:0;background:var(--accent);z-index:60;transition:width .08s linear}
+
+.wrap{max-width:1180px;margin:0 auto;
+  padding-left:max(22px,env(safe-area-inset-left,0px));padding-right:max(22px,env(safe-area-inset-right,0px))}
+
+/* ── band token swap ── */
+.band{--c-bg:var(--navy);--c-ink:var(--paper);--c-dim:rgba(242,239,233,.66);--c-faint:rgba(242,239,233,.42);
+  --c-line:rgba(242,239,233,.14);--c-line2:rgba(242,239,233,.3);--c-card:var(--navy-l);--c-ac:var(--accent);
+  background:var(--c-bg);color:var(--c-ink);padding-block:clamp(66px,9vw,118px);position:relative}
+.band.light{--c-bg:var(--paper);--c-ink:var(--navy);--c-dim:rgba(22,34,60,.66);--c-faint:rgba(22,34,60,.44);
+  --c-line:rgba(22,34,60,.13);--c-line2:rgba(22,34,60,.3);--c-card:rgba(22,34,60,.045);--c-ac:var(--accent-ink)}
+.band.deep{--c-bg:var(--navy-d);--c-card:var(--navy)}
+.dots::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(rgba(242,239,233,.11) 1px,transparent 1px);background-size:26px 26px}
+.band>.wrap{position:relative;z-index:1}
+
+/* ── section head (one type, every section) ── */
+.sechead{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,22ch);gap:18px 48px;align-items:end;
+  margin-bottom:clamp(34px,5vw,58px)}
+.eyebrow{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:11px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--c-ac);margin:0 0 16px}
+.eyebrow::before{content:"";width:9px;height:9px;background:var(--accent);flex:none}
+.big{font-weight:900;font-size:clamp(38px,8.4vw,86px);line-height:1.05;letter-spacing:-.05em;margin:0;text-wrap:balance}
+.sh-note{font-size:13px;color:var(--c-dim);line-height:1.95;margin:0;padding-bottom:10px}
+@media(max-width:800px){.sechead{grid-template-columns:1fr}.sh-note{padding-bottom:0}}
+
+h3{font-family:var(--body);font-weight:900;font-size:18px;margin:0 0 10px;letter-spacing:-.02em;line-height:1.5}
+p{margin:0 0 15px}
+.lede{color:var(--c-dim);max-width:58ch;margin:0 0 36px;font-size:15.5px}
+.small{font-size:13.5px;color:var(--c-dim);line-height:1.9}
+.tiny{font-size:12px;color:var(--c-faint);line-height:1.75}
+.mk{background:linear-gradient(transparent 56%,rgba(217,172,151,.55) 56%);padding:0 2px}
+.band.light .mk{background:linear-gradient(transparent 56%,rgba(217,172,151,.8) 56%)}
+em{font-style:normal;color:var(--c-ac);font-weight:700}
+strong{font-weight:900}
+ul{margin:0 0 15px;padding-left:1.25em}
+li{margin-bottom:9px}
+li::marker{color:var(--c-ac)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(282px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(238px,1fr))}
+.card{background:var(--c-card);border:1px solid var(--c-line);border-radius:3px;padding:28px 26px;min-width:0;
+  transition:transform .22s cubic-bezier(.2,.8,.3,1),border-color .22s ease}
+.card:hover{transform:translateY(-3px);border-color:var(--c-line2)}
+.card p:last-child,.card ul:last-child{margin-bottom:0}
+
+/* ── nav ── */
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(13,22,38,.9);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(242,239,233,.12)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:51;background:rgba(13,22,38,.95)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:60px}
+.nav-lg{font-family:var(--display);font-style:italic;font-weight:900;font-size:21px;letter-spacing:-.05em;color:var(--paper);
+  text-decoration:none;display:flex;align-items:center;gap:6px}
+.nav-lg i{width:6px;height:6px;background:var(--accent);display:block;font-style:normal}
+.nav-links{display:flex;align-items:center;gap:22px}
+.nav-links a{color:rgba(242,239,233,.78);text-decoration:none;font-size:13px;font-weight:700;transition:color .15s}
+.nav-links a:hover{color:var(--paper)}
+.nav-links a.pill{background:var(--accent);color:#14203A;padding:7px 17px;border-radius:2px}
+.nav-links a.pill:hover{background:var(--accent-hi)}
+@media(max-width:860px){.nav-links a:not(.pill){display:none}}
+
+/* ── hero ── */
+.hero{position:relative;background:var(--navy-d);overflow:hidden;padding-block:clamp(56px,8vw,104px) clamp(48px,7vw,86px)}
+.hero-media{position:absolute;inset:0}
+.hero-media img{width:100%;height:100%;object-fit:cover;object-position:58% 40%;
+  animation:drift 40s ease-in-out infinite alternate;transform-origin:60% 42%}
+@keyframes drift{from{transform:scale(1.05)}to{transform:scale(1.15)}}
+.hero-scrim{position:absolute;inset:0;background:linear-gradient(100deg,rgba(13,22,38,.95) 0%,rgba(13,22,38,.72) 46%,rgba(13,22,38,.3) 82%)}
+.hero-scrim2{position:absolute;inset:0;background:linear-gradient(0deg,#0D1626 2%,rgba(13,22,38,0) 46%)}
+.hero>.wrap{position:relative;z-index:2}
+.kick{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+.kick b{font-family:var(--display);font-style:italic;font-weight:900;font-size:14px;letter-spacing:-.03em;color:var(--accent)}
+.kick span{font-size:12px;letter-spacing:.14em;color:rgba(242,239,233,.6)}
+.kick i{display:block;width:34px;height:1px;background:rgba(242,239,233,.3)}
+.hl{font-weight:900;font-size:clamp(44px,11.5vw,124px);line-height:.98;letter-spacing:-.065em;margin:0 0 4px;text-wrap:balance}
+.hl .q{color:rgba(242,239,233,.42)}
+.smile{display:block;width:clamp(130px,30vw,300px);height:30px;margin:18px 0 30px}
+.smile path{stroke-dasharray:320;animation:draw 1.6s .3s cubic-bezier(.65,0,.35,1) backwards}
+@keyframes draw{from{stroke-dashoffset:320}to{stroke-dashoffset:0}}
+.sub{color:rgba(242,239,233,.76);font-size:clamp(14.5px,1.9vw,17px);max-width:36ch;margin:0 0 36px}
+.ctarow{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.cta{display:inline-flex;align-items:center;gap:14px;background:var(--accent);color:#14203A;font-weight:900;font-size:15px;
+  padding:17px 28px;border-radius:2px;text-decoration:none;letter-spacing:-.01em;
+  transition:transform .18s cubic-bezier(.2,.8,.3,1),background .18s}
+.cta svg{transition:transform .22s cubic-bezier(.2,.8,.3,1);flex:none}
+.cta:hover{background:var(--accent-hi);transform:translateY(-2px)}
+.cta:hover svg{transform:translateX(5px)}
+.cta.inv{background:transparent;border:1px solid rgba(242,239,233,.34);color:var(--paper)}
+.cta.inv:hover{background:rgba(242,239,233,.1)}
+.band.light .cta.inv{border-color:rgba(22,34,60,.3);color:var(--navy)}
+.band.light .cta.inv:hover{background:rgba(22,34,60,.06)}
+.ctanote{font-size:12px;color:rgba(242,239,233,.5);margin-top:18px}
+.subnote{color:rgba(242,239,233,.56);font-size:13px;max-width:44ch;margin:0 0 30px;line-height:1.9}
+.hero-figs{display:flex;flex-wrap:wrap;margin:0 0 34px;border-top:1px solid rgba(242,239,233,.22);max-width:580px}
+.hero-figs>div{padding:18px 30px 18px 0;margin-right:30px;border-right:1px solid rgba(242,239,233,.16);min-width:0}
+.hero-figs>div:last-child{border-right:0;margin-right:0;padding-right:0}
+.hk{display:block;font-size:11px;color:rgba(242,239,233,.55);letter-spacing:.14em;margin-bottom:8px}
+.hv{display:block;font-weight:900;font-size:clamp(27px,5vw,44px);letter-spacing:-.055em;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hv small{font-size:.33em;letter-spacing:0;margin-left:6px;color:rgba(242,239,233,.72)}
+
+/* ── figures ── */
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));border-top:1px solid var(--c-line2)}
+.fig{padding:30px 26px 30px 0;border-right:1px solid var(--c-line)}
+.fig:last-child{border-right:0}
+.fig .k{font-size:12px;font-weight:700;margin-bottom:10px;line-height:1.6}
+.fig .v{font-weight:900;font-size:clamp(46px,8vw,78px);line-height:.88;letter-spacing:-.06em;font-variant-numeric:tabular-nums}
+.fig .v small{font-size:.28em;letter-spacing:-.01em;margin-left:3px}
+.fig .n{font-size:12px;color:var(--c-faint);margin-top:12px;line-height:1.7}
+@media(max-width:620px){.fig{border-right:0;border-bottom:1px solid var(--c-line);padding-right:0}.fig:last-child{border-bottom:0}}
+
+/* ── pains ── */
+.pains{border-top:1px solid var(--c-line)}
+.pain{padding:22px 0 22px 46px;border-bottom:1px solid var(--c-line);position:relative;
+  font-size:clamp(15px,2.3vw,19px);font-weight:700;line-height:1.75;transition:padding-left .25s cubic-bezier(.2,.8,.3,1)}
+.pain::before{content:"";position:absolute;left:4px;top:50%;width:24px;height:2px;background:var(--accent);transition:width .25s}
+.pain:hover{padding-left:60px}
+.pain:hover::before{width:38px}
+
+/* ── steps ── */
+.step{position:relative;padding-top:4px}
+.step .no{font-family:var(--display);font-weight:800;font-size:46px;line-height:1;letter-spacing:-.05em;
+  -webkit-text-stroke:1.4px var(--c-line2);color:transparent;margin-bottom:16px;display:block}
+.step .wk{font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.2em;color:var(--c-ac);margin-bottom:9px}
+
+/* ── table ── */
+.tablewrap{overflow-x:auto;border-top:1px solid var(--c-line2);border-bottom:1px solid var(--c-line)}
+table{border-collapse:collapse;width:100%;min-width:600px;font-size:14px}
+th,td{text-align:left;padding:16px 18px 16px 0;border-bottom:1px solid var(--c-line);vertical-align:top}
+thead th{font-family:var(--display);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-faint);font-weight:700;white-space:nowrap;padding-top:14px;padding-bottom:14px}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--c-card)}
+tbody tr:last-child td{border-bottom:0}
+td.w{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--c-faint);font-family:var(--display);font-weight:600;font-size:13px}
+td.t{font-weight:700}
+tr.key td.t{font-weight:900}
+tr.key td.w{color:var(--c-ac)}
+.badge{display:inline-block;font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:.1em;
+  background:var(--accent);color:#14203A;padding:2px 8px;margin-left:8px;vertical-align:2px;border-radius:2px}
+
+/* ── tabs ── */
+.tabs{display:flex;gap:30px;border-bottom:1px solid var(--c-line2);margin-bottom:30px}
+.tab{background:none;border:0;padding:0 0 14px;font-family:var(--body);font-weight:900;font-size:clamp(19px,3.4vw,27px);
+  letter-spacing:-.035em;color:var(--c-faint);cursor:pointer;position:relative;transition:color .18s}
+.tab[aria-selected="true"]{color:var(--c-ink)}
+.tab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+
+/* ── plans ── */
+.plans{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));align-items:start}
+.plan{border:1px solid var(--c-line);border-radius:3px;padding:32px 28px;background:var(--c-card);min-width:0;
+  transition:transform .22s cubic-bezier(.2,.8,.3,1)}
+.plan:hover{transform:translateY(-4px)}
+.plan.star{border:2px solid var(--accent);background:var(--c-card)}
+.plan .tg{font-family:var(--display);font-weight:800;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--c-ac);margin-bottom:14px}
+.plan .nm{font-weight:900;font-size:19px;margin-bottom:4px;letter-spacing:-.02em}
+.plan .was{font-size:12.5px;color:var(--c-faint);text-decoration:line-through}
+.plan .amt{font-weight:900;font-size:clamp(42px,7vw,58px);letter-spacing:-.06em;line-height:1;
+  font-variant-numeric:tabular-nums;margin:14px 0 2px}
+.plan .amt small{font-size:.3em;letter-spacing:-.01em;color:var(--c-dim);margin-left:4px}
+.plan ul{margin-top:20px;font-size:13.5px}
+
+/* ── founder quote ── */
+.fq{font-weight:900;font-size:clamp(22px,4.4vw,42px);line-height:1.55;max-width:19ch;margin:0 0 34px;
+  letter-spacing:-.045em;text-wrap:balance}
+.fq span{color:rgba(242,239,233,.42)}
+
+/* ── faq ── */
+details{border-bottom:1px solid var(--c-line)}
+details:first-of-type{border-top:1px solid var(--c-line2)}
+summary{cursor:pointer;padding:21px 42px 21px 0;font-weight:900;font-size:15.5px;list-style:none;position:relative;
+  letter-spacing:-.015em;transition:color .15s}
+summary:hover{color:var(--c-ac)}
+summary::-webkit-details-marker{display:none}
+summary::after,summary::before{content:"";position:absolute;right:6px;top:50%;background:var(--c-ac);transition:transform .25s cubic-bezier(.2,.8,.3,1)}
+summary::after{width:14px;height:2px;margin-top:-1px}
+summary::before{width:2px;height:14px;margin-top:-7px;right:12px}
+details[open] summary::before{transform:scaleY(0)}
+details p{color:var(--c-dim);font-size:14px;padding:0 0 24px;margin:0;max-width:62ch}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* ── final ── */
+.final{background:var(--navy-d);padding-block:clamp(72px,10vw,126px);position:relative;overflow:hidden}
+.final::before{content:"";position:absolute;inset:0;opacity:.55;
+  background-image:radial-gradient(rgba(242,239,233,.12) 1px,transparent 1px);background-size:26px 26px}
+.final .wrap{position:relative;z-index:1}
+.final .big{margin-bottom:22px}
+footer{background:var(--navy-d);padding-block:40px 70px;color:rgba(242,239,233,.4);font-size:12px;line-height:1.95;
+  border-top:1px solid rgba(242,239,233,.12)}
+
+.dock{display:none}
+@media(max-width:720px){
+  body{padding-bottom:82px}
+  .dock{display:block;position:fixed;left:0;right:0;bottom:0;z-index:55;background:rgba(13,22,38,.94);
+    backdrop-filter:blur(14px);border-top:1px solid rgba(242,239,233,.14);
+    padding:11px max(16px,env(safe-area-inset-right,0px)) calc(11px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+  .dock .cta{width:100%;justify-content:center}
+  .plan{padding:26px 22px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-size:14px;font-family:system-ui,sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+
+<nav>
+  <div class="wrap">
+    <a class="nav-lg" href="#top">WING<i></i></a>
+    <div class="nav-links">
+      <a href="#why">なぜ</a><a href="#loop">毎月の流れ</a><a href="#sweden">スウェーデン</a>
+      <a href="#faq">質問</a><a class="pill" href="#price">料金</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ───── HERO ───── -->
+<header class="hero" id="top">
+  <div class="hero-media"><img src="wing-hero.jpg" alt="朝の光が差し込む診療室でマイクロスコープに向かう歯科衛生士"></div>
+  <div class="hero-scrim"></div><div class="hero-scrim2"></div>
+  <div class="wrap">
+    <div class="kick"><b>WING</b><i></i><span>歯科衛生士 2.0</span></div>
+    <h1 class="hl"><span class="q">視野が広がると、</span><br>手元が変わる。</h1>
+    <svg class="smile" viewBox="0 0 300 30" fill="none" aria-hidden="true"><path d="M8 7c38 24 246 24 284 0" stroke="#D9AC97" stroke-width="10" stroke-linecap="round"/></svg>
+    <p class="sub" style="font-weight:900;font-size:clamp(17px,2.6vw,23px);color:#F2EFE9;letter-spacing:-.03em;line-height:1.7;margin-bottom:12px">医院の中だけでは、学べないことがある。</p>
+    <p class="subnote">臨床の質を上げ、世界とつながり、キャリアの選択肢を広げる。歯科衛生士のためのコミュニティ。</p>
+    <div class="hero-figs">
+      <div><span class="hk">第 1 期</span><span class="hv">100<small>名限定</small></span></div>
+      <div><span class="hk">現 地 研 修</span><span class="hv">2027.6<small>スウェーデン</small></span></div>
+    </div>
+    <div class="ctarow">
+      <a class="cta" href="#join">先行案内を受け取る<svg width="16" height="11" viewBox="0 0 16 11" fill="none" aria-hidden="true"><path d="M1 5.5h13M10 1.5l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a class="cta inv" href="#sweden">スウェーデン研修を見る</a>
+    </div>
+    <p class="ctanote">2027年1月スタート／第1期メンバー100名・募集準備中</p>
+  </div>
+</header>
+
+<!-- ───── FIGURES ───── -->
+<div class="band light">
+  <div class="wrap">
+    <div class="sechead">
+      <div><p class="eyebrow">Overview</p><h2 class="big">数字で見る</h2></div>
+      <p class="sh-note">大きくしないことを、先に決めています。</p>
+    </div>
+    <div class="figs">
+      <div class="fig"><div class="k">第1期の定員</div><div class="v">100<small>名</small></div><div class="n">これ以上は増やしません</div></div>
+      <div class="fig"><div class="k">年間のセッション</div><div class="v">12<small>回</small></div><div class="n">1回90分。全回アーカイブあり</div></div>
+      <div class="fig"><div class="k">つながる国</div><div class="v">4<small>カ国</small></div><div class="n">米・仏・蘭・スウェーデン</div></div>
+      <div class="fig"><div class="k">班（Pod）の単位</div><div class="v">5<small>〜6名</small></div><div class="n">全員に顔が見える大きさ</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── WHY ───── -->
+<div class="band dots" id="why">
+  <div class="wrap">
+    <div class="sechead">
+      <div><p class="eyebrow">Why</p><h2 class="big">学ぶ場は<br>ある。</h2></div>
+      <p class="sh-note">セミナーは山ほどある。動画も無料で見られる。それでも月曜のアポに戻ると、今までと同じことをしている。</p>
+    </div>
+    <div class="pains">
+      <div class="pain">自分のSRPが本当にこれで合っているのか、確かめる相手がいない</div>
+      <div class="pain">院のやり方が唯一の基準になっていて、外の当たり前を知らない</div>
+      <div class="pain">勉強しても院内では評価されず、給与もキャリアも変わらない</div>
+      <div class="pain">セミナーに行っても、終わったら関係が切れて、また一人に戻る</div>
+      <div class="pain">「もっと学びたい」と思っているのに、最初の一歩の出し方がわからない</div>
+    </div>
+    <p style="font-weight:900;font-size:clamp(20px,3.6vw,34px);line-height:1.6;letter-spacing:-.04em;margin:46px 0 0;max-width:22ch;text-wrap:balance">
+      足りないのは知識じゃない。<br><span class="mk">基準をずらす体験</span>と、<br>それを一緒に通る人。</p>
+  </div>
+</div>
+
+<!-- ───── PILLARS ───── -->
+<div class="band light">
+  <div class="wrap">
+    <div class="sechead">
+      <div><p class="eyebrow">What is WING</p><h2 class="big">3つの柱</h2></div>
+      <p class="sh-note">WINGは英語で「翼」。一人ひとりが自分らしく学んで、羽ばたいていける場所をつくります。</p>
+    </div>
+    <div class="grid g3">
+      <div class="card"><div class="step" style="padding:0"><span class="no">01</span></div>
+        <h3 style="font-family:var(--display);font-style:italic;font-weight:900;font-size:27px;letter-spacing:-.045em;margin-bottom:6px">EDUCATION</h3>
+        <p style="color:var(--c-ac);font-weight:900;font-size:13.5px;margin-bottom:16px">臨床で活きる学び</p>
+        <p class="small">毎月のゲスト講師セッション。歯周病・矯正・小児・インプラント・外科まで、第一線の人から「なぜそうするのか」を学び、その場でワークまでやります。</p></div>
+      <div class="card"><div class="step" style="padding:0"><span class="no">02</span></div>
+        <h3 style="font-family:var(--display);font-style:italic;font-weight:900;font-size:27px;letter-spacing:-.045em;margin-bottom:6px">GLOBAL</h3>
+        <p style="color:var(--c-ac);font-weight:900;font-size:13.5px;margin-bottom:16px">世界とつながる学び</p>
+        <p class="small">アメリカ・フランス・オランダ・スウェーデン。現地で働くDHと直接つながり、日本の「当たり前」を外から見直す。</p></div>
+      <div class="card"><div class="step" style="padding:0"><span class="no">03</span></div>
+        <h3 style="font-family:var(--display);font-style:italic;font-weight:900;font-size:27px;letter-spacing:-.045em;margin-bottom:6px">CAREER</h3>
+        <p style="color:var(--c-ac);font-weight:900;font-size:13.5px;margin-bottom:16px">広がるキャリアの選択肢</p>
+        <p class="small">チェアサイドの先にある道を知る。認定、企業、教育、発信、海外。実際にその道にいる人から、お金と時間のリアルごと聞く。</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── LOOP ───── -->
+<div class="band dots" id="loop">
+  <div class="wrap">
+    <div class="sechead">
+      <div><p class="eyebrow">Monthly Loop</p><h2 class="big">毎月の流れ</h2></div>
+      <p class="sh-note">月1回、90分。ゲスト講師の講義で終わらせず、その場でワークまでやります。<span class="mk">自分が動く側</span>に回る場所です。</p>
+    </div>
+    <div class="grid g3" style="margin-bottom:54px">
+      <div class="card step"><span class="no">01</span><div class="wk">講 義 ／ 40分</div><h3>なぜそうするのか</h3><p class="small">その領域の第一線の人が、手順ではなく考え方から話します。</p></div>
+      <div class="card step"><span class="no">02</span><div class="wk">対 談 ／ 20分</div><h3>現場の疑問をぶつける</h3><p class="small">質問は事前に会員から集めます。聞きにくいことほど、代わりに聞きます。</p></div>
+      <div class="card step"><span class="no">03</span><div class="wk">ワ ー ク ／ 30分</div><h3>明日やることを決める</h3><p class="small">自分の患者に当てはめて手を動かします。聞いて終わる回は、1回もありません。</p></div>
+      <div class="card step" style="border-color:var(--accent)"><span class="no" style="-webkit-text-stroke-color:var(--accent)">04</span><div class="wk">月 末 ／ 班</div><h3>やってみてどうだったか</h3><p class="small">班で報告し合います。うまくいかなかった話の方が、価値があります。</p></div>
+    </div>
+    <h3 style="font-size:clamp(19px,3.2vw,28px);letter-spacing:-.04em;margin-bottom:14px">班（Pod）— 5〜6人の小さな単位に入ります</h3>
+    <p class="lede" style="margin-bottom:0">100人の部屋では、誰も発言しません。入会時に5〜6人の班に配属され、月に一度はその班で集まります。顔と名前が一致する人が5人いる。それだけで、続く理由になります。</p>
+  </div>
+</div>
+
+<!-- ───── LINEUP ───── -->
+<div class="band light">
+  <div class="wrap">
+    <div class="sechead">
+      <div><p class="eyebrow">Line-up</p><h2 class="big">年間12回</h2></div>
+      <p class="sh-note">足元から始めて、4ヶ月かけて世界に出る。順番そのものに意味があります。</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>時期</th><th>テーマ</th><th>柱</th></tr></thead>
+        <tbody>
+          <tr class="key"><td class="w">2027.1</td><td class="t">OHI &amp; TBI — 毎日やっているのに、誰にも習っていない<span class="badge">無料公開</span></td><td class="w">EDUCATION</td></tr>
+          <tr><td class="w">2027.2</td><td class="t">歯周病 — 認定への道と、その前にやるべきこと</td><td class="w">EDUCATION</td></tr>
+          <tr><td class="w">2027.3</td><td class="t">ドクター — Drは、DHのどこを見て評価しているのか</td><td class="w">EDUCATION</td></tr>
+          <tr class="key"><td class="w">2027.4</td><td class="t">スウェーデン — 予防の本場では、DHが何をしているのか</td><td class="w">GLOBAL</td></tr>
+          <tr><td class="w">2027.5</td><td class="t">オランダ — 予防が制度として回っている国の中身</td><td class="w">GLOBAL</td></tr>
+          <tr><td class="w">2027.7</td><td class="t">フランス — ヨーロッパのDH教育と資格</td><td class="w">GLOBAL</td></tr>
+          <tr><td class="w">2027.8</td><td class="t">矯正 — DHが関われる範囲は、思っているより広い</td><td class="w">EDUCATION</td></tr>
+          <tr><td class="w">2027.9</td><td class="t">小児 — 予防のはじまりを、どう設計するか</td><td class="w">EDUCATION</td></tr>
+          <tr><td class="w">2027.10</td><td class="t">インプラント／外科 — メインテナンスの責任範囲</td><td class="w">EDUCATION</td></tr>
+          <tr class="key"><td class="w">2027.11</td><td class="t">アメリカ — DHのキャリアと収入が、最も開いている国</td><td class="w">CAREER</td></tr>
+          <tr><td class="w">2027.12</td><td class="t">企業 — チェアサイド以外の働き方を知る</td><td class="w">CAREER</td></tr>
+          <tr><td class="w">2028.1</td><td class="t">SNS・発信 — 自分の学びを、仕事につなげる</td><td class="w">CAREER</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tiny" style="margin-top:16px">テーマ・ゲストは変更になる場合があります。最新情報はLINEでご案内します。</p>
+  </div>
+</div>
+
+<!-- ───── SWEDEN ───── -->
+<div class="band deep dots" id="sweden">
+  <div class="wrap">
+    <p class="eyebrow">Global Program ／ 第1期</p>
+    <h2 style="font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(36px,9vw,104px);line-height:.94;
+      letter-spacing:-.06em;margin:0 0 10px">SCANDINAVIAN<br><span style="color:var(--accent)">APPROACH</span></h2>
+    <p style="font-weight:900;font-size:clamp(20px,3.8vw,34px);line-height:1.55;letter-spacing:-.04em;margin:26px 0 38px;max-width:20ch;text-wrap:balance">
+      予防歯科の本場で、<br><span class="mk">現地のDH</span>を見る。</p>
+    <div class="grid g2" style="margin-bottom:12px">
+      <div class="card"><h3>本で読むのと、同じ部屋で見るのは違う</h3><p class="small">予防が制度として成立している国で、DHがどんな裁量を持ち、どんな基準で患者を見ているのか。資料ではなく、実際のチェアサイドで。全行程に通訳が入るので、英語に自信がなくても参加できます。</p></div>
+      <div class="card"><h3>学ぶだけで終わらせない</h3><p class="small">帰国後に自院で何を変えるかまでを、現地で言語化して持ち帰る。参加者同士は帰国後もWINGの中でつながり続けるので、「やってみてどうだったか」を報告し合えます。</p></div>
+    </div>
+    <div class="figs" style="margin-top:34px">
+      <div class="fig"><div class="k">開催</div><div class="v" style="font-size:clamp(26px,4.4vw,38px)">2027年6月</div><div class="n">第1期・少人数制</div></div>
+      <div class="fig"><div class="k">プログラム費</div><div class="v" style="font-size:clamp(26px,4.4vw,38px)">¥498,000</div><div class="n">渡航費は別途実費／会員は ¥448,000</div></div>
+      <div class="fig"><div class="k">共同主催</div><div class="v" style="font-size:clamp(26px,4.4vw,38px)">WING × case</div><div class="n">会員の方へ先行してご案内します</div></div>
+    </div>
+    <div class="ctarow" style="margin-top:40px"><a class="cta" href="#join">研修の先行案内を受け取る<svg width="16" height="11" viewBox="0 0 16 11" fill="none" aria-hidden="true"><path d="M1 5.5h13M10 1.5l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </div>
+</div>
+
+<!-- ───── SUMMIT ───── -->
+<div class="band light">
+  <div class="wrap">
+    <div class="sechead">
+      <div><p class="eyebrow">Annual</p><h2 class="big">年に一度</h2></div>
+      <p class="sh-note">WING SUMMIT。オンラインで一年一緒に学んだ人と、はじめて顔を合わせる日。スウェーデンに行ったメンバーが、その場で報告します。</p>
+    </div>
+    <div class="grid g3">
+      <div class="card"><h3>症例を持ち寄る</h3><p class="small">自分の担当患者を、院の外の目で見てもらう。普段はもらえないフィードバックが、一番の持ち帰りになります。</p></div>
+      <div class="card"><h3>手を動かす</h3><p class="small">少人数のハンズオン枠を併設。オンラインでは埋まらない部分だけに、時間を使います。</p></div>
+      <div class="card"><h3>名刺じゃない関係をつくる</h3><p class="small">同じ悩みを持つ人が全国から集まる一日。ここで出会った人と、翌年の海外研修に一緒に行く人もいます。</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── PRICE ───── -->
+<div class="band dots" id="price">
+  <div class="wrap">
+    <div class="sechead">
+      <div><p class="eyebrow">Membership</p><h2 class="big">料金</h2></div>
+      <p class="sh-note">「動画が見られる権利」ではありません。毎月自分が動き、年に一度は大きな一歩を踏み出す。そのための場所なので、人数に上限があります。</p>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" id="t1" role="tab" aria-selected="true" aria-controls="p1">会員になる</button>
+      <button class="tab" id="t2" role="tab" aria-selected="false" aria-controls="p2">単発で参加する</button>
+    </div>
+
+    <div id="p1" role="tabpanel" aria-labelledby="t1">
+      <div class="plans">
+        <div class="plan star">
+          <div class="tg">Founding Member ／ 第1期100名</div>
+          <div class="nm">WING CLUB</div>
+          <div class="was">2期以降 ¥3,980 ／月</div>
+          <div class="amt">¥2,980<small>／月</small></div>
+          <p class="tiny" style="margin:8px 0 0">在籍中も、一度卒業して戻るときも、この価格のまま。</p>
+          <ul class="small">
+            <li>毎月のセッション（全12回・各90分）</li>
+            <li><strong>班（Pod）での持ち寄り</strong>（会員のみ）</li>
+            <li>全アーカイブ見放題</li>
+            <li>会員コミュニティ（質問・症例相談）</li>
+            <li>スウェーデン研修 <strong>5万円割引＋先行申込</strong></li>
+            <li>SUMMIT 会員価格 ¥12,000（一般 ¥19,800）</li>
+            <li>会員限定ハンズオンの優先枠</li>
+          </ul>
+        </div>
+        <div class="plan">
+          <div class="tg">年払い</div>
+          <div class="nm">WING CLUB ／ 年</div>
+          <div class="was">&nbsp;</div>
+          <div class="amt">¥29,800<small>／年</small></div>
+          <p class="tiny" style="margin:8px 0 0">Founding Member 価格の年払い。月払いより2ヶ月分おトク。</p>
+          <ul class="small">
+            <li>内容は月額プランと同じ</li>
+            <li>毎月の支払い手続きが不要</li>
+            <li>研修・SUMMITの割引も同様に適用</li>
+            <li>途中でやめる場合は、残月分を返金します</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="p2" role="tabpanel" aria-labelledby="t2" hidden>
+      <div class="plans">
+        <div class="plan">
+          <div class="tg">会員にならない場合</div>
+          <div class="nm">単発参加</div>
+          <div class="was">&nbsp;</div>
+          <div class="amt">¥5,500<small>／回</small></div>
+          <p class="tiny" style="margin:8px 0 0">興味のある回だけ参加できます（90分・ワーク込み）。</p>
+          <ul class="small">
+            <li>その回のセッション参加のみ</li>
+            <li><strong>班・月末の持ち寄りには入れません</strong></li>
+            <li>アーカイブ・コミュニティは対象外</li>
+            <li>研修・SUMMITの会員価格は適用されません</li>
+          </ul>
+        </div>
+        <div class="plan">
+          <div class="tg">比べると</div>
+          <div class="nm">1回出るだけで、会員の約2ヶ月分</div>
+          <div class="was">&nbsp;</div>
+          <div class="amt">¥2,520<small>差</small></div>
+          <p class="tiny" style="margin:8px 0 0">単発 ¥5,500 − 会員 ¥2,980</p>
+          <p class="small" style="margin-top:20px">1回参加した時点で会員の方が得になり、そのまま残りの11回とアーカイブ、研修の割引が付いてきます。そして班と月末の持ち寄りは、単発では入れません。</p>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-weight:900;font-size:clamp(19px,3.4vw,32px);line-height:1.6;letter-spacing:-.04em;margin:46px 0 0;max-width:23ch;text-wrap:balance">
+      会員と非会員の差は、<br>値段ではなく<span class="mk">中身</span>です。</p>
+  </div>
+</div>
+
+<!-- ───── FIT ───── -->
+<div class="band light">
+  <div class="wrap">
+    <div class="sechead">
+      <div><p class="eyebrow">For whom</p><h2 class="big">向き不向き</h2></div>
+      <p class="sh-note">合わない人に入ってもらっても、お互いに損をします。先に書いておきます。</p>
+    </div>
+    <div class="grid g2">
+      <div class="card" style="border-color:var(--accent);border-width:2px">
+        <h3 style="color:var(--accent-ink)">向いている人</h3>
+        <ul class="small">
+          <li>院のやり方以外を知らないことに、うっすら危機感がある</li>
+          <li>もっと学びたいのに、どこから手をつけるか決めきれない</li>
+          <li>いつか海外を見てみたいと思ったことがある</li>
+          <li>認定を取りたい、または取った先を考えている</li>
+          <li>同じ熱量の人と話せる場所がほしい</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--c-faint)">向いていない人</h3>
+        <ul class="small" style="color:var(--c-faint)">
+          <li>見るだけで済ませたい（毎月アウトプットを求めます）</li>
+          <li>すぐ使えるテクニックだけを効率よく集めたい</li>
+          <li>受け身で、質問も発言もするつもりはない</li>
+          <li>答えを一つに決めてほしい</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── PHILOSOPHY ───── -->
+<div class="band">
+  <div class="wrap">
+    <div class="sechead">
+      <div><p class="eyebrow">Philosophy</p><h2 class="big">羼</h2></div>
+      <p class="sh-note">WINGは英語で「羼」。もっと学びたい。もっと視野を広げたい。新しい世界を見てみたい。その気持ちに、場所をつくりたかった。</p>
+    </div>
+    <p class="fq"><span>可能性は、</span>自分が思っているよりずっと広い。</p>
+    <div class="grid g2">
+      <div>
+        <p class="small">そんな気持ちがあっても、なかなか一歩を踏み出せなかったり、自分には無理かもって思ってしまうことがある。</p>
+        <p class="small">だからこそ、ここが新しいことを知るきっかけになったり、一歩踏み出す勇気につながったり。一人ひとりが自分らしく学んで、可能性を広げて羽ばたいていける。そんな場所になったら嬉しいです。</p>
+      </div>
+      <div class="card">
+        <h3>教える側と、教わる側に分かれない</h3>
+        <p class="small">WINGは、誰か一人が正解を配る場所ではありません。毎月のゲスト、班のメンバー、実践会の相手。学びの相手は一人ではなく、同じ臨床に立つ全員です。</p>
+        <p class="tiny" style="margin:18px 0 0">Instagram：@wing_dh</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── FAQ ───── -->
+<div class="band light" id="faq">
+  <div class="wrap">
+    <div class="sechead">
+      <div><p class="eyebrow">Q&amp;A</p><h2 class="big">質問</h2></div>
+      <p class="sh-note">ここに無いことは、LINEで直接聞いてください。</p>
+    </div>
+    <details><summary>セッションの時間に参加できません。意味はありますか？</summary><p>あります。全回アーカイブが残り、会員はいつでも見られます。質問も事前に受け付けて対談パートで取り上げます。ワークは課題として残るので、自分のペースでやって月末の持ち寄りに出せば、ループは成立します。</p></details>
+    <details><summary>経験が浅くてもついていけますか？</summary><p>大丈夫です。1月のOHI &amp; TBIのように、経験年数に関係なく全員が毎日やっていることから始めます。むしろ早い段階で外の基準に触れた方が、自己流が固まる前に修正できます。</p></details>
+    <details><summary>英語ができませんが、海外の回は理解できますか？</summary><p>オンラインの海外ゲスト回は通訳または日本語の解説を入れます。スウェーデン研修も全行程に通訳が入ります。</p></details>
+    <details><summary>なぜ今、第1期なのですか？</summary><p>2027年6月のスウェーデン研修に間に合わせるためです。1月から毎月のループを回し、6月に第1期が現地に立つ。この流れに最初から乗れるのは、いまの100名だけです。2期の募集は、第1期が一巡したあとになります。</p></details>
+    <details><summary>なぜ定員100名なのですか？</summary><p>実践会と班（Pod）を機能させるには、運営側が一人ひとりを把握できる人数に収める必要があるからです。人数を増やせば売上は伸びますが、発言しない人が増えて場が死にます。第1期は100名で締め切り、以降はウェイトリストでのご案内になります。</p></details>
+    <details><summary>いつでも解約できますか？</summary><p>できます。月単位でいつでも、フォームから1分で完了します。引き止めのご連絡は一切しません。理由の記入も任意です。WINGは一生いる場所ではないので、必要がなくなったら卒業するのが正しい使い方だと思っています。</p></details>
+    <details><summary>しばらく忙しくて参加できそうにありません。</summary><p>休会ができます。課金を止めたまま在籍を残せるので、落ち着いてから戻れます。班のメンバーにもその旨が共有されるので、黙って消えたことにはなりません。</p></details>
+    <details><summary>一度やめたら、もう同じ価格では入れませんか？</summary><p>入れます。Founding Member の価格は、卒業後に戻るときも同じです（定員に空きがある場合）。価格で縛ることはしません。卒業後もSUMMITなどのイベントは卒業生価格でご案内します。</p></details>
+    <details><summary>スウェーデン研修は、会員にならないと参加できませんか？</summary><p>参加できます。ただし会員は5万円割引と先行申込の対象になります。少人数制のため、会員優先で枠が埋まる可能性があります。</p></details>
+    <details><summary>院に内緒で参加しても大丈夫ですか？</summary><p>問題ありません。個人での参加が前提です。コミュニティ内の症例相談も、患者情報を特定できない形でのやり取りをルールにしています。</p></details>
+    <details><summary>Perio Labとの違いは何ですか？</summary><p>Perio Labは歯周病認定歯科衛生士の取得を目的とした講座で、ゴールが明確に決まっています。WINGはもっと広く、日々の臨床から海外・キャリアまでを扱う、終わりのない場です。Perio Lab修了生の方には、WING CLUBのご案内を別途しています。</p></details>
+  </div>
+</div>
+
+<!-- ───── FINAL ───── -->
+<div class="final band deep" id="join" style="padding-block:clamp(72px,10vw,126px)">
+  <div class="wrap">
+    <p class="eyebrow">Join</p>
+    <h2 class="big">一歩を、<br>外に出す。</h2>
+    <p class="lede" style="margin-top:28px">第1期メンバーの募集開始、スウェーデン研修の詳細、毎月のセッションスケジュールは、Instagram（@wing_dh）とLINEで先行してご案内します。どちらも登録は無料です。</p>
+    <div class="ctarow"><a class="cta" href="https://www.instagram.com/wing_dh/" target="_blank" rel="noopener">最新情報を受け取る<svg width="16" height="11" viewBox="0 0 16 11" fill="none" aria-hidden="true"><path d="M1 5.5h13M10 1.5l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    <p class="ctanote">1月の第1回ライブ（OHI &amp; TBI）は、登録者の方は無料でご参加いただけます。</p>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div style="font-family:var(--display);font-style:italic;font-weight:900;font-size:19px;letter-spacing:-.05em;color:var(--paper);margin-bottom:10px">WING</div>
+    <div>WING｜歯科衛生士2.0　Instagram <a href="https://www.instagram.com/wing_dh/" target="_blank" rel="noopener">@wing_dh</a></div>
+    <div style="margin-top:8px;color:rgba(242,239,233,.26)">※ テーマ・ゲスト・日程・料金は変更になる場合があります。最新情報はInstagramおよびLINEでご案内します。</div>
+  </div>
+</footer>
+
+<div class="dock"><a class="cta" href="#join">第1期の案内を受け取る<svg width="16" height="11" viewBox="0 0 16 11" fill="none" aria-hidden="true"><path d="M1 5.5h13M10 1.5l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+
+<script>
+(function(){
+  var bar=document.getElementById('prog');
+  function upd(){var h=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(h>0?Math.min(100,window.scrollY/h*100):0)+'%';}
+  addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);upd();
+  var tabs=[document.getElementById('t1'),document.getElementById('t2')];
+  var pans=[document.getElementById('p1'),document.getElementById('p2')];
+  tabs.forEach(function(t,i){t.addEventListener('click',function(){
+    tabs.forEach(function(x,j){x.setAttribute('aria-selected',String(i===j));pans[j].hidden=(i!==j);});
+  });});
+})();
+</script>
+</body>
+</html>
