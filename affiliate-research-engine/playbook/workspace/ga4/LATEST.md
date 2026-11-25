@@ -1,8 +1,8 @@
-# GA4 アクセス 2026-11-24
+# GA4 アクセス 2026-11-25
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **28** / ユーザー **27** / ページビュー **28**
+- セッション **29** / ユーザー **28** / ページビュー **28**
 
 ## 流入元
 
@@ -11,6 +11,7 @@
 | (direct) | (none) | 17 | 17 |
 | google | organic | 7 | 6 |
 | bing | organic | 3 | 3 |
+| (not set) | (not set) | 1 | 1 |
 | duckduckgo | organic | 1 | 1 |
 
 ## 着地ページ × 流入元
@@ -21,6 +22,7 @@
 | /present-core-image/ | google | 3 |
 | /take-core-image/ | (direct) | 2 |
 | /take-core-image/ | google | 2 |
+| (not set) | (not set) | 1 |
 | /canada-working-holiday-cost/ | (direct) | 1 |
 | /category/英会話サービス比較/ | (direct) | 1 |
 | /cebu-1month-review/ | (direct) | 1 |
@@ -67,4 +69,5 @@
 | 1 | 1 | 0.0分 | /take-off-core-image/ |
 | 1 | 1 | 0.0分 | /working-holiday-age-30/ |
 | 1 | 1 | 0.0分 | /working-holiday-english-anxiety/ |
+| 0 | 1 | 0.0分 | /articles/page/10/ |
 
