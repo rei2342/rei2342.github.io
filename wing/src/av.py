@@ -13,8 +13,10 @@ def extras(k):                       # drawn behind the head
 def top(k):                          # drawn in front
     return '<circle cx="40" cy="11" r="9.5"/>' if k==4 else ''
 
-def avatar(i):
-    b0,b1=BG[i%4]; s=SKIN[(i+1)%4]; d=DARK[i%4]; t=TOP[(i+2)%4]; k=i%6; u=f"a{i}"
+def avatar(i,mono=False):
+    b0,b1=(BG[0] if mono else BG[i%4]); s=(SKIN[0] if mono else SKIN[(i+1)%4])
+    d=(DARK[0] if mono else DARK[i%4]); t=(TOP[0] if mono else TOP[(i+2)%4]); k=i%6
+    u=f"m{i}" if mono else f"a{i}"
     return (f'<svg class="avs" viewBox="0 0 80 80" aria-hidden="true">'
       f'<defs><clipPath id="c{u}"><circle cx="40" cy="40" r="40"/></clipPath>'
       f'<linearGradient id="g{u}" x1=".1" y1="0" x2=".9" y2="1">'
