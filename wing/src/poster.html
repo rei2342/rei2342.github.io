@@ -1,0 +1,173 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,600;0,700;0,800;1,800;1,900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+<style>
+/* Editorial index, not a grid of boxes: numerals, bilingual titles, hairlines, one headliner band */
+:root{
+  --ink:#0A1220;--navy:#141F37;--navy2:#1B2946;--paper:#F2EFE9;--accent:#D9AC97;--accent-hi:#F3D4C0;
+  --dim:rgba(242,239,233,.62);--faint:rgba(242,239,233,.38);--ghost:rgba(242,239,233,.16);
+  --line:rgba(242,239,233,.1);--line2:rgba(242,239,233,.26);
+  --display:'Archivo','Noto Sans JP',system-ui,sans-serif;--body:'Noto Sans JP','Archivo',system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--body);font-size:15px;line-height:1.9;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:1240px;margin:0 auto;
+  padding-left:max(22px,env(safe-area-inset-left,0px));padding-right:max(22px,env(safe-area-inset-right,0px))}
+
+/* ── hero ── */
+.top{position:relative;overflow:hidden;padding-block:clamp(44px,6.5vw,78px) 0;
+  background:radial-gradient(120% 90% at 78% -10%,#2A3A5F 0%,#16223C 46%,#0A1220 100%)}
+.top::after{content:"";position:absolute;inset:0;opacity:.4;pointer-events:none;
+  background-image:radial-gradient(rgba(242,239,233,.1) 1px,transparent 1px);background-size:30px 30px}
+.top .wrap{position:relative;z-index:1}
+.brow{display:flex;align-items:center;gap:16px;margin-bottom:clamp(24px,4vw,42px)}
+.brow .lg{font-family:var(--display);font-style:italic;font-weight:900;font-size:21px;letter-spacing:-.055em;
+  display:flex;align-items:center;gap:6px}
+.brow .lg i{width:6px;height:6px;background:var(--accent);display:block}
+.brow .r{flex:1;height:1px;background:var(--line2)}
+.brow .t{font-family:var(--display);font-weight:600;font-size:11px;letter-spacing:.26em;color:var(--faint)}
+.season{font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(58px,14.5vw,186px);line-height:.8;
+  letter-spacing:-.07em;margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 .08em}
+.season em{font-style:italic;color:var(--accent)}
+.sline{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 28px;margin:clamp(20px,3vw,32px) 0 0;
+  padding-bottom:clamp(20px,3vw,30px)}
+.sline b{font-weight:900;font-size:clamp(16px,2.5vw,23px);letter-spacing:-.04em}
+.sline span{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.2em;color:var(--faint)}
+
+/* ── arc ── */
+.arcbox{overflow-x:auto;padding-bottom:clamp(14px,2.5vw,26px)}
+svg.arc{display:block;width:100%;min-width:760px;height:auto}
+.arccap{font-size:11.5px;color:var(--faint);margin:0;padding-bottom:clamp(30px,5vw,54px);letter-spacing:.02em}
+
+/* ── acts ── */
+.acts{padding-block:clamp(34px,5vw,62px) clamp(46px,7vw,86px)}
+.actline{display:flex;align-items:baseline;gap:14px;margin:clamp(44px,6vw,76px) 0 6px;flex-wrap:wrap}
+.actline:first-child{margin-top:0}
+.actno{font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(17px,2.6vw,24px);
+  letter-spacing:-.05em;color:var(--accent)}
+.acttitle{font-weight:900;font-size:clamp(17px,2.6vw,25px);letter-spacing:-.045em}
+.actnote{font-size:12px;color:var(--faint)}
+.actrule{flex:1;height:1px;background:var(--line2);min-width:14px;align-self:center}
+
+.rows{border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:62px minmax(0,1.05fr) minmax(0,1fr) auto;gap:10px 22px;align-items:center;
+  padding:clamp(16px,2.2vw,22px) 4px;border-bottom:1px solid var(--line);position:relative;
+  transition:background .2s ease,padding-left .25s cubic-bezier(.2,.8,.3,1)}
+.row:hover{background:rgba(242,239,233,.028);padding-left:14px}
+.rn{font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(26px,3.6vw,38px);line-height:1;
+  letter-spacing:-.06em;-webkit-text-stroke:1.2px var(--ghost);color:transparent;transition:-webkit-text-stroke-color .22s,color .22s}
+.row:hover .rn{-webkit-text-stroke-color:var(--accent);color:rgba(217,172,151,.14)}
+.rmain{display:flex;flex-direction:column;gap:5px;min-width:0}
+.rjp{font-weight:900;font-size:clamp(19px,2.9vw,28px);letter-spacing:-.045em;line-height:1.26}
+.ren{font-family:var(--display);font-weight:600;font-size:10.5px;letter-spacing:.2em;color:var(--faint);line-height:1.4}
+.rsub{font-size:12.5px;color:var(--dim);line-height:1.8;min-width:0}
+.rr{display:flex;align-items:center;gap:16px;justify-self:end}
+.rm{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.1em;color:var(--faint);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.ph{width:42px;height:42px;border-radius:50%;flex:none;overflow:hidden;position:relative;
+  background:linear-gradient(148deg,rgba(217,172,151,.62) 0%,rgba(217,172,151,.2) 44%,rgba(27,41,70,.9) 100%);
+  box-shadow:inset 0 0 0 1px rgba(217,172,151,.4),0 2px 10px rgba(0,0,0,.25)}
+.ph::after{content:"";position:absolute;inset:3px;border-radius:50%;border:1px solid rgba(242,239,233,.14)}
+.ph img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.04);mix-blend-mode:luminosity}
+.st{font-family:var(--display);font-weight:700;font-size:9.5px;letter-spacing:.14em;padding:4px 9px;border-radius:2px;
+  white-space:nowrap;min-width:104px;text-align:center}
+.st-ok{background:var(--accent);color:#14203A}
+.st-soon{border:1px solid var(--line2);color:var(--faint)}
+.st-free{background:var(--paper);color:#14203A}
+@media(max-width:860px){
+  .row{grid-template-columns:48px minmax(0,1fr);gap:4px 16px;padding-block:18px}
+  .rsub{grid-column:2;font-size:12px}
+  .rr{grid-column:2;justify-self:start;margin-top:8px}
+  .st{min-width:0}
+}
+
+/* ── headliner ── */
+.exp{position:relative;margin-top:26px;padding:clamp(28px,4.4vw,46px) clamp(24px,3.4vw,40px);overflow:hidden;
+  border:1px solid rgba(217,172,151,.45);border-radius:3px;
+  background:linear-gradient(104deg,rgba(217,172,151,.22) 0%,rgba(217,172,151,.05) 48%,rgba(10,18,32,0) 86%)}
+.exp::after{content:"";position:absolute;inset:0;opacity:.45;pointer-events:none;
+  background-image:radial-gradient(rgba(242,239,233,.12) 1px,transparent 1px);background-size:26px 26px}
+.exp>*{position:relative;z-index:1}
+.exp-k{display:block;font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.26em;color:var(--accent);margin-bottom:14px}
+.exp-b{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 26px}
+.exp-t{font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(28px,6.2vw,64px);line-height:.94;
+  letter-spacing:-.062em;color:var(--accent-hi)}
+.exp-d{font-family:var(--display);font-style:italic;font-weight:900;font-size:clamp(26px,4.6vw,46px);letter-spacing:-.06em;
+  line-height:1;white-space:nowrap}
+.exp-d i{font-style:normal;color:var(--accent)}
+.exp-s{display:block;font-size:12.5px;color:var(--dim);margin-top:16px;padding-top:15px;border-top:1px solid rgba(217,172,151,.3)}
+
+/* ── legend + cta ── */
+.legend{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin-top:clamp(34px,5vw,52px);
+  padding-top:22px;border-top:1px solid var(--line)}
+.legend span{display:flex;align-items:center;gap:9px;font-size:11.5px;color:var(--faint)}
+.cta-end{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;margin-top:30px;
+  padding:clamp(24px,3.4vw,34px) clamp(24px,3.4vw,36px);border:1px solid var(--line2);border-radius:3px;
+  background:linear-gradient(100deg,rgba(242,239,233,.055),transparent 70%)}
+.ce-l b{display:block;font-weight:900;font-size:clamp(17px,2.8vw,23px);letter-spacing:-.045em;margin-bottom:5px}
+.ce-l span{font-size:12.5px;color:var(--dim)}
+.ce-b{display:inline-flex;align-items:center;gap:12px;background:var(--accent);color:#14203A;font-weight:900;font-size:15px;
+  padding:16px 26px;border-radius:2px;text-decoration:none;white-space:nowrap;
+  transition:transform .18s cubic-bezier(.2,.8,.3,1),background .18s}
+.ce-b svg{transition:transform .22s cubic-bezier(.2,.8,.3,1)}
+.ce-b:hover{background:var(--accent-hi);transform:translateY(-2px)}
+.ce-b:hover svg{transform:translateX(5px)}
+
+footer{padding-block:38px 68px;color:var(--faint);font-size:12px;line-height:1.95;border-top:1px solid var(--line)}
+footer a{color:var(--accent)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+html,body{margin:0;padding:0;background:#0A1220}
+.poster{width:1080px;height:1350px;padding:40px 46px 32px;display:flex;flex-direction:column;position:relative;overflow:hidden;
+  background:radial-gradient(120% 70% at 80% -8%,#2A3A5F 0%,#16223C 42%,#0A1220 100%)}
+.poster::after{content:"";position:absolute;inset:0;opacity:.4;pointer-events:none;
+  background-image:radial-gradient(rgba(242,239,233,.1) 1px,transparent 1px);background-size:30px 30px}
+.poster>*{position:relative;z-index:1}
+.p-brow{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.p-brow .lg{font-family:var(--display);font-style:italic;font-weight:900;font-size:22px;letter-spacing:-.055em;display:flex;align-items:center;gap:6px}
+.p-brow .lg i{width:6px;height:6px;background:var(--accent);display:block}
+.p-brow .r{flex:1;height:1px;background:var(--line2)}
+.p-brow .t{font-family:var(--display);font-weight:600;font-size:11px;letter-spacing:.26em;color:var(--faint)}
+.p-season{font-family:var(--display);font-style:italic;font-weight:900;font-size:92px;line-height:.8;letter-spacing:-.07em;margin:0}
+.p-season em{font-style:italic;color:var(--accent)}
+.p-sline{display:flex;align-items:baseline;gap:24px;margin:13px 0 2px;padding-bottom:10px}
+.p-sline b{font-weight:900;font-size:19px;letter-spacing:-.04em}
+.p-sline span{font-family:var(--display);font-weight:600;font-size:11.5px;letter-spacing:.2em;color:var(--faint)}
+.pact{display:flex;align-items:baseline;gap:12px;margin:9px 0 2px}
+.pact .actno{font-size:16px} .pact .acttitle{font-size:16px}
+.prows{border-top:1px solid var(--line)}
+.prow{display:grid;grid-template-columns:46px 46px minmax(0,1fr) auto;gap:16px;align-items:center;
+  padding:6px 2px;border-bottom:1px solid var(--line)}
+.prow .ph{width:46px;height:46px;border-radius:50%;overflow:hidden;display:block}
+.prow .ph .avs{width:100%;height:100%;display:block}
+.prow .rn{font-size:27px;-webkit-text-stroke:1.1px var(--ghost);color:transparent;
+  font-family:var(--display);font-style:italic;font-weight:900;letter-spacing:-.06em;line-height:1}
+.prow .rjp{font-size:20px;letter-spacing:-.045em;line-height:1.2}
+.prow .ren{font-size:9px;letter-spacing:.2em}
+.prow .rr{display:flex;align-items:center;gap:14px}
+.prow .rm{font-size:11px} .prow .ph{width:34px;height:34px}
+.prow .st{font-size:8.5px;padding:3px 7px;min-width:92px}
+.pexp{margin-top:9px;padding:15px 22px;border:1px solid rgba(217,172,151,.5);border-radius:3px;position:relative;overflow:hidden;
+  background:linear-gradient(104deg,rgba(217,172,151,.24) 0%,rgba(217,172,151,.05) 50%,transparent 88%)}
+.pexp-b{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.pexp-t{font-family:var(--display);font-style:italic;font-weight:900;font-size:38px;line-height:.92;letter-spacing:-.065em;color:var(--accent-hi)}
+.pexp-d{font-family:var(--display);font-style:italic;font-weight:900;font-size:38px;letter-spacing:-.06em;line-height:1;white-space:nowrap}
+.pexp-d i{font-style:normal;color:var(--accent)}
+.pexp-s{display:block;font-size:11.5px;color:var(--dim);margin-top:13px;padding-top:12px;border-top:1px solid rgba(217,172,151,.3)}
+.p-foot{margin-top:auto;padding-top:15px;border-top:1px solid var(--line2);display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.p-foot b{display:block;font-weight:900;font-size:19px;letter-spacing:-.045em;margin-bottom:4px}
+.p-foot .l span{font-size:11.5px;color:var(--dim)}
+.p-foot .r{text-align:right;font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.12em;color:var(--accent)}
+.p-foot .r small{display:block;font-size:10px;letter-spacing:.1em;color:var(--faint);margin-top:5px;font-weight:600}
+</style></head><body>
+<div class="poster" id="poster">
+  <div class="p-brow"><span class="lg">WING<i></i></span><span class="r"></span><span class="t">歯科衛生士 2.0</span></div>
+  <h1 class="p-season">SEASON<em>01</em></h1>
+  <div class="p-sline"><b>12 SESSIONS ＋ 1 EXPEDITION</b><span>2027.1 — 2028.1</span></div>
+  <div class="pact"><span class="actno">ACT I</span><span class="acttitle">足元を疑う</span><span class="actrule"></span></div><div class="prows"><div class="prow"><span class="rn">01</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca1"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga1" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#F0E6DB"/><stop offset="1" stop-color="#D2A48F"/></linearGradient></defs><g clip-path="url(#ca1)"><rect width="80" height="80" fill="url(#ga1)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#F4EFE6"/><path d="M33 40h14v16H33z" fill="#F8ECE1"/><g fill="#1D2B49"><path d="M19 28h9v26h-9zM52 28h9v26h-9z"/><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F8ECE1"/><g fill="#1D2B49"></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">OHI &amp; TBI</span><span class="ren">ORAL HYGIENE INSTRUCTION</span></div><div class="rr"><span class="rm">2027.1</span><span class="ph"></span><span class="st st-free">無料公開</span></div></div><div class="prow"><span class="rn">02</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca2"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga2" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#F4E5D7"/><stop offset="1" stop-color="#DEB4A0"/></linearGradient></defs><g clip-path="url(#ca2)"><rect width="80" height="80" fill="url(#ga2)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#F7F3EC"/><path d="M33 40h14v16H33z" fill="#F1DAC7"/><g fill="#121C32"><path d="M17 26h10v42H17zM53 26h10v42H53z"/><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F1DAC7"/><g fill="#121C32"></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">歯周病</span><span class="ren">PERIODONTOLOGY</span></div><div class="rr"><span class="rm">2027.2</span><span class="ph"></span><span class="st st-soon">COMING SOON</span></div></div><div class="prow"><span class="rn">03</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca3"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga3" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#EEDCCD"/><stop offset="1" stop-color="#D5A692"/></linearGradient></defs><g clip-path="url(#ca3)"><rect width="80" height="80" fill="url(#ga3)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#F2ECE2"/><path d="M33 40h14v16H33z" fill="#F7E8DA"/><g fill="#1A2742"><path d="M55 24c9 2 14 9 14 18s-5 15-13 18l-5-9c5-2 8-5 8-9s-3-7-8-8z"/><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F7E8DA"/><g fill="#1A2742"></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">ドクター</span><span class="ren">THE DENTIST’S VIEW</span></div><div class="rr"><span class="rm">2027.3</span><span class="ph"></span><span class="st st-soon">COMING SOON</span></div></div></div><div class="pact"><span class="actno">ACT II</span><span class="acttitle">世界を見る</span><span class="actrule"></span></div><div class="prows"><div class="prow"><span class="rn">04</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca4"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga4" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#F2E2D5"/><stop offset="1" stop-color="#D9AC97"/></linearGradient></defs><g clip-path="url(#ca4)"><rect width="80" height="80" fill="url(#ga4)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#FAF6F0"/><path d="M33 40h14v16H33z" fill="#F3DECD"/><g fill="#16223C"><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F3DECD"/><g fill="#16223C"><circle cx="40" cy="11" r="9.5"/></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">スウェーデン</span><span class="ren">SWEDEN</span></div><div class="rr"><span class="rm">2027.4</span><span class="ph"></span><span class="st st-soon">COMING SOON</span></div></div><div class="prow"><span class="rn">05</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca5"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga5" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#F0E6DB"/><stop offset="1" stop-color="#D2A48F"/></linearGradient></defs><g clip-path="url(#ca5)"><rect width="80" height="80" fill="url(#ga5)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#F4EFE6"/><path d="M33 40h14v16H33z" fill="#F8ECE1"/><g fill="#1D2B49"><path d="M17 26c-2 14 0 25 5 33l9-4c-4-7-5-17-4-28zM63 26c2 14 0 25-5 33l-9-4c4-7 5-17 4-28z"/><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F8ECE1"/><g fill="#1D2B49"></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">オランダ</span><span class="ren">NETHERLANDS</span></div><div class="rr"><span class="rm">2027.5</span><span class="ph"></span><span class="st st-soon">COMING SOON</span></div></div><div class="prow"><span class="rn">06</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca6"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga6" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#F4E5D7"/><stop offset="1" stop-color="#DEB4A0"/></linearGradient></defs><g clip-path="url(#ca6)"><rect width="80" height="80" fill="url(#ga6)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#F7F3EC"/><path d="M33 40h14v16H33z" fill="#F1DAC7"/><g fill="#121C32"><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F1DAC7"/><g fill="#121C32"></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">フランス</span><span class="ren">FRANCE</span></div><div class="rr"><span class="rm">2027.7</span><span class="ph"></span><span class="st st-ok">GUEST 決定</span></div></div></div><div class="pexp"><span class="exp-k">★ EXPEDITION</span><div class="pexp-b"><span class="pexp-t">SCANDINAVIAN<br>APPROACH</span><span class="pexp-d">2027<i>.</i>6</span></div><span class="pexp-s">予防歯科の本場スウェーデンで学ぶ、現地研修プログラム／第1期・少人数制</span></div><div class="pact"><span class="actno">ACT III</span><span class="acttitle">領域を広げる</span><span class="actrule"></span></div><div class="prows"><div class="prow"><span class="rn">07</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca7"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga7" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#EEDCCD"/><stop offset="1" stop-color="#D5A692"/></linearGradient></defs><g clip-path="url(#ca7)"><rect width="80" height="80" fill="url(#ga7)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#F2ECE2"/><path d="M33 40h14v16H33z" fill="#F7E8DA"/><g fill="#1A2742"><path d="M19 28h9v26h-9zM52 28h9v26h-9z"/><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F7E8DA"/><g fill="#1A2742"></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">矯正</span><span class="ren">ORTHODONTICS</span></div><div class="rr"><span class="rm">2027.8</span><span class="ph"></span><span class="st st-soon">COMING SOON</span></div></div><div class="prow"><span class="rn">08</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca8"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga8" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#F2E2D5"/><stop offset="1" stop-color="#D9AC97"/></linearGradient></defs><g clip-path="url(#ca8)"><rect width="80" height="80" fill="url(#ga8)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#FAF6F0"/><path d="M33 40h14v16H33z" fill="#F3DECD"/><g fill="#16223C"><path d="M17 26h10v42H17zM53 26h10v42H53z"/><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F3DECD"/><g fill="#16223C"></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">小児</span><span class="ren">PEDIATRIC DENTISTRY</span></div><div class="rr"><span class="rm">2027.9</span><span class="ph"></span><span class="st st-soon">COMING SOON</span></div></div><div class="prow"><span class="rn">09</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca9"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga9" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#F0E6DB"/><stop offset="1" stop-color="#D2A48F"/></linearGradient></defs><g clip-path="url(#ca9)"><rect width="80" height="80" fill="url(#ga9)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#F4EFE6"/><path d="M33 40h14v16H33z" fill="#F8ECE1"/><g fill="#1D2B49"><path d="M55 24c9 2 14 9 14 18s-5 15-13 18l-5-9c5-2 8-5 8-9s-3-7-8-8z"/><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F8ECE1"/><g fill="#1D2B49"></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">インプラント／外科</span><span class="ren">IMPLANT &amp; SURGERY</span></div><div class="rr"><span class="rm">2027.10</span><span class="ph"></span><span class="st st-soon">COMING SOON</span></div></div></div><div class="pact"><span class="actno">ACT IV</span><span class="acttitle">出口を見る</span><span class="actrule"></span></div><div class="prows"><div class="prow"><span class="rn">10</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca10"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga10" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#F4E5D7"/><stop offset="1" stop-color="#DEB4A0"/></linearGradient></defs><g clip-path="url(#ca10)"><rect width="80" height="80" fill="url(#ga10)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#F7F3EC"/><path d="M33 40h14v16H33z" fill="#F1DAC7"/><g fill="#121C32"><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F1DAC7"/><g fill="#121C32"><circle cx="40" cy="11" r="9.5"/></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">アメリカ</span><span class="ren">UNITED STATES</span></div><div class="rr"><span class="rm">2027.11</span><span class="ph"></span><span class="st st-ok">GUEST 決定</span></div></div><div class="prow"><span class="rn">11</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca11"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga11" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#EEDCCD"/><stop offset="1" stop-color="#D5A692"/></linearGradient></defs><g clip-path="url(#ca11)"><rect width="80" height="80" fill="url(#ga11)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#F2ECE2"/><path d="M33 40h14v16H33z" fill="#F7E8DA"/><g fill="#1A2742"><path d="M17 26c-2 14 0 25 5 33l9-4c-4-7-5-17-4-28zM63 26c2 14 0 25-5 33l-9-4c4-7 5-17 4-28z"/><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F7E8DA"/><g fill="#1A2742"></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">企業</span><span class="ren">INDUSTRY</span></div><div class="rr"><span class="rm">2027.12</span><span class="ph"></span><span class="st st-soon">COMING SOON</span></div></div><div class="prow"><span class="rn">12</span><span class="ph"><svg class="avs" viewBox="0 0 80 80" aria-hidden="true"><defs><clipPath id="ca12"><circle cx="40" cy="40" r="40"/></clipPath><linearGradient id="ga12" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="#F2E2D5"/><stop offset="1" stop-color="#D9AC97"/></linearGradient></defs><g clip-path="url(#ca12)"><rect width="80" height="80" fill="url(#ga12)"/><path d="M4 80c0-19 16-29 36-29s36 10 36 29z" fill="#FAF6F0"/><path d="M33 40h14v16H33z" fill="#F3DECD"/><g fill="#16223C"><ellipse cx="40" cy="30" rx="17.5" ry="19.5"/></g><ellipse cx="40" cy="36" rx="14.5" ry="16" fill="#F3DECD"/><g fill="#16223C"></g></g><circle cx="40" cy="40" r="39" fill="none" stroke="rgba(242,239,233,.3)" stroke-width="2"/></svg></span><div class="rmain"><span class="rjp">SNS・発信</span><span class="ren">MEDIA &amp; VOICE</span></div><div class="rr"><span class="rm">2028.1</span><span class="ph"></span><span class="st st-soon">COMING SOON</span></div></div></div>
+  <div class="p-foot">
+    <div class="l"><b>第1期メンバー 100名限定</b><span>毎月1回・90分｜講義 → 対談 → ワーク</span></div>
+    <div class="r">@wing_dh<small>詳細は LINE にて先行案内</small></div>
+  </div>
+</div></body></html>
