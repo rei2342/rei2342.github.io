@@ -1,16 +1,16 @@
-# GA4 アクセス 2026-11-25
+# GA4 アクセス 2026-11-26
 
 プロパティ 548880365 / 直近14日（当日を含む・当日分は確定前）
 
-- セッション **29** / ユーザー **28** / ページビュー **28**
+- セッション **30** / ユーザー **29** / ページビュー **29**
 
 ## 流入元
 
 | 参照元 | メディア | セッション | ユーザー |
 |---|---|---|---|
-| (direct) | (none) | 17 | 17 |
+| (direct) | (none) | 19 | 19 |
 | google | organic | 7 | 6 |
-| bing | organic | 3 | 3 |
+| bing | organic | 2 | 2 |
 | (not set) | (not set) | 1 | 1 |
 | duckduckgo | organic | 1 | 1 |
 
@@ -18,7 +18,7 @@
 
 | 着地ページ | 参照元 | セッション |
 |---|---|---|
-| / | (direct) | 3 |
+| / | (direct) | 4 |
 | /present-core-image/ | google | 3 |
 | /take-core-image/ | (direct) | 2 |
 | /take-core-image/ | google | 2 |
@@ -31,7 +31,7 @@
 | /core-image-english-words/ | bing | 1 |
 | /core-image-english-words/ | duckduckgo | 1 |
 | /core-image-english-words/ | google | 1 |
-| /get-core-image/ | bing | 1 |
+| /english-conversation-daily-effectiveness/ | (direct) | 1 |
 | /philippines-english-study-after-return/ | (direct) | 1 |
 | /philippines-study-abroad-adult-costs/ | (direct) | 1 |
 | /present-core-image/ | bing | 1 |
@@ -52,15 +52,15 @@
 
 | PV | セッション | 平均滞在 | ページ |
 |---|---|---|---|
+| 4 | 4 | 0.0分 | / |
 | 4 | 4 | 0.7分 | /core-image-english-words/ |
 | 4 | 4 | 1.4分 | /present-core-image/ |
 | 4 | 4 | 0.0分 | /take-core-image/ |
-| 3 | 3 | 0.0分 | / |
 | 1 | 1 | 0.0分 | /canada-working-holiday-cost/ |
 | 1 | 1 | 0.0分 | /category/英会話サービス比較/ |
 | 1 | 1 | 0.0分 | /cebu-1month-review/ |
 | 1 | 1 | 0.0分 | /cebu-beginner-mistakes-design/ |
-| 1 | 1 | 0.1分 | /get-core-image/ |
+| 1 | 1 | 0.0分 | /english-conversation-daily-effectiveness/ |
 | 1 | 1 | 0.0分 | /philippines-english-study-after-return/ |
 | 1 | 1 | 0.0分 | /philippines-study-abroad-adult-costs/ |
 | 1 | 1 | 0.0分 | /put-core-image/ |
