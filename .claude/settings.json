@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Google_Slides__read_presentation",
+      "mcp__Google_Slides__read_slide_page",
+      "mcp__Google_Slides__read_slide_page_thumbnail",
+      "mcp__Google_Slides__update_presentation",
+      "mcp__Google_Drive__download_file_content",
+      "mcp__Google_Drive__read_file_content",
+      "mcp__Google_Drive__get_file_metadata",
+      "mcp__Google_Drive__search_files"
+    ]
+  }
+}
