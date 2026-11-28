@@ -1,4 +1,4 @@
-# 日次パトロール 2026-11-27
+# 日次パトロール 2026-11-28
 
 直近14日
 
@@ -8,24 +8,23 @@
 
 ## ② 記事に着地した数（GA4 / プロパティ548880365）
 
-- 全流入 **31** セッション / うちSNS由来 **0**
+- 全流入 **30** セッション / うちSNS由来 **0**
 
 SNS由来の着地は0件。
 
-2026-11-13 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
+2026-11-14 以降の投稿がまだ無いので、遷移率は次の投稿から出る。
 
 ### 着地ページ 上位
 
 | 着地ページ | セッション |
 |---|---|
 | /core-image-english-words/ | 4 |
-| /present-core-image/ | 4 |
 | /take-core-image/ | 4 |
 | / | 3 |
+| /present-core-image/ | 3 |
 | (not set) | 1 |
 | /canada-working-holiday-cost/ | 1 |
 | /category/英会話サービス比較/ | 1 |
-| /cebu-1month-review/ | 1 |
 | /cebu-beginner-mistakes-design/ | 1 |
 | /english-conversation-daily-effectiveness/ | 1 |
 | /english-meeting-transcription-checklist/ | 1 |
@@ -35,9 +34,10 @@ SNS由来の着地は0件。
 | /put-core-image/ | 1 |
 | /put-on-core-image/ | 1 |
 | /set-core-image/ | 1 |
-| /take-off-core-image/ | 1 |
+| /spring-core-image/ | 1 |
 | /working-holiday-age-30/ | 1 |
 | /working-holiday-english-anxiety/ | 1 |
+| /お問い合わせ/ | 1 |
 
 ## ③ アフィリエイトリンクのクリック
 
